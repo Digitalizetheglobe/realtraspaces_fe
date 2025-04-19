@@ -113,7 +113,7 @@ const BlogPage = () => {
 
   if (error) {
     return (
-      <div className="p-8 mt-10">
+      <div className="p-8 mt-15">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Blog Posts</h1>
           <Link href="/blog/create">
