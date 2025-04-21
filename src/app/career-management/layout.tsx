@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-const BlogLayout = ({
+const CareerManagementLayout = ({
   children,
 }: {
   children: React.ReactNode;
@@ -20,7 +20,7 @@ const BlogLayout = ({
   ];
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 mt-10">
       {/* Sidebar */}
       <div
         className={`${
@@ -59,4 +59,4 @@ const BlogLayout = ({
   );
 };
 
-export default BlogLayout; 
+export default CareerManagementLayout; 

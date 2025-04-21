@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 interface BlogFormData {
   blogTitle: string;
   blogDescription: string;
+  blogContent: string;
   blogImage: string;
   writer: string;
   category: string;
@@ -18,6 +19,7 @@ const CreateBlogPage = () => {
   const [formData, setFormData] = useState<BlogFormData>({
     blogTitle: '',
     blogDescription: '',
+    blogContent: '',
     blogImage: '',
     writer: '',
     category: '',
@@ -107,7 +109,24 @@ const CreateBlogPage = () => {
                     value={formData.blogDescription}
                     onChange={handleChange}
                     required
-                    rows={6}
+                    rows={3}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
+                    placeholder="Write a brief description of your blog..."
+                  />
+                </div>
+
+                {/* Blog Content */}
+                <div>
+                  <label htmlFor="blogContent" className="block text-sm font-medium text-gray-700 mb-1">
+                    Blog Content
+                  </label>
+                  <textarea
+                    id="blogContent"
+                    name="blogContent"
+                    value={formData.blogContent}
+                    onChange={handleChange}
+                    required
+                    rows={10}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
                     placeholder="Write your blog content here..."
                   />

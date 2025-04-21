@@ -116,10 +116,8 @@ const BlogPage = () => {
       <div className="p-8 mt-15">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Blog Posts</h1>
-          <Link href="/blog/create">
-            <a className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-              Create New Blog
-            </a>
+          <Link href="/blog/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            Create New Blog
           </Link>
         </div>
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -134,10 +132,7 @@ const BlogPage = () => {
       <div className="p-8 mt-10">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Blog Posts</h1>
-          <Link
-            href="/blog/create"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
+          <Link href="/blog/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
             Create New Blog
           </Link>
         </div>
@@ -154,10 +149,7 @@ const BlogPage = () => {
     <div className="p-8 mt-10">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Blog Posts</h1>
-        <Link
-          href="/blog/create"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
+        <Link href="/blog/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
           Create New Blog
         </Link>
       </div>
