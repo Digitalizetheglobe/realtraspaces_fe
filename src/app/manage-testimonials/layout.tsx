@@ -1,16 +1,20 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
+import { useState } from 'react';
+import Link from 'next/link';
 
-const BlogLayout = ({ children }: { children: React.ReactNode }) => {
+const ManageTestimonialsLayout = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const modules = [
-    { name: "Dashboard", icon: "📊", href: "/dashboard" },
-    { name: "Career Management", icon: "💼", href: "/career-management" },
-    { name: "Blog", icon: "📝", href: "/blog", active: true },
-    { name: "Manage Testimonials", icon: "⭐", href: "/manage-testimonials" },
+    { name: 'Dashboard', icon: '📊', href: '/dashboard' },
+    { name: 'Career Management', icon: '💼', href: '/career-management' },
+    { name: 'Blog', icon: '📝', href: '/blog' },
+    { name: 'Manage Testimonials', icon: '⭐', href: '/manage-testimonials', active: true },
   ];
 
   return (
@@ -18,55 +22,30 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
       {/* Sidebar */}
       <aside
         className={`${
-          isSidebarOpen ? "w-70" : "w-30"
+           isSidebarOpen ? "w-70" : "w-30"
         } bg-white shadow-xl transition-all duration-300 ease-in-out flex flex-col border-r border-gray-200`}
       >
         {/* Sidebar Header */}
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
           {isSidebarOpen ? (
-            <h2 className="text-sm font-bold text-indigo-600">
-              {" "}
-              Realtraspaces Dashboard
-            </h2>
+            <h4 className="text-sm font-bold text-indigo-600"> Realtraspaces Dashboard</h4>
           ) : (
             <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
-              <span className="text-indigo-600">RD</span>
+              <span className="text-indigo-600">R D</span>
             </div>
           )}
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
             className="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-            aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            aria-label={isSidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
           >
             {isSidebarOpen ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 text-gray-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             )}
           </button>
@@ -81,12 +60,14 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
                   href={module.href}
                   className={`flex items-center px-4 py-3 rounded-lg mx-2 transition-all duration-200 ${
                     module.active
-                      ? "bg-indigo-50 text-indigo-700 font-medium"
-                      : "text-gray-600 hover:bg-gray-100"
+                      ? 'bg-indigo-50 text-indigo-700 font-medium'
+                      : 'text-gray-600 hover:bg-gray-100'
                   }`}
                 >
                   <span className="text-xl w-6 text-center">{module.icon}</span>
-                  {isSidebarOpen && <span className="ml-3">{module.name}</span>}
+                  {isSidebarOpen && (
+                    <span className="ml-3">{module.name}</span>
+                  )}
                   {module.active && isSidebarOpen && (
                     <span className="ml-auto w-2 h-2 rounded-full bg-indigo-500"></span>
                   )}
@@ -129,11 +110,13 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
           </div> */}
 
           {/* Page Content */}
-          <div className="bg-white rounded-xl shadow-sm p-6">{children}</div>
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            {children}
+          </div>
         </div>
       </main>
     </div>
   );
 };
 
-export default BlogLayout;
+export default ManageTestimonialsLayout;
