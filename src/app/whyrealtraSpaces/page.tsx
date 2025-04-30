@@ -26,7 +26,7 @@ export default function WhyrealtraSpaces() {
                             <div className="p-8">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    fill="#007bff"
+                                    fill="#000"
                                     className="w-8 mb-6"
                                     viewBox="0 0 32 32"
                                 >
@@ -51,7 +51,7 @@ export default function WhyrealtraSpaces() {
                             <div className="p-8">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    fill="#007bff"
+                                    fill="#000"
                                     className="w-8 mb-6"
                                     viewBox="0 0 682.667 682.667"
                                 >
@@ -62,7 +62,7 @@ export default function WhyrealtraSpaces() {
                                     </defs>
                                     <g
                                         fill="none"
-                                        stroke="#007bff"
+                                        stroke="#000"
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                         strokeMiterlimit={10}
@@ -92,7 +92,7 @@ export default function WhyrealtraSpaces() {
                             <div className="p-8">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    fill="#007bff"
+                                    fill="#000"
                                     className="w-8 mb-6"
                                     viewBox="0 0 24 24"
                                 >
@@ -123,7 +123,7 @@ export default function WhyrealtraSpaces() {
                             <div className="p-8">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    fill="#007bff"
+                                    fill="#000"
                                     className="w-8 mb-6"
                                     viewBox="0 0 512.001 512.001"
                                 >
@@ -142,7 +142,7 @@ export default function WhyrealtraSpaces() {
                             <div className="p-8">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    fill="#007bff"
+                                    fill="#000"
                                     className="w-8 mb-6"
                                     viewBox="0 0 504.69 504.69"
                                 >
@@ -187,7 +187,7 @@ export default function WhyrealtraSpaces() {
                             <div className="p-8">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    fill="#007bff"
+                                    fill="#000"
                                     className="w-8 mb-6"
                                     viewBox="0 0 682.667 682.667"
                                 >
@@ -198,7 +198,7 @@ export default function WhyrealtraSpaces() {
                                     </defs>
                                     <g
                                         fill="none"
-                                        stroke="#007bff"
+                                        stroke="#000"
                                         strokeMiterlimit={10}
                                         strokeWidth={30}
                                         clipPath="url(#a)"

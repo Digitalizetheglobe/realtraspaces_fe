@@ -14,7 +14,6 @@ const TopDevelopers = () => {
   ];
 
   return (
-
     <>
     <section className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
       <div className="max-w-5xl mx-auto">
