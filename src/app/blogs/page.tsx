@@ -45,11 +45,11 @@ const Blogs = () => {
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   Waterfront Luxury Villas: The Ultimate Investment
                 </h3>
-                <p className="text-gray-600 mb-4">
+                {/* <p className="text-gray-600 mb-4">
                   Explore the exclusive world of waterfront properties and why
                   they continue to be one of the most secure real estate
                   investments in 2024.
-                </p>
+                </p> */}
               </div>
             </div>
 
@@ -80,11 +80,11 @@ const Blogs = () => {
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   Waterfront Luxury Villas: The Ultimate Investment
                 </h3>
-                <p className="text-gray-600 mb-4">
+                {/* <p className="text-gray-600 mb-4">
                   Explore the exclusive world of waterfront properties and why
                   they continue to be one of the most secure real estate
                   investments in 2024.
-                </p>
+                </p> */}
               </div>
             </div>
 
@@ -115,11 +115,11 @@ const Blogs = () => {
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">
                   Waterfront Luxury Villas: The Ultimate Investment
                 </h3>
-                <p className="text-gray-600 mb-4">
+                {/* <p className="text-gray-600 mb-4">
                   Explore the exclusive world of waterfront properties and why
                   they continue to be one of the most secure real estate
                   investments in 2024.
-                </p>
+                </p> */}
               </div>
             </div>
           </div>
@@ -248,7 +248,7 @@ const Blogs = () => {
       {/* CTA */}
       <div className="relative bg-white p-8 overflow-hidden">
         {/* Background Image */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-10 z-0">
           <Image
             src={ctabg}
             alt="Modern Home Interior"

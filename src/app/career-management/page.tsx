@@ -95,11 +95,11 @@ const CareerManagementPage = () => {
 
   return (
     <>
-      <div className="flex justify-between items-center mb-8 mt-10 ml-5">
+      <div className="flex justify-between items-center ml-5 p-8">
         <h1 className="text-3xl font-bold text-gray-900">Career Management</h1>
         <Link
           href="/career-management/create"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          className="bg-black text-white px-4 py-2 rounded-lg hover:bg-transparent hover:text-black border border-black transition-colors"
         >
           Create New Job
         </Link>

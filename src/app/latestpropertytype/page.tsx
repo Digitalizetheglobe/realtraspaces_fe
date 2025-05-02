@@ -39,7 +39,7 @@ export default function PropertyCards() {
                                         />
                                         <div className="absolute bottom-4 left-0 right-0 px-4 flex justify-between">
                                             <span className="text-sm text-black bg-white bg-opacity-70 rounded-full px-3 py-1">
-                                                Apartment
+                                                Office Space 
                                             </span>
                                             <span className="text-sm text-black bg-white bg-opacity-70 rounded-full px-3 py-1">
                                                 Wakad
@@ -51,7 +51,7 @@ export default function PropertyCards() {
                                     <div className="flex-1">
                                         <div className="flex justify-between items-start mb-1">
                                             <h3 className="text-xl font-bold text-gray-800">
-                                                Apartments Auckland
+                                            Prime Business Hub
                                             </h3>
                                             <button className="ml-2">
                                                 <Image
@@ -64,7 +64,7 @@ export default function PropertyCards() {
                                             </button>
                                         </div>
 
-                                        <p className="text-lg font-bold text-gray-500 mb-3">
+                                        <p className="text-lg text-gray-500 mb-3">
                                             ₹ 4.53 Cr
                                         </p>
 
@@ -129,10 +129,10 @@ export default function PropertyCards() {
                                         />
                                         <div className="absolute bottom-4 left-0 right-0 px-4 flex justify-between">
                                             <span className="text-sm text-black bg-white bg-opacity-70 rounded-full px-3 py-1">
-                                                Villa
+                                                Showroom
                                             </span>
                                             <span className="text-sm text-black bg-white bg-opacity-70 rounded-full px-3 py-1">
-                                                Baner
+                                                Wakad
                                             </span>
                                         </div>
                                     </div>
@@ -141,7 +141,7 @@ export default function PropertyCards() {
                                     <div className="flex-1">
                                         <div className="flex justify-between items-start mb-1">
                                             <h3 className="text-xl font-bold text-gray-800">
-                                                Luxury Villa
+                                            The Trade Tower
                                             </h3>
                                             <button className="ml-2">
                                                 <Image
@@ -154,7 +154,7 @@ export default function PropertyCards() {
                                             </button>
                                         </div>
 
-                                        <p className="text-lg font-bold text-gray-500 mb-3">
+                                        <p className="text-lg text-gray-500 mb-3">
                                             ₹ 6.75 Cr
                                         </p>
 
@@ -219,10 +219,10 @@ export default function PropertyCards() {
                                         />
                                         <div className="absolute bottom-4 left-0 right-0 px-4 flex justify-between">
                                             <span className="text-sm text-black bg-white bg-opacity-70 rounded-full px-3 py-1">
-                                                Penthouse
+                                                Warehouse
                                             </span>
                                             <span className="text-sm text-black bg-white bg-opacity-70 rounded-full px-3 py-1">
-                                                Hinjewadi
+                                                Wakad
                                             </span>
                                         </div>
                                     </div>
@@ -231,7 +231,7 @@ export default function PropertyCards() {
                                     <div className="flex-1">
                                         <div className="flex justify-between items-start mb-1">
                                             <h3 className="text-xl font-bold text-gray-800">
-                                                Modern Penthouse
+                                            Corporate Heights
                                             </h3>
                                             <button className="ml-2">
                                                 <Image
@@ -244,7 +244,7 @@ export default function PropertyCards() {
                                             </button>
                                         </div>
 
-                                        <p className="text-lg font-bold text-gray-500 mb-3">
+                                        <p className="text-lg text-gray-500 mb-3">
                                             ₹ 5.25 Cr
                                         </p>
 

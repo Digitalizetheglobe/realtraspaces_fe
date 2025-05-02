@@ -22,7 +22,7 @@ export default function WhyrealtraSpaces() {
                         </p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-md:max-w-md mx-auto">
-                        <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                        <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all border border-gray-300">
                             <div className="p-8">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -47,7 +47,7 @@ export default function WhyrealtraSpaces() {
                                 </p>
                             </div>
                         </div>
-                        <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                        <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all border border-gray-300">
                             <div className="p-8">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -88,7 +88,7 @@ export default function WhyrealtraSpaces() {
                                 </p>
                             </div>
                         </div>
-                        <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                        <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all border border-gray-300">
                             <div className="p-8">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -119,7 +119,7 @@ export default function WhyrealtraSpaces() {
                                 </p>
                             </div>
                         </div>
-                        <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                        <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all border border-gray-300">
                             <div className="p-8">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -138,7 +138,7 @@ export default function WhyrealtraSpaces() {
                                 </p>
                             </div>
                         </div>
-                        <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                        <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all border border-gray-300">
                             <div className="p-8">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -183,7 +183,7 @@ export default function WhyrealtraSpaces() {
                                 </p>
                             </div>
                         </div>
-                        <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all">
+                        <div className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all border border-gray-300">
                             <div className="p-8">
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"

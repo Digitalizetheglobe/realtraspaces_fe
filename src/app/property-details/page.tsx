@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
 import Image from "next/image";
@@ -11,7 +11,7 @@ import propertydetails4 from "../../../public/assets/images/property-details4.pn
 import sqft from "../../../public/assets/images/sqft.png";
 import homeimproment from "../../../public/assets/images/home-improvement1.png";
 import propertyvideo from "../../../public/assets/images/property-video.png";
-import parking from '../../../public/assets/images/parking.png'
+import parking from "../../../public/assets/images/parking.png";
 import latestpropertytype from "../../../public/assets/images/latestpropertytype.svg";
 import next from "../../../public/assets/images/next.png";
 import previous from "../../../public/assets/images/previous.png";
@@ -58,49 +58,60 @@ export default function Home() {
             />
           </div>
 
-          <div className="absolute inset-0 flex items-center justify-center z-10">
+          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 text-center space-y-4">
             <h1 className="text-white text-4xl font-bold">Properties</h1>
-            {/* <p className="text-white text-lg">Home {">"} Properties</p> */}
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center z-10">
-            {/* <p className="text-white text-lg">Home {">"} Properties</p> */}
+            {/* Breadcrumb */}
+            <nav aria-label="breadcrumb">
+              <ol className="text-white text-lg flex space-x-2">
+                <li>
+                  <a href="/" className="">
+                    Home
+                  </a>
+                </li>
+                <li>{">"}</li>
+                <li className="">Properties</li>
+              </ol>
+            </nav>
           </div>
         </section>
 
         <div className="max-w-5xl items-center justify-center mx-auto py-12">
-        <div className="">
-        <Image
-          src={propertydetails}
-          alt="property"
-          className="items-center justify-center mx-auto"
-        />
-      </div>
+          <div className="">
+            <Image
+              src={propertydetails}
+              alt="property"
+              className="items-center justify-center mx-auto"
+            />
+          </div>
 
-      {/* Thumbnails with slider buttons */}
-      <div className="flex max-w-5xl items-center justify-center mx-auto py-12 gap-4">
-      <Image
-  src={previous}
-  alt="Previous"
-  onClick={handlePrev}
-  className={`w-8 h-8 cursor-pointer ${startIndex === 0 ? 'opacity-50 pointer-events-none' : ''}`}
-/>
+          {/* Thumbnails with slider buttons */}
+          <div className="flex max-w-5xl items-center justify-center mx-auto py-12 gap-4">
+            <Image
+              src={previous}
+              alt="Previous"
+              onClick={handlePrev}
+              className={`w-8 h-8 cursor-pointer ${
+                startIndex === 0 ? "opacity-50 pointer-events-none" : ""
+              }`}
+            />
 
-        {visibleImages.map((img, index) => (
-          <Image
-            key={index}
-            src={img}
-            alt={`property-${index}`}
-            className="w-60 h-42"
-          />
-        ))}
-      <Image
-  src={next}
-  alt="next"
-  onClick={handlePrev}
-  className={`w-8 h-8 cursor-pointer ${startIndex === 0 ? 'opacity-50 pointer-events-none' : ''}`}
-/>
-
-      </div>
+            {visibleImages.map((img, index) => (
+              <Image
+                key={index}
+                src={img}
+                alt={`property-${index}`}
+                className="w-60 h-42"
+              />
+            ))}
+            <Image
+              src={next}
+              alt="next"
+              onClick={handlePrev}
+              className={`w-8 h-8 cursor-pointer ${
+                startIndex === 0 ? "opacity-50 pointer-events-none" : ""
+              }`}
+            />
+          </div>
 
           <div className="max-w-5xl mx-auto items-center justify-center">
             <div>
@@ -117,21 +128,23 @@ export default function Home() {
                 high-speed elevators, and sustainable infrastructure.
               </p>
             </div>
-            <div className="mt-12 ">
+
+            <div className="mt-12">
               <h1 className="text-black text-xl font-semibold">
                 Property Overview
               </h1>
               <div className="bg-gray-100 rounded-lg px-8 py-8 mt-6">
-                <div className="flex items-center justify-between mb-4 ">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  {/* 1 - ID NO. */}
                   <div className="flex items-center space-x-2">
                     <Image
                       src={sqft}
-                      alt="Area"
+                      alt="ID"
                       width={30}
                       height={30}
                       className="opacity-70"
                     />
-                    <div className="flex flex-col ">
+                    <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-600">
                         ID NO.
                       </span>
@@ -141,15 +154,16 @@ export default function Home() {
                     </div>
                   </div>
 
+                  {/* 2 - Category */}
                   <div className="flex items-center space-x-2">
                     <Image
                       src={homeimproment}
-                      alt="floor"
+                      alt="Category"
                       width={30}
                       height={30}
                       className="opacity-70"
                     />
-                    <div className="flex flex-col ">
+                    <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-600">
                         Category
                       </span>
@@ -159,15 +173,16 @@ export default function Home() {
                     </div>
                   </div>
 
+                  {/* 3 - Size */}
                   <div className="flex items-center space-x-2">
                     <Image
                       src={sqft}
-                      alt="parking"
+                      alt="Size"
                       width={30}
                       height={30}
                       className="opacity-70"
                     />
-                    <div className="flex flex-col ">
+                    <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-600">
                         Size
                       </span>
@@ -177,15 +192,16 @@ export default function Home() {
                     </div>
                   </div>
 
+                  {/* 4 - Bath */}
                   <div className="flex items-center space-x-2">
                     <Image
                       src={sqft}
-                      alt="parking"
+                      alt="Bath"
                       width={30}
                       height={30}
                       className="opacity-70"
                     />
-                    <div className="flex flex-col ">
+                    <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-600">
                         Bath
                       </span>
@@ -194,17 +210,17 @@ export default function Home() {
                       </span>
                     </div>
                   </div>
-                </div>
-                <div className="flex items-center justify-between ">
+
+                  {/* 5 - Price */}
                   <div className="flex items-center space-x-2">
                     <Image
                       src={sqft}
-                      alt="Area"
+                      alt="Price"
                       width={30}
                       height={30}
                       className="opacity-70"
                     />
-                    <div className="flex flex-col ">
+                    <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-600">
                         Price
                       </span>
@@ -214,15 +230,16 @@ export default function Home() {
                     </div>
                   </div>
 
+                  {/* 6 - Type */}
                   <div className="flex items-center space-x-2">
                     <Image
                       src={homeimproment}
-                      alt="floor"
+                      alt="Type"
                       width={30}
                       height={30}
                       className="opacity-70"
                     />
-                    <div className="flex flex-col ">
+                    <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-600">
                         Type
                       </span>
@@ -232,15 +249,16 @@ export default function Home() {
                     </div>
                   </div>
 
+                  {/* 7 - Furnished */}
                   <div className="flex items-center space-x-2">
                     <Image
                       src={sqft}
-                      alt="parking"
+                      alt="Furnished"
                       width={30}
                       height={30}
                       className="opacity-70"
                     />
-                    <div className="flex flex-col ">
+                    <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-600">
                         Furnished
                       </span>
@@ -250,17 +268,18 @@ export default function Home() {
                     </div>
                   </div>
 
+                  {/* 8 - Parking */}
                   <div className="flex items-center space-x-2">
                     <Image
                       src={sqft}
-                      alt="parking"
+                      alt="Parking"
                       width={30}
                       height={30}
                       className="opacity-70"
                     />
-                    <div className="flex flex-col ">
+                    <div className="flex flex-col">
                       <span className="text-sm font-medium text-gray-600">
-                        parking
+                        Parking
                       </span>
                       <span className="text-sm font-medium text-gray-600">
                         8 slots
@@ -398,329 +417,341 @@ export default function Home() {
 
         {/* more properties listing */}
         <div className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
-  <div className="mb-6 max-w-5xl mx-auto">
-    <h2 className="text-2xl sm:text-3xl font-bold text-black">
-      Explore More Listings             
-    </h2>
-  </div>
+          <div className="mb-6 max-w-5xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold text-black">
+              Explore More Listings
+            </h2>
+          </div>
 
-  <div className="space-y-6 max-w-5xl mx-auto">
-    {/* Property Card 1 */}
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="flex flex-col sm:flex-row">
-        {/* Image */}
-        <div className="w-full sm:w-1/3 p-2">
-          <Image
-            alt="Property"
-            src={latestpropertytype}
-            className="w-full h-56 object-cover rounded-2xl p-2"
-          />
+          <div className="space-y-6 max-w-5xl mx-auto">
+            {/* Property Card 1 */}
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="flex flex-col sm:flex-row">
+                {/* Image */}
+                <div className="w-full sm:w-1/3 p-2">
+                  <Image
+                    alt="Property"
+                    src={latestpropertytype}
+                    className="w-full h-56 object-cover rounded-2xl p-2"
+                  />
+                </div>
+
+                <div className="bg-gray-400 border-r border"></div>
+
+                {/* Content */}
+                <div className="w-full sm:w-2/3 p-4 px-8">
+                  {/* Property Tag */}
+                  <div className="mb-3">
+                    <span className="bg-[#6E6E73] text-white px-3 py-1 rounded-full text-sm">
+                      Property type
+                    </span>
+                  </div>
+
+                  {/* Title and Price */}
+                  <h3 className="font-semibold text-xl text-gray-900">
+                    Metrolla Plaza
+                  </h3>
+                  <h4 className="text-base text-gray-500 mb-4">₹ 4.53 Cr</h4>
+
+                  {/* Property Details */}
+                  <div className="flex space-x-12 border-t border-b border-gray-200 py-3 mb-3">
+                    <div className="flex items-center space-x-2">
+                      <Image src={sqft} alt="Bed" width={20} height={20} />
+                      <div className="flex flex-col">
+                        <span className="text-md text-gray-600">Sqft</span>
+                        <span className="text-sm font-medium text-gray-500">
+                          1520
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Image src={bath} alt="Bath" width={20} height={20} />
+                      <div className="flex flex-col">
+                        <span className="text-md text-gray-600">Fully </span>
+                        <span className="text-sm font-medium text-gray-500">
+                          Furnished
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src={homeimproment}
+                        alt="Area"
+                        width={20}
+                        height={20}
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-md text-gray-600">Ready to </span>
+                        <span className="text-sm font-medium text-gray-500">
+                          Move
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Image src={parking} alt="Area" width={20} height={20} />
+                      <div className="flex flex-col">
+                        <span className="text-md text-gray-600">
+                          2 Reserved
+                        </span>
+                        <span className="text-sm font-medium text-gray-500">
+                          Parking
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Location and Actions */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-1">
+                      <Image src={pin} alt="Location" width={20} height={20} />
+                      <span className="text-md text-gray-700">
+                        Sector 62, Noida
+                      </span>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <button className="p-1">
+                        <Image
+                          src={bookmark}
+                          alt="Bookmark"
+                          width={30}
+                          height={30}
+                        />
+                      </button>
+                      <a
+                        href="#"
+                        className="bg-black text-white px-5 py-1 text-md rounded"
+                      >
+                        Details
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Property Card 2 */}
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="flex flex-col sm:flex-row">
+                {/* Content */}
+                <div className="w-full sm:w-2/3 p-4 px-8">
+                  {/* Property Tag */}
+                  <div className="mb-3">
+                    <span className="bg-[#6E6E73] text-white px-3 py-1 rounded-full text-sm">
+                      Property type
+                    </span>
+                  </div>
+
+                  {/* Title and Price */}
+                  <h3 className="font-semibold text-xl text-gray-900">
+                    Metrolla Plaza
+                  </h3>
+                  <h4 className="text-base text-gray-500 mb-4">₹ 4.53 Cr</h4>
+
+                  {/* Property Details */}
+                  <div className="flex space-x-12 border-t border-b border-gray-200 py-3 mb-3">
+                    <div className="flex items-center space-x-2">
+                      <Image src={sqft} alt="Bed" width={20} height={20} />
+                      <div className="flex flex-col">
+                        <span className="text-md text-gray-600">Sqft</span>
+                        <span className="text-sm font-medium text-gray-500">
+                          1520
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Image src={bath} alt="Bath" width={20} height={20} />
+                      <div className="flex flex-col">
+                        <span className="text-md text-gray-600">Fully </span>
+                        <span className="text-sm font-medium text-gray-500">
+                          Furnished
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src={homeimproment}
+                        alt="Area"
+                        width={20}
+                        height={20}
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-md text-gray-600">Ready to </span>
+                        <span className="text-sm font-medium text-gray-500">
+                          Move
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Image src={parking} alt="Area" width={20} height={20} />
+                      <div className="flex flex-col">
+                        <span className="text-md text-gray-600">
+                          2 Reserved
+                        </span>
+                        <span className="text-sm font-medium text-gray-500">
+                          Parking
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Location and Actions */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-1">
+                      <Image src={pin} alt="Location" width={20} height={20} />
+                      <span className="text-md text-gray-700">
+                        Sector 62, Noida
+                      </span>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <button className="p-1">
+                        <Image
+                          src={bookmark}
+                          alt="Bookmark"
+                          width={30}
+                          height={30}
+                        />
+                      </button>
+                      <a
+                        href="#"
+                        className="bg-black text-white px-5 py-1 text-md rounded"
+                      >
+                        Details
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-400 border-r border"></div>
+
+                {/* Image */}
+                <div className="w-full sm:w-1/3 p-2">
+                  <Image
+                    alt="Property"
+                    src={latestpropertytype}
+                    className="w-full h-56 object-cover rounded-2xl p-2"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Property Card 3 */}
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <div className="flex flex-col sm:flex-row">
+                {/* Image */}
+                <div className="w-full sm:w-1/3 p-2">
+                  <Image
+                    alt="Property"
+                    src={latestpropertytype}
+                    className="w-full h-56 object-cover rounded-2xl p-2"
+                  />
+                </div>
+
+                <div className="bg-gray-400 border-r border"></div>
+
+                {/* Content */}
+                <div className="w-full sm:w-2/3 p-4 px-8">
+                  {/* Property Tag */}
+                  <div className="mb-3">
+                    <span className="bg-[#6E6E73] text-white px-3 py-1 rounded-full text-sm">
+                      Property type
+                    </span>
+                  </div>
+
+                  {/* Title and Price */}
+                  <h3 className="font-semibold text-xl text-gray-900">
+                    Metrolla Plaza
+                  </h3>
+                  <h4 className="text-base text-gray-500 mb-4">₹ 4.53 Cr</h4>
+
+                  {/* Property Details */}
+                  <div className="flex space-x-12 border-t border-b border-gray-200 py-3 mb-3">
+                    <div className="flex items-center space-x-2">
+                      <Image src={sqft} alt="Bed" width={20} height={20} />
+                      <div className="flex flex-col">
+                        <span className="text-md text-gray-600">Sqft</span>
+                        <span className="text-sm font-medium text-gray-500">
+                          1520
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Image src={bath} alt="Bath" width={20} height={20} />
+                      <div className="flex flex-col">
+                        <span className="text-md text-gray-600">Fully </span>
+                        <span className="text-sm font-medium text-gray-500">
+                          Furnished
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src={homeimproment}
+                        alt="Area"
+                        width={20}
+                        height={20}
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-md text-gray-600">Ready to </span>
+                        <span className="text-sm font-medium text-gray-500">
+                          Move
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Image src={parking} alt="Area" width={20} height={20} />
+                      <div className="flex flex-col">
+                        <span className="text-md text-gray-600">
+                          2 Reserved
+                        </span>
+                        <span className="text-sm font-medium text-gray-500">
+                          Parking
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Location and Actions */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-1">
+                      <Image src={pin} alt="Location" width={20} height={20} />
+                      <span className="text-md text-gray-700">
+                        Sector 62, Noida
+                      </span>
+                    </div>
+
+                    <div className="flex items-center space-x-3">
+                      <button className="p-1">
+                        <Image
+                          src={bookmark}
+                          alt="Bookmark"
+                          width={30}
+                          height={30}
+                        />
+                      </button>
+                      <a
+                        href="#"
+                        className="bg-black text-white px-5 py-1 text-md rounded"
+                      >
+                        Details
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <div className="bg-gray-400 border-r border"></div>
-        
-        {/* Content */}
-        <div className="w-full sm:w-2/3 p-4 px-8">
-          {/* Property Tag */}
-          <div className="mb-3">
-            <span className="bg-[#6E6E73] text-white px-3 py-1 rounded-full text-sm">
-              Property type
-            </span>
-          </div>
-
-          {/* Title and Price */}
-          <h3 className="font-semibold text-xl text-gray-900">
-            Metrolla Plaza
-          </h3>
-          <h4 className="text-base text-gray-500 mb-4">₹ 4.53 Cr</h4>
-
-          {/* Property Details */}
-          <div className="flex space-x-12 border-t border-b border-gray-200 py-3 mb-3">
-            <div className="flex items-center space-x-2">
-              <Image src={sqft} alt="Bed" width={20} height={20} />
-              <div className="flex flex-col">
-                <span className="text-md text-gray-600">Sqft</span>
-                <span className="text-sm font-medium text-gray-500">
-                  1520
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Image src={bath} alt="Bath" width={20} height={20} />
-              <div className="flex flex-col">
-                <span className="text-md text-gray-600">Fully </span>
-                <span className="text-sm font-medium text-gray-500">
-                Furnished
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Image src={homeimproment} alt="Area" width={20} height={20} />
-              <div className="flex flex-col">
-                <span className="text-md text-gray-600">Ready to </span>
-                <span className="text-sm font-medium text-gray-500">
-                  Move
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Image src={parking} alt="Area" width={20} height={20} />
-              <div className="flex flex-col">
-                <span className="text-md text-gray-600">2 Reserved</span>
-                <span className="text-sm font-medium text-gray-500">
-                Parking
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Location and Actions */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-1">
-              <Image
-                src={pin}
-                alt="Location"
-                width={20}
-                height={20}
-              />
-              <span className="text-md text-gray-700">Sector 62, Noida</span>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <button className="p-1">
-                <Image
-                  src={bookmark}
-                  alt="Bookmark"
-                  width={30}
-                  height={30}
-                />
-              </button>
-              <a
-                href="#"
-                className="bg-black text-white px-5 py-1 text-md rounded"
-              >
-                Details
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {/* Property Card 2 */}
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="flex flex-col sm:flex-row">
-        {/* Content */}
-        <div className="w-full sm:w-2/3 p-4 px-8">
-          {/* Property Tag */}
-          <div className="mb-3">
-            <span className="bg-[#6E6E73] text-white px-3 py-1 rounded-full text-sm">
-              Property type
-            </span>
-          </div>
-
-          {/* Title and Price */}
-          <h3 className="font-semibold text-xl text-gray-900">
-            Metrolla Plaza
-          </h3>
-          <h4 className="text-base text-gray-500 mb-4">₹ 4.53 Cr</h4>
-
-          {/* Property Details */}
-          <div className="flex space-x-12 border-t border-b border-gray-200 py-3 mb-3">
-            <div className="flex items-center space-x-2">
-              <Image src={sqft} alt="Bed" width={20} height={20} />
-              <div className="flex flex-col">
-                <span className="text-md text-gray-600">Sqft</span>
-                <span className="text-sm font-medium text-gray-500">
-                  1520
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Image src={bath} alt="Bath" width={20} height={20} />
-              <div className="flex flex-col">
-                <span className="text-md text-gray-600">Fully </span>
-                <span className="text-sm font-medium text-gray-500">
-                Furnished
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Image src={homeimproment} alt="Area" width={20} height={20} />
-              <div className="flex flex-col">
-                <span className="text-md text-gray-600">Ready to </span>
-                <span className="text-sm font-medium text-gray-500">
-                  Move
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Image src={parking} alt="Area" width={20} height={20} />
-              <div className="flex flex-col">
-                <span className="text-md text-gray-600">2 Reserved</span>
-                <span className="text-sm font-medium text-gray-500">
-                Parking
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Location and Actions */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-1">
-              <Image
-                src={pin}
-                alt="Location"
-                width={20}
-                height={20}
-              />
-              <span className="text-md text-gray-700">Sector 62, Noida</span>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <button className="p-1">
-                <Image
-                  src={bookmark}
-                  alt="Bookmark"
-                  width={30}
-                  height={30}
-                />
-              </button>
-              <a
-                href="#"
-                className="bg-black text-white px-5 py-1 text-md rounded"
-              >
-                Details
-              </a>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-gray-400 border-r border"></div>
-        
-        {/* Image */}
-        <div className="w-full sm:w-1/3 p-2">
-          <Image
-            alt="Property"
-            src={latestpropertytype}
-            className="w-full h-56 object-cover rounded-2xl p-2"
-          />
-        </div>
-      </div>
-    </div>
-
-    {/* Property Card 3 */}
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="flex flex-col sm:flex-row">
-        {/* Image */}
-        <div className="w-full sm:w-1/3 p-2">
-          <Image
-            alt="Property"
-            src={latestpropertytype}
-            className="w-full h-56 object-cover rounded-2xl p-2"
-          />
-        </div>
-
-        <div className="bg-gray-400 border-r border"></div>
-        
-        {/* Content */}
-        <div className="w-full sm:w-2/3 p-4 px-8">
-          {/* Property Tag */}
-          <div className="mb-3">
-            <span className="bg-[#6E6E73] text-white px-3 py-1 rounded-full text-sm">
-              Property type
-            </span>
-          </div>
-
-          {/* Title and Price */}
-          <h3 className="font-semibold text-xl text-gray-900">
-            Metrolla Plaza
-          </h3>
-          <h4 className="text-base text-gray-500 mb-4">₹ 4.53 Cr</h4>
-
-          {/* Property Details */}
-          <div className="flex space-x-12 border-t border-b border-gray-200 py-3 mb-3">
-            <div className="flex items-center space-x-2">
-              <Image src={sqft} alt="Bed" width={20} height={20} />
-              <div className="flex flex-col">
-                <span className="text-md text-gray-600">Sqft</span>
-                <span className="text-sm font-medium text-gray-500">
-                  1520
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Image src={bath} alt="Bath" width={20} height={20} />
-              <div className="flex flex-col">
-                <span className="text-md text-gray-600">Fully </span>
-                <span className="text-sm font-medium text-gray-500">
-                Furnished
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Image src={homeimproment} alt="Area" width={20} height={20} />
-              <div className="flex flex-col">
-                <span className="text-md text-gray-600">Ready to </span>
-                <span className="text-sm font-medium text-gray-500">
-                  Move
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Image src={parking} alt="Area" width={20} height={20} />
-              <div className="flex flex-col">
-                <span className="text-md text-gray-600">2 Reserved</span>
-                <span className="text-sm font-medium text-gray-500">
-                Parking
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Location and Actions */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-1">
-              <Image
-                src={pin}
-                alt="Location"
-                width={20}
-                height={20}
-              />
-              <span className="text-md text-gray-700">Sector 62, Noida</span>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <button className="p-1">
-                <Image
-                  src={bookmark}
-                  alt="Bookmark"
-                  width={30}
-                  height={30}
-                />
-              </button>
-              <a
-                href="#"
-                className="bg-black text-white px-5 py-1 text-md rounded"
-              >
-                Details
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
       </main>
     </>
   );
