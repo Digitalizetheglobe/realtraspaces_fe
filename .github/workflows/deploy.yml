@@ -20,12 +20,12 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H 82.29.162.221 >> ~/.ssh/known_hosts
 
-      - name: Deploy via SSH
-        run: |
-          ssh -tt root@82.29.162.221 << 'EOF'
-            cd /var/www/realtraspaces_fe
-            git pull origin main
-            npm install
-            npm run build
-            pm2 restart realtraspaces_fe || pm2 start npm --name "realtraspaces_fe" -- start
-          EOF
+          - name: Deploy via SSH
+          run: |
+            ssh -o ServerAliveInterval=60 -tt root@82.29.162.221 << 'EOF'
+              cd /var/www/realtraspaces_fe
+              git pull origin main
+              npm install
+              npm run build
+              pm2 restart realtraspaces_fe || pm2 start npm --name "realtraspaces_fe" -- start
+            EOF
