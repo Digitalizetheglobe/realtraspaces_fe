@@ -183,7 +183,7 @@ const BlogPage = () => {
                 <span className="text-sm text-gray-500">•</span>
                 <span className="text-sm text-gray-500">By {blog.writer}</span>
               </div>
-              <h2 className="text-xl font-semibold mb-2">{blog.blogTitle}</h2>
+              <h2 className="text-xl font-semibold mb-2 text-gray-700">{blog.blogTitle}</h2>
               <p className="text-gray-600 mb-4 line-clamp-2">
                 {blog.blogDescription}
               </p>

@@ -144,7 +144,7 @@ const ManageTestimonialsPage = () => {
             >
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-xl font-semibold">{testimonial.name}</h2>
+                  <h2 className="text-xl font-semibold text-gray-700">{testimonial.name}</h2>
                   <span className={`px-2 py-1 rounded-full text-xs ${
                     testimonial.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>

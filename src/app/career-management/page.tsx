@@ -113,7 +113,7 @@ const CareerManagementPage = () => {
           >
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
-                <h2 className="text-xl font-semibold">{job.jobTitle}</h2>
+                <h2 className="text-xl font-semibold text-black">{job.jobTitle}</h2>
                 <span className={`px-2 py-1 rounded-full text-xs ${
                   job.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                 }`}>
