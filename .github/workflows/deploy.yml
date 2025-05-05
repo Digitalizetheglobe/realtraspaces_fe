@@ -18,11 +18,11 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.HOST_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H 123.456.78.90 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 82.29.162.221 >> ~/.ssh/known_hosts
 
       - name: Deploy via SSH
         run: |
-          ssh root@123.456.78.90 << 'EOF'
+          ssh root@82.29.162.221 << 'EOF'
             cd /var/www/realtraspaces_fe
             git pull origin main
             npm install
