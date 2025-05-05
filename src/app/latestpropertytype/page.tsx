@@ -18,7 +18,7 @@ export default function PropertyCards() {
                         {/* Heading */}
                         <div className="mb-[25px] w-full justify-between items-start sm:items-center gap-6 sm:gap-0 ">
                             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black w-full pr-4">
-                                The latest.
+                                The latest News.
                                 <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#6E6E73] w-full pr-4">
                                     Take a look at what&rsquo;s new right now.
                                 </span>
