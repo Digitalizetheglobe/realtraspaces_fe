@@ -18,6 +18,8 @@ import previous from "../../../public/assets/images/previous.png";
 import bath from "../../../public/assets/images/bath.png";
 import pin from "../../../public/assets/images/marker-pin-01.png";
 import bookmark from "../../../public/assets/images/bookmark.png";
+import Link from "next/link";
+
 
 export default function Home() {
   const thumbnails = [
@@ -64,9 +66,7 @@ export default function Home() {
             <nav aria-label="breadcrumb">
               <ol className="text-white text-lg flex space-x-2">
                 <li>
-                  <a href="/" className="">
-                    Home
-                  </a>
+                  <Link href="/">Home</Link>
                 </li>
                 <li>{">"}</li>
                 <li className="">Properties</li>
@@ -106,9 +106,9 @@ export default function Home() {
             <Image
               src={next}
               alt="next"
-              onClick={handlePrev}
+              onClick={handleNext}
               className={`w-8 h-8 cursor-pointer ${
-                startIndex === 0 ? "opacity-50 pointer-events-none" : ""
+                startIndex + visibleCount >= thumbnails.length ? "opacity-50 pointer-events-none" : ""
               }`}
             />
           </div>

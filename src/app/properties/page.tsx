@@ -31,9 +31,7 @@ export default function Home() {
             <nav aria-label="breadcrumb">
               <ol className="text-white text-lg flex space-x-2">
                 <li>
-                  <a href="/" className="">
-                    Home
-                  </a>
+                  <Link href="/">Home</Link>
                 </li>
                 <li>{">"}</li>
                 <li className="">Property</li>

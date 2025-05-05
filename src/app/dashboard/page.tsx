@@ -43,7 +43,7 @@ const DashboardPage = () => {
           totalTestimonials: testimonialsData.data?.length || 0,
           totalBlogs: blogsData.data?.length || 0,
           activeJobs:
-            jobsData.data?.filter((job: any) => job.isActive)?.length || 0,
+            jobsData.data?.filter((item: unknown) => (item as { isActive?: boolean }).isActive)?.length || 0,
         }));
       } catch (err) {
         setError("Failed to fetch dashboard data");

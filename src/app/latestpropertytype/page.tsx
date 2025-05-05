@@ -20,7 +20,7 @@ export default function PropertyCards() {
                             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black w-full pr-4">
                                 The latest.
                                 <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#6E6E73] w-full pr-4">
-                                    Take a look at what's new right now.
+                                    Take a look at what&rsquo;s new right now.
                                 </span>
                             </h2>
                         </div>

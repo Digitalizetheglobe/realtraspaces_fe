@@ -19,7 +19,7 @@ const TopDevelopers = () => {
       <div className="max-w-5xl mx-auto">
       <div className="mb-[25px] w-full justify-between items-start sm:items-center gap-6 sm:gap-0 ">
                         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black w-full pr-4">
-                        Top Developers. 
+                        Don&apos;t miss out on the top developers!. 
                             <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#6E6E73] w-full pr-4">
                             Renowned names you can trust.
                             </span>
@@ -35,10 +35,10 @@ const TopDevelopers = () => {
                 Need Guidance?
               </p>
               <p className="text-md mb-6 text-gray-800">
-                We're Here to Help
+                We&rsquo;re Here to Help
               </p>
               <p className="text-gray-500 mb-6">
-               Not sure where to begin? Reach out to our experts for personalized consultation—we'll help you find the perfect property that fits your needs and vision.              </p>
+               Not sure where to begin? Reach out to our experts for personalized consultation—we&rsquo;ll help you find the perfect property that fits your needs and vision.              </p>
            <button className="bg-black text-white px-4 p-2 rounded-lg">Contact Us</button>
             </div>           
           </div>

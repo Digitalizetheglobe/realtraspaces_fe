@@ -1,15 +1,4 @@
-import Link from 'next/link';
-import footerimg from '../../public/assets/images/footerimg.png'
-import Image from 'next/image';
-
 const Footer = () => {
-  const menuItems = [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
-    { name: 'Services', href: '/services' },
-    { name: 'Contact', href: '/contact' },
-  ];
-
   return (
     <footer className="bg-black">
       <div className="mx-auto max-w-screen-xl space-y-8 px-4 py-16 sm:px-6 lg:space-y-16 lg:px-8">

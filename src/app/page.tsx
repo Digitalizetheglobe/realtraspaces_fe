@@ -1,7 +1,7 @@
 import Image from "next/image";
 import home from '../../public/assets/images/Home.png'
 import Latestpropertytype from "./latestpropertytype/page";
-import Blogs from "./blogs/page";
+
 
 export default function Home() {
   return (
