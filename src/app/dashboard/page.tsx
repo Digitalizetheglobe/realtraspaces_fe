@@ -61,6 +61,7 @@ const DashboardPage = () => {
     { name: "Career Management", icon: "💼", href: "/career-management" },
     { name: "Blog", icon: "📝", href: "/blog" },
     { name: "Manage Testimonials", icon: "⭐", href: "/manage-testimonials" },
+    {name :'All properties', href: '/PropertyListing'}
   ];
 
   if (loading) {

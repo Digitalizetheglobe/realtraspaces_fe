@@ -15,6 +15,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     { name: 'Dashboard', href: '/career-management' },
     { name: 'Create Job', href: '/career-management/create' },
     { name: 'All Applications', href: '/career-management/applications' },
+
   ];
 
   return (
