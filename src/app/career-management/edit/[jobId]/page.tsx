@@ -27,7 +27,6 @@ interface PageProps {
 
 const EditJobPage = ({ params }: PageProps) => {
   const router = useRouter();
-  const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<Partial<Job>>({});
@@ -51,7 +50,6 @@ const EditJobPage = ({ params }: PageProps) => {
           throw new Error('Failed to fetch job details');
         }
         const data = await response.json();
-        setJob(data.data);
         setFormData(data.data);
       } catch (error) {
         setError(error instanceof Error ? error.message : 'An error occurred');
@@ -260,4 +258,4 @@ const EditJobPage = ({ params }: PageProps) => {
   );
 };
 
-export default EditJobPage; 
+export default EditJobPage;

@@ -1,17 +1,19 @@
-import Link from 'next/link';
-import footerimg from '../../public/assets/images/footerimg.png'
-import Image from 'next/image';
+import footerimg from '../../public/assets/images/footerimg1.png'
 
 const Footer = () => {
-  const menuItems = [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
-    { name: 'Services', href: '/services' },
-    { name: 'Contact', href: '/contact' },
-  ];
+  // const menuItems = [
+  //   { name: 'Home', href: '/' },
+  //   { name: 'About', href: '/about' },
+  //   { name: 'Services', href: '/services' },
+  //   { name: 'Contact', href: '/contact' },
+  // ];
 
   return (
-    <footer className="bg-black">
+    <footer  className="bg-no-repeat bg-right-bottom bg-black text-white"
+    style={{
+      backgroundImage: `url(${footerimg.src})`,
+    }}
+  >
       <div className="mx-auto max-w-screen-xl space-y-8 px-4 py-16 sm:px-6 lg:space-y-16 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div>

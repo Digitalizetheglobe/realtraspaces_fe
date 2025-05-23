@@ -35,10 +35,10 @@ const TopDevelopers = () => {
                 Need Guidance?
               </p>
               <p className="text-md mb-6 text-gray-800">
-                We're Here to Help
+                We are Here to Help
               </p>
               <p className="text-gray-500 mb-6">
-               Not sure where to begin? Reach out to our experts for personalized consultation—we'll help you find the perfect property that fits your needs and vision.              </p>
+               Not sure where to begin? Reach out to our experts for personalized consultation—we will help you find the perfect property that fits your needs and vision.              </p>
            <button className="bg-black text-white px-4 p-2 rounded-lg">Contact Us</button>
             </div>           
           </div>

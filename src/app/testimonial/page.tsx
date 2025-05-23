@@ -98,7 +98,7 @@ export default function Testimonial() {
                         </div>
                         {/* User info with avatar and name */}
                         <div className="flex items-center gap-3 mt-4">
-                          <img
+                          <Image
                             src={testimonial.image}
                             className="w-8 h-8 rounded-full"
                             alt={testimonial.name}

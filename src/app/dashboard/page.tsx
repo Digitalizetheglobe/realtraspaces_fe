@@ -38,13 +38,17 @@ const DashboardPage = () => {
         const jobsRes = await fetch("http://localhost:8000/api/jobs");
         const jobsData = await jobsRes.json();
 
-        setStats((prevStats) => ({
-          ...prevStats,
-          totalTestimonials: testimonialsData.data?.length || 0,
-          totalBlogs: blogsData.data?.length || 0,
-          activeJobs:
-            jobsData.data?.filter((job: any) => job.isActive)?.length || 0,
-        }));
+      interface Job {
+  isActive: boolean;
+}
+
+// ... in your useEffect:
+setStats((prevStats) => ({
+  ...prevStats,
+  totalTestimonials: testimonialsData.data?.length || 0,
+  totalBlogs: blogsData.data?.length || 0,
+  activeJobs: jobsData.data?.filter((job: Job) => job.isActive)?.length || 0,
+}));
       } catch (err) {
         setError("Failed to fetch dashboard data");
         console.error("Error fetching dashboard data:", err);

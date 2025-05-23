@@ -4,6 +4,7 @@ import email from "../../../public/assets/images/email.png";
 import map from "../../../public/assets/images/map.png";
 import phone from "../../../public/assets/images/phone.png";
 import ctabg from "../../../public/assets/images/ctabg.png";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -29,9 +30,9 @@ export default function Home() {
             <nav aria-label="breadcrumb">
               <ol className="text-white text-lg flex space-x-2">
                 <li>
-                  <a href="/" className="">
+                  <Link href="/" className="">
                     Home
-                  </a>
+                  </Link>
                 </li>
                 <li>{">"}</li>
                 <li className="">Contact</li>

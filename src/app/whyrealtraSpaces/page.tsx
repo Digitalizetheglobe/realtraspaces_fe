@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import Testimonial from "../testimonial/page";
 
 export default function WhyrealtraSpaces() {
