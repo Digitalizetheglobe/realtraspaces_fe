@@ -5,6 +5,7 @@ import map from "../../../public/assets/images/map.png";
 import phone from "../../../public/assets/images/phone.png";
 import ctabg from "../../../public/assets/images/ctabg.png";
 import Link from "next/link";
+import Link from "next/link";
 
 export default function Home() {
   return (

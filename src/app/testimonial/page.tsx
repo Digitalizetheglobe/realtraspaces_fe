@@ -100,6 +100,8 @@ export default function Testimonial() {
                         <div className="flex items-center gap-3 mt-4">
                           <Image
                             src={testimonial.image}
+                            width={32}
+                            height={32}
                             className="w-8 h-8 rounded-full"
                             alt={testimonial.name}
                           />

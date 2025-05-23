@@ -19,7 +19,7 @@ const TopDevelopers = () => {
       <div className="max-w-5xl mx-auto">
       <div className="mb-[25px] w-full justify-between items-start sm:items-center gap-6 sm:gap-0 ">
                         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-black w-full pr-4">
-                        Top Developers. 
+                        Don&apos;t miss out on the top developers!. 
                             <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-[#6E6E73] w-full pr-4">
                             Renowned names you can trust.
                             </span>

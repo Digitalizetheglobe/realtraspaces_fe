@@ -3,6 +3,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    domains: ['readymadeui.com'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -21,4 +22,3 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
-  
