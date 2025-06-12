@@ -170,7 +170,7 @@ const PropertyListing = () => {
               key={property.id}
               className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
             >
-              <div className="bg-gray-200 h-48 flex items-center justify-center">
+              <div className="w-full px-4 md:w-1/2 lg:w-1/3 mb-8">
                 {Object.keys(property.imageUrls).length > 0 ? (
                   <img
                     src={property.imageUrls[Object.keys(property.imageUrls)[0]]}
@@ -194,7 +194,7 @@ const PropertyListing = () => {
                   </svg>
                 )}
               </div>
-              <div className="p-6">
+              <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="text-xl font-semibold text-gray-800 mb-1">{property.title}</h3>

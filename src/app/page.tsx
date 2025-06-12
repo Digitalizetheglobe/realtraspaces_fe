@@ -1,88 +1,60 @@
 import Image from "next/image";
-import home from '../../public/assets/images/Home.png'
+import home from '../../public/assets/hero.jpg'
 import Latestpropertytype from "./latestpropertytype/page";
-// import Blogs from "./blogs/page";
 
 export default function Home() {
   return (
     <>
-    <main className="min-h-screen bg-gray-100">
-      {/* Hero Section */}
-      <section className="relative h-[90vh] w-full">
-        <div className="absolute inset-0">
-          <Image
-            src={home}
-            alt="Modern Home Interior"
-            fill
-            priority
-            className="object-cover"
-          />
-        </div>
-        
-        {/* Content Container */}
-        <div className="relative h-full flex flex-col justify-end pb-8">
-          {/* Search Bar Container */}
-          <div className="w-full px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto bg-[#FEFEFE4D] backdrop-blur-[10%] rounded-full shadow-lg p-4">
-              {/* Property Type Tags */}
-              {/* <div className="flex gap-2 mb-4">
-                <span className="bg-black text-white backdrop-blur-sm px-4 py-1 rounded-full text-sm font-medium">
-                  Leasing
-                </span>
-                <span className="bg-white text-black backdrop-blur-sm px-4 py-1 rounded-full text-sm font-medium">
-                  Leasing
-                </span>
-                <span className="bg-white text-black px-4 py-1 rounded-full text-sm font-medium">
-                  Leasing
-                </span>
-              </div> */}
-              {/* Search Bar */}
-              <div className="flex flex-wrap md:flex-nowrap gap-2">
-                <div className="w-full md:w-1/4">
-                  <select className="w-full px-4 py-2 border-0 focus:ring-0 text-gray-600 bg-white backdrop-blur-sm rounded-md">
-                    <option value="">Location </option>
-                    <option value="new-york">New York</option>
-                    <option value="london">London</option>
-                    <option value="paris">Paris</option>
-                  </select>
-                </div>
-                <div className="w-full md:w-1/4">
-                  <select className="w-full px-4 py-2 border-0 focus:ring-0 text-gray-600 bg-white/80 backdrop-blur-sm rounded-md">
-                    <option value="">Property Type </option>
-                    <option value="apartment">Apartment</option>
-                    <option value="house">House</option>
-                    <option value="villa">Villa</option>
-                  </select>
-                </div>
-                <div className="w-full md:w-1/4">
-                  <select className="w-full px-4 py-2 border-0 focus:ring-0 text-gray-600 bg-white/80 backdrop-blur-sm rounded-md">
-                    <option value="">Location </option>
-                    <option value="downtown">Downtown</option>
-                    <option value="suburb">Suburb</option>
-                    <option value="beach">Beach</option>
-                  </select>
-                </div>
-                <div className="w-full md:w-1/4">
-                  <input
-                    type="text"
-                    placeholder="Property Name"
-                    className="w-full px-4 py-2 border-0 focus:ring-0 text-gray-600 bg-white/80 backdrop-blur-sm rounded-md"
-                  />
-                </div>
-                <div className="w-full md:w-auto">
-                  <button className="w-full md:w-auto bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-colors">
-                    Search
-                  </button>
-                </div>
-              </div>
+      <main className="min-h-screen bg-gray-100">
+        {/* Hero Section */}
+        <section className="relative w-full h-[420px]">
+          <div className="absolute inset-0">
+            <Image
+              src={home}
+              alt="Modern Home Interior"
+              fill
+              priority
+              className="object-cover"
+            />
+          </div>
+          
+          {/* Top Navigation */}
+          <div className="relative flex justify-between items-center p-6">
+            <div className="text-white font-bold text-xl">Q</div>
+            <div className="flex gap-8">
+              <button className="text-white">LIST PROPERTY</button>
+              <button className="text-white">SIGN IN</button>
             </div>
           </div>
-        </div>
-      </section>
-    </main>
 
-    <Latestpropertytype />
+          {/* Search Bar Container */}
+          {/* <div className="relative flex flex-col items-center mt-16">
+            <div className="mb-4">
+              <select className="bg-transparent text-white border-0 focus:ring-0">
+                <option>Select search type</option>
+                <option>For Sale</option>
+                <option>For Rent</option>
+              </select>
+            </div>
+            
+            <div 
+              className="w-[741px] h-[62px] bg-white rounded-[98px] border border-gray-300 flex items-center px-8 py-2 gap-2"
+              style={{ marginTop: '298px', marginLeft: '410px' }}
+            >
+              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input 
+                type="text" 
+                placeholder="Search" 
+                className="flex-grow border-0 focus:ring-0 focus:outline-none" 
+              />
+            </div>
+          </div> */}
+        </section>
 
+        <Latestpropertytype />
+      </main>
     </>
   );
 }

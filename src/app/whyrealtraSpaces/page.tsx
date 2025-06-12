@@ -1,11 +1,20 @@
 "use client";
+import Blogs from "../blogs/page";
 import Testimonial from "../testimonial/page";
+import { Raleway } from 'next/font/google';
+
+// Load Raleway font
+const raleway = Raleway({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-raleway',
+});
 
 export default function WhyrealtraSpaces() {
     return (
-
         <>
-            <div className="bg-[#F7F7F7]">
+            <div className={`${raleway.className} bg-[#F7F7F7]`}>
                 <div className="max-w-6xl mx-auto py-16 px-4">
                     <div className="flex flex-col sm:flex-row mb-[25px] w-full justify-between items-start gap-6 sm:gap-0">
                         <div className="w-full sm:w-1/2 pr-4">
@@ -221,7 +230,7 @@ export default function WhyrealtraSpaces() {
                 </div>
             </div>
 
-            <Testimonial />
+            <Blogs />
         </>
     )
 }
