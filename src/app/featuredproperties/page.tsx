@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import latestpropertytype from "../../../public/assets/images/latestpropertytype.svg";
 import sqft from "../../../public/assets/images/sqft.png";
 import homeimproment from "../../../public/assets/images/home-improvement1.png";
@@ -31,16 +32,22 @@ type Property = {
   };
   monetaryInfo?: {
     expectedPrice?: number;
+    monthlyRentAmount?: number;
   };
   dimension?: {
     area?: string | number;
+    unit?: string;
   };
   furnishStatus?: string;
   status?: string;
   address?: {
     subLocality?: string;
     city?: string;
+    state?: string;
   };
+  notes?: string;
+  enquiredFor?: string;
+  serialNo?: string;
 };
 
 const FeaturedProperties = () => {
@@ -51,7 +58,7 @@ const FeaturedProperties = () => {
     const fetchProperties = async () => {
       try {
         const response = await fetch(
-          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=3",
+          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=6",
           {
             method: "GET",
             headers: {
@@ -61,9 +68,7 @@ const FeaturedProperties = () => {
           }
         );
         const data = await response.json();
-        // Log the response to inspect its structure
         console.log("API response:", data);
-        // Set the correct array based on the response structure
         setProperties(
           Array.isArray(data) ? data : data.items || data.data || []
         );
@@ -90,12 +95,24 @@ const FeaturedProperties = () => {
   }
 
   interface FormatPrice {
-    (price?: number): string;
+    (price?: number, enquiredFor?: string): string;
   }
 
-  const formatPrice: FormatPrice = (price) => {
-    if (!price) return "Price not available";
-    return `₹ ${(price / 100000).toFixed(2)} Cr`;
+  const formatPrice: FormatPrice = (price, enquiredFor) => {
+    if (!price) return "Price on request";
+
+    if (enquiredFor === "Rent") {
+      return `₹ ${price.toLocaleString()} /month`;
+    } else {
+      // For sale properties
+      if (price >= 10000000) {
+        return `₹ ${(price / 10000000).toFixed(2)} Cr`;
+      } else if (price >= 100000) {
+        return `₹ ${(price / 100000).toFixed(2)} Lac`;
+      } else {
+        return `₹ ${price.toLocaleString()}`;
+      }
+    }
   };
 
   interface FurnishStatusMap {
@@ -107,8 +124,24 @@ const FeaturedProperties = () => {
       FullyFurnished: "Fully Furnished",
       SemiFurnished: "Semi Furnished",
       Unfurnished: "Unfurnished",
+      Unknown: "Status Unknown",
     };
-    return statusMap[status ?? ""] || "Fully Furnished";
+    return statusMap[status ?? ""] || "Status Unknown";
+  };
+
+  const getPropertyNotes = (notes?: string): string => {
+    if (!notes) return "";
+    // Extract the first sentence or limit to 100 characters
+    const firstSentence = notes.split(".")[0];
+    return firstSentence.length > 100
+      ? firstSentence.substring(0, 100) + "..."
+      : firstSentence;
+  };
+
+  // Function to create a URL-friendly slug from the property title
+  const createSlug = (title?: string): string => {
+    if (!title) return "property";
+    return title.replace(/\s+/g, "-").toLowerCase();
   };
 
   return (
@@ -119,7 +152,7 @@ const FeaturedProperties = () => {
         <div className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
           <div className="mb-6 max-w-5xl mx-auto">
             <h2 className="text-2xl sm:text-3xl font-bold text-black">
-              Explore More Listings
+              Explore Commercial Properties in BKC
             </h2>
           </div>
 
@@ -136,7 +169,7 @@ const FeaturedProperties = () => {
                 >
                   {/* Image */}
                   <div className="w-full sm:w-1/3 p-2">
-                    {Object.keys(property.imageUrls).length > 0 ? (
+                    {Object.keys(property.imageUrls || {}).length > 0 ? (
                       <img
                         src={
                           property.imageUrls[Object.keys(property.imageUrls)[0]]
@@ -162,72 +195,80 @@ const FeaturedProperties = () => {
                       <span className="bg-[#6E6E73] text-white px-3 py-1 rounded-full text-sm">
                         {property.propertyType?.childType?.displayName ||
                           property.propertyType?.displayName ||
-                          "Property"}
+                          "Office Space"}
+                      </span>
+                      <span className="ml-2 bg-[#6E6E73] text-white px-3 py-1 rounded-full text-sm">
+                        {property.enquiredFor || "For Sale/Rent"}
                       </span>
                     </div>
 
                     {/* Title and Price */}
                     <h3 className="font-semibold text-xl text-gray-900">
-                      {property.title || "Property Title"}
+                      {property.title || "ONE BKC C Wing"}
                     </h3>
                     <h4 className="text-base text-gray-500 mb-4">
-                      {formatPrice(property.monetaryInfo?.expectedPrice)}
+                      {formatPrice(
+                        property.monetaryInfo?.expectedPrice ||
+                          property.monetaryInfo?.monthlyRentAmount,
+                        property.enquiredFor
+                      )}
                     </h4>
 
                     {/* Property Details */}
-                    <div className="flex space-x-12 border-t border-b border-gray-200 py-3 mb-3">
-                      <div className="flex items-center space-x-2">
+                    <div className="flex flex-wrap space-x-4 md:space-x-12 border-t border-b border-gray-200 py-3 mb-3">
+                      <div className="flex items-center space-x-2 mb-2">
                         <Image src={sqft} alt="Area" width={20} height={20} />
                         <div className="flex flex-col">
-                          <span className="text-md text-gray-600">Sqft</span>
+                          <span className="text-md text-gray-600">Area</span>
                           <span className="text-sm font-medium text-gray-500">
-                            {property.dimension?.area || "N/A"}
+                            {property.dimension?.area || "N/A"}{" "}
+                            {property.dimension?.unit || "Sq. Feet"}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 mb-2">
                         <Image src={bath} alt="Bath" width={20} height={20} />
                         <div className="flex flex-col">
-                          <span className="text-md text-gray-600">Fully </span>
+                          <span className="text-md text-gray-600">Status</span>
                           <span className="text-sm font-medium text-gray-500">
                             {getFurnishStatus(property.furnishStatus)}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 mb-2">
                         <Image
                           src={homeimproment}
-                          alt="Area"
+                          alt="Status"
                           width={20}
                           height={20}
                         />
                         <div className="flex flex-col">
                           <span className="text-md text-gray-600">
-                            Ready to{" "}
+                            Availability
                           </span>
                           <span className="text-sm font-medium text-gray-500">
                             {property.status === "Active"
-                              ? "Move"
+                              ? "Ready to Move"
                               : "Coming Soon"}
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 mb-2">
                         <Image
                           src={parking}
-                          alt="Area"
+                          alt="Parking"
                           width={20}
                           height={20}
                         />
                         <div className="flex flex-col">
                           <span className="text-md text-gray-600">
-                            2 Reserved
+                            Property ID
                           </span>
                           <span className="text-sm font-medium text-gray-500">
-                            Parking
+                            {property.serialNo || "N/A"}
                           </span>
                         </div>
                       </div>
@@ -243,9 +284,9 @@ const FeaturedProperties = () => {
                           height={20}
                         />
                         <span className="text-md text-gray-700">
-                          {property.address?.subLocality ||
-                            property.address?.city ||
-                            "Location not specified"}
+                          {property.address?.subLocality || ""},{" "}
+                          {property.address?.city || "Mumbai"},{" "}
+                          {property.address?.state || "Maharashtra"}
                         </span>
                       </div>
 
@@ -258,12 +299,12 @@ const FeaturedProperties = () => {
                             height={30}
                           />
                         </button>
-                        <a
-                          href="#"
+                        <Link
+                          href={`/property-details/${createSlug(property.title)}`}
                           className="bg-black text-white px-5 py-1 text-md rounded"
                         >
                           Details
-                        </a>
+                        </Link>
                       </div>
                     </div>
                   </div>

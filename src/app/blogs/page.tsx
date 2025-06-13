@@ -2,14 +2,14 @@
 import Image from "next/image";
 import latestpropertytype from "../../../public/assets/images/latestpropertytype.svg";
 import ctabg from "../../../public/assets/images/ctabg.png";
-import { Raleway } from 'next/font/google';
+import { Raleway } from "next/font/google";
 
 // Load Raleway font
 const raleway = Raleway({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  display: 'swap',
-  variable: '--font-raleway',
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-raleway",
 });
 
 const Blogs = () => {
@@ -135,7 +135,6 @@ const Blogs = () => {
           </div>
         </div>
       </section>
-
       {/* FAQ */}
       <section className="bg-white flex justify-center items-center min-h-screen">
         <div className="w-full max-w-2xl p-4">
@@ -305,7 +304,7 @@ const Blogs = () => {
           />
 
           <button className="bg-black text-white px-4 py-2 rounded text-sm font-medium">
-           Submit 
+            Submit
           </button>
         </div>
       </div>

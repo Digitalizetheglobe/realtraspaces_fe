@@ -11,7 +11,7 @@ export default function Home() {
     <>
       <main className="min-h-screen bg-gray-100">
         {/* Hero Section */}
-        <section className="relative h-[90vh] w-full">
+        <section className="relative h-[60vh] w-full">
           {/* Background Image */}
           <div className="absolute inset-0">
             <Image
