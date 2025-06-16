@@ -270,7 +270,7 @@ export default function PropertyDetails() {
     <div className={raleway.className}>
        <main className="min-h-screen bg-white">
         {/* Hero Section */}
-        <section className="relative h-[60vh] w-full">
+         <section className="relative h-[60vh] w-full">
           <div className="absolute inset-0">
             {imageUrls.length > 0 ? (
               <img
