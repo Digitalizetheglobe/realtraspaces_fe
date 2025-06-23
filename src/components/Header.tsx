@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState } from "react";
+import Link from "next/link";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -17,24 +17,24 @@ const Header = () => {
   };
 
   const menuItems = [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
-    { name: 'Properties', href: '/properties' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'Career', href: '/career' },
-    { name: 'Contact', href: '/contact' },
-    { name: 'Saved Properties', href: '/saved-properties', divider: true },
-    { name: 'Compare Properties', href: '/compare-properties', divider: true },
-    { name: 'IRR Calculator', href: '/irr-calculator' },
-    { name: 'LRD Calculator', href: '/lrd-calculator' },
-    { name: 'ROI Calculator', href: '/roi-calculator' },
+    { name: "Home", href: "/" },
+    { name: "About", href: "/about" },
+    { name: "Properties", href: "/properties" },
+    { name: "Blog", href: "/blog" },
+    { name: "Career", href: "/career" },
+    { name: "Contact", href: "/contact" },
+    { name: "Saved Properties", href: "/saved-properties", divider: true },
+    { name: "Compare Properties", href: "/compare-properties", divider: true },
+    { name: "IRR Calculator", href: "/irr-calculator" },
+    { name: "LRD Calculator", href: "/lrd-calculator" },
+    { name: "ROI Calculator", href: "/roi-calculator" },
   ];
 
   return (
     <>
       {/* Blur overlay when menu or search is open */}
       {(isMenuOpen || isSearchOpen) && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/20 z-40"
           onClick={() => {
             setIsMenuOpen(false);
@@ -43,13 +43,11 @@ const Header = () => {
         />
       )}
 
-      <header className="fixed top-0 left-0 right-0 w-full bg-white z-50 border-b border-gray-200">
+      <header className="fixed top-0 left-0 right-0 w-full z-50 ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo - Left empty as in the screenshot */}
-            <div className="flex-1">
-              {/* Empty space for logo */}
-            </div>
+            <div className="flex-1">{/* Empty space for logo */}</div>
 
             {/* Search overlay - appears when search is open */}
             {isSearchOpen && (
@@ -69,19 +67,24 @@ const Header = () => {
                       onClick={toggleSearch}
                       className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                     >
-                      <svg 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        className="h-6 w-6" 
-                        fill="none" 
-                        viewBox="0 0 24 24" 
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
                         stroke="currentColor"
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>
                   <div className="mt-2 text-sm text-gray-500">
-                    <p>The latest. Take a look at what's new right now.</p>
+                    <p>The latest. Take a look at whats new right now.</p>
                   </div>
                 </div>
               </div>
@@ -93,22 +96,37 @@ const Header = () => {
               <button
                 type="button"
                 onClick={toggleSearch}
-                className={`p-2 rounded-md ${isSearchOpen ? 'bg-black text-white' : 'bg-white text-black hover:bg-gray-100'} h-10 w-10 flex items-center justify-center transition-colors`}
+                className={`p-2 rounded-md ${
+                  isSearchOpen
+                    ? "bg-black text-white"
+                    : "bg-[#F5F5FF99] text-black hover:bg-gray-100"
+                } h-8 w-8 flex items-center justify-center transition-colors`}
                 aria-label="Search"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </button>
-              
+
               {/* List Property Button */}
-              <button
+              {/* <button
                 type="button"
                 className="hidden sm:inline-flex bg-white text-black border border-gray-300 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors uppercase tracking-wider"
               >
                 LIST PROPERTY
-              </button>
-              
+              </button> */}
+
               {/* Sign In Button */}
               <button
                 type="button"
@@ -116,24 +134,35 @@ const Header = () => {
               >
                 SIGN IN
               </button>
-              
+
               {/* Menu Button - X when open, hamburger when closed */}
               <button
                 type="button"
                 onClick={toggleMenu}
-                className={`inline-flex items-center justify-center p-2 rounded-md ${isMenuOpen ? 'bg-black text-white' : 'bg-white text-black hover:bg-gray-100'} transition-colors`}
+                className={`inline-flex items-center justify-center p-2 rounded-md ${
+                  isMenuOpen
+                    ? "bg-white text-black"
+                    : "bg-black text-white hover:bg-gray-100"
+                } transition-colors`}
                 aria-expanded={isMenuOpen}
               >
-                <span className="sr-only">{isMenuOpen ? 'Close menu' : 'Open menu'}</span>
+                <span className="sr-only">
+                  {isMenuOpen ? "Close menu" : "Open menu"}
+                </span>
                 {isMenuOpen ? (
-                  <svg 
-                    className="h-5 w-5" 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
+                  <svg
+                    className="h-5 w-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 ) : (
                   <svg
@@ -160,11 +189,8 @@ const Header = () => {
         {isMenuOpen && (
           <div className="fixed inset-0 top-16 z-40 flex justify-end">
             {/* Empty space that closes menu when clicked */}
-            <div 
-              className="flex-1 bg-black/20"
-              onClick={toggleMenu}
-            />
-            
+            <div className="flex-1 bg-black/20" onClick={toggleMenu} />
+
             {/* Menu content with blur effect */}
             <div className="w-full sm:w-80 bg-white/95 backdrop-blur-md shadow-lg h-full sm:h-auto">
               <div className="py-4">

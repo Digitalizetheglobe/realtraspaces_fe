@@ -2,11 +2,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Raleway } from 'next/font/google';
-import parking from "../../../public/assets/images/parking.png";
-import floor from "../../../public/assets/images/floor.png";
-import sqft from "../../../public/assets/images/sqft.png";
-import bookmarkprop from "../../../public/assets/images/bookmark.png";
-import Discoverpropertieslocation from "../discoverpropertieslocation/page";
 import defaultPropertyImage from "../../../public/assets/images/latestproperty1.png";
 import share from "../../../public/assets/Frame 29.png";
 import bookmark from "../../../public/assets/Frame 28.png";
@@ -131,7 +126,7 @@ export default function Similarproperties() {
             <div className="mb-[60px] w-full">
               <h2 className="mt-10 font-normal text-[32px] leading-[100%] tracking-normal text-center">
                 <span className="text-black">The latest.</span>{" "}
-                <span className="text-[#6E6E73]">Take a look at what's new right now.</span>
+                <span className="text-[#6E6E73]">Take a look at whats new right now.</span>
               </h2>
             </div>
 

@@ -1,6 +1,5 @@
 "use client";
 import Blogs from "../blogs/page";
-import Testimonial from "../testimonial/page";
 import { Raleway } from 'next/font/google';
 
 // Load Raleway font

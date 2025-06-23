@@ -2,11 +2,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Raleway } from "next/font/google";
-import parking from "../../../public/assets/images/parking.png";
-import floor from "../../../public/assets/images/floor.png";
-import sqft from "../../../public/assets/images/sqft.png";
-import bookmarkprop from "../../../public/assets/images/bookmark.png";
-import Discoverpropertieslocation from "../discoverpropertieslocation/page";
 import defaultPropertyImage from "../../../public/assets/images/latestproperty1.png";
 import share from "../../../public/assets/Frame 29.png";
 import bookmark from "../../../public/assets/Frame 28.png";
@@ -71,29 +66,29 @@ export default function Similarproperties() {
   });
 
   // Available filter options
-  const propertyTypes = [
-    "Office space",
-    "Retail space",
-    "Commercial land",
-    "Warehouse",
-    "Industrial building",
-  ];
+  // const propertyTypes = [
+  //   "Office space",
+  //   "Retail space",
+  //   "Commercial land",
+  //   "Warehouse",
+  //   "Industrial building",
+  // ];
 
-  const priceRanges = [
-    "Under ₹50 Lakhs",
-    "₹50 Lakhs - ₹1 Cr",
-    "₹1 Cr - ₹2 Cr",
-    "₹2 Cr - ₹5 Cr",
-    "Over ₹5 Cr",
-  ];
+  // const priceRanges = [
+  //   "Under ₹50 Lakhs",
+  //   "₹50 Lakhs - ₹1 Cr",
+  //   "₹1 Cr - ₹2 Cr",
+  //   "₹2 Cr - ₹5 Cr",
+  //   "Over ₹5 Cr",
+  // ];
 
-  const areaRanges = [
-    "Under 1000 sqft",
-    "1000 - 5000 sqft",
-    "5000 - 10000 sqft",
-    "10000 - 20000 sqft",
-    "Over 20000 sqft",
-  ];
+  // const areaRanges = [
+  //   "Under 1000 sqft",
+  //   "1000 - 5000 sqft",
+  //   "5000 - 10000 sqft",
+  //   "10000 - 20000 sqft",
+  //   "Over 20000 sqft",
+  // ];
 
   const conditions = ["Furnished", "Semi-Furnished", "Unfurnished"];
 

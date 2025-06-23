@@ -256,7 +256,7 @@ export default function PropertyDetails() {
           </section>
           <div className="max-w-7xl mx-auto px-4 py-12 text-center">
             <h1 className="text-2xl font-bold text-gray-800 mb-4">Property Not Found</h1>
-            <p className="text-gray-600 mb-6">The property you're looking for doesn't exist or may have been removed.</p>
+            <p className="text-gray-600 mb-6">The property you are looking for does not exist or may have been removed.</p>
             <Link href="/" className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition">
               Back to Home
             </Link>

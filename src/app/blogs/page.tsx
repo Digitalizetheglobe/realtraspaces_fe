@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import latestpropertytype from "../../../public/assets/images/latestpropertytype.svg";
-import ctabg from "../../../public/assets/images/ctabg.png";
 import { Raleway } from "next/font/google";
 
 // Load Raleway font
@@ -263,8 +262,8 @@ const Blogs = () => {
           </h2>
 
           <p className="text-gray-600 mb-8">
-            Let our experts guide you. Whether you're buying, selling, or just
-            exploring, we're here to help you make informed decisions.
+            Let our experts guide you. Whether you are buying, selling, or just
+            exploring, we are here to help you make informed decisions.
           </p>
 
           <p className="text-gray-900 font-semibold mb-6">
