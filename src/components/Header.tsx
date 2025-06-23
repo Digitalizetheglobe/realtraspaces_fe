@@ -192,7 +192,7 @@ const Header = () => {
             <div className="flex-1 bg-black/20" onClick={toggleMenu} />
 
             {/* Menu content with blur effect */}
-            <div className="w-full sm:w-80 bg-white/95 backdrop-blur-md shadow-lg h-full sm:h-auto">
+            <div className="w-full sm:w-80 bg-[#FEFEFE4D] backdrop-blur-md shadow-lg h-full sm:h-auto">
               <div className="py-4">
                 {menuItems.map((item, index) => (
                   <div key={item.name}>
