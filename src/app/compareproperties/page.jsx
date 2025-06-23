@@ -86,7 +86,7 @@ const CompareProperties = () => {
                 <Link href="/">Home</Link>
               </li>
               <li>{">"}</li>
-              <li>Properties</li>
+              <li>Compare Properties</li>
             </ol>
           </nav>
         </div>
