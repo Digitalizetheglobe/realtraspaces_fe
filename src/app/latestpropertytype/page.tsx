@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Raleway } from 'next/font/google';
+import { Raleway } from "next/font/google";
 import defaultPropertyImage from "../../../public/assets/images/latestproperty1.png";
 import share from "../../../public/assets/Frame 29.png";
 import bookmark from "../../../public/assets/Frame 28.png";
@@ -10,10 +10,10 @@ import TopDevelopers from "../topdevelopers/page";
 
 // Load Raleway font with more weight options
 const raleway = Raleway({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  display: 'swap',
-  variable: '--font-raleway',
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+  variable: "--font-raleway",
 });
 
 type Property = {
@@ -83,7 +83,7 @@ export default function PropertyCards() {
   // Helper function to get attribute value by ID
   const getAttributeValue = (property: Property, attributeId: string) => {
     const attribute = property.attributes?.find(
-      attr => attr.masterPropertyAttributeId === attributeId
+      (attr) => attr.masterPropertyAttributeId === attributeId
     );
     return attribute?.value || "N/A";
   };
@@ -91,16 +91,16 @@ export default function PropertyCards() {
   // Format price in Indian currency format (e.g., ₹ 45,00,000)
   const formatPrice = (price?: number) => {
     if (!price) return "Price not available";
-    
+
     // For values less than 100,000, show directly
     if (price < 100000) return `₹ ${price}`;
-    
+
     // For values in lakhs (1 lakh = 100,000)
     if (price < 10000000) {
       const lakhs = (price / 100000).toFixed(2);
       return `₹ ${lakhs} Lakhs`;
     }
-    
+
     // For values in crores (1 crore = 10,000,000)
     const crores = (price / 10000000).toFixed(2);
     return `₹ ${crores} Cr`;
@@ -127,7 +127,9 @@ export default function PropertyCards() {
             <div className="mb-[60px] w-full">
               <h2 className="mt-10 font-normal text-[32px] leading-[100%] tracking-normal text-center">
                 <span className="text-black">The latest.</span>{" "}
-                <span className="text-[#6E6E73]">Take a look at whats new right now.</span>
+                <span className="text-[#6E6E73]">
+                  Take a look at whats new right now.
+                </span>
               </h2>
             </div>
 
@@ -145,16 +147,45 @@ export default function PropertyCards() {
                         {property.title || "Prime Business Hub"}
                       </h3>
                       <div className="flex items-center text-gray-700 text-xs">
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <svg
+                          className="w-4 h-4 mr-1"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                          />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
                         </svg>
-                        {property.address?.subLocality || property.address?.city || "Location Name"}
+                        {property.address?.subLocality ||
+                          property.address?.city ||
+                          "Location Name"}
                       </div>
                     </div>
                     <div className="w-5 h-5 border border-gray-600 rounded flex items-center justify-center">
-                      <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <svg
+                        className="w-3 h-3 text-black"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                     </div>
                   </div>
@@ -171,10 +202,18 @@ export default function PropertyCards() {
                     {/* For Sale/Rent / Property Type overlay */}
                     <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-sm">
                       <span className="mr-2">
-                        {property.forSale ? "For Sale" : property.forRent ? "For Rent" : "For Sale"}
+                        {property.forSale
+                          ? "For Sale"
+                          : property.forRent
+                          ? "For Rent"
+                          : "For Sale"}
                       </span>
                       <span className="mx-1">•</span>
-                      <span className="ml-1">{property.propertyType?.displayName || property.propertyType?.childType?.displayName || "Office space"}</span>
+                      <span className="ml-1">
+                        {property.propertyType?.displayName ||
+                          property.propertyType?.childType?.displayName ||
+                          "Office space"}
+                      </span>
                     </div>
                   </div>
 
@@ -185,30 +224,32 @@ export default function PropertyCards() {
                       <div className="text-right text-black">
                         {property.dimension?.area || "5490"} sqft
                       </div>
-                      
+
                       <div className="text-gray-500">Space Condition</div>
                       <div className="text-right text-black">
-                        {getAttributeValue(property, "condition-id") || "Furnished"}
+                        {getAttributeValue(property, "condition-id") ||
+                          "Furnished"}
                       </div>
-                      
+
                       <div className="text-gray-500">Seat in office</div>
                       <div className="text-right text-black">
-                        {getAttributeValue(property, "seating-capacity-id") || "120"}
+                        {getAttributeValue(property, "seating-capacity-id") ||
+                          "120"}
                       </div>
-                      
+
                       <div className="text-gray-500">No of Cabin</div>
                       <div className="text-right text-black">
                         {getAttributeValue(property, "cabins-id") || "12"}
                       </div>
                     </div>
-                    
+
                     <div className="border-t border-gray-200 my-2"></div>
-                    
+
                     {/* Price and Actions */}
                     <div className="flex justify-between items-center mt-1">
                       <div>
                         <div className="text-base text-black font-semibold">
-                          {property.forRent 
+                          {property.forRent
                             ? `₹ ${property.monetaryInfo?.expectedRent || 4500}`
                             : formatPrice(property.monetaryInfo?.expectedPrice)}
                         </div>
@@ -219,33 +260,33 @@ export default function PropertyCards() {
                       <div className="flex space-x-1">
                         {/* Bookmark button */}
                         <button className="p-1.5 rounded flex items-center justify-center">
-                          <Image 
-                            src={bookmark} 
-                            alt="Bookmark" 
-                            width={24} 
-                            height={24} 
+                          <Image
+                            src={bookmark}
+                            alt="Bookmark"
+                            width={24}
+                            height={24}
                             className="object-contain"
                           />
                         </button>
-                        
+
                         {/* Share button */}
                         <button className="p-1.5 rounded flex items-center justify-center">
-                          <Image 
-                            src={share} 
-                            alt="Share" 
-                            width={24} 
-                            height={24} 
+                          <Image
+                            src={share}
+                            alt="Share"
+                            width={24}
+                            height={24}
                             className="object-contain"
                           />
                         </button>
-                        
+
                         {/* WhatsApp button */}
                         <button className="p-1.5 items-center justify-center">
-                          <Image 
-                            src={whatsapp} 
-                            alt="WhatsApp" 
-                            width={24} 
-                            height={24} 
+                          <Image
+                            src={whatsapp}
+                            alt="WhatsApp"
+                            width={24}
+                            height={24}
                             className="object-contain"
                           />
                         </button>

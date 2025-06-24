@@ -51,13 +51,13 @@ const Header = () => {
 
             {/* Search overlay - appears when search is open */}
             {isSearchOpen && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white z-50 px-4">
+              <div className="absolute inset-0 flex items-center justify-center bg-[#F5F5FF99] z-50 px-4">
                 <div className="w-full max-w-2xl">
                   <div className="relative">
                     <input
                       type="text"
                       placeholder="Search..."
-                      className="w-full py-3 pl-4 pr-12 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                      className="w-full py-3 pl-4 pr-12 rounded-md border text-gray-700 border-gray-300 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       autoFocus
@@ -83,9 +83,9 @@ const Header = () => {
                       </svg>
                     </button>
                   </div>
-                  <div className="mt-2 text-sm text-gray-500">
+                  {/* <div className="mt-2 text-sm text-gray-500">
                     <p>The latest. Take a look at whats new right now.</p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             )}
