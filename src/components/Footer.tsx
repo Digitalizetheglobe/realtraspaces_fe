@@ -282,7 +282,7 @@ const Footer = () => {
 
         <div className="flex justify-between items-center">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            &copy; 2022. Company Name. All rights reserved.
+            &copy; 2025. Company Name. All rights reserved.
           </p>
           {/* <Image src={footerimg} alt='footer' className='items-end justify-end w-74 right-0' /> */}
         </div>
