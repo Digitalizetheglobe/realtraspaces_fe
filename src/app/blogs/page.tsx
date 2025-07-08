@@ -1,7 +1,9 @@
 "use client";
 import Image from "next/image";
+import { useState, useEffect } from "react";
 import latestpropertytype from "../../../public/assets/images/latestpropertytype.svg";
 import { Raleway } from "next/font/google";
+import Link from "next/link";
 
 // Load Raleway font
 const raleway = Raleway({
@@ -11,7 +13,74 @@ const raleway = Raleway({
   variable: "--font-raleway",
 });
 
+type Blog = {
+  id: string | number;
+  blogTitle: string;
+  blogDescription: string;
+  blogImages?: string[];
+  category?: string;
+  createdAt: string;
+  writer?: string;
+  likes?: number;
+  bookmarks?: number;
+  tags?: string[];
+  dynamicFields?: {
+    isFeatured?: boolean;
+    readingTime?: number;
+  };
+};
+
 const Blogs = () => {
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch blogs from API
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:8000/api/blogs/');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        // Extract data from the response structure
+        if (result.status === 'success' && result.data) {
+          setBlogs(result.data);
+        } else {
+          throw new Error('Invalid response format');
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        console.error('Error fetching blogs:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
+
+  // Format date helper function
+  interface FormatDateOptions {
+    year: 'numeric' | '2-digit';
+    month: 'long' | 'short' | 'narrow' | 'numeric' | '2-digit';
+    day: 'numeric' | '2-digit';
+  }
+
+  const formatDate = (dateString: string, options?: FormatDateOptions): string => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', options ?? {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
     <div className={raleway.className}>
       <section className="py-16 bg-gray-50 flex justify-center items-center">
@@ -21,119 +90,91 @@ const Blogs = () => {
             <h2 className="text-3xl font-bold text-gray-900">
               Insights and Updates
             </h2>
-            <button className="text-white bg-black px-4 py-2 rounded-lg">
+            {/* <button className="text-white bg-black px-4 py-2 rounded-lg">
               Read More
-            </button>
+            </button> */}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Blog Card 1 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden group">
-              <div className="relative overflow-hidden rounded-lg">
-                <Image
-                  src={latestpropertytype}
-                  alt="blog"
-                  className="object-cover p-3 rounded-2xl h-[220px] transform group-hover:scale-110 transition-transform duration-500"
-                />
-                {/* Property Type and Location - Positioned absolutely on top of image */}
-                <div className="absolute top-4 right-0 px-4 flex justify-between">
-                  <span className="text-sm text-black bg-white bg-opacity-70 rounded-full px-3 py-1">
-                    News
-                  </span>
-                </div>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center mb-2">
-                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                    Luxury Properties
-                  </span>
-                  <span className="text-sm text-gray-500 ml-2">
-                    April 14, 2024
-                  </span>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Waterfront Luxury Villas: The Ultimate Investment
-                </h3>
-                {/* <p className="text-gray-600 mb-4">
-                  Explore the exclusive world of waterfront properties and why
-                  they continue to be one of the most secure real estate
-                  investments in 2024.
-                </p> */}
-              </div>
+          {/* Loading state */}
+          {loading && (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
             </div>
+          )}
 
-            {/* Blog Card 2 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden group">
-              <div className="relative overflow-hidden rounded-lg">
-                <Image
-                  src={latestpropertytype}
-                  alt="blog"
-                  className="object-cover p-3 rounded-2xl h-[220px] transform group-hover:scale-110 transition-transform duration-500"
-                />
-                {/* Property Type and Location - Positioned absolutely on top of image */}
-                <div className="absolute top-4 right-0 px-4 flex justify-between">
-                  <span className="text-sm text-black bg-white bg-opacity-70 rounded-full px-3 py-1">
-                    News
-                  </span>
-                </div>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center mb-2">
-                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                    Luxury Properties
-                  </span>
-                  <span className="text-sm text-gray-500 ml-2">
-                    April 14, 2024
-                  </span>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Waterfront Luxury Villas: The Ultimate Investment
-                </h3>
-                {/* <p className="text-gray-600 mb-4">
-                  Explore the exclusive world of waterfront properties and why
-                  they continue to be one of the most secure real estate
-                  investments in 2024.
-                </p> */}
-              </div>
+          {/* Error state */}
+          {error && (
+            <div className="text-center py-8">
+              <p className="text-red-600 mb-4">Error loading blogs: {error}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="bg-black text-white px-4 py-2 rounded-lg"
+              >
+                Try Again
+              </button>
             </div>
+          )}
 
-            {/* Blog Card 3 */}
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden group">
-              <div className="relative overflow-hidden rounded-lg">
-                <Image
-                  src={latestpropertytype}
-                  alt="blog"
-                  className="object-cover p-3 rounded-2xl h-[220px] transform group-hover:scale-110 transition-transform duration-500"
-                />
-                {/* Property Type and Location - Positioned absolutely on top of image */}
-                <div className="absolute top-4 right-0 px-4 flex justify-between">
-                  <span className="text-sm text-black bg-white bg-opacity-70 rounded-full px-3 py-1">
-                    Article
-                  </span>
+          {/* Blogs grid */}
+          {!loading && !error && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {blogs.length > 0 ? (
+                blogs.map((blog, index) => (
+                  <Link href={`/blogs/${blog.id}`} key={blog.id} className="block group">
+                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                      <div className="relative overflow-hidden rounded-lg">
+                        <Image
+                          src={blog.blogImages && blog.blogImages.length > 0 ? blog.blogImages[0] : latestpropertytype}
+                          alt={blog.blogTitle || "blog"}
+                          className="object-cover p-3 rounded-2xl h-[220px] transform group-hover:scale-110 transition-transform duration-500"
+                          width={400}
+                          height={220}
+                        />
+                        {/* Property Type and Location - Positioned absolutely on top of image */}
+                        <div className="absolute top-4 right-0 px-4 flex justify-between">
+                          <span className="text-sm text-black bg-white bg-opacity-70 rounded-full px-3 py-1">
+                            {blog.dynamicFields?.isFeatured ? "Featured" : "Article"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="p-6">
+                       
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                          {blog.blogTitle}
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                          {blog.blogDescription.split(' ').length > 10
+                            ? blog.blogDescription.split(' ').slice(0, 10).join(' ') + '...'
+                            : blog.blogDescription}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4">
+                           
+                            <div className="flex items-center space-x-2">
+                              <span className="text-sm text-gray-500">
+                                ❤️ {blog.likes}
+                              </span>
+                              <span className="text-sm text-gray-500">
+                                🔖 {blog.bookmarks}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                       
+                      </div>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-8">
+                  <p className="text-gray-600">No blogs available at the moment.</p>
                 </div>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center mb-2">
-                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded">
-                    Luxury Properties
-                  </span>
-                  <span className="text-sm text-gray-500 ml-2">
-                    April 14, 2024
-                  </span>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Waterfront Luxury Villas: The Ultimate Investment
-                </h3>
-                {/* <p className="text-gray-600 mb-4">
-                  Explore the exclusive world of waterfront properties and why
-                  they continue to be one of the most secure real estate
-                  investments in 2024.
-                </p> */}
-              </div>
+              )}
             </div>
-          </div>
+          )}
         </div>
       </section>
+
       {/* FAQ */}
       <section className="bg-white flex justify-center items-center min-h-screen">
         <div className="w-full max-w-2xl p-4">

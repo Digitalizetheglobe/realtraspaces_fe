@@ -16,11 +16,17 @@ const Header = () => {
     if (isMenuOpen) setIsMenuOpen(false);
   };
 
-  const menuItems = [
+  type MenuItem = {
+    name: string;
+    href: string;
+    divider?: boolean;
+  };
+
+  const menuItems: MenuItem[] = [
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
     { name: "Properties", href: "/properties" },
-    { name: "Blog", href: "/blog" },
+    { name: "Blog", href: "/blogs" },
     { name: "Career", href: "/career" },
     { name: "Contact", href: "/contact" },
     { name: "Saved Properties", href: "/saved-properties"},
@@ -128,12 +134,12 @@ const Header = () => {
               </button> */}
 
               {/* Sign In Button */}
-              <button
-                type="button"
+                <Link
+                href="/signin"
                 className="hidden sm:inline-flex bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
-              >
+                >
                 SIGN IN
-              </button>
+                </Link>
 
               {/* Menu Button - X when open, hamburger when closed */}
               <button
