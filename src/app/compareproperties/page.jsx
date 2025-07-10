@@ -15,7 +15,7 @@ import {
 import { FaWhatsapp } from "react-icons/fa"; // NEW  colourful WhatsApp logo
 import contactimg from "../../../public/assets/images/contactimg.png";
 
-/* ─────────────────────────  CONSTANTS  ───────────────────────── */
+/* ─────────────────────────  CONSTANTS  ───────────────────────── */ 
 const ATTRIBUTES = [
   "Carpet Area",
   "Floor",
@@ -88,7 +88,7 @@ const CompareProperties = () => {
               <li>{">"}</li>
               <li>Compare Properties</li>
             </ol>
-          </nav>
+          </nav> 
         </div>
       </section>
 
