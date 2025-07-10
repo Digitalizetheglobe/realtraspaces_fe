@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Building, Phone, ArrowRight, Shield, Mail } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-
 const SignInPage = () => {
   const [formData, setFormData] = useState({
     mobileNumber: '',
@@ -95,13 +94,14 @@ const SignInPage = () => {
       <div className="w-full max-w-6xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           {/* Left Side - Visual */}
-          <div
+         
+<div
   className="hidden lg:block relative p-12 bg-cover bg-center col-span-1"
   style={{
-    backgroundImage: "url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=80')"
+    backgroundImage: `url('/assets/signin.jpeg')`
   }}
 >
-            <div className="absolute inset-0 bg-black opacity-60 z-0"></div>
+            <div className="absolute inset-0 bg-black opacity-30 z-0"></div>
             <div className="relative z-10 h-full flex flex-col justify-between">
               <div className="flex items-center space-x-3">
                 <Building className="h-8 w-8 text-white" />
