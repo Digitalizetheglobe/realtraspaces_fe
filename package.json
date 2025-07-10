@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "aos": "^2.3.4",
+    "framer-motion": "^12.23.2",
     "lucide-react": "^0.507.0",
     "next": "15.3.0",
     "react": "^19.0.0",
