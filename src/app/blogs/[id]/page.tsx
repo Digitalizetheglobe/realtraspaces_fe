@@ -62,7 +62,7 @@ const BlogDetail = ({ params }: PageProps) => {
     const fetchBlog = async () => {
       try {
         console.log('Fetching blog for id:', resolvedParams.id);
-        const response = await fetch(`http://localhost:8000/api/blogs/${resolvedParams.id}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/blogs/${resolvedParams.id}`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch blog data: ${response.status}`);

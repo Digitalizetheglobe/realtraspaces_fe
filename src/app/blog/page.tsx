@@ -26,7 +26,7 @@ const BlogPage = () => {
     const fetchBlogs = async () => {
       try {
         console.log("Fetching blogs from API...");
-        const response = await fetch("http://localhost:8000/api/blogs/");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/blogs/`);
         console.log("Response status:", response.status);
         console.log("Response headers:", response.headers);
 

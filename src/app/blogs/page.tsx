@@ -40,7 +40,7 @@ const Blogs = () => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:8000/api/blogs/');
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/blogs/`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
