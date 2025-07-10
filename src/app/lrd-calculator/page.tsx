@@ -9,7 +9,13 @@ export default function EmiCalculator() {
   const [monthlyPayment, setMonthlyPayment] = useState(0);
   const [yearlyPayment, setYearlyPayment] = useState(0);
   const [totalPayment, setTotalPayment] = useState(0);
-  const [chartData, setChartData] = useState([]);
+  interface ChartDataPoint {
+    year: string;
+    remainingPrincipal: number;
+    totalPaid: number;
+  }
+
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
 
   useEffect(() => {
     calculateEMI();
@@ -41,7 +47,7 @@ export default function EmiCalculator() {
     setTotalPayment(total || 0);
 
     // Generate chart data - both lines connected to EMI calculations
-    const data = [];
+    const data: ChartDataPoint[] = [];
     let remainingPrincipal = loanAmount;
     let totalPaidSoFar = 0;
     
@@ -86,7 +92,7 @@ export default function EmiCalculator() {
     setChartData(data);
   };
 
-  const handleLoanTermChange = (term) => {
+  const handleLoanTermChange = (term: number) => {
     setLoanTerm(term);
   };
 

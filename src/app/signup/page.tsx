@@ -1,263 +1,381 @@
 "use client";
-import React, { useState } from 'react';
-import { Building, Phone, Mail, MapPin, User } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Building,
+  Phone,
+  Mail,
+  MapPin,
+  User,
+  Eye,
+  EyeOff,
+  Lock,
+  Briefcase,
+} from "lucide-react";
+import { toast } from "react-hot-toast";
 
 type FormData = {
-  name: string;
+  fullName: string;
   email: string;
-  mobile: string;
+  mobileNumber: string;
   location: string;
+  company: string;
+  password: string;
   mobileOpt: boolean;
 };
 
 type FormErrors = {
-  name?: string;
+  fullName?: string;
   email?: string;
-  mobile?: string;
+  mobileNumber?: string;
   location?: string;
+  company?: string;
+  password?: string;
   [key: string]: string | undefined;
 };
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState<FormData>({
-    name: '',
-    email: '',
-    mobile: '',
-    location: '',
-    mobileOpt: false
+    fullName: "",
+    email: "",
+    mobileNumber: "",
+    location: "",
+    company: "",
+    password: "",
+    mobileOpt: false,
   });
 
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-interface InputChangeEvent extends React.ChangeEvent<HTMLInputElement> {}
-
-const handleInputChange = (e: InputChangeEvent) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev: FormData) => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
     }));
 
     // Clear error when user starts typing
     if (errors[name]) {
-        setErrors((prev: FormErrors) => ({ ...prev, [name]: '' }));
+      setErrors((prev: FormErrors) => ({ ...prev, [name]: "" }));
     }
-};
+  };
 
   const validateForm = () => {
     const newErrors: FormErrors = {};
-    
-    if (!formData.name.trim()) newErrors.name = 'Name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
-    if (!formData.mobile.trim()) newErrors.mobile = 'Mobile number is required';
-    else if (!/^\d{10}$/.test(formData.mobile)) newErrors.mobile = 'Mobile number must be 10 digits';
-    if (!formData.location.trim()) newErrors.location = 'Location is required';
-    
+
+    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = "Email is invalid";
+    if (!formData.mobileNumber.trim())
+      newErrors.mobileNumber = "Mobile number is required";
+    else if (!/^\d{10}$/.test(formData.mobileNumber))
+      newErrors.mobileNumber = "Mobile number must be 10 digits";
+    if (!formData.location.trim()) newErrors.location = "Location is required";
+    if (!formData.company.trim()) newErrors.company = "Company is required";
+    if (!formData.password) newErrors.password = "Password is required";
+    else if (formData.password.length < 8)
+      newErrors.password = "Password must be at least 8 characters";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-interface SubmitEvent extends React.FormEvent<HTMLFormElement> {}
-
-const handleSubmit = (e: SubmitEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-        console.log('Form submitted:', formData);
-        // Handle form submission here - send OTP to mobile
-        alert('OTP sent to your mobile number!');
+
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch(
+        "http://localhost:8000/api/webusers/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Registration failed");
+      }
+
+      if (result.status === "success" && result.data?.token) {
+        localStorage.setItem("authToken", result.data.token);
+        toast.success("Registration successful!");
+        window.location.href = "/";
+      } else if (result.data?.token) {
+        localStorage.setItem("authToken", result.data.token);
+        toast.success("Registration successful!");
+        window.location.href = "/";
+      } else {
+        throw new Error("No authentication token received");
+      }
+    } catch (error: any) {
+      toast.error(error.message || "An error occurred during registration");
+      console.error("Registration error:", error);
+    } finally {
+      setIsSubmitting(false);
     }
-};
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 flex items-center justify-center p-4">
-      {/* Background City Silhouette */}
-      <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black/30 to-transparent pointer-events-none">
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-r from-transparent via-black/20 to-transparent"></div>
-      </div>
-      
-      <div className="w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 items-center relative z-10">
-        {/* Left Side - Content */}
-        <div className="text-white space-y-8 px-4">
-          <div className="flex items-center space-x-3">
-            <Building className="h-8 w-8 text-blue-400" />
-            <span className="text-2xl font-bold">Realtraspace</span>
-          </div>
-          
-          <div className="space-y-6">
-            <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
-              Take control of the service experience during your property search & ownership journey
-            </h1>
-            
-            <div className="space-y-4">
-              <div className="flex items-start space-x-4">
-                <div className="w-6 h-6 bg-blue-500 rounded-sm flex items-center justify-center mt-1">
-                  <Building className="h-4 w-4 text-white" />
-                </div>
-                <p className="text-gray-300">Provide more information about your property needs</p>
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 md:p-8"
+      style={{ 
+        backgroundColor: '#F1F1F4',
+        fontFamily: 'Raleway, sans-serif'
+      }}
+    >
+      {/* Main Container */}
+      <div className="w-full max-w-6xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2">
+          {/* Left Side - Visual */}
+          <div className="hidden lg:block relative bg-gradient-to-br from-blue-600 to-blue-800 p-12">
+            <div className="absolute inset-0 bg-[url('/pattern.svg')] bg-cover opacity-10"></div>
+            <div className="relative z-10 h-full flex flex-col justify-between">
+              <div className="flex items-center space-x-3">
+                <Building className="h-8 w-8 text-white" />
+                <span className="text-2xl font-bold text-white">Realtraspace</span>
               </div>
               
-              <div className="flex items-start space-x-4">
-                <div className="w-6 h-6 bg-blue-500 rounded-sm flex items-center justify-center mt-1">
-                  <span className="text-white text-sm">♥</span>
+              <div className="space-y-6">
+                <h1 className="text-4xl font-bold text-white leading-tight">
+                  Take control of your property journey
+                </h1>
+                
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-6 h-6 bg-white/20 rounded-sm flex items-center justify-center mt-1">
+                      <Building className="h-4 w-4 text-white" />
+                    </div>
+                    <p className="text-white/90">Premium property listings</p>
+                  </div>
+                  
+                  <div className="flex items-start space-x-4">
+                    <div className="w-6 h-6 bg-white/20 rounded-sm flex items-center justify-center mt-1">
+                      <span className="text-white text-sm">♥</span>
+                    </div>
+                    <p className="text-white/90">Personalized recommendations</p>
+                  </div>
+                  
+                  <div className="flex items-start space-x-4">
+                    <div className="w-6 h-6 bg-white/20 rounded-sm flex items-center justify-center mt-1">
+                      <span className="text-white text-sm">★</span>
+                    </div>
+                    <p className="text-white/90">Exclusive market insights</p>
+                  </div>
                 </div>
-                <p className="text-gray-300">Shortlist more properties for site visits & evaluation</p>
               </div>
               
-              <div className="flex items-start space-x-4">
-                <div className="w-6 h-6 bg-blue-500 rounded-sm flex items-center justify-center mt-1">
-                  <span className="text-white text-sm">★</span>
-                </div>
-                <p className="text-gray-300">Rate your experience with us and give feedback</p>
-              </div>
-              
-              <div className="flex items-start space-x-4">
-                <div className="w-6 h-6 bg-blue-500 rounded-sm flex items-center justify-center mt-1">
-                  <User className="h-4 w-4 text-white" />
-                </div>
-                <p className="text-gray-300">View assigned sales expert's profile & request for change if required</p>
-              </div>
-              
-              <div className="flex items-start space-x-4">
-                <div className="w-6 h-6 bg-blue-500 rounded-sm flex items-center justify-center mt-1">
-                  <span className="text-white text-sm">📅</span>
-                </div>
-                <p className="text-gray-300">Manage your meetings/site visits schedule</p>
+              <div className="text-white/80 text-sm">
+                © 2023 Realtraspace. All rights reserved.
               </div>
             </div>
-          </div>
-        </div>
-        
-        {/* Right Side - Sign Up Form */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8 mx-4 lg:mx-0">
-          <div className="text-center mb-8">
-            {/* <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-              <Building className="h-8 w-8 text-blue-600" />
-            </div> */}
-            <h2 className="text-2xl font-bold text-gray-900">Create Account</h2>
-            <p className="text-gray-600 mt-2">Join Realtraspace to find your perfect property</p>
           </div>
           
-          <div className="space-y-4">
-            {/* Name Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name *
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.name ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter your full name"
-                />
-              </div>
-              {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+          {/* Right Side - Form */}
+          <div className="p-8 md:p-12">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold mb-2" style={{ color: '#1A1A1A' }}>Create Account</h2>
+              <p className="text-[#6E6E73]">Join Realtraspace to find your perfect property</p>
             </div>
             
-            {/* Email Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address *
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.email ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter your email"
-                />
-              </div>
-              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-            </div>
-            
-            {/* Mobile Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Mobile Number *
-              </label>
-              <div className="flex">
-                <div className="flex items-center bg-gray-50 border border-r-0 border-gray-300 rounded-l-lg px-3">
-                  <span className="text-2xl mr-2">🇮🇳</span>
-                  <span className="text-gray-700">+91</span>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Full Name */}
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#6E6E73' }}>
+                  Full Name *
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#6E6E73]" />
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleInputChange}
+                    className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      errors.fullName ? 'border-red-500' : 'border-[#E5E5E7]'
+                    }`}
+                    placeholder="Enter your full name"
+                    style={{ color: '#1A1A1A' }}
+                  />
                 </div>
-                <input
-                  type="tel"
-                  name="mobile"
-                  value={formData.mobile}
-                  onChange={handleInputChange}
-                  className={`flex-1 px-4 py-3 border rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.mobile ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter Mobile Number"
-                />
+                {errors.fullName && <p className="text-red-500 text-sm mt-1">{errors.fullName}</p>}
               </div>
-              {errors.mobile && <p className="text-red-500 text-sm mt-1">{errors.mobile}</p>}
-            </div>
-            
-            {/* Location Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Location *
-              </label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                    errors.location ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter your location"
-                />
+              
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#6E6E73' }}>
+                  Email Address *
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#6E6E73]" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      errors.email ? 'border-red-500' : 'border-[#E5E5E7]'
+                    }`}
+                    placeholder="Enter your email"
+                    style={{ color: '#1A1A1A' }}
+                  />
+                </div>
+                {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
               </div>
-              {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
-            </div>
-            
-            {/* Mobile Opt Checkbox */}
-            <div className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                name="mobileOpt"
-                id="mobileOpt"
-                checked={formData.mobileOpt}
-                onChange={handleInputChange}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-              />
-              <label htmlFor="mobileOpt" className="text-sm text-gray-700">
-                I agree to receive SMS updates and promotional offers
-              </label>
-            </div>
-            
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center space-x-2"
-            >
-              <span>Send OTP</span>
-              <span>→</span>
-            </button>
-            
-            {/* Login Link */}
-            <p className="text-center text-sm text-gray-600 mt-6">
-              Already have an account?{' '}
-              <a href="/signin" className="text-blue-600 hover:underline font-semibold">
-                Sign In Here
-              </a>
-            </p>
+              
+              {/* Mobile */}
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#6E6E73' }}>
+                  Mobile Number *
+                </label>
+                <div className="flex">
+                  <div className="flex items-center bg-[#F1F1F4] border border-r-0 border-[#E5E5E7] rounded-l-lg px-3">
+                    <span className="text-2xl mr-2">🇮🇳</span>
+                    <span style={{ color: '#6E6E73' }}>+91</span>
+                  </div>
+                  <input
+                    type="tel"
+                    name="mobileNumber"
+                    value={formData.mobileNumber}
+                    onChange={handleInputChange}
+                    className={`flex-1 px-4 py-3 bg-[#F1F1F4] border rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      errors.mobileNumber ? 'border-red-500' : 'border-[#E5E5E7]'
+                    }`}
+                    placeholder="Enter Mobile Number"
+                    style={{ color: '#1A1A1A' }}
+                  />
+                </div>
+                {errors.mobileNumber && <p className="text-red-500 text-sm mt-1">{errors.mobileNumber}</p>}
+              </div>
+              
+              {/* Location */}
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#6E6E73' }}>
+                  Location *
+                </label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#6E6E73]" />
+                  <input
+                    type="text"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      errors.location ? 'border-red-500' : 'border-[#E5E5E7]'
+                    }`}
+                    placeholder="Enter your location"
+                    style={{ color: '#1A1A1A' }}
+                  />
+                </div>
+                {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
+              </div>
+              
+              {/* Company */}
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#6E6E73' }}>
+                  Company *
+                </label>
+                <div className="relative">
+                  <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#6E6E73]" />
+                  <input
+                    type="text"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleInputChange}
+                    className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      errors.company ? 'border-red-500' : 'border-[#E5E5E7]'
+                    }`}
+                    placeholder="Enter your company name"
+                    style={{ color: '#1A1A1A' }}
+                  />
+                </div>
+                {errors.company && <p className="text-red-500 text-sm mt-1">{errors.company}</p>}
+              </div>
+              
+              {/* Password */}
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: '#6E6E73' }}>
+                  Password *
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#6E6E73]" />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className={`w-full pl-10 pr-10 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                      errors.password ? 'border-red-500' : 'border-[#E5E5E7]'
+                    }`}
+                    placeholder="Enter your password"
+                    style={{ color: '#1A1A1A' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6E6E73] hover:text-[#1A1A1A]"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+              </div>
+              
+              {/* Checkbox */}
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="mobileOpt"
+                  id="mobileOpt"
+                  checked={formData.mobileOpt}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 text-blue-600 border-[#E5E5E7] rounded focus:ring-blue-500"
+                />
+                <label htmlFor="mobileOpt" className="text-sm" style={{ color: '#6E6E73' }}>
+                  I agree to receive SMS updates and promotional offers
+                </label>
+              </div>
+              
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center space-x-2"
+              >
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Create Account</span>
+                    <span>→</span>
+                  </>
+                )}
+              </button>
+              
+              {/* Login Link */}
+              <p className="text-center text-sm" style={{ color: '#6E6E73' }}>
+                Already have an account?{' '}
+                <a href="/signin" className="text-blue-600 hover:underline font-semibold">
+                  Sign In Here
+                </a>
+              </p>
+            </form>
           </div>
         </div>
       </div>

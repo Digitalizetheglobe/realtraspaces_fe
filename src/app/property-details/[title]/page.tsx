@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Raleway } from "next/font/google";
-// import Similarproperties from "../similarproperties/page";
 // Import your static images
 import contactimg from "../../../../public/assets/images/contactimg.png";
 import propertydetails from "../../../../public/assets/images/property-details.png";
@@ -96,6 +95,13 @@ export default function PropertyDetails() {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const propertyOverviewRef = useRef<HTMLDivElement | null>(null);
   const [isSticky, setIsSticky] = useState(true);
+  const [showEnquirePopup, setShowEnquirePopup] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    mobile: "",
+    message: "",
+    propertySlug: propertyTitle || ""
+  });
 
   const thumbnails = [
     propertydetails1,
@@ -178,6 +184,44 @@ export default function PropertyDetails() {
     // setMainImage(img);
   };
 
+  const handleEnquireClick = () => {
+    setShowEnquirePopup(true);
+    // Update the property slug in form data when opening the popup
+    setFormData(prev => ({
+      ...prev,
+      propertySlug: propertyTitle || ""
+    }));
+  };
+
+  const handleClosePopup = () => {
+    setShowEnquirePopup(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Here you would typically send the form data to your backend
+    console.log("Form submitted:", formData);
+    // Close the popup after submission
+    setShowEnquirePopup(false);
+    // Reset form
+    setFormData({
+      name: "",
+      mobile: "",
+      message: "",
+      propertySlug: propertyTitle || ""
+    });
+    // Show success message or redirect
+    alert("Thank you for your enquiry! We'll get back to you soon.");
+  };
+
   const visibleImages = imageUrls.length > 0 
     ? imageUrls.slice(startIndex, startIndex + visibleCount)
     : thumbnails.slice(startIndex, startIndex + visibleCount);
@@ -197,7 +241,6 @@ export default function PropertyDetails() {
       }
     }
   };
-
 
   const getFurnishStatus = (status?: string): string => {
     const statusMap: Record<string, string> = {
@@ -268,25 +311,101 @@ export default function PropertyDetails() {
 
   return (
     <div className={raleway.className}>
-       <main className="min-h-screen bg-white">
+      {/* Enquire Now Popup */}
+      {showEnquirePopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6 relative">
+            <button 
+              onClick={handleClosePopup}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Enquire About This Property</h2>
+            <p className="text-gray-600 mb-6">Please fill out the form below and we'll get back to you soon.</p>
+            
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label htmlFor="name" className="block text-gray-700 text-sm font-medium mb-2">
+                  Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Your Name"
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label htmlFor="mobile" className="block text-gray-700 text-sm font-medium mb-2">
+                  Mobile Number <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="tel"
+                  id="mobile"
+                  name="mobile"
+                  value={formData.mobile}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border text-black border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Your Mobile Number"
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label htmlFor="message" className="block text-gray-700 text-sm font-medium mb-2">
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  rows={4}
+                  className="w-full px-3 py-2 border text-black border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Your message or questions about this property"
+                ></textarea>
+              </div>
+              
+              <input
+                type="hidden"
+                name="propertySlug"
+                value={formData.propertySlug}
+              />
+              
+              <div className="mt-6">
+                <button
+                  type="submit"
+                  className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 transition duration-300"
+                >
+                  Submit Enquiry
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <main className="min-h-screen bg-white">
         {/* Hero Section */}
-         <section className="relative h-[60vh] w-full">
+        <section className="relative h-[60vh] w-full">
           <div className="absolute inset-0">
-            {imageUrls.length > 0 ? (
-              <img
-                src={imageUrls[0]}
-                alt={property.title || "Property"}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <Image
-                src={contactimg}
-                alt="Modern Home Interior"
-                fill
-                priority
-                className="object-cover"
-              />
-            )}
+            <Image
+              src={propertydetails}
+              alt={property.title || "Property"}
+              fill
+              priority
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-black opacity-50"></div>
           </div>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center z-10 text-center space-y-4">
@@ -461,10 +580,13 @@ export default function PropertyDetails() {
 
                 {/* Buttons */}
                 <div className="mt-5 flex flex-wrap gap-3">
-                  <button className="border border-black text-black text-sm font-medium py-2 px-10 rounded-lg">
+                  <button 
+                    onClick={handleEnquireClick}
+                    className="border border-black text-black text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-100 transition"
+                  >
                     Enquire Now
                   </button>
-                  <button className="bg-black text-white text-sm font-medium py-2 px-10 rounded-lg">
+                  <button className="bg-black text-white text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-800 transition">
                     Schedule a Visit
                   </button>
                 </div>
@@ -982,10 +1104,8 @@ export default function PropertyDetails() {
             />
           </div>
         </div>
-      {/* </div> */}
-    </main>
-    <Similarproperties />
+      </main>
+      <Similarproperties />
     </div>
-  
   );
 }
