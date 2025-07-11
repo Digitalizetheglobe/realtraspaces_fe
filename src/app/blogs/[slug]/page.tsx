@@ -48,7 +48,7 @@ const BlogDetail = ({ params }: PageProps) => {
   const [error, setError] = useState<string | null>(null);
 
   // Unwrap the params Promise using React.use()
-  const resolvedParams = React.use(params as unknown as Promise<{ id: string }>);
+  const resolvedParams = React.use(params as unknown as Promise<{ slug: string }>);
   
   useEffect(() => {
     // Initialize AOS animation library
@@ -61,8 +61,8 @@ const BlogDetail = ({ params }: PageProps) => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        console.log('Fetching blog for id:', resolvedParams.id);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/blogs/${resolvedParams.id}`);
+        console.log('Fetching blog for id:', resolvedParams.slug);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/blogs/${resolvedParams.slug}`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch blog data: ${response.status}`);
@@ -85,10 +85,10 @@ const BlogDetail = ({ params }: PageProps) => {
       }
     };
     
-    if (resolvedParams.id) {
+    if (resolvedParams.slug) {
       fetchBlog();
     }
-  }, [resolvedParams.id]);
+  }, [resolvedParams.slug]);
 
   // Function to format date
   const formatDate = (dateString: string) => {
@@ -130,7 +130,7 @@ const BlogDetail = ({ params }: PageProps) => {
   return (
     <> 
       {/* Hero Section */}
-      <section id="top" className="relative min-h-screen">
+      <section id="top" className="relative ">
         <div className="absolute inset-0 z-0">
           {/* Use blog image if available, otherwise use default */}
           {blog.blogImages && blog.blogImages.length > 0 ? (
@@ -154,7 +154,7 @@ const BlogDetail = ({ params }: PageProps) => {
         </div>
         
         {/* Hero Content */}
-        <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
+        <div className="relative z-10 flex items-center justify-center pt-20 pb-10 px-4">
           <div className="text-center max-w-3xl mx-auto text-white">
             <div className="flex items-center justify-center gap-4 mb-4">
               <p className="text-sm uppercase font-medium tracking-wider">
@@ -170,32 +170,17 @@ const BlogDetail = ({ params }: PageProps) => {
             <h2 className="text-4xl md:text-5xl font-serif leading-tight mb-6">
               Blogs
             </h2>
-            
+{/*             
             <h1 className="text-4xl md:text-5xl font-serif leading-tight mb-6" data-aos="fade-up">
               {blog.blogTitle}
-            </h1>
+            </h1> */}
             
             <p className="mb-8 max-w-xl mx-auto" data-aos="fade-up" data-aos-delay="100">
               {blog.blogDescription}
             </p>
             
             {/* Blog Meta Information */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8" data-aos="fade-up" data-aos-delay="200">
-              <p className="text-sm">Written by <span className="font-medium">{blog.writer}</span></p>
-              <span className="hidden sm:inline">•</span>
-              <p className="text-sm">{formatDate(blog.createdAt)}</p>
-              {blog.dynamicFields?.readingTime && (
-                <>
-                  <span className="hidden sm:inline">•</span>
-                  <p className="text-sm">{blog.dynamicFields.readingTime} min read</p>
-                </>
-              )}
-              <span className="hidden sm:inline">•</span>
-              <div className="flex items-center gap-4">
-                <span className="text-sm">❤️ {blog.likes}</span>
-                <span className="text-sm">🔖 {blog.bookmarks}</span>
-              </div>
-            </div>
+           
 
             {/* Tags */}
             {/* {blog.tags && blog.tags.length > 0 && (
@@ -209,23 +194,13 @@ const BlogDetail = ({ params }: PageProps) => {
             )} */}
             
             {/* CTA Button */}
-            <div className="flex justify-center">
-              <Link
-               href="/blogs"
-                className="bg-white text-[#172747] hover:bg-[#172747] hover:text-white border border-white px-6 py-3 rounded-[4px] flex items-center justify-center gap-2 transition-colors"
-              >
-                Read Article
-                <ArrowRight size={16} />
-              </Link>
-               
-              
-            </div>
+          
           </div>
         </div>
       </section>
 
       {/* Blog Content Section */}
-      <section id="blog-content" className="py-16 px-4">
+      <section id="blog-content" className="py-10 px-4">
         <div className="max-w-3xl mx-auto">
           {/* Article Header */}
           <div className="mb-8">
@@ -239,10 +214,10 @@ const BlogDetail = ({ params }: PageProps) => {
 
             {/* Article Meta */}
             <div className="flex flex-wrap items-center gap-4 pb-6 border-b border-gray-200">
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">By</span>
                 <span className="text-sm font-medium">{blog.writer}</span>
-              </div>
+              </div> */}
               <span className="text-gray-300">•</span>
               <span className="text-sm text-gray-600">{formatDate(blog.createdAt)}</span>
               {blog.dynamicFields?.readingTime && (
@@ -277,9 +252,17 @@ const BlogDetail = ({ params }: PageProps) => {
           {/* Blog Content */}
           <div 
             className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-blue-600 prose-strong:text-gray-900"
-            dangerouslySetInnerHTML={createMarkup(blog.blogContent)}
             data-aos="fade-up"
-          />
+          >
+            {blog.blogContent
+              .split(/\n+/)
+              .filter(paragraph => paragraph.trim() !== "")
+              .map((paragraph, idx) => (
+                <p key={idx} className="mb-6 px-2">
+                  {paragraph}
+                </p>
+              ))}
+          </div>
           
           {/* Additional Images */}
           {blog.blogImages && blog.blogImages.length > 1 && (

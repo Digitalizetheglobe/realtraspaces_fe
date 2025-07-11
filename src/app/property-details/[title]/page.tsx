@@ -376,6 +376,19 @@ export default function PropertyDetails() {
     });
   };
 
+  // Helper to build full address string for map
+  const getFullAddress = (address?: Property["address"]) => {
+    if (!address) return "";
+    return [
+      address.subLocality || address.community,
+      address.city,
+      address.state,
+      address.postalCode,
+    ]
+      .filter(Boolean)
+      .join(", ");
+  };
+
   if (loading) {
     return (
       <div className={raleway.className}>
@@ -1307,14 +1320,24 @@ export default function PropertyDetails() {
         <div className="mt-12 max-w-5xl mx-auto px-4">
           <h1 className="text-black text-xl font-semibold mb-2">Location</h1>
           <p className="text-gray-700 text-md">
-            Located in the bustling commercial hub of Andheri East, 215 Atrium.
+            {getFullAddress(property.address) || "Location not specified."}
           </p>
           <div className="py-4 mt-8">
-            <Image
-              src={location}
-              alt="property location"
-              className="items-center justify-center mx-auto"
-            />
+            {getFullAddress(property.address) ? (
+              <iframe
+                title="Property Location"
+                width="100%"
+                height="350"
+                style={{ border: 0, borderRadius: "12px" }}
+                loading="lazy"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+                src={`https://www.google.com/maps?q=${encodeURIComponent(getFullAddress(property.address))}&output=embed`}
+                className="w-full rounded-lg"
+              />
+            ) : (
+              <p className="text-gray-500">Map not available.</p>
+            )}
           </div>
         </div>
       </main>

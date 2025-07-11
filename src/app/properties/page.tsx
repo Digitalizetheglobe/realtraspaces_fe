@@ -346,37 +346,37 @@ export default function Similarproperties() {
               <div className="mb-[60px] w-full"></div>
 
               {/* Search and Filter Section */}
-              <div className="mb-8">
-                {/* Search Bar */}
-                <div className="relative mb-6">
-                  <input
-                    type="text"
-                    placeholder="Search by property name, location, or type..."
-                    className="w-full text-black p-4 pl-12 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <svg
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-black"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                </div>
+             <div className="mb-8 px-4 sm:px-0">
+  {/* Search Bar */}
+  <div className="relative mb-6">
+    <input
+      type="text"
+      placeholder="Search by property name, location, or type..."
+      className="w-full text-black text-sm sm:text-base p-3 sm:p-4 pl-10 sm:pl-12 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+    />
+    <svg
+      className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-black"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+      />
+    </svg>
+  </div>
 
-                <div className="text-sm text-gray-600 mb-4">
-                  Showing {filteredProperties.length} of {properties.length}{" "}
-                  properties
-                </div>
-              </div>
+  <div className="text-sm text-gray-600 mb-4 text-center sm:text-left">
+    Showing {filteredProperties.length} of {properties.length} properties
+  </div>
+</div>
+
 
               {/* Property Cards */}
               {filteredProperties.length > 0 ? (

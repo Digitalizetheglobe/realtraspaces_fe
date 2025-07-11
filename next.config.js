@@ -3,7 +3,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['readymadeui.com'],
+    domains: [
+      'example.com', // Add any other domains your images come from
+    ],
     remotePatterns: [
       {
         protocol: 'https',
