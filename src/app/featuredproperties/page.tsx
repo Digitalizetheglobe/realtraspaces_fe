@@ -53,6 +53,7 @@ type Property = {
 const FeaturedProperties = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -81,6 +82,28 @@ const FeaturedProperties = () => {
 
     fetchProperties();
   }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = parseInt(entry.target.getAttribute('data-index') || '0');
+            setVisibleItems(prev => new Set(prev).add(index));
+          }
+        });
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '50px'
+      }
+    );
+
+    const propertyElements = document.querySelectorAll('.property-card');
+    propertyElements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [properties]);
 
   if (loading) {
     return (
@@ -146,12 +169,125 @@ const FeaturedProperties = () => {
 
   return (
     <>
+      <style jsx global>{`
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-100px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(100px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-slide-left {
+          animation: slideInLeft 0.8s ease-out forwards;
+        }
+
+        .animate-slide-right {
+          animation: slideInRight 0.8s ease-out forwards;
+        }
+
+        .animate-fade-up {
+          animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .property-card {
+          opacity: 0;
+          transform: translateX(-100px);
+          transition: all 0.3s ease;
+        }
+
+        .property-card.visible-left {
+          animation: slideInLeft 0.8s ease-out forwards;
+        }
+
+        .property-card.visible-right {
+          animation: slideInRight 0.8s ease-out forwards;
+        }
+
+        .property-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .property-image {
+          transition: transform 0.3s ease;
+        }
+
+        .property-card:hover .property-image {
+          transform: scale(1.05);
+        }
+
+        .property-tags span {
+          transition: all 0.3s ease;
+        }
+
+        .property-card:hover .property-tags span {
+          transform: translateY(-2px);
+        }
+
+        .property-details > div {
+          transition: transform 0.3s ease;
+        }
+
+        .property-card:hover .property-details > div {
+          transform: translateY(-2px);
+        }
+
+        .bookmark-btn {
+          transition: transform 0.3s ease;
+        }
+
+        .property-card:hover .bookmark-btn {
+          transform: rotate(10deg) scale(1.1);
+        }
+
+        .details-btn {
+          transition: all 0.3s ease;
+        }
+
+        .details-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-animate {
+          opacity: 0;
+          transform: translateY(30px);
+          animation: fadeInUp 0.8s ease-out forwards;
+        }
+      `}</style>
+
       <section
         className={`${raleway.className} py-12 px-4 sm:px-6 lg:px-8 bg-gray-50`}
       >
         <div className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
           <div className="mb-6 max-w-5xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold text-black">
+            <h2 className="text-2xl sm:text-3xl font-bold text-black header-animate">
               Explore Commercial Properties in BKC
             </h2>
           </div>
@@ -160,7 +296,12 @@ const FeaturedProperties = () => {
             {properties.map((property, index) => (
               <div
                 key={property.id}
-                className="bg-white rounded-lg shadow-sm overflow-hidden"
+                className={`property-card bg-white rounded-lg shadow-sm overflow-hidden ${
+                  visibleItems.has(index) 
+                    ? (index % 2 === 0 ? 'visible-left' : 'visible-right')
+                    : ''
+                }`}
+                data-index={index}
               >
                 <div
                   className={`flex flex-col sm:flex-row ${
@@ -168,20 +309,20 @@ const FeaturedProperties = () => {
                   }`}
                 >
                   {/* Image */}
-                  <div className="w-full sm:w-1/3 p-2">
+                  <div className="w-full sm:w-1/3 p-2 overflow-hidden">
                     {Object.keys(property.imageUrls || {}).length > 0 ? (
                       <img
                         src={
                           property.imageUrls[Object.keys(property.imageUrls)[0]]
                         }
                         alt={property.title}
-                        className="w-full h-56 object-cover rounded-2xl p-2"
+                        className="property-image w-full h-56 object-cover rounded-2xl p-2"
                       />
                     ) : (
                       <Image
                         alt="Property"
                         src={latestpropertytype}
-                        className="w-full h-56 object-cover rounded-2xl p-2"
+                        className="property-image w-full h-56 object-cover rounded-2xl p-2"
                       />
                     )}
                   </div>
@@ -191,7 +332,7 @@ const FeaturedProperties = () => {
                   {/* Content */}
                   <div className="w-full sm:w-2/3 p-4 px-8">
                     {/* Property Tag */}
-                    <div className="mb-3">
+                    <div className="property-tags mb-3">
                       <span className="bg-[#6E6E73] text-white px-3 py-1 rounded-full text-sm">
                         {property.propertyType?.childType?.displayName ||
                           property.propertyType?.displayName ||
@@ -203,10 +344,10 @@ const FeaturedProperties = () => {
                     </div>
 
                     {/* Title and Price */}
-                    <h3 className="font-semibold text-xl text-gray-900">
+                    <h3 className="font-semibold text-xl text-gray-900 transition-colors duration-300">
                       {property.title || "ONE BKC C Wing"}
                     </h3>
-                    <h4 className="text-base text-gray-500 mb-4">
+                    <h4 className="text-base text-gray-500 mb-4 transition-colors duration-300">
                       {formatPrice(
                         property.monetaryInfo?.expectedPrice ||
                           property.monetaryInfo?.monthlyRentAmount,
@@ -215,7 +356,7 @@ const FeaturedProperties = () => {
                     </h4>
 
                     {/* Property Details */}
-                    <div className="flex flex-wrap space-x-4 md:space-x-12 border-t border-b border-gray-200 py-3 mb-3">
+                    <div className="property-details flex flex-wrap space-x-4 md:space-x-12 border-t border-b border-gray-200 py-3 mb-3">
                       <div className="flex items-center space-x-2 mb-2">
                         <Image src={sqft} alt="Area" width={20} height={20} />
                         <div className="flex flex-col">
@@ -291,7 +432,7 @@ const FeaturedProperties = () => {
                       </div>
 
                       <div className="flex items-center space-x-3">
-                        <button className="p-1">
+                        <button className="bookmark-btn p-1">
                           <Image
                             src={bookmark}
                             alt="Bookmark"
@@ -301,7 +442,7 @@ const FeaturedProperties = () => {
                         </button>
                         <Link
                           href={`/property-details/${createSlug(property.title)}`}
-                          className="bg-black text-white px-5 py-1 text-md rounded"
+                          className="details-btn bg-black text-white px-5 py-1 text-md rounded cursor-pointer hover:bg-gray-800 transition-colors"
                         >
                           Details
                         </Link>

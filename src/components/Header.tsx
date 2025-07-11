@@ -101,7 +101,7 @@ const Header = () => {
               <button
                 type="button"
                 onClick={toggleSearch}
-                className={`p-2 rounded-md ${
+                className={`p-2 rounded-md cursor-pointer ${
                   isSearchOpen
                     ? "bg-black text-white"
                     : "bg-[#F5F5FF99] text-black hover:bg-gray-100"

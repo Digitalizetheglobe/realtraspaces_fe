@@ -756,57 +756,65 @@ export default function PropertyDetails() {
                 </div>
 
                 {/* Buttons */}
-                <div className="mt-5 flex flex-wrap gap-3">
-                  <button
-                    onClick={handleEnquireClick}
-                    className="cursor-pointer border border-black text-black text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-100 transition"
-                  >
-                    Enquire Now
-                  </button>
-                  <button className="bg-black text-white text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-800 transition">
-                    Schedule a Visit
-                  </button>
-                  <button
-                    className={`cursor-pointer border border-black text-black text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-100 transition${
-                      isSaving ? "opacity-70 cursor-not-allowed" : ""
-                    }`}
-                    onClick={handleSaveProperty}
-                    disabled={isSaving}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-                      />
-                    </svg>
-                    {isSaving ? "Saving..." : "Save Property"}
-                  </button>
-                  <button
-                    onClick={handleCompareClick}
-                    disabled={isComparing}
-                    className="cursor-pointer flex items-center justify-center px-6 py-3 border border-blue-600 text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors disabled:opacity-50"
-                  >
-                    {isComparing ? (
-                      <>
-                        <div className="h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-2"></div>
-                        Adding...
-                      </>
-                    ) : (
-                      <>
-                        <GitCompare className="h-5 w-5 mr-2" />
-                        Compare
-                      </>
-                    )}
-                  </button>
-                </div>
+              <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+  {/* Enquire Now */}
+  <button
+    onClick={handleEnquireClick}
+    className="w-full cursor-pointer border border-black text-black text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-100 transition"
+  >
+    Enquire Now
+  </button>
+
+  {/* Schedule a Visit */}
+  <button className="w-full bg-black text-white text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-800 transition">
+    Schedule a Visit
+  </button>
+
+  {/* Save Property */}
+  <button
+    className={`w-full flex items-center justify-center gap-2 border border-black text-black text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-100 transition ${
+      isSaving ? "opacity-70 cursor-not-allowed" : ""
+    }`}
+    onClick={handleSaveProperty}
+    disabled={isSaving}
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-5 w-5"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+      />
+    </svg>
+    {isSaving ? "Saving..." : "Save Property"}
+  </button>
+
+  {/* Compare */}
+  <button
+    onClick={handleCompareClick}
+    disabled={isComparing}
+    className="w-full flex items-center justify-center gap-2 border border-black text-black text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-100 transition"
+  >
+    {isComparing ? (
+      <>
+        <div className="h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        Adding...
+      </>
+    ) : (
+      <>
+        <GitCompare className="h-5 w-5" />
+        Compare
+      </>
+    )}
+  </button>
+</div>
+
               </div>
 
               <div className="mt-8 bg-gray-100 p-4 rounded-xl">
@@ -1341,7 +1349,9 @@ export default function PropertyDetails() {
           </div>
         </div>
       </main>
-      <Similarproperties />
+       <Similarproperties />
+      
+     
     </div>
   );
 }

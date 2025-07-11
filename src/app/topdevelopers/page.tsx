@@ -52,7 +52,7 @@ const TopDevelopers = () => {
                   personalized consultation—we will help you find the perfect
                   property that fits your needs and vision.{" "}
                 </p>
-                <button className={`${raleway.className}  bg-black text-white px-4 p-2 rounded-lg `}>
+                <button className={`${raleway.className}  bg-black cursor-pointer text-white px-4 p-2 rounded-lg `}>
                   Contact Us
                 </button>
               </div>

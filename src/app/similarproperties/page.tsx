@@ -6,6 +6,7 @@ import defaultPropertyImage from "../../../public/assets/images/latestproperty1.
 import share from "../../../public/assets/Frame 29.png";
 import bookmark from "../../../public/assets/Frame 28.png";
 import whatsapp from "../../../public/assets/WhatsApp.png";
+import Link from "next/link";
 
 // Load Raleway font with more weight options
 const raleway = Raleway({
@@ -133,9 +134,12 @@ export default function Similarproperties() {
             {/* Property Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {properties.slice(0, 4).map((property) => (
-                <div
+                
+                <Link
                   key={property.id}
-                  className="w-full max-w-[307.5px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col"
+                  href={`/property-details/${encodeURIComponent(property.title ?? "")}`}
+                  className="w-full max-w-[307.5px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col hover:shadow-lg transition cursor-pointer"
+                  prefetch={false}
                 >
                   {/* Header with title and checkbox */}
                   <div className="p-3 flex justify-between items-center">
@@ -217,7 +221,7 @@ export default function Similarproperties() {
                       </div>
                       <div className="flex space-x-1">
                         {/* Bookmark button */}
-                        <button className="p-1.5 rounded flex items-center justify-center">
+                        <button className="p-1.5 rounded flex items-center justify-center" onClick={e => e.preventDefault()}>
                           <Image 
                             src={bookmark} 
                             alt="Bookmark" 
@@ -228,7 +232,7 @@ export default function Similarproperties() {
                         </button>
                         
                         {/* Share button */}
-                        <button className="p-1.5 rounded flex items-center justify-center">
+                        <button className="p-1.5 rounded flex items-center justify-center" onClick={e => e.preventDefault()}>
                           <Image 
                             src={share} 
                             alt="Share" 
@@ -239,7 +243,7 @@ export default function Similarproperties() {
                         </button>
                         
                         {/* WhatsApp button */}
-                        <button className="p-1.5 items-center justify-center">
+                        <button className="p-1.5 items-center justify-center" onClick={e => e.preventDefault()}>
                           <Image 
                             src={whatsapp} 
                             alt="WhatsApp" 
@@ -251,7 +255,7 @@ export default function Similarproperties() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

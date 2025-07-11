@@ -174,12 +174,12 @@ export default function PropertyCards() {
 </div>
 
       </section>
-      <section className="pb-8 sm:pb-10 lg:pb-20 bg-white dark:bg-dark relative overflow-hidden">
+   <section className="pb-8 sm:pb-10 lg:pb-20 bg-white dark:bg-dark relative overflow-hidden">
         <div className="container mx-auto px-2 sm:px-4">
           <div className="w-full">
             {/* Heading */}
             <div className="mb-8 sm:mb-[60px] w-full">
-              <h2 className="mt-6 sm:mt-10 font-normal text-xl sm:text-2xl md:text-[32px] leading-[120%] tracking-normal text-center">
+              <h2 className="mt-6 sm:mt-10 font-normal text-xl sm:text-2xl md:text-[32px] leading-[120%] tracking-normal text-center transform transition-all duration-700 hover:scale-105">
                 <span className="text-black">The latest.</span>{" "}
                 <span className="text-[#6E6E73]">
                   Take a look at whats new right now.
@@ -189,21 +189,22 @@ export default function PropertyCards() {
 
             {/* Property Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              {filteredProperties.slice(0, 4).map((property) => (
+              {filteredProperties.slice(0, 4).map((property, index) => (
                 <Link href={`/property-details/${property.title}`} key={property.title} className="block">
                 <div
                   key={property.id}
-                  className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col"
+                  className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col transform transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-gray-400/20 hover:-translate-y-2 hover:border-gray-300 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 150}ms` }}
                 >
                   {/* Header with title and checkbox */}
-                  <div className="p-2 sm:p-3 flex justify-between items-center">
+                  <div className="p-2 sm:p-3 flex justify-between items-center transition-all duration-300 hover:bg-gray-50/50">
                     <div className="h-14">
-                      <h3 className="font-medium text-black text-sm sm:text-base">
+                      <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
                         {property.title || "Prime Business Hub"}
                       </h3>
-                      <div className="flex items-center text-gray-700 text-xs">
+                      <div className="flex items-center text-gray-700 text-xs transition-all duration-300 hover:text-gray-900">
                         <svg
-                          className="w-4 h-4 mr-1"
+                          className="w-4 h-4 mr-1 transition-all duration-300 hover:scale-110"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -227,9 +228,9 @@ export default function PropertyCards() {
                           "Location Name"}
                       </div>
                     </div>
-                    <div className="w-5 h-5 border border-gray-600 rounded flex items-center justify-center">
+                    <div className="w-5 h-5 border border-gray-600 rounded flex items-center justify-center transition-all duration-300 hover:border-gray-800 hover:bg-gray-100 hover:scale-110">
                       <svg
-                        className="w-3 h-3 text-black"
+                        className="w-3 h-3 text-black transition-all duration-300 hover:scale-110"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -246,25 +247,25 @@ export default function PropertyCards() {
                   </div>
 
                   {/* Property Image */}
-                  <div className="relative h-[140px] sm:h-[180px]">
+                  <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
                     <Image
                       src={defaultPropertyImage}
                       alt={property.title || "Property"}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
                       width={340}
                       height={180}
                     />
                     {/* For Sale/Rent / Property Type overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs">
-                      <span className="mr-2">
+                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
+                      <span className="mr-2 transition-all duration-300 group-hover:font-medium">
                         {property.forSale
                           ? "For Sale"
                           : property.forRent
                           ? "For Rent"
                           : "For Sale"}
                       </span>
-                      <span className="mx-1">•</span>
-                      <span className="ml-1">
+                      <span className="mx-1 transition-all duration-300 group-hover:scale-110">•</span>
+                      <span className="ml-1 transition-all duration-300 group-hover:font-medium">
                         {property.propertyType?.displayName ||
                           property.propertyType?.childType?.displayName ||
                           "Office space"}
@@ -272,76 +273,76 @@ export default function PropertyCards() {
                     </div>
                   </div>
                   {/* Property Details */}
-                  <div className="p-2 sm:p-3 flex-grow">
+                  <div className="p-2 sm:p-3 flex-grow transition-all duration-300 hover:bg-gray-50/30">
                     <div className="grid grid-cols-2 gap-1 text-xs">
-                      <div className="text-gray-500">Carpet Area</div>
-                      <div className="text-right text-black">
+                      <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Carpet Area</div>
+                      <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
                         {property.dimension?.area || "5490"} sqft
                       </div>
 
-                      <div className="text-gray-500">Space Condition</div>
-                      <div className="text-right text-black">
+                      <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Space Condition</div>
+                      <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
                         {getAttributeValue(property, "condition-id") ||
                           "Furnished"}
                       </div>
 
-                      <div className="text-gray-500">Seat in office</div>
-                      <div className="text-right text-black">
+                      <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Seat in office</div>
+                      <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
                         {getAttributeValue(property, "seating-capacity-id") ||
                           "120"}
                       </div>
 
-                      <div className="text-gray-500">No of Cabin</div>
-                      <div className="text-right text-black">
+                      <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">No of Cabin</div>
+                      <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
                         {getAttributeValue(property, "cabins-id") || "12"}
                       </div>
                     </div>
 
-                    <div className="border-t border-gray-200 my-2"></div>
+                    <div className="border-t border-gray-200 my-2 transition-all duration-300 hover:border-gray-300"></div>
 
                     {/* Price and Actions */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
-                      <div>
-                        <div className="text-base text-black font-semibold">
+                      <div className="transition-all duration-300 hover:scale-105">
+                        <div className="text-base text-black font-semibold transition-all duration-300 hover:text-gray-800">
                           {property.forRent
                             ? `₹ ${property.monetaryInfo?.expectedRent || 4500}`
                             : formatPrice(property.monetaryInfo?.expectedPrice)}
                         </div>
-                        <div className="text-gray-500 text-xs">
+                        <div className="text-gray-500 text-xs transition-all duration-300 hover:text-gray-600">
                           {property.forRent ? "rent/month" : ""}
                         </div>
                       </div>
                       <div className="flex space-x-1">
                         {/* Bookmark button */}
-                        <button className="p-1.5 rounded flex items-center cursor-pointer justify-center">
+                        <button className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-gray-200 hover:scale-110 hover:shadow-md active:scale-95">
                           <Image
                             src={bookmark}
                             alt="Bookmark"
                             width={20}
                             height={20}
-                            className="object-contain"
+                            className="object-contain transition-all duration-300 hover:scale-110"
                           />
                         </button>
 
                         {/* Share button */}
-                        <button className="p-1.5 rounded cursor-pointer flex items-center justify-center">
+                        <button className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-gray-200 hover:scale-110 hover:shadow-md active:scale-95">
                           <Image
                             src={share}
                             alt="Share"
                             width={20}
                             height={20}
-                            className="object-contain"
+                            className="object-contain transition-all duration-300 hover:scale-110"
                           />
                         </button>
 
                         {/* WhatsApp button */}
-                        <button className="p-1.5 items-center justify-center">
+                        <button className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-gray-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded">
                           <Image
                             src={whatsapp}
                             alt="WhatsApp"
                             width={20}
                             height={20}
-                            className="object-contain"
+                            className="object-contain transition-all duration-300 hover:scale-110"
                           />
                         </button>
                       </div>
@@ -353,6 +354,24 @@ export default function PropertyCards() {
             </div>
           </div>
         </div>
+
+        {/* CSS Animation Keyframes */}
+        <style jsx>{`
+          @keyframes fade-in-up {
+            0% {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          
+          .animate-fade-in-up {
+            animation: fade-in-up 0.8s ease-out both;
+          }
+        `}</style>
       </section>
       <TopDevelopers />
     </div>
