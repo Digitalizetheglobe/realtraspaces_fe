@@ -15,6 +15,7 @@ const raleway = Raleway({
 
 type Blog = {
   id: string | number;
+  slug: string;
   blogTitle: string;
   blogDescription: string;
   blogImages?: string[];
@@ -120,7 +121,7 @@ const Blogs = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {blogs.length > 0 ? (
                 blogs.map((blog, index) => (
-                  <Link href={`/blogs/${blog.id}`} key={blog.id} className="block group">
+                  <Link href={`/blogs/${blog.slug}`} key={blog.slug} className="block group">
                     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                       <div className="relative overflow-hidden rounded-lg">
                         <Image
