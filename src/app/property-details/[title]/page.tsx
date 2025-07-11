@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { useParams, useRouter } from "next/navigation";
 import { Raleway } from "next/font/google";
 // Import your static images
@@ -19,6 +20,7 @@ import pin from "../../../../public/assets/images/marker-pin-01.png";
 import floor from "../../../../public/assets/images/floor.png";
 import location from "../../../../public/assets/images/location.png";
 import Similarproperties from "@/app/similarproperties/page";
+import { GitCompare } from "lucide-react";
 
 // Initialize Raleway font
 const raleway = Raleway({
@@ -102,7 +104,7 @@ export default function PropertyDetails() {
     name: "",
     mobile: "",
     message: "",
-    propertySlug: propertyTitle || ""
+    propertySlug: propertyTitle || "",
   });
 
   const thumbnails = [
@@ -114,14 +116,20 @@ export default function PropertyDetails() {
     propertydetails2,
   ];
   const visibleCount = 4;
+  const [isComparing, setIsComparing] = useState(false);
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
       try {
-        const decodedTitle = decodeURIComponent(propertyTitle).replace(/-/g, " ");
-        
+        const decodedTitle = decodeURIComponent(propertyTitle).replace(
+          /-/g,
+          " "
+        );
+
         const response = await fetch(
-          `https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=100&PropertyTitle=${encodeURIComponent(decodedTitle)}`,
+          `https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=100&PropertyTitle=${encodeURIComponent(
+            decodedTitle
+          )}`,
           {
             method: "GET",
             headers: {
@@ -130,15 +138,21 @@ export default function PropertyDetails() {
             },
           }
         );
-        
+
         const data = await response.json();
-        const properties = Array.isArray(data) ? data : data.items || data.data || [];
-        
+        const properties = Array.isArray(data)
+          ? data
+          : data.items || data.data || [];
+
         if (properties.length > 0) {
           setProperty(properties[0]);
-          
+
           // Set image URLs from API if available, otherwise use default images
-          if (properties[0].imageUrls && typeof properties[0].imageUrls === "object" && Object.keys(properties[0].imageUrls).length > 0) {
+          if (
+            properties[0].imageUrls &&
+            typeof properties[0].imageUrls === "object" &&
+            Object.keys(properties[0].imageUrls).length > 0
+          ) {
             setImageUrls(Object.values(properties[0].imageUrls));
             // setMainImage(Object.values(properties[0].imageUrls)[0]);
           } else {
@@ -149,7 +163,7 @@ export default function PropertyDetails() {
           console.warn("No property found with this title:", decodedTitle);
           setProperty(null);
         }
-        
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching property details:", error);
@@ -163,7 +177,8 @@ export default function PropertyDetails() {
 
     const handleScroll = () => {
       if (propertyOverviewRef.current) {
-        const overviewPosition = propertyOverviewRef.current.getBoundingClientRect().top;
+        const overviewPosition =
+          propertyOverviewRef.current.getBoundingClientRect().top;
         setIsSticky(overviewPosition > window.innerHeight * 0.5);
       }
     };
@@ -189,9 +204,9 @@ export default function PropertyDetails() {
   const handleEnquireClick = () => {
     setShowEnquirePopup(true);
     // Update the property slug in form data when opening the popup
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      propertySlug: propertyTitle || ""
+      propertySlug: propertyTitle || "",
     }));
   };
 
@@ -199,11 +214,13 @@ export default function PropertyDetails() {
     setShowEnquirePopup(false);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -218,7 +235,7 @@ export default function PropertyDetails() {
       name: "",
       mobile: "",
       message: "",
-      propertySlug: propertyTitle || ""
+      propertySlug: propertyTitle || "",
     });
     // Show success message or redirect
     alert("Thank you for your enquiry! We'll get back to you soon.");
@@ -226,11 +243,11 @@ export default function PropertyDetails() {
 
   const handleSaveProperty = async () => {
     // Check if user is logged in
-    const token = localStorage.getItem('authToken');
-    
+    const token = localStorage.getItem("authToken");
+
     if (!token) {
       // Redirect to signin page if not logged in
-      router.push('/signin');
+      router.push("/signin");
       return;
     }
 
@@ -238,36 +255,40 @@ export default function PropertyDetails() {
 
     try {
       setIsSaving(true);
-      
-      const response = await fetch('http://localhost:8000/api/webusers/save-property', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          propertyId: property.id,
-          propertyData: property
-        })
-      });
+
+      const response = await fetch(
+        "http://localhost:8000/api/webusers/save-property",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            propertyId: property.id,
+            propertyData: property,
+          }),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to save property');
+        throw new Error("Failed to save property");
       }
 
       const data = await response.json();
-      alert('Property saved successfully!');
+      alert("Property saved successfully!");
     } catch (error) {
-      console.error('Error saving property:', error);
-      alert('Failed to save property. Please try again.');
+      console.error("Error saving property:", error);
+      alert("Failed to save property. Please try again.");
     } finally {
       setIsSaving(false);
     }
   };
 
-  const visibleImages = imageUrls.length > 0 
-    ? imageUrls.slice(startIndex, startIndex + visibleCount)
-    : thumbnails.slice(startIndex, startIndex + visibleCount);
+  const visibleImages =
+    imageUrls.length > 0
+      ? imageUrls.slice(startIndex, startIndex + visibleCount)
+      : thumbnails.slice(startIndex, startIndex + visibleCount);
 
   const formatPrice = (price?: number, enquiredFor?: string): string => {
     if (!price) return "Price on request";
@@ -285,6 +306,55 @@ export default function PropertyDetails() {
     }
   };
 
+  const handleCompareClick = async () => {
+    // Check if user is logged in
+    const token = localStorage.getItem("authToken");
+    
+    if (!token) {
+      toast.error("Please log in to compare properties");
+      router.push("/signin");
+      return;
+    }
+  
+    if (!property) {
+      toast.error("Property information is not available");
+      return;
+    }
+  
+    try {
+      setIsComparing(true);
+      
+      const response = await fetch("http://localhost:8000/api/webusers/compare/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          propertyId: property.id,
+          propertyData: property
+        })
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to add property to comparison");
+      }
+  
+      const data = await response.json();
+      toast.success("Property added to comparison");
+      
+      // Optionally navigate to compare page
+      router.push("/compareproperties");
+      
+    } catch (error) {
+      console.error("Error adding to compare:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to add to comparison");
+    } finally {
+      setIsComparing(false);
+    }
+  };
+
   const getFurnishStatus = (status?: string): string => {
     const statusMap: Record<string, string> = {
       FullyFurnished: "Fully Furnished",
@@ -297,7 +367,7 @@ export default function PropertyDetails() {
 
   const formatDate = (dateString?: string): string => {
     if (!dateString) return "Not specified";
-    
+
     const date = new Date(dateString);
     return date.toLocaleDateString("en-IN", {
       year: "numeric",
@@ -341,9 +411,17 @@ export default function PropertyDetails() {
             </div>
           </section>
           <div className="max-w-7xl mx-auto px-4 py-12 text-center">
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">Property Not Found</h1>
-            <p className="text-gray-600 mb-6">The property you are looking for does not exist or may have been removed.</p>
-            <Link href="/" className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition">
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">
+              Property Not Found
+            </h1>
+            <p className="text-gray-600 mb-6">
+              The property you are looking for does not exist or may have been
+              removed.
+            </p>
+            <Link
+              href="/"
+              className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition"
+            >
               Back to Home
             </Link>
           </div>
@@ -358,21 +436,39 @@ export default function PropertyDetails() {
       {showEnquirePopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full p-6 relative">
-            <button 
+            <button
               onClick={handleClosePopup}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
-            
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Enquire About This Property</h2>
-            <p className="text-gray-600 mb-6">Please fill out the form below and we'll get back to you soon.</p>
-            
+
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              Enquire About This Property
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Please fill out the form below and we'll get back to you soon.
+            </p>
+
             <form onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label htmlFor="name" className="block text-gray-700 text-sm font-medium mb-2">
+                <label
+                  htmlFor="name"
+                  className="block text-gray-700 text-sm font-medium mb-2"
+                >
                   Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -386,9 +482,12 @@ export default function PropertyDetails() {
                   placeholder="Your Name"
                 />
               </div>
-              
+
               <div className="mb-4">
-                <label htmlFor="mobile" className="block text-gray-700 text-sm font-medium mb-2">
+                <label
+                  htmlFor="mobile"
+                  className="block text-gray-700 text-sm font-medium mb-2"
+                >
                   Mobile Number <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -402,9 +501,12 @@ export default function PropertyDetails() {
                   placeholder="Your Mobile Number"
                 />
               </div>
-              
+
               <div className="mb-4">
-                <label htmlFor="message" className="block text-gray-700 text-sm font-medium mb-2">
+                <label
+                  htmlFor="message"
+                  className="block text-gray-700 text-sm font-medium mb-2"
+                >
                   Message
                 </label>
                 <textarea
@@ -417,13 +519,13 @@ export default function PropertyDetails() {
                   placeholder="Your message or questions about this property"
                 ></textarea>
               </div>
-              
+
               <input
                 type="hidden"
                 name="propertySlug"
                 value={formData.propertySlug}
               />
-              
+
               <div className="mt-6">
                 <button
                   type="submit"
@@ -452,7 +554,7 @@ export default function PropertyDetails() {
           </div>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center z-10 text-center space-y-4">
-            <h1 className="text-white text-4xl font-bold">  {property.title}</h1>
+            <h1 className="text-white text-4xl font-bold"> {property.title}</h1>
             <nav aria-label="breadcrumb">
               <ol className="text-white text-lg flex space-x-2">
                 <li>
@@ -469,23 +571,23 @@ export default function PropertyDetails() {
 
         {/* Property Details Section */}
         <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="flex flex-col md:flex-row gap-8">
-              {/* Left Side - Image Gallery */}
-              <div
-                className={`max-w-5xl mx-auto p-4 ${
-                  isSticky ? "sticky top-4 self-start" : ""
-                }`}
-              >
+          <div className="flex flex-col md:flex-row gap-8">
+            {/* Left Side - Image Gallery */}
+            <div
+              className={`max-w-5xl mx-auto p-4 ${
+                isSticky ? "sticky top-4 self-start" : ""
+              }`}
+            >
               {/* Main Image */}
               <div className="mb-4 rounded-lg overflow-hidden shadow-lg border border-gray-200">
-                  <Image
-                    src={mainImage}
-                    alt="Main View"
-                    className="w-full h-[400px] object-cover"
-                    width={800}
-                    height={600}
-                  />
-                </div>
+                <Image
+                  src={mainImage}
+                  alt="Main View"
+                  className="w-full h-[400px] object-cover"
+                  width={800}
+                  height={600}
+                />
+              </div>
 
               {/* Thumbnails with arrows */}
               <div className="flex items-center justify-center gap-2">
@@ -525,7 +627,7 @@ export default function PropertyDetails() {
                       }`}
                       // onClick={() => handleThumbnailClick(img)}
                     >
-                      {typeof img === 'string' ? (
+                      {typeof img === "string" ? (
                         <img
                           src={img}
                           alt={`Thumbnail ${index + 1}`}
@@ -546,9 +648,17 @@ export default function PropertyDetails() {
 
                 <button
                   onClick={handleNext}
-                  disabled={startIndex + visibleCount >= (imageUrls.length > 0 ? imageUrls.length : thumbnails.length)}
+                  disabled={
+                    startIndex + visibleCount >=
+                    (imageUrls.length > 0
+                      ? imageUrls.length
+                      : thumbnails.length)
+                  }
                   className={`p-2 rounded-full bg-white shadow-md ${
-                    startIndex + visibleCount >= (imageUrls.length > 0 ? imageUrls.length : thumbnails.length)
+                    startIndex + visibleCount >=
+                    (imageUrls.length > 0
+                      ? imageUrls.length
+                      : thumbnails.length)
                       ? "opacity-30 cursor-not-allowed"
                       : "hover:bg-gray-100"
                   }`}
@@ -597,10 +707,17 @@ export default function PropertyDetails() {
                     className="mt-1"
                   />
                   <p className="text-gray-500 text-sm mt-1">
-                    {property.address?.subLocality || property.address?.community || ""}, 
-                    {property.address?.city ? ` ${property.address.city}, ` : " "}
+                    {property.address?.subLocality ||
+                      property.address?.community ||
+                      ""}
+                    ,
+                    {property.address?.city
+                      ? ` ${property.address.city}, `
+                      : " "}
                     {property.address?.state || ""}
-                    {property.address?.postalCode ? ` - ${property.address.postalCode}` : ""}
+                    {property.address?.postalCode
+                      ? ` - ${property.address.postalCode}`
+                      : ""}
                   </p>
                 </div>
 
@@ -610,20 +727,24 @@ export default function PropertyDetails() {
                     {property.enquiredFor || "For Sale/Rent"}
                   </span>
                   <span className="text-sm bg-gray-100 text-gray-600 px-4 py-2 rounded-full">
-                    {property.status === "Active" ? "Available" : "Not Available"}
+                    {property.status === "Active"
+                      ? "Available"
+                      : "Not Available"}
                   </span>
                   {property.possessionDate && (
                     <span className="text-sm bg-gray-100 text-gray-600 px-4 py-2 rounded-full">
-                      {new Date(property.possessionDate) <= new Date() 
-                        ? "Immediate Possession" 
-                        : `Possession on ${formatDate(property.possessionDate)}`}
+                      {new Date(property.possessionDate) <= new Date()
+                        ? "Immediate Possession"
+                        : `Possession on ${formatDate(
+                            property.possessionDate
+                          )}`}
                     </span>
                   )}
                 </div>
 
                 {/* Buttons */}
                 <div className="mt-5 flex flex-wrap gap-3">
-                  <button 
+                  <button
                     onClick={handleEnquireClick}
                     className="border border-black text-black text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-100 transition"
                   >
@@ -632,15 +753,45 @@ export default function PropertyDetails() {
                   <button className="bg-black text-white text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-800 transition">
                     Schedule a Visit
                   </button>
-                  <button 
-                    className={`border border-black text-black text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-100 transition flex items-center gap-2 ${isSaving ? 'opacity-70 cursor-not-allowed' : ''}`}
+                  <button
+                    className={`border border-black text-black text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-100 transition flex items-center gap-2 ${
+                      isSaving ? "opacity-70 cursor-not-allowed" : ""
+                    }`}
                     onClick={handleSaveProperty}
                     disabled={isSaving}
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                      />
                     </svg>
-                    {isSaving ? 'Saving...' : 'Save Property'}
+                    {isSaving ? "Saving..." : "Save Property"}
+                  </button>
+                  <button
+                    onClick={handleCompareClick}
+                    disabled={isComparing}
+                    className="flex items-center justify-center px-6 py-3 border border-blue-600 text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors disabled:opacity-50"
+                  >
+                    {isComparing ? (
+                      <>
+                        <div className="h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-2"></div>
+                        Adding...
+                      </>
+                    ) : (
+                      <>
+                        <GitCompare className="h-5 w-5 mr-2" />
+                        Compare
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -662,9 +813,9 @@ export default function PropertyDetails() {
                     <div>
                       <p className="text-sm text-gray-500">Category</p>
                       <p className="font-medium text-gray-800">
-                        {property.propertyType?.childType?.displayName || 
-                         property.propertyType?.displayName || 
-                         "Office Space"}
+                        {property.propertyType?.childType?.displayName ||
+                          property.propertyType?.displayName ||
+                          "Office Space"}
                       </p>
                     </div>
                   </div>
@@ -712,7 +863,8 @@ export default function PropertyDetails() {
                     <div>
                       <p className="text-sm text-gray-500">Chargeable Area</p>
                       <p className="font-medium text-gray-800">
-                        {property.dimension?.area || "N/A"} {property.dimension?.unit || "sq ft"}
+                        {property.dimension?.area || "N/A"}{" "}
+                        {property.dimension?.unit || "sq ft"}
                       </p>
                     </div>
                   </div>
@@ -742,10 +894,13 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Building Structure</p>
+                      <p className="text-sm text-gray-500">
+                        Building Structure
+                      </p>
                       <p className="font-medium text-gray-800">
-                        {property.dimension?.length && property.dimension?.breadth 
-                          ? `${property.dimension.length} x ${property.dimension.breadth}` 
+                        {property.dimension?.length &&
+                        property.dimension?.breadth
+                          ? `${property.dimension.length} x ${property.dimension.breadth}`
                           : "N/A"}
                       </p>
                     </div>
@@ -762,8 +917,13 @@ export default function PropertyDetails() {
                     <div>
                       <p className="text-sm text-gray-500">Efficiency</p>
                       <p className="font-medium text-gray-800">
-                        {property.dimension?.carpetArea && property.dimension?.area
-                          ? `${Math.round((Number(property.dimension.carpetArea) / Number(property.dimension.area)) * 100)}%`
+                        {property.dimension?.carpetArea &&
+                        property.dimension?.area
+                          ? `${Math.round(
+                              (Number(property.dimension.carpetArea) /
+                                Number(property.dimension.area)) *
+                                100
+                            )}%`
                           : "N/A"}
                       </p>
                     </div>
@@ -781,7 +941,8 @@ export default function PropertyDetails() {
                       <p className="text-sm text-gray-500">Quoted Rent</p>
                       <p className="font-medium text-gray-800">
                         {formatPrice(
-                          property.monetaryInfo?.expectedPrice || property.monetaryInfo?.monthlyRentAmount,
+                          property.monetaryInfo?.expectedPrice ||
+                            property.monetaryInfo?.monthlyRentAmount,
                           property.enquiredFor
                         )}
                       </p>
@@ -868,9 +1029,7 @@ export default function PropertyDetails() {
                     />
                     <div>
                       <p className="text-sm text-gray-500">Car Park Ratio</p>
-                      <p className="font-medium text-gray-800">
-                        1:1000 sq.ft.
-                      </p>
+                      <p className="font-medium text-gray-800">1:1000 sq.ft.</p>
                     </div>
                   </div>
 
@@ -1105,7 +1264,9 @@ export default function PropertyDetails() {
                             />
                           </svg>
                         </div>
-                        <span className="text-gray-700">Fire Safety Compliance</span>
+                        <span className="text-gray-700">
+                          Fire Safety Compliance
+                        </span>
                       </div>
                     </>
                   )}
@@ -1118,11 +1279,11 @@ export default function PropertyDetails() {
                 </h2>
                 <div className="bg-gray-100 p-6 rounded-xl">
                   <p className="text-gray-700 leading-relaxed">
-                    Located in the bustling commercial hub of Andheri East,
-                    215 Atrium offers a prime leasing opportunity with 35,000
-                    sq.ft. chargeable space. With excellent connectivity and
-                    70% efficiency, this bare shell property is ideal for
-                    companies looking for scalable office space.
+                    Located in the bustling commercial hub of Andheri East, 215
+                    Atrium offers a prime leasing opportunity with 35,000 sq.ft.
+                    chargeable space. With excellent connectivity and 70%
+                    efficiency, this bare shell property is ideal for companies
+                    looking for scalable office space.
                   </p>
                 </div>
               </div>
@@ -1146,8 +1307,7 @@ export default function PropertyDetails() {
         <div className="mt-12 max-w-5xl mx-auto px-4">
           <h1 className="text-black text-xl font-semibold mb-2">Location</h1>
           <p className="text-gray-700 text-md">
-            Located in the bustling commercial hub of Andheri East, 215
-            Atrium.
+            Located in the bustling commercial hub of Andheri East, 215 Atrium.
           </p>
           <div className="py-4 mt-8">
             <Image
