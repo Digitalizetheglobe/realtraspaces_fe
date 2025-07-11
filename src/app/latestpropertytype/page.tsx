@@ -132,7 +132,7 @@ export default function PropertyCards() {
 
   return (
     <div className={raleway.className}>
-       <section className="relative w-full h-[420px]">
+       <section className="relative w-full h-[220px] sm:h-[320px] md:h-[420px]">
         <Image
           src={home}
           alt="City skyline"
@@ -142,42 +142,43 @@ export default function PropertyCards() {
         />
 
         {/* Search bar positioned at the bottom center of the banner */}
-        <div className="absolute bottom-6 w-full flex justify-center">
-          <div className="flex w-[750px] max-w-[95%] items-center gap-2 px-2 py-1 rounded-full border border-gray-300 bg-[#F5F5FF99] backdrop-blur-sm shadow-md">
-            
-            {/* Dropdown */}
-            <div className="relative">
-              <select
-                className="appearance-none bg-black text-white text-sm font-medium pl-6 pr-10 py-[14px] h-full rounded-full outline-none cursor-pointer"
-              >
-                <option value="">Select search type</option>
-                <option value="commercial">Commercial</option>
-                {/* <option value="residential">Residential</option> */}
-                <option value="coworking">Co-working</option>
-              </select>
-              {/* Custom arrow */}
-              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white text-xs">
-                ▼
-              </span>
-            </div>
+      <div className="absolute bottom-4 w-full flex justify-center px-2">
+  <div className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-2 px-3 py-2 rounded-2xl border border-gray-300 bg-[#F5F5FF99] backdrop-blur-sm shadow-md">
+    
+    {/* Dropdown */}
+    <div className="relative w-full sm:w-auto">
+      <select
+        className="appearance-none w-full bg-black text-white text-sm font-medium pl-6 pr-10 py-3 h-full rounded-full outline-none cursor-pointer"
+      >
+        <option value="">Select search type</option>
+        <option value="commercial">Commercial</option>
+        <option value="coworking">Co-working</option>
+      </select>
+      
+      {/* Custom arrow */}
+      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white text-xs">
+        ▼
+      </span>
+    </div>
 
-            {/* Search input */}
-            <input
-              type="text"
-              placeholder="Search"
-              className="flex-1 bg-white text-gray-900 px-6 py-[12px] text-sm rounded-full outline-none"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-          </div>
-        </div>
+    {/* Search input */}
+    <input
+      type="text"
+      placeholder="Search by property name, location, or type..."
+      className="w-full bg-white text-gray-900 px-4 py-3 text-sm rounded-full outline-none min-w-0"
+      value={search}
+      onChange={e => setSearch(e.target.value)}
+    />
+  </div>
+</div>
+
       </section>
-      <section className="pb-10 lg:pb-20 bg-white dark:bg-dark relative overflow-hidden">
-        <div className="container mx-auto">
-          <div className="w-full px-4">
+      <section className="pb-8 sm:pb-10 lg:pb-20 bg-white dark:bg-dark relative overflow-hidden">
+        <div className="container mx-auto px-2 sm:px-4">
+          <div className="w-full">
             {/* Heading */}
-            <div className="mb-[60px] w-full">
-              <h2 className="mt-10 font-normal text-[32px] leading-[100%] tracking-normal text-center">
+            <div className="mb-8 sm:mb-[60px] w-full">
+              <h2 className="mt-6 sm:mt-10 font-normal text-xl sm:text-2xl md:text-[32px] leading-[120%] tracking-normal text-center">
                 <span className="text-black">The latest.</span>{" "}
                 <span className="text-[#6E6E73]">
                   Take a look at whats new right now.
@@ -186,16 +187,16 @@ export default function PropertyCards() {
             </div>
 
             {/* Property Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {filteredProperties.slice(0, 4).map((property) => (
                 <div
                   key={property.id}
-                  className="w-full max-w-[307.5px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col"
+                  className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col"
                 >
                   {/* Header with title and checkbox */}
-                  <div className="p-3 flex justify-between items-center">
+                  <div className="p-2 sm:p-3 flex justify-between items-center">
                     <div className="h-14">
-                      <h3 className="font-medium text-black text-base">
+                      <h3 className="font-medium text-black text-sm sm:text-base">
                         {property.title || "Prime Business Hub"}
                       </h3>
                       <div className="flex items-center text-gray-700 text-xs">
@@ -243,16 +244,16 @@ export default function PropertyCards() {
                   </div>
 
                   {/* Property Image */}
-                  <div className="relative h-[180px]">
+                  <div className="relative h-[140px] sm:h-[180px]">
                     <Image
                       src={defaultPropertyImage}
                       alt={property.title || "Property"}
                       className="w-full h-full object-cover"
-                      width={307}
+                      width={340}
                       height={180}
                     />
                     {/* For Sale/Rent / Property Type overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-sm">
+                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs">
                       <span className="mr-2">
                         {property.forSale
                           ? "For Sale"
@@ -269,7 +270,7 @@ export default function PropertyCards() {
                     </div>
                   </div>
                   {/* Property Details */}
-                  <div className="p-3 flex-grow">
+                  <div className="p-2 sm:p-3 flex-grow">
                     <div className="grid grid-cols-2 gap-1 text-xs">
                       <div className="text-gray-500">Carpet Area</div>
                       <div className="text-right text-black">
@@ -297,7 +298,7 @@ export default function PropertyCards() {
                     <div className="border-t border-gray-200 my-2"></div>
 
                     {/* Price and Actions */}
-                    <div className="flex justify-between items-center mt-1">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
                       <div>
                         <div className="text-base text-black font-semibold">
                           {property.forRent
@@ -314,8 +315,8 @@ export default function PropertyCards() {
                           <Image
                             src={bookmark}
                             alt="Bookmark"
-                            width={24}
-                            height={24}
+                            width={20}
+                            height={20}
                             className="object-contain"
                           />
                         </button>
@@ -325,8 +326,8 @@ export default function PropertyCards() {
                           <Image
                             src={share}
                             alt="Share"
-                            width={24}
-                            height={24}
+                            width={20}
+                            height={20}
                             className="object-contain"
                           />
                         </button>
@@ -336,8 +337,8 @@ export default function PropertyCards() {
                           <Image
                             src={whatsapp}
                             alt="WhatsApp"
-                            width={24}
-                            height={24}
+                            width={20}
+                            height={20}
                             className="object-contain"
                           />
                         </button>

@@ -275,6 +275,17 @@ const Footer = () => {
                     Hiring-3 Statistics
                   </a>
                 </li>
+                {/* Added Privacy Policy and Terms and Condition links */}
+                <li>
+                  <a href="/privacy-policy" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a href="/terms-and-condition" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
+                    Terms and Condition
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
