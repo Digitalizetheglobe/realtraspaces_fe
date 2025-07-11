@@ -7,7 +7,7 @@ import share from "../../../public/assets/Frame 29.png";
 import bookmark from "../../../public/assets/Frame 28.png";
 import whatsapp from "../../../public/assets/WhatsApp.png";
 import TopDevelopers from "../topdevelopers/page";
-
+import home from "../../../public/assets/hero.jpg";
 // Load Raleway font with more weight options
 const raleway = Raleway({
   subsets: ["latin"],
@@ -50,6 +50,7 @@ type Property = {
 export default function PropertyCards() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -118,8 +119,59 @@ export default function PropertyCards() {
     );
   }
 
+  // Filter properties based on search input
+  const filteredProperties = properties.filter((property) => {
+    const searchLower = search.toLowerCase();
+    return (
+      (property.title?.toLowerCase().includes(searchLower) ?? false) ||
+      (property.address?.subLocality?.toLowerCase().includes(searchLower) ?? false) ||
+      (property.address?.city?.toLowerCase().includes(searchLower) ?? false) ||
+      (property.dimension?.area?.toString().toLowerCase().includes(searchLower) ?? false)
+    );
+  });
+
   return (
     <div className={raleway.className}>
+       <section className="relative w-full h-[420px]">
+        <Image
+          src={home}
+          alt="City skyline"
+          fill
+          priority
+          className="object-cover"
+        />
+
+        {/* Search bar positioned at the bottom center of the banner */}
+        <div className="absolute bottom-6 w-full flex justify-center">
+          <div className="flex w-[750px] max-w-[95%] items-center gap-2 px-2 py-1 rounded-full border border-gray-300 bg-[#F5F5FF99] backdrop-blur-sm shadow-md">
+            
+            {/* Dropdown */}
+            <div className="relative">
+              <select
+                className="appearance-none bg-black text-white text-sm font-medium pl-6 pr-10 py-[14px] h-full rounded-full outline-none cursor-pointer"
+              >
+                <option value="">Select search type</option>
+                <option value="commercial">Commercial</option>
+                {/* <option value="residential">Residential</option> */}
+                <option value="coworking">Co-working</option>
+              </select>
+              {/* Custom arrow */}
+              <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white text-xs">
+                ▼
+              </span>
+            </div>
+
+            {/* Search input */}
+            <input
+              type="text"
+              placeholder="Search"
+              className="flex-1 bg-white text-gray-900 px-6 py-[12px] text-sm rounded-full outline-none"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
+      </section>
       <section className="pb-10 lg:pb-20 bg-white dark:bg-dark relative overflow-hidden">
         <div className="container mx-auto">
           <div className="w-full px-4">
@@ -135,7 +187,7 @@ export default function PropertyCards() {
 
             {/* Property Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {properties.slice(0, 4).map((property) => (
+              {filteredProperties.slice(0, 4).map((property) => (
                 <div
                   key={property.id}
                   className="w-full max-w-[307.5px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col"
@@ -216,7 +268,6 @@ export default function PropertyCards() {
                       </span>
                     </div>
                   </div>
-
                   {/* Property Details */}
                   <div className="p-3 flex-grow">
                     <div className="grid grid-cols-2 gap-1 text-xs">
