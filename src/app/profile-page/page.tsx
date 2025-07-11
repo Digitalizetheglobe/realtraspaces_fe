@@ -114,8 +114,8 @@ const ProfilePage = () => {
             <h2 className="text-2xl font-bold mt-4" style={{ color: '#1A1A1A' }}>Error Loading Profile</h2>
             <p className="mt-2" style={{ color: '#6E6E73' }}>{error}</p>
             <button
-              onClick={() => router.push('/login')}
-              className="mt-6 bg-blue-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
+              onClick={() => router.push('/signin')}
+              className="cursor-pointer mt-6 bg-blue-600 text-white py-2 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
             >
               Return to Login
             </button>
