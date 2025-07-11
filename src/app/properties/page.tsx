@@ -382,6 +382,7 @@ export default function Similarproperties() {
               {filteredProperties.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {filteredProperties.map((property) => (
+                    <Link href={`/property-details/${property.title}`} key={property.id} className="block">
                     <div
                       key={property.id}
                       className="w-full max-w-[307.5px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col"
@@ -420,7 +421,7 @@ export default function Similarproperties() {
                         </div>
                         <button
                           onClick={() => handleCheckboxClick(property.id)}
-                          className={`w-5 h-5 border rounded flex items-center justify-center ${
+                          className={`w-5 h-5 border rounded flex items-center justify-center cursor-pointer ${
                             bookmarkedProperties.has(property.id)
                               ? "border-green-500 bg-green-500"
                               : "border-gray-400"
@@ -518,7 +519,7 @@ export default function Similarproperties() {
                           </div>
                           <div className="flex space-x-1">
                             {/* Bookmark button */}
-                            <button className="p-1.5 rounded flex items-center justify-center">
+                            <button className="p-1.5 rounded flex items-center justify-center cursor-pointer">
                               <Image
                                 src={bookmark}
                                 alt="Bookmark"
@@ -529,7 +530,7 @@ export default function Similarproperties() {
                             </button>
 
                             {/* Share button */}
-                            <button className="p-1.5 rounded flex items-center justify-center">
+                            <button className="p-1.5 rounded flex items-center justify-center cursor-pointer">
                               <Image
                                 src={share}
                                 alt="Share"
@@ -540,7 +541,7 @@ export default function Similarproperties() {
                             </button>
 
                             {/* WhatsApp button */}
-                            <button className="p-1.5 items-center justify-center">
+                            <button className="p-1.5 items-center justify-center cursor-pointer">
                               <Image
                                 src={whatsapp}
                                 alt="WhatsApp"
@@ -553,6 +554,7 @@ export default function Similarproperties() {
                         </div>
                       </div>
                     </div>
+                    </Link>
                   ))}
                 </div>
               ) : (
@@ -565,7 +567,7 @@ export default function Similarproperties() {
                   </p>
                   <button
                     onClick={resetFilters}
-                    className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                    className="mt-4 px-4 py-2 cursor-pointer bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                   >
                     Reset All Filters
                   </button>
@@ -585,13 +587,13 @@ export default function Similarproperties() {
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => confirmBookmark(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border-gray-300 cursor-pointer rounded-md text-gray-700 hover:bg-gray-50"
               >
                 No
               </button>
               <button
                 onClick={() => confirmBookmark(true)}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                className="px-4 py-2 bg-green-600 cursor-pointer text-white rounded-md hover:bg-green-700"
               >
                 Yes
               </button>

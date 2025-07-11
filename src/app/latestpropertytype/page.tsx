@@ -8,6 +8,7 @@ import bookmark from "../../../public/assets/Frame 28.png";
 import whatsapp from "../../../public/assets/WhatsApp.png";
 import TopDevelopers from "../topdevelopers/page";
 import home from "../../../public/assets/hero.jpg";
+import Link from "next/link";
 // Load Raleway font with more weight options
 const raleway = Raleway({
   subsets: ["latin"],
@@ -189,6 +190,7 @@ export default function PropertyCards() {
             {/* Property Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {filteredProperties.slice(0, 4).map((property) => (
+                <Link href={`/property-details/${property.title}`} key={property.title} className="block">
                 <div
                   key={property.id}
                   className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col"
@@ -311,7 +313,7 @@ export default function PropertyCards() {
                       </div>
                       <div className="flex space-x-1">
                         {/* Bookmark button */}
-                        <button className="p-1.5 rounded flex items-center justify-center">
+                        <button className="p-1.5 rounded flex items-center cursor-pointer justify-center">
                           <Image
                             src={bookmark}
                             alt="Bookmark"
@@ -322,7 +324,7 @@ export default function PropertyCards() {
                         </button>
 
                         {/* Share button */}
-                        <button className="p-1.5 rounded flex items-center justify-center">
+                        <button className="p-1.5 rounded cursor-pointer flex items-center justify-center">
                           <Image
                             src={share}
                             alt="Share"
@@ -346,6 +348,7 @@ export default function PropertyCards() {
                     </div>
                   </div>
                 </div>
+                </Link>
               ))}
             </div>
           </div>

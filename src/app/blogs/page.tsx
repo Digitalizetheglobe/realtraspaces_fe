@@ -109,7 +109,7 @@ const Blogs = () => {
               <p className="text-red-600 mb-4">Error loading blogs: {error}</p>
               <button 
                 onClick={() => window.location.reload()} 
-                className="bg-black text-white px-4 py-2 rounded-lg"
+                className="bg-black text-white px-4 py-2 rounded-lg cursor-pointer"
               >
                 Try Again
               </button>
@@ -313,10 +313,10 @@ const Blogs = () => {
           </p>
 
           <div className="flex justify-center gap-4">
-            <button className="bg-black text-white px-6 py-2 rounded-md text-sm font-medium">
+            <button className="bg-black text-white px-6 py-2 rounded-md text-sm cursor-pointer font-medium">
               Contact Us
             </button>
-            <button className="bg-white text-black border border-gray-300 px-6 py-2 rounded-md text-sm font-medium">
+            <button className="bg-white text-black border border-gray-300 cursor-pointer px-6 py-2 rounded-md text-sm font-medium">
               Schedule a Call
             </button>
           </div>
@@ -344,7 +344,7 @@ const Blogs = () => {
             className="text-black px-4 py-2 rounded border border-gray-300 bg-[#F1F1F4] text-sm w-48"
           />
 
-          <button className="bg-black text-white px-4 py-2 rounded text-sm font-medium">
+          <button className="bg-black text-white px-4 py-2 rounded text-sm cursor-pointer font-medium">
             Submit
           </button>
         </div>
