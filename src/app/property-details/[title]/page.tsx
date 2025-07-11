@@ -759,7 +759,7 @@ export default function PropertyDetails() {
                 <div className="mt-5 flex flex-wrap gap-3">
                   <button
                     onClick={handleEnquireClick}
-                    className="border border-black text-black text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-100 transition"
+                    className="cursor-pointer border border-black text-black text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-100 transition"
                   >
                     Enquire Now
                   </button>
@@ -767,7 +767,7 @@ export default function PropertyDetails() {
                     Schedule a Visit
                   </button>
                   <button
-                    className={`border border-black text-black text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-100 transition flex items-center gap-2 ${
+                    className={`cursor-pointer border border-black text-black text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-100 transition${
                       isSaving ? "opacity-70 cursor-not-allowed" : ""
                     }`}
                     onClick={handleSaveProperty}
@@ -792,7 +792,7 @@ export default function PropertyDetails() {
                   <button
                     onClick={handleCompareClick}
                     disabled={isComparing}
-                    className="flex items-center justify-center px-6 py-3 border border-blue-600 text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors disabled:opacity-50"
+                    className="cursor-pointer flex items-center justify-center px-6 py-3 border border-blue-600 text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition-colors disabled:opacity-50"
                   >
                     {isComparing ? (
                       <>
