@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Raleway } from "next/font/google";
 // Import your static images
 import contactimg from "../../../../public/assets/images/contactimg.png";
@@ -96,6 +96,8 @@ export default function PropertyDetails() {
   const propertyOverviewRef = useRef<HTMLDivElement | null>(null);
   const [isSticky, setIsSticky] = useState(true);
   const [showEnquirePopup, setShowEnquirePopup] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
     mobile: "",
@@ -220,6 +222,47 @@ export default function PropertyDetails() {
     });
     // Show success message or redirect
     alert("Thank you for your enquiry! We'll get back to you soon.");
+  };
+
+  const handleSaveProperty = async () => {
+    // Check if user is logged in
+    const token = localStorage.getItem('authToken');
+    
+    if (!token) {
+      // Redirect to signin page if not logged in
+      router.push('/signin');
+      return;
+    }
+
+    if (!property) return;
+
+    try {
+      setIsSaving(true);
+      
+      const response = await fetch('http://localhost:8000/api/webusers/save-property', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          propertyId: property.id,
+          propertyData: property
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save property');
+      }
+
+      const data = await response.json();
+      alert('Property saved successfully!');
+    } catch (error) {
+      console.error('Error saving property:', error);
+      alert('Failed to save property. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const visibleImages = imageUrls.length > 0 
@@ -588,6 +631,16 @@ export default function PropertyDetails() {
                   </button>
                   <button className="bg-black text-white text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-800 transition">
                     Schedule a Visit
+                  </button>
+                  <button 
+                    className={`border border-black text-black text-sm font-medium py-2 px-10 rounded-lg hover:bg-gray-100 transition flex items-center gap-2 ${isSaving ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    onClick={handleSaveProperty}
+                    disabled={isSaving}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                    {isSaving ? 'Saving...' : 'Save Property'}
                   </button>
                 </div>
               </div>
