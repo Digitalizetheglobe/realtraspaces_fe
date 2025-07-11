@@ -29,12 +29,14 @@ const Header = () => {
     { name: "Blog", href: "/blogs" },
     { name: "Career", href: "/career" },
     { name: "Contact", href: "/contact" },
-    // { name: "Saved Properties", href: "/saved-properties"},
     { name: "Compare Properties", href: "/compareproperties" },
     { name: "IRR Calculator", href: "/irr-calculator" },
     { name: "LRD Calculator", href: "/lrd-calculator" },
     { name: "ROI Calculator", href: "/roi-calculator" },
   ];
+
+  // Check if the user is logged in by checking local storage for authToken
+  const isLoggedIn = !!localStorage.getItem("authToken");
 
   return (
     <>
@@ -89,9 +91,6 @@ const Header = () => {
                       </svg>
                     </button>
                   </div>
-                  {/* <div className="mt-2 text-sm text-gray-500">
-                    <p>The latest. Take a look at whats new right now.</p>
-                  </div> */}
                 </div>
               </div>
             )}
@@ -125,21 +124,22 @@ const Header = () => {
                 </svg>
               </button>
 
-              {/* List Property Button */}
-              {/* <button
-                type="button"
-                className="hidden sm:inline-flex bg-white text-black border border-gray-300 px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-100 transition-colors uppercase tracking-wider"
-              >
-                LIST PROPERTY
-              </button> */}
-
-              {/* Sign In Button */}
+              {/* Conditional Button */}
+              {isLoggedIn ? (
                 <Link
-                href="/signin"
-                className="hidden sm:inline-flex bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                  href="/profile-page"
+                  className="hidden sm:inline-flex bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
                 >
-                SIGN IN
+                  Profile
                 </Link>
+              ) : (
+                <Link
+                  href="/signup"
+                  className="hidden sm:inline-flex bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                >
+                  Sign Up
+                </Link>
+              )}
 
               {/* Menu Button - X when open, hamburger when closed */}
               <button

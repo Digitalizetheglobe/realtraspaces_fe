@@ -144,15 +144,15 @@ const ProfilePage = () => {
         
         <nav className="p-4 space-y-2">
           <button
-            onClick={() => navigateTo('similar-properties')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'similar-properties' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
+            onClick={() => router.push('/compare-properties')}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'compare-properties' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
           >
             <GitCompare className="h-5 w-5" />
-            <span>Similar Properties</span>
+            <span>Compare Properties</span>
           </button>
           
           <button
-            onClick={() => navigateTo('explore')}
+            onClick={() => router.push('/properties')}
             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'explore' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
           >
             <Search className="h-5 w-5" />
@@ -160,15 +160,15 @@ const ProfilePage = () => {
           </button>
           
           <button
-            onClick={() => navigateTo('profile')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'profile' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
+            onClick={() => router.push('/profile-page')}
+            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'profile-page' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
           >
             <User className="h-5 w-5" />
             <span>Profile</span>
           </button>
           
           <button
-            onClick={() => navigateTo('saved-properties')}
+            onClick={() => router.push('/SavedProperties')}
             className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'saved-properties' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
           >
             <Heart className="h-5 w-5" />
