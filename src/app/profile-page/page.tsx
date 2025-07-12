@@ -24,6 +24,68 @@ const ProfilePage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeRoute, setActiveRoute] = useState('profile');
+  const [savedPropertiesCount, setSavedPropertiesCount] = useState(0);
+  const [comparedPropertiesCount, setComparedPropertiesCount] = useState(0);
+  const [loadingCounts, setLoadingCounts] = useState(true);
+
+  const fetchSavedPropertiesCount = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch(
+        `https://api.realtraspaces.com/api/webusers/saved-properties?page=1&limit=1`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setSavedPropertiesCount(data.pagination?.total || 0);
+      }
+    } catch (error) {
+      console.error("Error fetching saved properties count:", error);
+    }
+  };
+
+  const fetchComparedPropertiesCount = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) return;
+
+    try {
+      const response = await fetch(
+        "https://api.realtraspaces.com/api/webusers/compare/list",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setComparedPropertiesCount(data.data?.length || 0);
+      }
+    } catch (error) {
+      console.error("Error fetching compared properties count:", error);
+    } finally {
+      setLoadingCounts(false);
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await Promise.all([
+        fetchSavedPropertiesCount(),
+        fetchComparedPropertiesCount()
+      ]);
+    };
+    
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -148,7 +210,7 @@ const ProfilePage = () => {
             className={` cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'compare-properties' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
           >
             <GitCompare className="h-5 w-5" />
-            <span>Compare Properties</span>
+            <span className="text-black">Compare Properties</span>
           </button>
           
           <button
@@ -156,7 +218,7 @@ const ProfilePage = () => {
             className={`cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'explore' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
           >
             <Search className="h-5 w-5" />
-            <span>Explore More</span>
+            <span className="text-black">Explore More</span>
           </button>
           
           <button
@@ -164,7 +226,7 @@ const ProfilePage = () => {
             className={`cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'profile-page' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
           >
             <User className="h-5 w-5" />
-            <span>Profile</span>
+            <span className="text-black">Profile</span>
           </button>
           
           <button
@@ -172,7 +234,7 @@ const ProfilePage = () => {
             className={`cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'saved-properties' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
           >
             <Heart className="h-5 w-5" />
-            <span>Saved Properties</span>
+            <span className="text-black">Saved Properties</span>
           </button>
           
           <button
@@ -277,27 +339,37 @@ const ProfilePage = () => {
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-lg font-semibold mb-4" style={{ color: '#1A1A1A' }}>
-                      Professional Details
+                      Saved Properties
                     </h3>
-                    <div className="bg-white border border-[#E5E5E7] rounded-lg p-4">
-                      <div className="flex items-center space-x-3 mb-3">
-                        <Briefcase className="h-5 w-5 text-[#6E6E73]" />
-                        <span style={{ color: '#1A1A1A' }}>{profile?.company || 'No Company Information'}</span>
+                    <div className="cursor-pointer bg-white border border-[#E5E5E7] rounded-lg p-6 text-center hover:shadow-md transition-shadow cursor-pointer"
+                         onClick={() => router.push('/SavedProperties')}>
+                      <div className="text-3xl font-bold text-black mb-2">
+                        {loadingCounts ? '...' : savedPropertiesCount}
                       </div>
                       <p className="text-[#6E6E73] text-sm">
-                        Add more professional details here when available
+                        Properties saved to your list
                       </p>
+                      <button className="mt-3 text-blue-600 text-sm font-medium hover:underline">
+                        View all saved properties
+                      </button>
                     </div>
                   </div>
                   
                   <div>
                     <h3 className="text-lg font-semibold mb-4" style={{ color: '#1A1A1A' }}>
-                      Preferences
+                      Compare Properties
                     </h3>
-                    <div className="bg-white border border-[#E5E5E7] rounded-lg p-4">
+                    <div className="cursor-pointer bg-white border border-[#E5E5E7] rounded-lg p-6 text-center hover:shadow-md transition-shadow cursor-pointer"
+                         onClick={() => router.push('/compareproperties')}>
+                      <div className="text-3xl font-bold text-black mb-2">
+                        {loadingCounts ? '...' : comparedPropertiesCount}
+                      </div>
                       <p className="text-[#6E6E73] text-sm">
-                        User preferences and settings would appear here
+                        Properties in your comparison list
                       </p>
+                      <button className="mt-3 text-blue-600 text-sm font-medium hover:underline">
+                        {comparedPropertiesCount > 0 ? 'View comparison' : 'Add properties to compare'}
+                      </button>
                     </div>
                   </div>
                 </div>

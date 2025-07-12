@@ -151,7 +151,7 @@ const Header = () => {
               <button
                 type="button"
                 onClick={toggleMenu}
-                className={`inline-flex items-center justify-center p-2 rounded-md ${
+                className={` cursor-pointer inline-flex items-center justify-center p-2 rounded-md ${
                   isMenuOpen
                     ? "bg-white text-black"
                     : "bg-black text-white hover:bg-gray-100"

@@ -168,7 +168,7 @@ const SavedProperties = () => {
             className="cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-[#F1F1F4] transition-colors"
           >
             <Home className="h-5 w-5" />
-            <span>Compare Properties</span>
+            <span className="text-black">Compare Properties</span>
           </button>
           
           <button
@@ -176,7 +176,7 @@ const SavedProperties = () => {
             className="cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-[#F1F1F4] transition-colors"
           >
             <Search className="h-5 w-5" />
-            <span>Explore More</span>
+            <span className="text-black">Explore More</span>
           </button>
           
           <button
@@ -184,7 +184,7 @@ const SavedProperties = () => {
             className="cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-[#F1F1F4] transition-colors"
           >
             <User className="h-5 w-5" />
-            <span>Profile</span>
+            <span className="text-black">Profile</span>
           </button>
           
           <button
@@ -192,7 +192,7 @@ const SavedProperties = () => {
             className="cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600"
           >
             <Heart className="h-5 w-5" />
-            <span>Saved Properties</span>
+            <span className="text-black">Saved Properties</span>
           </button>
           
           <button

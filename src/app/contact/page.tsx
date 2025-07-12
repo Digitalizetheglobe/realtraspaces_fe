@@ -59,7 +59,7 @@ export default function Home() {
                         Write to Us
                       </small>
                       <span className="text-gray-500 text-md font-medium">
-                        contact@buildinfinity.in
+                        contact@realtraspaces.com
                       </span>
                     </a>
                   </li>
@@ -74,10 +74,7 @@ export default function Home() {
                     <a href="javascript:void(0)" className="text-sm ml-4 ">
                       <small className="block text-xl text-black">Phones</small>
                       <span className="text-gray-500 text-md font-medium">
-                        +91 91456 88167 /
-                      </span>
-                      <span className="text-gray-500 text-md font-medium">
-                        +91 91456 88167
+                        +91 91456 88167  | +91 91456 88167
                       </span>
                     </a>
                   </li>
