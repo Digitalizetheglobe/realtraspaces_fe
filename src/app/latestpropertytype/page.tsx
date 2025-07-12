@@ -422,143 +422,114 @@ export default function PropertyCards() {
 
       {/* Popup Modal */}
       {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 opacity-100">
-            {/* Header with gradient background */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-t-2xl">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h3 className="text-2xl font-bold">Get in Touch</h3>
-                  <p className="text-blue-100 mt-1">We'd love to hear from you!</p>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowPopup(false);
-                    setPopupDismissed(true);
-                  }}
-                  className="text-white hover:text-gray-200 transition-colors duration-200 p-2 hover:bg-white hover:bg-opacity-20 rounded-full"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
+  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+    <div className="bg-white border-2 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 opacity-100">
+      {/* Header with gradient background */}
+      <div className="bg-gray-500 text-white p-6 rounded-t-2xl">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="text-2xl font-bold">Get in Touch</h3>
+            <p className="text-[#F1F1F4] mt-1">We'd love to hear from you!</p>
+          </div>
+          <button
+            onClick={() => {
+              setShowPopup(false);
+              setPopupDismissed(true);
+            }}
+            className="text-white hover:text-[#F1F1F4] transition-colors duration-200 p-2 hover:bg-white hover:bg-opacity-20 rounded-full"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+      </div>
 
-            {/* Form */}
-            <div className="p-6 space-y-6">
-              {/* Name Field */}
-              <div className="space-y-2">
-                <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
-                  Full Name *
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-              </div>
-
-              {/* Email Field */}
-              <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
-                  Email Address *
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
-                    placeholder="Enter your email address"
-                  />
-                </div>
-              </div>
-
-              {/* Phone Field */}
-              <div className="space-y-2">
-                <label htmlFor="number" className="block text-sm font-semibold text-gray-700">
-                  Phone Number *
-                </label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                  <input
-                    type="tel"
-                    id="number"
-                    name="number"
-                    value={formData.number}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
-                    placeholder="Enter your phone number"
-                  />
-                </div>
-              </div>
-
-              {/* Message Field */}
-              {/* <div className="space-y-2">
-                <label htmlFor="message" className="block text-sm font-semibold text-gray-700">
-                  Message *
-                </label>
-                <div className="relative">
-                  <MessageSquare className="absolute left-3 top-3 text-gray-400 w-5 h-5" />
-                  <textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
-                    onChange={handleInputChange}
-                    required
-                    rows={4}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all duration-200 hover:border-gray-400"
-                    placeholder="Tell us how we can help you..."
-                  />
-                </div>
-              </div> */}
-
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={handleSubmit}
-                  className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2"
-                >
-                  <Send className="w-5 h-5" />
-                  Send Message
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowPopup(false);
-                    setPopupDismissed(true);
-                  }}
-                  className="flex-1 bg-gray-100 text-gray-700 py-3 px-6 rounded-xl hover:bg-gray-200 transition-all duration-200 font-semibold border border-gray-300 hover:border-gray-400"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-
-            {/* Footer */}
-            {/* <div className="px-6 pb-6">
-              <div className="text-center text-sm text-gray-500 bg-gray-50 p-4 rounded-xl">
-                <p className="flex items-center justify-center gap-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                  We typically respond within 24 hours
-                </p>
-              </div>
-            </div> */}
+      {/* Form */}
+      <div className="p-6 space-y-6 bg-[#F1F1F4]">
+        {/* Name Field */}
+        <div className="space-y-2">
+          <label htmlFor="name" className="block text-sm font-semibold text-[#6E6E73]">
+            Full Name *
+          </label>
+          <div className="relative">
+            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6E6E73] w-5 h-5" />
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
+              placeholder="Enter your full name"
+            />
           </div>
         </div>
-      )}
+
+        {/* Email Field */}
+        <div className="space-y-2">
+          <label htmlFor="email" className="block text-sm font-semibold text-[#6E6E73]">
+            Email Address *
+          </label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6E6E73] w-5 h-5" />
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
+              placeholder="Enter your email address"
+            />
+          </div>
+        </div>
+
+        {/* Phone Field */}
+        <div className="space-y-2">
+          <label htmlFor="number" className="block text-sm font-semibold text-[#6E6E73]">
+            Phone Number *
+          </label>
+          <div className="relative">
+            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6E6E73] w-5 h-5" />
+            <input
+              type="tel"
+              id="number"
+              name="number"
+              value={formData.number}
+              onChange={handleInputChange}
+              required
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
+              placeholder="Enter your phone number"
+            />
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3 pt-2">
+          <button
+            onClick={handleSubmit}
+            className="flex-1 bg-gray-500 text-white py-3 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2"
+          >
+            <Send className="w-5 h-5" />
+            Send Message
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setShowPopup(false);
+              setPopupDismissed(true);
+            }}
+            className="flex-1 bg-white text-[#6E6E73] py-3 px-6 rounded-xl hover:bg-[#F1F1F4] transition-all duration-200 font-semibold border border-gray-300 hover:border-gray-400"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
