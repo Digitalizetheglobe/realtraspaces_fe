@@ -237,8 +237,8 @@ export default function PropertyDetails() {
       message: "",
       propertySlug: propertyTitle || "",
     });
-    // Show success message or redirect
-    alert("Thank you for your enquiry! We'll get back to you soon.");
+    // Show success message
+    toast.success("Thank you for your enquiry! We'll get back to you soon.");
   };
 
   const handleSaveProperty = async () => {
@@ -247,11 +247,15 @@ export default function PropertyDetails() {
 
     if (!token) {
       // Redirect to signin page if not logged in
+      toast.error("Please log in to save properties");
       router.push("/signin");
       return;
     }
 
-    if (!property) return;
+    if (!property) {
+      toast.error("Property information is not available");
+      return;
+    }
 
     try {
       setIsSaving(true);
@@ -271,15 +275,22 @@ export default function PropertyDetails() {
         }
       );
 
+      if (response.status === 401 || response.status === 403) {
+        toast.error("You Are Not Login");
+        router.push("/signin");
+        return;
+      }
+
       if (!response.ok) {
-        throw new Error("Failed to save property");
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to save property");
       }
 
       const data = await response.json();
-      alert("Property saved successfully!");
+      toast.success("Property saved successfully!");
     } catch (error) {
       console.error("Error saving property:", error);
-      alert("Failed to save property. Please try again.");
+      toast.error(error instanceof Error ? error.message : "Failed to save property. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -335,6 +346,12 @@ export default function PropertyDetails() {
           propertyData: property
         })
       });
+  
+      if (response.status === 401 || response.status === 403) {
+        toast.error("You Are Not Login");
+        router.push("/signin");
+        return;
+      }
   
       if (!response.ok) {
         const errorData = await response.json();
