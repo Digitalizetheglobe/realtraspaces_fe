@@ -29,7 +29,7 @@ export default function ScrollButton() {
   return (
     <button
       onClick={handleScroll}
-      className="fixed bottom-10 right-8 bg-[#172747] hover:bg-[#4b6096] font-bo text-white w-8 h-8 flex items-center justify-center rounded shadow-lg z-50"
+      className="fixed bottom-10 right-8 bg-black hover:bg-[#4b6096] font-bo text-white w-8 h-8 flex items-center justify-center rounded shadow-lg z-50"
     >
       {isAtTop ? "↓" : "↑"}
     </button>
