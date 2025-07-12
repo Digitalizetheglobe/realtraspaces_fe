@@ -5,6 +5,8 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
+import WhatsAppPopup from "./whatsapp";
+import ScrollButton from "./scrollbutton";
 
 export default function LayoutWithConditionalHeader({
   children,
@@ -20,6 +22,8 @@ export default function LayoutWithConditionalHeader({
     <>
       {!shouldHideHeader && <Header />}
       {children}
+      <WhatsAppPopup />
+      <ScrollButton />
       {!shouldHideHeader && <Footer />}
       <Toaster
         position="top-right"
