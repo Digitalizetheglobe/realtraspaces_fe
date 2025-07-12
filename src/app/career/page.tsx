@@ -2,7 +2,6 @@
 
 // BenefitsSection.jsx
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { ArrowRight, Upload, MapPin, Clock, Users, Award, Target, Heart } from "lucide-react";
 import Link from 'next/link';
 import AOS from 'aos';
@@ -98,7 +97,6 @@ const BenefitsSection = () => {
         throw new Error('Failed to submit application');
       }
 
-      const result: { message: string } = await response.json();
       setSubmitStatus({ 
         success: true, 
         message: 'Your application has been submitted successfully!' 
@@ -244,41 +242,40 @@ const BenefitsSection = () => {
       <section className="py-20" style={{ backgroundColor: '#F1F1F4' }}>
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-light text-black mb-6">
-              Why Choose Realtra Spaces?
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">
+              Why Work With Us?
             </h2>
-            <p className="text-xl max-w-3xl mx-auto" style={{ color: '#6E6E73' }}>
-              We're not just another real estate company. We're pioneers in creating extraordinary 
-              property experiences through innovation, integrity, and unparalleled service.
+            <p className="text-lg text-gray-600 mb-8">
+              We&apos;re looking for passionate individuals who share our vision of transforming the real estate industry. Join our team and be part of something extraordinary.
             </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: <Target className="w-8 h-8 text-black" />,
-                title: 'Innovation First',
-                desc: 'We leverage cutting-edge technology to transform how people discover, buy, and sell properties.'
-              },
-              {
-                icon: <Users className="w-8 h-8 text-black" />,
-                title: 'People-Centered',
-                desc: 'Our success is built on putting clients and team members at the heart of everything we do.'
-              },
-              {
-                icon: <Award className="w-8 h-8 text-black" />,
-                title: 'Excellence Driven',
-                desc: 'We maintain the highest standards in service delivery and professional growth.'
-              }
-            ].map((item, index) => (
-              <div key={index} className="text-center p-6" data-aos="fade-up" data-aos-delay={index * 100}>
-                <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  {item.icon}
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: <Target className="w-8 h-8 text-black" />,
+                  title: 'Innovation First',
+                  desc: 'We leverage cutting-edge technology to transform how people discover, buy, and sell properties.'
+                },
+                {
+                  icon: <Users className="w-8 h-8 text-black" />,
+                  title: 'People-Centered',
+                  desc: 'Our success is built on putting clients and team members at the heart of everything we do.'
+                },
+                {
+                  icon: <Award className="w-8 h-8 text-black" />,
+                  title: 'Excellence Driven',
+                  desc: 'We maintain the highest standards in service delivery and professional growth.'
+                }
+              ].map((item, index) => (
+                <div key={index} className="text-center p-6" data-aos="fade-up" data-aos-delay={index * 100}>
+                  <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    {item.icon}
+                  </div>
+                  <h3 className="text-2xl font-medium text-black mb-4">{item.title}</h3>
+                  <p className="leading-relaxed" style={{ color: '#6E6E73' }}>{item.desc}</p>
                 </div>
-                <h3 className="text-2xl font-medium text-black mb-4">{item.title}</h3>
-                <p className="leading-relaxed" style={{ color: '#6E6E73' }}>{item.desc}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -437,7 +434,7 @@ const BenefitsSection = () => {
               <div className="bg-black rounded-xl p-8 text-white h-full">
                 <h3 className="text-2xl font-semibold mb-4 text-white">Ready to Apply?</h3>
                 <p className="mb-6 leading-relaxed" style={{ color: '#6E6E73' }}>
-                  Don't see a role that fits? We're always looking for talented individuals 
+                  Don&apos;t see a role that fits? We&apos;re always looking for talented individuals 
                   who share our passion for innovation in real estate.
                 </p>
                 <Link href="#apply">
@@ -466,7 +463,7 @@ const BenefitsSection = () => {
                 </h2>
                 <p className="text-xl max-w-2xl mx-auto" style={{ color: '#6E6E73' }}>
                   Ready to be part of something extraordinary? Submit your application and 
-                  let's discuss how you can contribute to our mission.
+                  let&apos;s discuss how you can contribute to our mission.
                 </p>
               </div>
               

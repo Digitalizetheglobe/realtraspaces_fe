@@ -3,8 +3,6 @@
 import { useState, FormEvent, ChangeEvent, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import heroBackground from '@/public/images/7578550-uhd_3840_2160_30fps 1.png'; 
-import { ArrowRight } from 'lucide-react';
 import { useEffect } from 'react';
 
 export default function JobTitle() {
@@ -144,7 +142,6 @@ function JobTitleContent() {
       });
       
       if (response.ok) {
-        const result = await response.json();
         setSubmitMessage('Application submitted successfully!');
         
         // Redirect or clear form after successful submission
@@ -240,7 +237,7 @@ function JobTitleContent() {
         <section className="relative min-h-screen">
       <div className="absolute inset-0 z-0">
         <Image 
-          src={heroBackground}
+          src="/assets/images/contactimg.png"
           alt="Career Opportunity Background" 
           fill
           style={{ objectFit: "cover" }}

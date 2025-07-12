@@ -18,7 +18,6 @@ import propertyvideo from "../../../../public/assets/images/property-video.png";
 import parking from "../../../../public/assets/images/parking.png";
 import pin from "../../../../public/assets/images/marker-pin-01.png";
 import floor from "../../../../public/assets/images/floor.png";
-import location from "../../../../public/assets/images/location.png";
 import Similarproperties from "@/app/similarproperties/page";
 import { GitCompare } from "lucide-react";
 
@@ -71,8 +70,8 @@ type Property = {
   enquiredFor?: string;
   serialNo?: string;
   possessionDate?: string;
-  amenities?: Array<any>;
-  attributes?: Array<any>;
+  amenities?: Array<string | { name: string; value: string }>;
+  attributes?: Array<string | { name: string; value: string }>;
   aboutProperty?: string;
   ownerDetails?: {
     name?: string;
@@ -197,10 +196,6 @@ export default function PropertyDetails() {
     }
   };
 
-  const handleThumbnailClick = (img: string) => {
-    // setMainImage(img);
-  };
-
   const handleEnquireClick = () => {
     setShowEnquirePopup(true);
     // Update the property slug in form data when opening the popup
@@ -286,7 +281,6 @@ export default function PropertyDetails() {
         throw new Error(errorData.message || "Failed to save property");
       }
 
-      const data = await response.json();
       toast.success("Property saved successfully!");
     } catch (error) {
       console.error("Error saving property:", error);
@@ -358,7 +352,6 @@ export default function PropertyDetails() {
         throw new Error(errorData.message || "Failed to add property to comparison");
       }
   
-      const data = await response.json();
       toast.success("Property added to comparison");
       
       // Optionally navigate to compare page
@@ -1129,7 +1122,9 @@ export default function PropertyDetails() {
                             />
                           </svg>
                         </div>
-                        <span className="text-gray-700">{amenity}</span>
+                        <span className="text-gray-700">
+                          {typeof amenity === 'string' ? amenity : amenity.name}
+                        </span>
                       </div>
                     ))
                   ) : (

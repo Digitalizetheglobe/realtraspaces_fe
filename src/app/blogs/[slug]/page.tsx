@@ -35,21 +35,20 @@ interface ApiResponse {
   data: Blog;
 }
 
+// Updated interface for Next.js 15 - params is now a Promise
 interface PageProps {
-  params: {
-    id: string;
-  };
-  searchParams: { [key: string]: string | string[] | undefined };
+  params: Promise<{
+    slug: string;
+  }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 const BlogDetail = ({ params }: PageProps) => {
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [slug, setSlug] = useState<string | null>(null);
 
-  // Unwrap the params Promise using React.use()
-  const resolvedParams = React.use(params as unknown as Promise<{ slug: string }>);
-  
   useEffect(() => {
     // Initialize AOS animation library
     AOS.init({
@@ -57,21 +56,34 @@ const BlogDetail = ({ params }: PageProps) => {
       easing: 'ease-in-out',
     });
   }, []);
-  
+
+  // Effect to resolve params promise
+  useEffect(() => {
+    const resolveParams = async () => {
+      try {
+        const resolvedParams = await params;
+        setSlug(resolvedParams.slug);
+      } catch (err) {
+        console.error('Error resolving params:', err);
+        setError('Unable to load blog. Please try again later.');
+        setLoading(false);
+      }
+    };
+    
+    resolveParams();
+  }, [params]);
+
   useEffect(() => {
     const fetchBlog = async () => {
+      if (!slug) return;
+      
       try {
-        console.log('Fetching blog for id:', resolvedParams.slug);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/blogs/${resolvedParams.slug}`);
-        
+        console.log('Fetching blog for slug:', slug);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/blogs/${slug}`);
         if (!response.ok) {
           throw new Error(`Failed to fetch blog data: ${response.status}`);
         }
-        
         const result: ApiResponse = await response.json();
-        console.log('Received blog data:', result);
-        
-        // Extract data from the response structure
         if (result.status === 'success' && result.data) {
           setBlog(result.data);
         } else {
@@ -85,10 +97,10 @@ const BlogDetail = ({ params }: PageProps) => {
       }
     };
     
-    if (resolvedParams.slug) {
+    if (slug) {
       fetchBlog();
     }
-  }, [resolvedParams.slug]);
+  }, [slug]);
 
   // Function to format date
   const formatDate = (dateString: string) => {

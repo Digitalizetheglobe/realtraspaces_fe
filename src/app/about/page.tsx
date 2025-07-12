@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, X, Globe, Book, Wallet, Zap, ArrowRight, Star, Award, Users, MapPin, Phone, Mail } from 'lucide-react';
+import { X, Globe, Book, Zap, ArrowRight, Star, Award, Users } from 'lucide-react';
 
 // Dummy images using placeholder services
 const DUMMY_IMAGES = {
@@ -59,13 +59,14 @@ const useCounter = (end: number, duration: number = 2000) => {
       { threshold: 0.1 }
     );
 
-    if (ref.current) {
-      observer.observe(ref.current);
+    const currentRef = ref.current;
+    if (currentRef) {
+      observer.observe(currentRef);
     }
 
     return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
+      if (currentRef) {
+        observer.unobserve(currentRef);
       }
     };
   }, []);
@@ -98,8 +99,57 @@ const useCounter = (end: number, duration: number = 2000) => {
 };
 
 export default function RealtraSpacesAbout() {
-  const [modalImage, setModalImage] = useState<any>(null);
+  const [modalImage, setModalImage] = useState<string | null>(null);
   const [isCarouselHovered, setIsCarouselHovered] = useState(false);
+
+  // Create counter components outside of render
+  const YearsCounter = () => {
+    const { count, ref } = useCounter(8);
+    return (
+      <div ref={ref}>
+        <h3 className="text-5xl font-bold text-gray-300 mb-2">
+          {count}+
+        </h3>
+        <p className="text-xl text-white">Years in Business</p>
+      </div>
+    );
+  };
+
+  const PropertiesCounter = () => {
+    const { count, ref } = useCounter(1250);
+    return (
+      <div ref={ref}>
+        <h3 className="text-5xl font-bold text-gray-300 mb-2">
+          {count}+
+        </h3>
+        <p className="text-xl text-white">Properties Sold</p>
+      </div>
+    );
+  };
+
+  const ClientsCounter = () => {
+    const { count, ref } = useCounter(500);
+    return (
+      <div ref={ref}>
+        <h3 className="text-5xl font-bold text-gray-300 mb-2">
+          {count}+
+        </h3>
+        <p className="text-xl text-white">Happy Clients</p>
+      </div>
+    );
+  };
+
+  const AwardsCounter = () => {
+    const { count, ref } = useCounter(25);
+    return (
+      <div ref={ref}>
+        <h3 className="text-5xl font-bold text-gray-300 mb-2">
+          {count}+
+        </h3>
+        <p className="text-xl text-white">Awards Won</p>
+      </div>
+    );
+  };
 
   return (
     <div className="w-full bg-white">
@@ -165,17 +215,7 @@ export default function RealtraSpacesAbout() {
               <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Zap className="w-8 h-8 text-black" />
               </div>
-              {(() => {
-                const { count, ref } = useCounter(8);
-                return (
-                  <div ref={ref}>
-                    <h3 className="text-5xl font-bold text-gray-300 mb-2">
-                      {count}+
-                    </h3>
-                    <p className="text-xl text-white">Years in Business</p>
-                  </div>
-                );
-              })()}
+              <YearsCounter />
             </motion.div>
 
             {/* Properties Sold */}
@@ -188,20 +228,10 @@ export default function RealtraSpacesAbout() {
               <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-black" />
               </div>
-              {(() => {
-                const { count, ref } = useCounter(1250);
-                return (
-                  <div ref={ref}>
-                    <h3 className="text-5xl font-bold text-gray-300 mb-2">
-                      {count}+
-                    </h3>
-                    <p className="text-xl text-white">Properties Sold</p>
-                  </div>
-                );
-              })()}
+              <PropertiesCounter />
             </motion.div>
 
-            {/* Awards Won */}
+            {/* Happy Clients */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -209,22 +239,12 @@ export default function RealtraSpacesAbout() {
               className="text-center text-white"
             >
               <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="w-8 h-8 text-black" />
+                <Star className="w-8 h-8 text-black" />
               </div>
-              {(() => {
-                const { count, ref } = useCounter(35);
-                return (
-                  <div ref={ref}>
-                    <h3 className="text-5xl font-bold text-gray-300 mb-2">
-                      {count}+
-                    </h3>
-                    <p className="text-xl text-white">Awards Won</p>
-                  </div>
-                );
-              })()}
+              <ClientsCounter />
             </motion.div>
 
-            {/* Cities Served */}
+            {/* Awards Won */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -232,19 +252,9 @@ export default function RealtraSpacesAbout() {
               className="text-center text-white"
             >
               <div className="bg-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-8 h-8 text-black" />
+                <Award className="w-8 h-8 text-black" />
               </div>
-              {(() => {
-                const { count, ref } = useCounter(15);
-                return (
-                  <div ref={ref}>
-                    <h3 className="text-5xl font-bold text-gray-300 mb-2">
-                      {count}+
-                    </h3>
-                    <p className="text-xl text-white">Cities Served</p>
-                  </div>
-                );
-              })()}
+              <AwardsCounter />
             </motion.div>
           </div>
         </div>
@@ -388,7 +398,7 @@ export default function RealtraSpacesAbout() {
                   className={`flex-shrink-0 bg-white rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:scale-105 border border-gray-300 ${
                     image.size === 'large' ? 'w-80 h-60' : 'w-60 h-60'
                   }`}
-                  onClick={() => setModalImage(image)}
+                  onClick={() => setModalImage(image.src)}
                 >
                   <img
                     src={image.src}
@@ -504,13 +514,13 @@ export default function RealtraSpacesAbout() {
             </button>
             <div className="w-full h-96 relative rounded-xl overflow-hidden">
               <img
-                src={modalImage.src}
-                alt={modalImage.alt}
+                src={modalImage}
+                alt="Modal Image"
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="mt-4 text-center">
-              <h3 className="text-xl font-semibold text-black">{modalImage.alt}</h3>
+              <h3 className="text-xl font-semibold text-black">Modal Image</h3>
             </div>
           </div>
         </div>
