@@ -64,10 +64,10 @@ const Footer = () => {
 
             <p className="mt-4 max-w-xs text-gray-200 dark:text-gray-400">
             Realtraspaces is a modern real estate company offering smart solutions for buying, selling, and leasing properties.
-         <br/>   We simplify your property journey with expert guidance and a tech-driven approach.
+         <br/>  <br/> We simplify your property journey with expert guidance and a tech-driven approach.
             </p>
 
-            <ul className="mt-8 flex gap-6">
+            {/* <ul className="mt-8 flex gap-6">
               <li>
                 <a
                   href="#"
@@ -160,11 +160,11 @@ const Footer = () => {
                   </svg>
                 </a>
               </li>
-            </ul>
+            </ul> */}
           </div>
 
-          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:col-span-2 lg:grid-cols-4">
-            <div>
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:col-span-2 lg:grid-cols-3">
+            {/* <div>
               <p className="font-medium text-gray-200 dark:text-white">Services</p>
 
               <ul className="mt-6 space-y-4 text-sm">
@@ -198,27 +198,37 @@ const Footer = () => {
                   </a>
                 </li>
               </ul>
-            </div>
+            </div> */}
 
             <div>
-              <p className="font-medium text-gray-200 dark:text-white">Company</p>
+              <p className="font-medium text-gray-200 dark:text-white">Quick Links</p>
 
               <ul className="mt-6 space-y-4 text-sm">
                 <li>
-                  <a href="#" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
+                  <a href="/" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
+                    Home
+                  </a>
+                </li>
+                <li>
+                  <a href="/about" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
                     About
                   </a>
                 </li>
 
                 <li>
-                  <a href="#" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
-                    Meet the Team
+                  <a href="/properties" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
+                  Properties
                   </a>
                 </li>
 
                 <li>
-                  <a href="#" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
-                    Accounts Review
+                  <a href="/blogs" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
+                    Blog
+                  </a>
+                </li>
+                <li>
+                  <a href="/career" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
+                    Career
                   </a>
                 </li>
               </ul>
@@ -247,6 +257,21 @@ const Footer = () => {
                 <li>
                   <a href="/terms-and-condition" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
                     Terms and Condition
+                  </a>
+                </li>
+                <li>
+                  <a href="/irr-calculator" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
+                  IRR Calculator
+                  </a>
+                </li>
+                <li>
+                  <a href="/lrd-calculator" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
+                  LRD Calculator
+                  </a>
+                </li>
+                <li>
+                  <a href="/roi-calculator" className="text-gray-200 transition hover:opacity-75 dark:text-gray-200">
+                  ROI Calculator
                   </a>
                 </li>
                 {/* <li>
