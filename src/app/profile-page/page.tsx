@@ -144,8 +144,8 @@ const ProfilePage = () => {
         
         <nav className="p-4 space-y-2">
           <button
-            onClick={() => router.push('/compare-properties')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'compare-properties' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
+            onClick={() => router.push('/compareproperties')}
+            className={` cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'compare-properties' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
           >
             <GitCompare className="h-5 w-5" />
             <span>Compare Properties</span>
@@ -153,7 +153,7 @@ const ProfilePage = () => {
           
           <button
             onClick={() => router.push('/properties')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'explore' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
+            className={`cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'explore' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
           >
             <Search className="h-5 w-5" />
             <span>Explore More</span>
@@ -161,7 +161,7 @@ const ProfilePage = () => {
           
           <button
             onClick={() => router.push('/profile-page')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'profile-page' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
+            className={`cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'profile-page' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
           >
             <User className="h-5 w-5" />
             <span>Profile</span>
@@ -169,7 +169,7 @@ const ProfilePage = () => {
           
           <button
             onClick={() => router.push('/SavedProperties')}
-            className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'saved-properties' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
+            className={`cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${activeRoute === 'saved-properties' ? 'bg-blue-50 text-blue-600' : 'hover:bg-[#F1F1F4]'}`}
           >
             <Heart className="h-5 w-5" />
             <span>Saved Properties</span>
@@ -177,7 +177,7 @@ const ProfilePage = () => {
           
           <button
             onClick={handleLogout}
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 mt-8"
+            className="cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 mt-8"
           >
             <LogOut className="h-5 w-5" />
             <span>Logout</span>
@@ -216,7 +216,7 @@ const ProfilePage = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
+                  {/* <div className="flex items-center space-x-3">
                     <Mail className="h-5 w-5 text-[#6E6E73]" />
                     <span style={{ color: '#1A1A1A' }}>{profile?.email || 'No Email'}</span>
                   </div>
@@ -224,7 +224,7 @@ const ProfilePage = () => {
                   <div className="flex items-center space-x-3">
                     <Phone className="h-5 w-5 text-[#6E6E73]" />
                     <span style={{ color: '#1A1A1A' }}>{profile?.mobileNumber || 'No Mobile'}</span>
-                  </div>
+                  </div> */}
                   
                   <div className="flex items-center space-x-3">
                     <MapPin className="h-5 w-5 text-[#6E6E73]" />
@@ -242,16 +242,16 @@ const ProfilePage = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm" style={{ color: '#6E6E73' }}>Member Since</p>
+                      <p className="text-sm" style={{ color: '#6E6E73' }}>Full Name</p>
                       <p style={{ color: '#1A1A1A' }}>
-                        {profile?.createdAt ? formatDate(profile.createdAt) : 'N/A'}
+                        {profile?.fullName || 'N/A'}
                       </p>
                     </div>
                     
                     <div>
-                      <p className="text-sm" style={{ color: '#6E6E73' }}>Last Updated</p>
+                      <p className="text-sm" style={{ color: '#6E6E73' }}>Mobile Number</p>
                       <p style={{ color: '#1A1A1A' }}>
-                        {profile?.updatedAt ? formatDate(profile.updatedAt) : 'N/A'}
+                        {profile?.mobileNumber || 'N/A'}
                       </p>
                     </div>
                     
@@ -305,7 +305,7 @@ const ProfilePage = () => {
             </div>
             
             {/* Footer Actions */}
-            <div className="border-t border-[#E5E5E7] p-6 flex justify-end space-x-4">
+            {/* <div className="border-t border-[#E5E5E7] p-6 flex justify-end space-x-4">
               <button 
                 className="px-6 py-2 border border-[#E5E5E7] rounded-lg font-semibold hover:bg-[#F1F1F4] transition-colors duration-200" 
                 style={{ color: '#6E6E73' }}
@@ -317,7 +317,7 @@ const ProfilePage = () => {
               >
                 Save Changes
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

@@ -164,8 +164,8 @@ const SavedProperties = () => {
         
         <nav className="p-4 space-y-2">
           <button
-            onClick={() => router.push('/compare-properties')}
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-[#F1F1F4] transition-colors"
+            onClick={() => router.push('/compareproperties')}
+            className="cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-[#F1F1F4] transition-colors"
           >
             <Home className="h-5 w-5" />
             <span>Compare Properties</span>
@@ -173,7 +173,7 @@ const SavedProperties = () => {
           
           <button
             onClick={() => router.push('/properties')}
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-[#F1F1F4] transition-colors"
+            className="cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-[#F1F1F4] transition-colors"
           >
             <Search className="h-5 w-5" />
             <span>Explore More</span>
@@ -181,7 +181,7 @@ const SavedProperties = () => {
           
           <button
             onClick={() => router.push('/profile-page')}
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-[#F1F1F4] transition-colors"
+            className="cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-[#F1F1F4] transition-colors"
           >
             <User className="h-5 w-5" />
             <span>Profile</span>
@@ -189,7 +189,7 @@ const SavedProperties = () => {
           
           <button
             onClick={() => router.push('/saved-properties')}
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600"
+            className="cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600"
           >
             <Heart className="h-5 w-5" />
             <span>Saved Properties</span>
@@ -200,7 +200,7 @@ const SavedProperties = () => {
               localStorage.removeItem('authToken');
               router.push('/login');
             }}
-            className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 mt-8"
+            className="cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 mt-8"
           >
             <LogOut className="h-5 w-5" />
             <span>Logout</span>
