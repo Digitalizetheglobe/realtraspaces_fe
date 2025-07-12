@@ -257,7 +257,7 @@ export default function PropertyDetails() {
       setIsSaving(true);
 
       const response = await fetch(
-        "http://localhost:8000/api/webusers/save-property",
+        "https://api.realtraspaces.com/api/webusers/save-property",
         {
           method: "POST",
           headers: {
@@ -324,7 +324,7 @@ export default function PropertyDetails() {
     try {
       setIsComparing(true);
       
-      const response = await fetch("http://localhost:8000/api/webusers/compare/add", {
+      const response = await fetch("https://api.realtraspaces.com/api/webusers/compare/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

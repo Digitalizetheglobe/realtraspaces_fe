@@ -22,7 +22,7 @@ const ManageTestimonialsPage = () => {
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/testimonials');
+        const response = await fetch('https://api.realtraspaces.com/api/testimonials');
         if (!response.ok) {
           throw new Error('Failed to fetch testimonials');
         }
@@ -54,7 +54,7 @@ const ManageTestimonialsPage = () => {
     if (!confirm('Are you sure you want to delete this testimonial?')) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/api/testimonials/${id}`, {
+      const response = await fetch(`https://api.realtraspaces.com/api/testimonials/${id}`, {
         method: 'DELETE',
       });
 
@@ -70,7 +70,7 @@ const ManageTestimonialsPage = () => {
 
   const handleStatusChange = async (id: number, isActive: boolean) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/testimonials/${id}`, {
+      const response = await fetch(`https://api.realtraspaces.com/api/testimonials/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

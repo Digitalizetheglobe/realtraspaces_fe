@@ -29,7 +29,7 @@ const CareerManagementPage = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/jobs');
+        const response = await fetch('https://api.realtraspaces.com/api/jobs');
         if (!response.ok) {
           throw new Error('Failed to fetch jobs');
         }
@@ -61,7 +61,7 @@ const CareerManagementPage = () => {
     if (!confirm('Are you sure you want to delete this job?')) return;
 
     try {
-      const response = await fetch(`http://localhost:8000/api/jobs/${jobId}`, {
+      const response = await fetch(`https://api.realtraspaces.com/api/jobs/${jobId}`, {
         method: 'DELETE',
       });
 

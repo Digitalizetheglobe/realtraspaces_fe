@@ -33,7 +33,7 @@ const ProfilePage = () => {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch('http://localhost:8000/api/webusers/profile', {
+        const response = await fetch('https://api.realtraspaces.com/api/webusers/profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

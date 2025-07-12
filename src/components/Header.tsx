@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 const Header = () => {
@@ -36,7 +36,13 @@ const Header = () => {
   ];
 
   // Check if the user is logged in by checking local storage for authToken
-  const isLoggedIn = !!localStorage.getItem("authToken");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLoggedIn(!!localStorage.getItem("authToken"));
+    }
+  }, []);
 
   return (
     <>

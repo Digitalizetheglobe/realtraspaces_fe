@@ -41,7 +41,7 @@ const Blogs = () => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/blogs/`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/blogs/`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -177,7 +177,7 @@ const Blogs = () => {
       </section>
 
       {/* FAQ */}
-      <section className="bg-white flex justify-center items-center min-h-screen">
+      <section className="bg-white flex justify-center  items-center min-h-screen">
         <div className="w-full max-w-2xl p-4">
           {/* Updated heading section */}
           <div className="text-center mb-8">
@@ -191,11 +191,11 @@ const Blogs = () => {
 
           <details className="group [&_summary::-webkit-details-marker]:hidden">
             <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
-              <h2 className="text-lg font-medium">
+              <h2 className="text-lg font-medium cursor-pointer">
                 Lorem ipsum dolor sit amet consectetur adipisicing?
               </h2>
               <svg
-                className="size-8 shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
+                className="size-8 cursor-pointer shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"

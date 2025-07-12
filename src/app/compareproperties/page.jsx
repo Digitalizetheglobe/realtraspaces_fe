@@ -50,7 +50,7 @@ const CompareProperties = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        "http://localhost:8000/api/webusers/compare/list",
+        "https://api.realtraspaces.com/api/webusers/compare/list",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -82,7 +82,7 @@ const CompareProperties = () => {
     try {
       setIsRemoving(propertyId);
       const response = await fetch(
-        `http://localhost:8000/api/webusers/compare/remove/${propertyId}`,
+        `https://api.realtraspaces.com/api/webusers/compare/remove/${propertyId}`,
         {
           method: "DELETE",
           headers: {
@@ -116,7 +116,7 @@ const CompareProperties = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/api/webusers/compare/clear",
+        "https://api.realtraspaces.com/api/webusers/compare/clear",
         {
           method: "DELETE",
           headers: {

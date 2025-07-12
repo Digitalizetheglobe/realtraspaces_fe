@@ -138,7 +138,7 @@ function JobTitleContent() {
       });
       
       // Submit the form data
-      const response = await fetch('https://api.propertydronerealty.com/applications/submit', {
+      const response = await fetch('https://api.realtraspaces.com/applications/submit', {
         method: 'POST',
         body: submitData,
       });
@@ -185,7 +185,7 @@ function JobTitleContent() {
         // Extract the slug from the URL (last part after the final slash)
         const slug = path.substring(path.lastIndexOf('/') + 1);
         
-        const response = await fetch("https://api.propertydronerealty.com/careers");
+        const response = await fetch("https://api.realtraspaces.com/careers");
         if (!response.ok) {
           throw new Error("Failed to fetch job data");
         }

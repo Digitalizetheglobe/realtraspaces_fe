@@ -138,7 +138,7 @@ export default function RealtraSpacesAbout() {
               Realtra Spaces is a forward-thinking real estate company specializing in luxury residential and commercial properties. We combine innovation with expertise to deliver exceptional real estate experiences.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {/* <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button className="bg-white text-black hover:bg-gray-300 px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105">
                 Explore Properties
                 <ArrowRight size={20} />
@@ -146,7 +146,7 @@ export default function RealtraSpacesAbout() {
               <button className="border-2 border-white text-white hover:bg-white hover:text-black px-8 py-4 rounded-full font-semibold transition-all duration-300">
                 Book Consultation
               </button>
-            </div>
+            </div> */}
           </motion.div>
         </div>
       </section>
@@ -477,7 +477,7 @@ export default function RealtraSpacesAbout() {
                   className="w-full px-4 py-3 rounded-lg bg-white/30 border border-white/50 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white/50 focus:bg-white/40"
                 />
               </div>
-              <button className="w-full bg-white text-black font-semibold py-4 px-8 rounded-lg hover:bg-gray-300 transition-colors duration-300 flex items-center justify-center gap-2">
+              <button className="w-full cursor-pointer bg-white text-black font-semibold py-4 px-8 rounded-lg hover:bg-gray-300 transition-colors duration-300 flex items-center justify-center gap-2">
                 Get Free Consultation
                 <ArrowRight size={20} />
               </button>

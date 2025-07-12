@@ -91,7 +91,7 @@ const SignUpPage = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/api/webusers/register",
+        "https://api.realtraspaces.com/api/webusers/register",
         {
           method: "POST",
           headers: {

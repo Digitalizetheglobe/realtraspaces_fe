@@ -323,7 +323,7 @@ export default function Similarproperties() {
           <div className="absolute inset-0 flex flex-col items-center justify-center z-10 text-center space-y-4">
             <h2 className="mt-10 font-normal text-[32px] leading-[100%] tracking-normal text-center mt-[100px]">
               <span className="text-white">All Properties</span>{" "}
-              <span className="">Explore our properties</span>
+             <span className="text-gray-400">Explore our properties</span>
             </h2>
             {/* Breadcrumb */}
             <nav aria-label="breadcrumb">
