@@ -19,7 +19,7 @@ export default function WhyrealtraSpaces() {
                     <div className="flex flex-col sm:flex-row mb-[25px] w-full justify-between items-start gap-6 sm:gap-0 opacity-0 animate-fade-in">
                         <div className="w-full sm:w-1/2 pr-4">
                             <h2 className="text-xl sm:text-2xl lg:text-4xl font-bold text-black transform translate-y-4 opacity-0 animate-slide-up animation-delay-200">
-                                Why RealtraSpaces?
+                                Why Realtra Spaces ?
                             </h2>
                             <h3 className="text-xl sm:text-2xl lg:text-4xl font-bold text-[#6E6E73] transform translate-y-4 opacity-0 animate-slide-up animation-delay-400">
                                 Built on trust. Designed for ease.

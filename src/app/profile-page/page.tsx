@@ -253,13 +253,7 @@ const ProfilePage = () => {
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold" style={{ color: '#1A1A1A' }}>My Profile</h1>
-            <button 
-              className="flex items-center space-x-2 text-blue-600 hover:text-blue-700"
-              onClick={() => setActiveRoute('edit-profile')}
-            >
-              <Edit className="h-5 w-5" />
-              <span>Edit Profile</span>
-            </button>
+           
           </div>
           
           {/* Profile Card */}
@@ -300,7 +294,15 @@ const ProfilePage = () => {
                 <div className="bg-[#F1F1F4] rounded-lg p-6 mb-6">
                   <h3 className="text-lg font-semibold mb-4" style={{ color: '#1A1A1A' }}>
                     Account Information
+ {/* <button 
+              className="flex items-center space-x-2 text-blue-600 hover:text-blue-700"
+              onClick={() => setActiveRoute('edit-profile')}
+            >
+              <Edit className="h-5 w-5" />
+              <span>Edit Profile</span>
+            </button> */}
                   </h3>
+                  
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>

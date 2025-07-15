@@ -10,6 +10,7 @@ import whatsapp from "../../../public/assets/WhatsApp.png";
 import TopDevelopers from "../topdevelopers/page";
 import home from "../../../public/assets/hero.jpg";
 import Link from "next/link";
+import ShareModal from "../../components/ShareModal";
 // Load Raleway font with more weight options
 const raleway = Raleway({
   subsets: ["latin"],
@@ -61,6 +62,41 @@ export default function PropertyCards() {
     number: "",
     message: ""
   });
+  const [openShareIndex, setOpenShareIndex] = useState<number | null>(null);
+
+  // Click-away listener for share dropdown
+  useEffect(() => {
+    if (openShareIndex === null) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      // Only close if the click is outside any share dropdown
+      // We use a class on the dropdown for detection
+      const target = event.target as HTMLElement;
+      if (!target.closest('.share-dropdown')) {
+        setOpenShareIndex(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [openShareIndex]);
+
+  // Debug: log when dropdown is rendered
+  useEffect(() => {
+    if (openShareIndex !== null) {
+      console.log('Dropdown rendered for index:', openShareIndex);
+    }
+  }, [openShareIndex]);
+
+  // Helper to get property URL
+  const getPropertyUrl = (property: Property) => {
+    if (!property.title) return window.location.href;
+    return `${window.location.origin}/property-details/${encodeURIComponent(property.title)}`;
+  };
+
+  // Helper to copy link
+  const handleCopyLink = (url: string) => {
+    navigator.clipboard.writeText(url);
+    alert('Link copied to clipboard!');
+  };
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -188,15 +224,15 @@ export default function PropertyCards() {
         />
 
         {/* Search bar positioned at the bottom center of the banner */}
-      <div className="absolute bottom-4 w-full flex justify-center px-2">
-  <div className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-2 px-3 py-2 rounded-2xl border border-gray-300 bg-[#F5F5FF99] backdrop-blur-sm shadow-md">
+    <div className="absolute bottom-4 w-full flex justify-center px-4">
+  <div className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-3 px-4 py-3 rounded-2xl border border-gray-300 bg-white/60 backdrop-blur-md shadow-lg">
     
     {/* Dropdown */}
     <div className="relative w-full sm:w-auto">
       <select
-        className="appearance-none w-full bg-black text-white text-sm font-medium pl-6 pr-10 py-3 h-full rounded-full outline-none cursor-pointer"
+        className="appearance-none w-full sm:min-w-[200px] bg-black text-white text-sm font-medium pl-5 pr-10 py-3 rounded-full outline-none cursor-pointer"
       >
-        <option value="">Select search type</option>
+        <option value="">Select Search Type</option>
         <option value="commercial">Commercial</option>
         <option value="coworking">Co-working</option>
       </select>
@@ -211,12 +247,13 @@ export default function PropertyCards() {
     <input
       type="text"
       placeholder="Search by property name, location, or type..."
-      className="w-full bg-white text-gray-900 px-4 py-3 text-sm rounded-full outline-none min-w-0"
+      className="w-full bg-white text-gray-900 px-5 py-3 text-sm rounded-full outline-none"
       value={search}
-      onChange={e => setSearch(e.target.value)}
+      onChange={(e) => setSearch(e.target.value)}
     />
   </div>
 </div>
+
 
       </section>
    <section className="pb-8 sm:pb-10 lg:pb-20 bg-white dark:bg-dark relative overflow-hidden">
@@ -225,7 +262,7 @@ export default function PropertyCards() {
             {/* Heading */}
             <div className="mb-8 sm:mb-[60px] w-full">
               <h2 className="mt-6 sm:mt-10 font-normal text-xl sm:text-2xl md:text-[32px] leading-[120%] tracking-normal text-center transform transition-all duration-700 hover:scale-105">
-                <span className="text-black">The latest.</span>{" "}
+                <span className="text-black">The Latest.</span>{" "}
                 <span className="text-[#6E6E73]">
                   Take a look at whats new right now.
                 </span>
@@ -235,7 +272,7 @@ export default function PropertyCards() {
             {/* Property Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {filteredProperties.slice(0, 4).map((property, index) => (
-                <Link href={`/property-details/${property.title}`} key={property.title} className="block">
+                
                 <div
                   key={property.id}
                   className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col transform transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-gray-400/20 hover:-translate-y-2 hover:border-gray-300 animate-fade-in-up"
@@ -243,6 +280,7 @@ export default function PropertyCards() {
                 >
                   {/* Header with title and checkbox */}
                   <div className="p-2 sm:p-3 flex justify-between items-center transition-all duration-300 hover:bg-gray-50/50">
+                  <Link href={`/property-details/${property.title}`} key={property.title} className="block">
                     <div className="h-14">
                       <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
                         {property.title || "Prime Business Hub"}
@@ -273,7 +311,8 @@ export default function PropertyCards() {
                           "Location Name"}
                       </div>
                     </div>
-                    <div className="w-5 h-5 border border-gray-600 rounded flex items-center justify-center transition-all duration-300 hover:border-gray-800 hover:bg-gray-100 hover:scale-110">
+                    </Link>
+                    {/* <div className="w-5 h-5 border border-gray-600 rounded flex items-center justify-center transition-all duration-300 hover:border-gray-800 hover:bg-gray-100 hover:scale-110">
                       <svg
                         className="w-3 h-3 text-black transition-all duration-300 hover:scale-110"
                         fill="none"
@@ -288,10 +327,11 @@ export default function PropertyCards() {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Property Image */}
+                  <Link href={`/property-details/${property.title}`} key={property.title} className="block">
                   <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
                     <Image
                       src={defaultPropertyImage}
@@ -301,6 +341,7 @@ export default function PropertyCards() {
                       height={180}
                     />
                     {/* For Sale/Rent / Property Type overlay */}
+                    {/* <Link href={`/property-details/${property.title}`} key={property.title} className="block"> */}
                     <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
                       <span className="mr-2 transition-all duration-300 group-hover:font-medium">
                         {property.forSale
@@ -316,9 +357,12 @@ export default function PropertyCards() {
                           "Office space"}
                       </span>
                     </div>
+                    {/* </Link> */}
                   </div>
+                  </Link>
                   {/* Property Details */}
                   <div className="p-2 sm:p-3 flex-grow transition-all duration-300 hover:bg-gray-50/30">
+                  <Link href={`/property-details/${property.title}`} key={property.title} className="block">
                     <div className="grid grid-cols-2 gap-1 text-xs">
                       <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Carpet Area</div>
                       <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
@@ -342,11 +386,13 @@ export default function PropertyCards() {
                         {getAttributeValue(property, "cabins-id") || "12"}
                       </div>
                     </div>
-
+                          </Link>
                     <div className="border-t border-gray-200 my-2 transition-all duration-300 hover:border-gray-300"></div>
 
                     {/* Price and Actions */}
+                    {/* <Link href={`/property-details/${property.title}`} key={property.title} className="block"> */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
+                    <Link href={`/property-details/${property.title}`} key={property.title} className="block">
                       <div className="transition-all duration-300 hover:scale-105">
                         <div className="text-base text-black font-semibold transition-all duration-300 hover:text-gray-800">
                           {property.forRent
@@ -357,7 +403,8 @@ export default function PropertyCards() {
                           {property.forRent ? "rent/month" : ""}
                         </div>
                       </div>
-                      <div className="flex space-x-1">
+                      </Link>
+                      <div className="flex space-x-1 relative">
                         {/* Bookmark button */}
                         <button className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-gray-200 hover:scale-110 hover:shadow-md active:scale-95">
                           <Image
@@ -369,19 +416,38 @@ export default function PropertyCards() {
                           />
                         </button>
 
-                        {/* Share button */}
-                        <button className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-gray-200 hover:scale-110 hover:shadow-md active:scale-95">
-                          <Image
-                            src={share}
-                            alt="Share"
-                            width={20}
-                            height={20}
-                            className="object-contain transition-all duration-300 hover:scale-110"
+                        {/* Share button with dropdown */}
+                        <div className="relative">
+                          <button
+                            className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-gray-200 hover:scale-110 hover:shadow-md active:scale-95"
+                            onClick={() => setOpenShareIndex(openShareIndex === index ? null : index)}
+                            aria-label="Share"
+                            type="button"
+                          >
+                            <Image
+                              src={share}
+                              alt="Share"
+                              width={20}
+                              height={20}
+                              className="object-contain transition-all duration-300 hover:scale-110"
+                            />
+                          </button>
+                          <ShareModal
+                            open={openShareIndex === index}
+                            onClose={() => setOpenShareIndex(null)}
+                            property={property}
+                            getPropertyUrl={getPropertyUrl}
                           />
-                        </button>
+                        </div>
 
-                        {/* WhatsApp button */}
-                        <button className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-gray-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded">
+                        {/* WhatsApp button (active, opens chat with 7039311539) */}
+                        <a
+                          href={`https://wa.me/7039311539?text=${encodeURIComponent(property.title || 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-gray-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
+                          aria-label="WhatsApp"
+                        >
                           <Image
                             src={whatsapp}
                             alt="WhatsApp"
@@ -389,12 +455,13 @@ export default function PropertyCards() {
                             height={20}
                             className="object-contain transition-all duration-300 hover:scale-110"
                           />
-                        </button>
+                        </a>
                       </div>
                     </div>
+                    
                   </div>
                 </div>
-                </Link>
+               
               ))}
             </div>
           </div>
@@ -486,24 +553,25 @@ export default function PropertyCards() {
         </div>
 
         {/* Phone Field */}
-        <div className="space-y-2">
-          <label htmlFor="number" className="block text-sm font-semibold text-[#6E6E73]">
-            Phone Number *
-          </label>
-          <div className="relative">
-            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6E6E73] w-5 h-5" />
-            <input
-              type="tel"
-              id="number"
-              name="number"
-              value={formData.number}
-              onChange={handleInputChange}
-              required
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
-              placeholder="Enter your phone number"
-            />
-          </div>
-        </div>
+        <div className="text-gray-700 space-y-2">
+  <p>
+    <span className="font-semibold">Contact No:</span>{' '}
+    <a href="tel:+919730156575" className="text-blue-600 hover:text-blue-800 hover:underline">
+      +91 9730156575
+    </a>
+  </p>
+  <p>
+    <span className="font-semibold">Email:</span>{' '}
+    <a href="mailto:info@realtraspaces.com" className="text-blue-600 hover:text-blue-800 hover:underline">
+      info@realtraspaces.com
+    </a>
+  </p>
+  <p>
+    <span className="font-semibold">Address:</span> Pune, Maharashtra, India
+  </p>
+</div>
+
+
 
         {/* Action Buttons */}
         <div className="flex gap-3 pt-2">

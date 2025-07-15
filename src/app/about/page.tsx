@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { X, Globe, Book, Zap, ArrowRight, Star, Award, Users } from 'lucide-react';
-
+import developer3 from "../../../public/assets/developer3.jpg";
+import Image from "next/image";
 // Dummy images using placeholder services
 const DUMMY_IMAGES = {
   heroVideo: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&h=1080&fit=crop",
@@ -154,11 +155,11 @@ export default function RealtraSpacesAbout() {
   return (
     <div className="w-full bg-white">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative  flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <img
-            src={DUMMY_IMAGES.heroVideo}
+          <Image
+            src={developer3.src ? developer3.src : developer3}
             alt="Modern Real Estate"
             className="w-full h-full object-cover"
           />
@@ -166,7 +167,7 @@ export default function RealtraSpacesAbout() {
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 container mx-auto px-4 text-center text-white">
+        <div className="relative py-10 z-10 container mx-auto px-4 text-center text-white">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -184,7 +185,7 @@ export default function RealtraSpacesAbout() {
               <span className="text-gray-300"> Dreams</span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
               Realtra Spaces is a forward-thinking real estate company specializing in luxury residential and commercial properties. We combine innovation with expertise to deliver exceptional real estate experiences.
             </p>
             
@@ -272,7 +273,7 @@ export default function RealtraSpacesAbout() {
               <h2 className="text-4xl md:text-5xl font-bold text-black mb-6">
                 Who We Are
               </h2>
-              <p className="text-xl text-gray-600 leading-relaxed">
+              <p className="text-lg text-gray-600 leading-relaxed">
                 Realtra Spaces is a premier real estate company dedicated to providing exceptional service in residential and commercial properties. We specialize in luxury homes, modern apartments, commercial spaces, and investment opportunities across multiple cities.
               </p>
             </motion.div>
@@ -291,7 +292,7 @@ export default function RealtraSpacesAbout() {
                 <Star className="w-8 h-8 text-black" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">Our Mission</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 text-lg leading-relaxed">
                 To revolutionize the real estate experience by providing personalized, technology-driven solutions that exceed client expectations and create lasting value.
               </p>
             </motion.div>
@@ -307,7 +308,7 @@ export default function RealtraSpacesAbout() {
                 <Globe className="w-8 h-8 text-black" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">Our Vision</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 text-lg leading-relaxed">
                 To become the most trusted and innovative real estate company, setting new standards for excellence in property services and client satisfaction.
               </p>
             </motion.div>

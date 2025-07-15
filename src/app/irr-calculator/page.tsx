@@ -40,7 +40,7 @@ export default function IRRCalculator() {
   }, [principal, years, rate, interestType]);
 
   return (
-    <div className="min-h-screen bg-gray-100 p-2 sm:p-5 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-50 p-2 sm:p-5 flex items-center justify-center">
       <div className="w-full max-w-2xl md:max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="flex flex-col md:flex-row h-full">
           {/* Left Panel */}
@@ -58,10 +58,11 @@ export default function IRRCalculator() {
                 Choose Interest Type
               </label>
               <select
-                value={interestType}
+                value="select"
                 onChange={(e) => setInterestType(e.target.value)}
                 className="w-full p-2 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none text-xs sm:text-sm"
               >
+                <option >Select</option>
                 <option value="simple">Simple Interest</option>
                 <option value="compound">Compound Interest</option>
               </select>

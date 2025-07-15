@@ -97,6 +97,7 @@ export default function PropertyDetails() {
   const propertyOverviewRef = useRef<HTMLDivElement | null>(null);
   const [isSticky, setIsSticky] = useState(true);
   const [showEnquirePopup, setShowEnquirePopup] = useState(false);
+  const [showSchedulePopup, setShowSchedulePopup] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -104,6 +105,8 @@ export default function PropertyDetails() {
     mobile: "",
     message: "",
     propertySlug: propertyTitle || "",
+    visitDate: "",
+    visitTime: "",
   });
 
   const thumbnails = [
@@ -209,6 +212,18 @@ export default function PropertyDetails() {
     setShowEnquirePopup(false);
   };
 
+  const handleScheduleClick = () => {
+    setShowSchedulePopup(true);
+    setFormData((prev) => ({
+      ...prev,
+      propertySlug: propertyTitle || "",
+    }));
+  };
+
+  const handleCloseSchedulePopup = () => {
+    setShowSchedulePopup(false);
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -231,6 +246,8 @@ export default function PropertyDetails() {
       mobile: "",
       message: "",
       propertySlug: propertyTitle || "",
+      visitDate: "",
+      visitTime: "",
     });
     // Show success message
     toast.success("Thank you for your enquiry! We'll get back to you soon.");
@@ -288,6 +305,10 @@ export default function PropertyDetails() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleThumbnailClick = (img: any) => {
+    setMainImage(img);
   };
 
   const visibleImages =
@@ -543,12 +564,155 @@ export default function PropertyDetails() {
                 ></textarea>
               </div>
 
-              <input
-                type="hidden"
-                name="propertySlug"
-                value={formData.propertySlug}
-              />
+              <div className="text-sm text-gray-700">
+  Enquiring for - <span className="font-medium text-black">{property?.title}</span>
+</div>
 
+                
+              <div className="mt-6">
+                <button
+                  type="submit"
+                  className="w-full bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800 transition duration-300"
+                >
+                  Submit Enquiry
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Schedule a Visit Popup */}
+      {showSchedulePopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6 relative">
+            <button
+              onClick={handleCloseSchedulePopup}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                Schedule a Visit
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Please fill out the form below and we'll get back to you soon.
+            </p>
+
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                {/* <label
+                  htmlFor="name"
+                  className="block text-gray-700 text-sm font-medium mb-2"
+                >
+                  Name <span className="text-red-500">*</span>
+                </label> */}
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Your Name"
+                />
+              </div>
+
+              <div className="mb-4">
+                {/* <label
+                  htmlFor="mobile"
+                  className="block text-gray-700 text-sm font-medium mb-2"
+                >
+                  Mobile Number <span className="text-red-500">*</span>
+                </label> */}
+                <input
+                  type="tel"
+                  id="mobile"
+                  name="mobile"
+                  value={formData.mobile}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border text-black border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Your Mobile Number"
+                />
+              </div>
+
+              {/* Date Field */}
+              <div className="mb-4">
+                {/* <label
+                  htmlFor="visitDate"
+                  className="block text-gray-700 text-sm font-medium mb-2"
+                >
+                  Preferred Date <span className="text-red-500">*</span>
+                </label> */}
+                <input
+                  type="date"
+                  id="visitDate"
+                  name="visitDate"
+                  value={formData.visitDate}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Time Field */}
+              <div className="mb-4">
+                {/* <label
+                  htmlFor="visitTime"
+                  className="block text-gray-700 text-sm font-medium mb-2"
+                >
+                  Preferred Time <span className="text-red-500">*</span>
+                </label> */}
+                <input
+                  type="time"
+                  id="visitTime"
+                  name="visitTime"
+                  value={formData.visitTime}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="mb-4">
+                {/* <label
+                  htmlFor="message"
+                  className="block text-gray-700 text-sm font-medium mb-2"
+                >
+                  Message
+                </label> */}
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  rows={4}
+                  className="w-full px-3 py-2 border text-black border-black rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Your message or questions about this property"
+                ></textarea>
+              </div>
+
+              <div className="text-sm text-gray-700">
+   Schedule a Visit for - <span className="font-medium text-black">{property?.title}</span>
+</div>
+
+                
               <div className="mt-6">
                 <button
                   type="submit"
@@ -648,7 +812,7 @@ export default function PropertyDetails() {
                           ? "border-blue-500"
                           : "border-transparent"
                       }`}
-                      // onClick={() => handleThumbnailClick(img)}
+                      onClick={() => handleThumbnailClick(img)}
                     >
                       {typeof img === "string" ? (
                         <img
@@ -776,13 +940,16 @@ export default function PropertyDetails() {
   </button>
 
   {/* Schedule a Visit */}
-  <button className="w-full bg-black text-white text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-800 transition">
+  <button
+    className="w-full bg-black cursor-pointer text-white text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-800 transition"
+    onClick={handleScheduleClick}
+  >
     Schedule a Visit
   </button>
 
   {/* Save Property */}
   <button
-    className={`w-full flex items-center justify-center gap-2 border border-black text-black text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-100 transition ${
+    className={`w-full flex items-center cursor-pointer justify-center gap-2 border border-black text-black text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-100 transition ${
       isSaving ? "opacity-70 cursor-not-allowed" : ""
     }`}
     onClick={handleSaveProperty}
@@ -809,7 +976,7 @@ export default function PropertyDetails() {
   <button
     onClick={handleCompareClick}
     disabled={isComparing}
-    className="w-full flex items-center justify-center gap-2 border border-black text-black text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-100 transition"
+    className="w-full flex items-center cursor-pointer justify-center gap-2 border border-black text-black text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-100 transition"
   >
     {isComparing ? (
       <>

@@ -215,7 +215,7 @@ const BenefitsSection = () => {
               <span className="text-white font-medium">Real Estate</span>
             </h1>
             
-            <p className="text-xl mb-10 max-w-2xl mx-auto leading-relaxed" style={{ color: '#6E6E73' }}>
+            <p className="text-xl mb-10 max-w-2xl mx-auto leading-relaxed text-gray-200" >
               Join our innovative team where cutting-edge technology meets exceptional real estate expertise. 
               Build your career with industry leaders who are redefining property experiences.
             </p>

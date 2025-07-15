@@ -117,7 +117,7 @@ export default function EmiCalculator() {
               type="number"
               value={loanAmount}
               onChange={(e) => setLoanAmount(parseFloat(e.target.value) || 0)}
-              className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 text-lg font-semibold focus:outline-none focus:border-blue-500"
+              className="w-full border-2 text-black border-gray-300 rounded-lg px-4 py-3 text-lg font-semibold focus:outline-none focus:border-blue-500"
               placeholder="10000"
             />
           </div>

@@ -309,7 +309,7 @@ const FeaturedProperties = () => {
                   }`}
                 >
                   {/* Image */}
-                  <div className="w-full sm:w-1/3 p-2 overflow-hidden">
+<div className="w-full sm:w-1/3 p-2 overflow-hidden flex items-center justify-center">
                     {Object.keys(property.imageUrls || {}).length > 0 ? (
                       <img
                         src={
@@ -322,7 +322,7 @@ const FeaturedProperties = () => {
                       <Image
                         alt="Property"
                         src={latestpropertytype}
-                        className="property-image w-full h-56 object-cover rounded-2xl p-2"
+                        className="property-image  w-full h-56 object-cover rounded-2xl p-2"
                       />
                     )}
                   </div>

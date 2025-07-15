@@ -46,7 +46,7 @@ export default function ROICalculator() {
   };
 
   return (
-    <div className="bg-gray-600 min-h-screen p-5">
+    <div className="bg-gray-50 min-h-screen p-5">
       <div className="max-w-4xl mx-auto bg-white rounded-none shadow-lg overflow-hidden">
         <div className="flex flex-col md:flex-row min-h-[500px]">
           {/* Left Panel - White Background */}

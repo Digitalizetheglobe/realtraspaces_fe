@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import contactimg from "../../../public/assets/images/contactimg.png";
 import email from "../../../public/assets/images/email.png";
@@ -5,8 +7,22 @@ import map from "../../../public/assets/images/map.png";
 import phone from "../../../public/assets/images/phone.png";
 import ctabg from "../../../public/assets/images/ctabg.png";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function Home() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    number: "",
+    subject: "",
+    message: "",
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   return (
     <>
       <main className="min-h-screen bg-gray-100">
@@ -154,20 +170,54 @@ export default function Home() {
             <form className="space-y-4">
               <input
                 type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
                 placeholder="Name"
                 className="w-full text-slate-900 rounded-md py-2.5 px-4 border text-sm outline-none focus:border-blue-500"
               />
               <input
                 type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
                 placeholder="Email"
                 className="w-full text-slate-900 rounded-md py-2.5 px-4 border text-sm outline-none focus:border-blue-500"
               />
+              <div className="space-y-2">
+               
+                <div className="relative">
+                  <input
+                    type="tel"
+                    id="number"
+                    name="number"
+                    value={formData.number}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      // Allow only numbers and restrict to 10 digits
+                      if (/^\d{0,10}$/.test(value)) {
+                        handleInputChange(e);
+                      }
+                    }}
+                    required
+                    maxLength={10}
+                    className="w-full text-slate-900 rounded-md py-2.5 px-4 border text-sm outline-none focus:border-blue-500"
+                     placeholder="phone number"
+                  />
+                </div>
+              </div>
               <input
                 type="text"
+                name="subject"
+                value={formData.subject}
+                onChange={handleInputChange}
                 placeholder="Subject"
                 className="w-full text-slate-900 rounded-md py-2.5 px-4 border text-sm outline-none focus:border-blue-500"
               />
               <textarea
+                name="message"
+                value={formData.message}
+                onChange={handleInputChange}
                 placeholder="Message"
                 rows={6}
                 className="w-full text-slate-900 rounded-md px-4 border text-sm pt-2.5 outline-none focus:border-blue-500"
@@ -211,12 +261,14 @@ export default function Home() {
               </p>
             </div>
             <div className="flex max-sm:flex-col justify-center gap-6 max-w-sm mx-auto ">
+              <Link href={'/contact'}>
               <button
                 type="button"
                 className="text-slate-900 min-w-[140px] rounded px-4 py-2.5 text-sm tracking-wider font-medium outline-none border border-gray-600 hover:bg-black hover:text-white transition-all duration-300"
               >
                 Book Now
               </button>
+              </Link>
             </div>
           </div>
         </div>

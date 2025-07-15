@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import latestpropertytype from "../../../public/assets/images/latestpropertytype.svg";
 import { Raleway } from "next/font/google";
 import Link from "next/link";
@@ -81,6 +81,11 @@ const Blogs = () => {
       day: 'numeric'
     });
   };
+
+  const firstFaqRef = useRef<HTMLDetailsElement>(null);
+
+  // FAQ accordion state
+  const [openFaq, setOpenFaq] = useState(0); // 0: first open by default
 
   return (
     <div className={raleway.className}>
@@ -177,123 +182,165 @@ const Blogs = () => {
       </section>
 
       {/* FAQ */}
-      <section className="bg-white flex justify-center  items-center min-h-screen">
-        <div className="w-full max-w-2xl p-4">
-          {/* Updated heading section */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center space-x-2">
-              <h2 className="text-3xl font-bold text-gray-900">FAQ</h2>
-              <h2 className="text-3xl font-bold text-gray-500">
-                Frequently Asked Questions
-              </h2>
-            </div>
-          </div>
+      <section className="bg-white flex justify-center items-center min-h-screen">
+  <div className="w-full max-w-2xl p-4">
+    {/* Heading */}
+    <div className="text-center mb-8">
+      <div className="inline-flex items-center space-x-2">
+        <h2 className="text-3xl font-bold text-gray-900">FAQ</h2>
+        <h2 className="text-3xl font-bold text-gray-500">
+          Frequently Asked Questions
+        </h2>
+      </div>
+    </div>
 
-          <details className="group [&_summary::-webkit-details-marker]:hidden">
-            <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
-              <h2 className="text-lg font-medium cursor-pointer">
-                Lorem ipsum dolor sit amet consectetur adipisicing?
-              </h2>
-              <svg
-                className="size-8 cursor-pointer shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                color="white"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </summary>
-            <p className="px-4 pt-4 text-gray-900">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit...
-            </p>
-          </details>
+    {/* FAQ 1 */}
+    <details
+      open={openFaq === 0}
+      className="group [&_summary::-webkit-details-marker]:hidden"
+      onClick={e => {
+        e.preventDefault();
+        setOpenFaq(openFaq === 0 ? -1 : 0);
+      }}
+    >
+      <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
+        <h2 className="text-lg font-medium cursor-pointer">
+          What is Realtraspaces?
+        </h2>
+        <svg
+          className="size-8 cursor-pointer shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          color="white"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </summary>
+      <p className="px-4 pt-4 text-gray-900">
+        Realtraspaces.com is a digital platform that helps users explore, compare, and connect with premium real estate projects across India.
+      </p>
+    </details>
 
-          <details className="group [&_summary::-webkit-details-marker]:hidden mt-4">
-            <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
-              <h2 className="text-lg font-medium">
-                Lorem ipsum dolor sit amet consectetur adipisicing?
-              </h2>
-              <svg
-                className="size-8 shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                color="white"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </summary>
-            <p className="px-4 pt-4 text-gray-900">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit...
-            </p>
-          </details>
+    {/* FAQ 2 */}
+    <details
+      open={openFaq === 1}
+      className="group [&_summary::-webkit-details-marker]:hidden mt-4"
+      onClick={e => {
+        e.preventDefault();
+        setOpenFaq(openFaq === 1 ? -1 : 1);
+      }}
+    >
+      <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
+        <h2 className="text-lg font-medium">
+          Are the properties listed on Realtraspaces verified?
+        </h2>
+        <svg
+          className="size-8 shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          color="white"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </summary>
+      <p className="px-4 pt-4 text-gray-900">
+        Yes, all listings are curated and verified in collaboration with trusted developers to ensure authenticity and transparency.
+      </p>
+    </details>
 
-          <details className="group [&_summary::-webkit-details-marker]:hidden mt-4">
-            <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
-              <h2 className="text-lg font-medium">
-                Lorem ipsum dolor sit amet consectetur adipisicing?
-              </h2>
-              <svg
-                className="size-8 shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                color="white"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </summary>
-            <p className="px-4 pt-4 text-gray-900">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit...
-            </p>
-          </details>
+    {/* FAQ 3 */}
+    <details
+      open={openFaq === 2}
+      className="group [&_summary::-webkit-details-marker]:hidden mt-4"
+      onClick={e => {
+        e.preventDefault();
+        setOpenFaq(openFaq === 2 ? -1 : 2);
+      }}
+    >
+      <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
+        <h2 className="text-lg font-medium">
+          Can I compare different properties side by side?
+        </h2>
+        <svg
+          className="size-8 shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          color="white"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </summary>
+      <p className="px-4 pt-4 text-gray-900">
+        Yes, Realtraspaces allows you to compare project details, amenities, prices, and more using our "Compare Properties" feature.
+      </p>
+    </details>
 
-          <details className="group [&_summary::-webkit-details-marker]:hidden mt-4">
-            <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
-              <h2 className="text-lg font-medium">
-                Lorem ipsum dolor sit amet consectetur adipisicing?
-              </h2>
-              <svg
-                className="size-8 shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                color="white"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M19 9l-7 7-7-7"
-                />
-              </svg>
-            </summary>
-            <p className="px-4 pt-4 text-gray-900">
-              Lorem ipsum dolor sit amet consectetur, adipisicing elit...
-            </p>
-          </details>
-        </div>
-      </section>
+    {/* FAQ 4 */}
+    <details
+      open={openFaq === 3}
+      className="group [&_summary::-webkit-details-marker]:hidden mt-4"
+      onClick={e => {
+        e.preventDefault();
+        setOpenFaq(openFaq === 3 ? -1 : 3);
+      }}
+    >
+      <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
+        <h2 className="text-lg font-medium">
+          How do I enquire about a property I'm interested in?
+        </h2>
+        <svg
+          className="size-8 shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          color="white"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </summary>
+      <p className="px-4 pt-4 text-gray-900">
+        Just click on the “Enquire Now” button on the property page, submit your details, and our team will connect with you shortly.
+      </p>
+    </details>
+
+    {/* FAQ 5 */}
+    <details
+      open={openFaq === 4}
+      className="group [&_summary::-webkit-details-marker]:hidden mt-4"
+      onClick={e => {
+        e.preventDefault();
+        setOpenFaq(openFaq === 4 ? -1 : 4);
+      }}
+    >
+      <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
+        <h2 className="text-lg font-medium">
+          Do you charge users for property searches or enquiries?
+        </h2>
+        <svg
+          className="size-8 shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          color="white"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </summary>
+      <p className="px-4 pt-4 text-gray-900">
+        No, Realtraspaces is completely free for property seekers. There are no charges for browsing or enquiring.
+      </p>
+    </details>
+  </div>
+</section>
+
 
       {/* CTA */}
       <div className="bg-[#F1F1F4] p-8">
@@ -313,42 +360,47 @@ const Blogs = () => {
           </p>
 
           <div className="flex justify-center gap-4">
-            <button className="bg-black text-white px-6 py-2 rounded-md text-sm cursor-pointer font-medium">
+                  <Link href="/contact" >
+            <button className="bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black px-6 py-2 rounded-md text-sm cursor-pointer font-medium">
               Contact Us
             </button>
-            <button className="bg-white text-black border border-gray-300 cursor-pointer px-6 py-2 rounded-md text-sm font-medium">
+                  </Link>
+
+            {/* <button className="bg-white text-black border border-gray-300 cursor-pointer px-6 py-2 rounded-md text-sm font-medium">
               Schedule a Call
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
-      <div className="bg-white p-6">
-        <div className="flex flex-wrap items-center justify-center gap-4">
-          <h3 className="text-[35px] font-bold text-gray-900 whitespace-nowrap">
-            Get a quote
-          </h3>
+     <div className="bg-white p-6">
+  <div className="max-w-4xl mx-auto">
+    <h3 className="text-[35px] font-bold text-gray-900 text-center mb-6">
+      Get a quote
+    </h3>
 
-          <input
-            type="text"
-            placeholder="Enter your name"
-            className="text-black px-4 py-2 rounded border border-gray-300 bg-[#F1F1F4] text-sm w-48"
-          />
-          <input
-            type="text"
-            placeholder="Enter your email"
-            className="text-black px-4 py-2 rounded border border-gray-300 bg-[#F1F1F4] text-sm w-48"
-          />
-          <input
-            type="text"
-            placeholder="Enter your phone"
-            className="text-black px-4 py-2 rounded border border-gray-300 bg-[#F1F1F4] text-sm w-48"
-          />
+    <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center items-center gap-4">
+      <input
+        type="text"
+        placeholder="Enter your name"
+        className="text-black px-4 py-2 rounded border border-gray-300 bg-[#F1F1F4] text-sm w-full sm:w-48"
+      />
+      <input
+        type="text"
+        placeholder="Enter your email"
+        className="text-black px-4 py-2 rounded border border-gray-300 bg-[#F1F1F4] text-sm w-full sm:w-48"
+      />
+      <input
+        type="text"
+        placeholder="Enter your phone"
+        className="text-black px-4 py-2 rounded border border-gray-300 bg-[#F1F1F4] text-sm w-full sm:w-48"
+      />
+      <button className="bg-black hover:bg-white hover:text-black hover:border hover:border-black text-white px-4 py-2 rounded text-sm cursor-pointer font-medium w-full sm:w-auto">
+        Submit
+      </button>
+    </div>
+  </div>
+</div>
 
-          <button className="bg-black text-white px-4 py-2 rounded text-sm cursor-pointer font-medium">
-            Submit
-          </button>
-        </div>
-      </div>
     </div>
   );
 };
