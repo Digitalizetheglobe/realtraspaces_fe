@@ -4,11 +4,14 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } fro
 
 export default function EmiCalculator() {
   const [loanAmount, setLoanAmount] = useState(10000);
+  const [downPayment, setDownPayment] = useState(0);
   const [interestRate, setInterestRate] = useState(9.85);
   const [loanTerm, setLoanTerm] = useState(20);
   const [monthlyPayment, setMonthlyPayment] = useState(0);
   const [yearlyPayment, setYearlyPayment] = useState(0);
   const [totalPayment, setTotalPayment] = useState(0);
+  const [totalInterest, setTotalInterest] = useState(0);
+  
   interface ChartDataPoint {
     year: string;
     remainingPrincipal: number;
@@ -19,36 +22,42 @@ export default function EmiCalculator() {
 
   useEffect(() => {
     calculateEMI();
-  }, [loanAmount, interestRate, loanTerm]);
+  }, [loanAmount, downPayment, interestRate, loanTerm]);
 
   const calculateEMI = () => {
+    // Calculate actual loan amount after down payment
+    const actualLoanAmount = Math.max(0, loanAmount - downPayment);
+    
     // Convert annual interest rate to monthly and percentage to decimal
     const monthlyRate = interestRate / 100 / 12;
     const numberOfPayments = loanTerm * 12;
 
     // Handle edge cases
-    if (loanAmount <= 0 || interestRate <= 0 || loanTerm <= 0) {
+    if (actualLoanAmount <= 0 || interestRate <= 0 || loanTerm <= 0) {
       setMonthlyPayment(0);
       setYearlyPayment(0);
       setTotalPayment(0);
+      setTotalInterest(0);
       setChartData([]);
       return;
     }
 
     // Calculate EMI using the standard formula
-    const emi = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / 
+    const emi = (actualLoanAmount * monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / 
                 (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
 
     // Calculate total payment
     const total = emi * numberOfPayments;
+    const totalInt = total - actualLoanAmount;
 
     setMonthlyPayment(emi || 0);
     setYearlyPayment(emi * 12 || 0);
     setTotalPayment(total || 0);
+    setTotalInterest(totalInt || 0);
 
     // Generate chart data - both lines connected to EMI calculations
     const data: ChartDataPoint[] = [];
-    let remainingPrincipal = loanAmount;
+    let remainingPrincipal = actualLoanAmount;
     let totalPaidSoFar = 0;
     
     // Starting point (Year 0)
@@ -92,9 +101,23 @@ export default function EmiCalculator() {
     setChartData(data);
   };
 
-  const handleLoanTermChange = (term: number) => {
-    setLoanTerm(term);
+  const formatAmount = (amount: number) => {
+    return `₹${amount.toLocaleString('en-IN')}`;
   };
+
+  const formatAmountShort = (amount: number) => {
+    if (amount >= 10000000) {
+      return `₹${(amount / 10000000).toFixed(2)}Cr`;
+    } else if (amount >= 100000) {
+      return `₹${(amount / 100000).toFixed(2)}L`;
+    } else if (amount >= 1000) {
+      return `₹${(amount / 1000).toFixed(2)}K`;
+    } else {
+      return `₹${amount.toFixed(0)}`;
+    }
+  };
+
+  const maxDownPayment = Math.max(0, loanAmount * 0.8); // Max 80% of loan amount
 
   return (
     <div className="max-w-6xl mx-auto p-8 bg-gray-50 min-h-screen">
@@ -113,13 +136,57 @@ export default function EmiCalculator() {
           {/* Loan Amount */}
           <div>
             <h2 className="text-xl font-semibold mb-4 text-gray-800">Enter the Price</h2>
-            <input
-              type="number"
-              value={loanAmount}
-              onChange={(e) => setLoanAmount(parseFloat(e.target.value) || 0)}
-              className="w-full border-2 text-black border-gray-300 rounded-lg px-4 py-3 text-lg font-semibold focus:outline-none focus:border-blue-500"
-              placeholder="10000"
-            />
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-lg font-semibold text-gray-600">₹</span>
+              <input
+                type="number"
+                value={loanAmount}
+                onChange={(e) => setLoanAmount(parseFloat(e.target.value) || 0)}
+                className="w-full border-2 text-black border-gray-300 rounded-lg pl-8 pr-4 py-3 text-lg font-semibold focus:outline-none focus:border-blue-500"
+                placeholder="10000"
+              />
+            </div>
+          </div>
+
+          {/* Down Payment */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Down Payment</h2>
+            <div className="relative mb-4">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-lg font-semibold text-gray-600">₹</span>
+              <input
+                type="number"
+                value={downPayment}
+                onChange={(e) => setDownPayment(Math.min(parseFloat(e.target.value) || 0, maxDownPayment))}
+                className="w-full border-2 text-black border-gray-300 rounded-lg pl-8 pr-4 py-3 text-lg font-semibold focus:outline-none focus:border-blue-500"
+                placeholder="0"
+                max={maxDownPayment}
+              />
+            </div>
+            
+            {/* Down Payment Slider */}
+            <div className="relative">
+              <input
+                type="range"
+                min="0"
+                max={maxDownPayment}
+                value={downPayment}
+                onChange={(e) => setDownPayment(parseFloat(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                style={{
+                  background: `linear-gradient(to right, #000 0%, #000 ${(downPayment / maxDownPayment) * 100}%, #e5e7eb ${(downPayment / maxDownPayment) * 100}%, #e5e7eb 100%)`
+                }}
+              />
+              <div className="flex justify-between text-sm text-gray-600 mt-2">
+                <span>₹0</span>
+                <span>{formatAmountShort(maxDownPayment)}</span>
+              </div>
+            </div>
+            
+            {/* Loan Amount After Down Payment */}
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+              <p className="text-sm text-gray-600">Loan Amount After Down Payment:</p>
+              <p className="text-lg font-semibold text-blue-600">{formatAmount(Math.max(0, loanAmount - downPayment))}</p>
+            </div>
           </div>
 
           {/* Loan Term */}
@@ -195,92 +262,46 @@ export default function EmiCalculator() {
         <div className="bg-black text-white p-8 rounded-lg">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-semibold mb-4">Total Payment is</h2>
-            <div className="text-6xl font-bold mb-8">{Math.round(totalPayment)}</div>
+            <div className="text-4xl font-bold mb-4">{formatAmount(Math.round(totalPayment))}</div>
+            <div className="text-sm text-gray-400">
+              Total Interest: {formatAmount(Math.round(totalInterest))}
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-gray-800 p-4 rounded-lg text-center">
-              <h3 className="text-lg font-semibold mb-2">Monthly</h3>
-              <div className="text-2xl font-bold">{monthlyPayment.toFixed(3)}</div>
+              <h3 className="text-lg font-semibold mb-2">Monthly EMI</h3>
+              <div className="text-xl font-bold">{formatAmount(Math.round(monthlyPayment))}</div>
             </div>
             <div className="bg-gray-800 p-4 rounded-lg text-center">
               <h3 className="text-lg font-semibold mb-2">Yearly</h3>
-              <div className="text-2xl font-bold">{yearlyPayment.toFixed(3)}</div>
+              <div className="text-xl font-bold">{formatAmount(Math.round(yearlyPayment))}</div>
+            </div>
+          </div>
+
+          {/* Summary */}
+          <div className="border-t border-gray-700 pt-4">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-gray-400">Property Price:</p>
+                <p className="font-semibold">{formatAmount(loanAmount)}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Down Payment:</p>
+                <p className="font-semibold">{formatAmount(downPayment)}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Loan Amount:</p>
+                <p className="font-semibold">{formatAmount(Math.max(0, loanAmount - downPayment))}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Interest Rate:</p>
+                <p className="font-semibold">{interestRate}%</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Chart Section */}
-      {/* <div className="mt-8 bg-white p-6 rounded-lg">
-        <div className="h-96">
-          {chartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData} margin={{ top: 20, right: 30, left: 80, bottom: 40 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis 
-                  dataKey="year" 
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 12, fill: '#6b7280' }}
-                />
-                <YAxis 
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 12, fill: '#6b7280' }}
-                  domain={[0, 'dataMax + 10']}
-                  tickFormatter={(value) => `${value} Lacs`}
-                  label={{ 
-                    value: 'Loan paid (in ₹)', 
-                    angle: -90, 
-                    position: 'insideLeft', 
-                    style: { textAnchor: 'middle', fontSize: '12px', fill: '#6b7280' } 
-                  }}
-                />
-              
-                <Line 
-                  type="monotone" 
-                  dataKey="remainingPrincipal" 
-                  stroke="#60a5fa" 
-                  strokeWidth={3}
-                  dot={{ fill: '#60a5fa', strokeWidth: 2, r: 5 }}
-                  activeDot={{ r: 8, fill: '#60a5fa', stroke: '#fff', strokeWidth: 2 }}
-                  name="Remaining Principal"
-                />
-                
-                <Line 
-                  type="monotone" 
-                  dataKey="totalPaid" 
-                  stroke="#1e40af" 
-                  strokeWidth={3}
-                  dot={{ fill: '#1e40af', strokeWidth: 2, r: 5 }}
-                  activeDot={{ r: 8, fill: '#1e40af', stroke: '#fff', strokeWidth: 2 }}
-                  name="Total Paid"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-gray-500">Loading chart...</p>
-            </div>
-          )}
-        </div>
-        <div className="mt-4 text-center">
-          <p className="text-sm text-gray-600">Years Elapsed</p>
-        </div>
-        
-     
-        <div className="mt-4 flex justify-center space-x-8">
-          <div className="flex items-center">
-            <div className="w-4 h-0.5 bg-blue-400 mr-2"></div>
-            <span className="text-sm text-gray-600">Remaining Principal</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-4 h-0.5 bg-blue-800 mr-2"></div>
-            <span className="text-sm text-gray-600">Total Paid</span>
-          </div>
-        </div>
-      </div> */}
 
       <style jsx>{`
         .slider::-webkit-slider-thumb {

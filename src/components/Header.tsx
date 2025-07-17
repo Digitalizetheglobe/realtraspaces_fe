@@ -167,7 +167,7 @@ const Header = () => {
         {isMenuOpen && (
           <div className="fixed inset-0 top-16 z-40 flex justify-end">
             {/* Empty space that closes menu when clicked */}
-            <div className="flex-1 bg-black/20 hover:bg-white " onClick={toggleMenu} />
+            {/* <div className="flex-1 bg-black/20 hover:bg-white " onClick={toggleMenu} /> */}
 
             {/* Menu content with blur effect */}
             <div className="w-full sm:w-80 bg-[#FEFEFE4D] backdrop-blur-md shadow-lg h-full sm:h-auto">

@@ -221,7 +221,6 @@ export default function Home() {
                 placeholder="Message"
                 rows={6}
                 className="w-full text-slate-900 rounded-md px-4 border text-sm pt-2.5 outline-none focus:border-blue-500"
-                defaultValue={""}
               />
               <button
                 type="button"

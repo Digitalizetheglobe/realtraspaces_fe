@@ -11,6 +11,7 @@ import TopDevelopers from "../topdevelopers/page";
 import home from "../../../public/assets/hero.jpg";
 import Link from "next/link";
 import ShareModal from "../../components/ShareModal";
+import CalculatorSection from "@/components/calculate";
 // Load Raleway font with more weight options
 const raleway = Raleway({
   subsets: ["latin"],
@@ -63,6 +64,8 @@ export default function PropertyCards() {
     message: ""
   });
   const [openShareIndex, setOpenShareIndex] = useState<number | null>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [selectedType, setSelectedType] = useState<string>("");
 
   // Click-away listener for share dropdown
   useEffect(() => {
@@ -133,7 +136,19 @@ export default function PropertyCards() {
       const scrollPosition = window.scrollY;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
-      
+
+      // Check localStorage for dismissal time
+      const dismissedAt = localStorage.getItem('popupDismissedAt');
+      if (dismissedAt) {
+        const elapsed = Date.now() - parseInt(dismissedAt, 10);
+        if (elapsed < 30 * 60 * 1000) { // 30 minutes
+          setPopupDismissed(true);
+          return;
+        } else {
+          setPopupDismissed(false);
+        }
+      }
+
       // Show popup when user scrolls 50% of the page and popup hasn't been dismissed
       if (scrollPosition > (documentHeight - windowHeight) * 0.5 && !showPopup && !popupDismissed) {
         setShowPopup(true);
@@ -143,6 +158,24 @@ export default function PropertyCards() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [showPopup, popupDismissed]);
+
+  // On mount, check if popup should be shown
+  useEffect(() => {
+    const dismissedAt = localStorage.getItem('popupDismissedAt');
+    if (dismissedAt) {
+      const elapsed = Date.now() - parseInt(dismissedAt, 10);
+      if (elapsed < 30 * 60 * 1000) {
+        setPopupDismissed(true);
+      }
+    }
+  }, []);
+
+  // Popup close handler
+  const handleClosePopup = () => {
+    setShowPopup(false);
+    setPopupDismissed(true);
+    localStorage.setItem('popupDismissedAt', Date.now().toString());
+  };
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -158,8 +191,7 @@ export default function PropertyCards() {
     e.preventDefault();
     console.log('Form submitted:', formData);
     // Here you can add your form submission logic
-    setShowPopup(false);
-    setPopupDismissed(true);
+    handleClosePopup();
     setFormData({ email: "", name: "", number: "", message: "" });
   };
 
@@ -224,26 +256,79 @@ export default function PropertyCards() {
         />
 
         {/* Search bar positioned at the bottom center of the banner */}
-    <div className="absolute bottom-4 w-full flex justify-center px-4">
-  <div className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-3 px-4 py-3 rounded-2xl border border-gray-300 bg-white/60 backdrop-blur-md shadow-lg">
+    <div className="absolute bottom-4 w-full flex justify-center px-4 py-20">
+  <div className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-3 px-4 py-3 rounded-2xl border border-gray-300 bg-white/60 backdrop-blur-md shadow-lg overflow-visible">
     
     {/* Dropdown */}
-    <div className="relative w-full sm:w-auto">
-      <select
-        className="appearance-none w-full sm:min-w-[200px] bg-black text-white text-sm font-medium pl-5 pr-10 py-3 rounded-full outline-none cursor-pointer"
+    <div
+      className="relative w-full sm:w-auto"
+      onMouseEnter={() => setDropdownOpen(true)}
+      onMouseLeave={() => setDropdownOpen(false)}
+    >
+      <button
+        type="button"
+        className="appearance-none w-full sm:min-w-[200px] bg-black text-white text-sm font-medium pl-5 pr-10 py-3 rounded-full outline-none cursor-pointer flex justify-between items-center"
+        onClick={() => setDropdownOpen(true)}
       >
-        <option value="">Select Search Type</option>
-        <option value="commercial">Commercial</option>
-        <option value="coworking">Co-working</option>
-      </select>
-      
-      {/* Custom arrow */}
-      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white text-xs">
-        ▼
-      </span>
+        {selectedType
+          ? selectedType === "commercial"
+            ? "Commercial"
+            : selectedType === "coworking"
+            ? "Co-working"
+            : selectedType
+          : "Select Search Type"}
+        <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white text-xs">
+          ▼
+        </span>
+      </button>
+      {dropdownOpen && (
+        <div className="absolute left-0 right-0 mt-2 bg-black text-white rounded-lg shadow-lg z-50" style={{ zIndex: 9999 }}>
+          <div
+            className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-t-lg ${selectedType === "commercial" ? "bg-gray-700" : ""}`}
+            onClick={() => { setSelectedType("commercial"); setDropdownOpen(false); }}
+          >
+            Commercial
+          </div>
+          <div
+            className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "coworking" ? "bg-gray-700" : ""}`}
+            onClick={() => { setSelectedType("coworking"); setDropdownOpen(false); }}
+          >
+            Co-working
+          </div>
+        </div>
+      )}
     </div>
 
-    {/* Search input */}
+    {/* Autocomplete Dropdown (now above the search input) */}
+    {search && filteredProperties.length > 0 && (
+      <div className="absolute left-0 right-0 -top-2 mb-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-72 overflow-y-auto">
+        {filteredProperties.slice(0, 8).map((property, idx) => (
+          <div
+            key={property.id}
+            className="px-5 py-3 cursor-pointer hover:bg-gray-100 flex justify-between items-center"
+            onClick={() => {
+              setSearch(property.title || "");
+              // Optionally, you can trigger navigation or selection here
+            }}
+          >
+            <div>
+              <div className="font-medium text-black">{property.title}</div>
+              <div className="text-xs text-gray-500">
+                {(property.address?.subLocality || property.address?.city) && (
+                  <>
+                    {property.address?.subLocality
+                      ? `${property.address.subLocality}, `
+                      : ""}
+                    {property.address?.city}
+                  </>
+                )}
+              </div>
+            </div>
+            <span className="text-xs text-gray-400">LOCALITY</span>
+          </div>
+        ))}
+      </div>
+    )}
     <input
       type="text"
       placeholder="Search by property name, location, or type..."
@@ -312,7 +397,7 @@ export default function PropertyCards() {
                       </div>
                     </div>
                     </Link>
-                    {/* <div className="w-5 h-5 border border-gray-600 rounded flex items-center justify-center transition-all duration-300 hover:border-gray-800 hover:bg-gray-100 hover:scale-110">
+                    <div className="w-5 h-5 border border-gray-600 rounded flex items-center justify-center transition-all duration-300 hover:border-gray-800 hover:bg-gray-100 hover:scale-110">
                       <svg
                         className="w-3 h-3 text-black transition-all duration-300 hover:scale-110"
                         fill="none"
@@ -327,7 +412,7 @@ export default function PropertyCards() {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                    </div> */}
+                    </div>
                   </div>
 
                   {/* Property Image */}
@@ -405,58 +490,89 @@ export default function PropertyCards() {
                       </div>
                       </Link>
                       <div className="flex space-x-1 relative">
-                        {/* Bookmark button */}
-                        <button className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-gray-200 hover:scale-110 hover:shadow-md active:scale-95">
-                          <Image
-                            src={bookmark}
-                            alt="Bookmark"
-                            width={20}
-                            height={20}
-                            className="object-contain transition-all duration-300 hover:scale-110"
-                          />
-                        </button>
+  {/* Bookmark button */}
+  <button className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-yellow-300 hover:scale-110 hover:shadow-md active:scale-95">
+    <Image
+      src={bookmark}
+      alt="Bookmark"
+      width={20}
+      height={20}
+      className="object-contain transition-all duration-300 hover:scale-110"
+    />
+  </button>
 
-                        {/* Share button with dropdown */}
-                        <div className="relative">
-                          <button
-                            className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-gray-200 hover:scale-110 hover:shadow-md active:scale-95"
-                            onClick={() => setOpenShareIndex(openShareIndex === index ? null : index)}
-                            aria-label="Share"
-                            type="button"
-                          >
-                            <Image
-                              src={share}
-                              alt="Share"
-                              width={20}
-                              height={20}
-                              className="object-contain transition-all duration-300 hover:scale-110"
-                            />
-                          </button>
-                          <ShareModal
-                            open={openShareIndex === index}
-                            onClose={() => setOpenShareIndex(null)}
-                            property={property}
-                            getPropertyUrl={getPropertyUrl}
-                          />
-                        </div>
+  {/* Location button */}
+  <button
+    className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-red-200 hover:scale-110 hover:shadow-md active:scale-95"
+    aria-label="View on Map"
+    onClick={() => {
+      const address = [
+        property.address?.subLocality,
+        property.address?.city,
+        property.address?.state
+      ].filter(Boolean).join(", ");
+      const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+      window.open(mapUrl, '_blank');
+    }}
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      strokeWidth={1.5}
+      stroke="currentColor"
+      className="w-5 h-5 text-red-500"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 21c-4.418 0-8-5.373-8-10A8 8 0 0112 3a8 8 0 018 8c0 4.627-3.582 10-8 10zm0-7a3 3 0 100-6 3 3 0 000 6z"
+      />
+    </svg>
+  </button>
 
-                        {/* WhatsApp button (active, opens chat with 7039311539) */}
-                        <a
-                          href={`https://wa.me/7039311539?text=${encodeURIComponent(property.title || 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-gray-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
-                          aria-label="WhatsApp"
-                        >
-                          <Image
-                            src={whatsapp}
-                            alt="WhatsApp"
-                            width={20}
-                            height={20}
-                            className="object-contain transition-all duration-300 hover:scale-110"
-                          />
-                        </a>
-                      </div>
+  {/* Share button */}
+  <div className="relative">
+    <button
+      className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
+      onClick={() => setOpenShareIndex(openShareIndex === index ? null : index)}
+      aria-label="Share"
+      type="button"
+    >
+      <Image
+        src={share}
+        alt="Share"
+        width={20}
+        height={20}
+        className="object-contain transition-all duration-300 hover:scale-110"
+      />
+    </button>
+    <ShareModal
+      open={openShareIndex === index}
+      onClose={() => setOpenShareIndex(null)}
+      property={property}
+      getPropertyUrl={getPropertyUrl}
+    />
+  </div>
+
+  {/* WhatsApp button */}
+  <a
+    href={`https://wa.me/7039311539?text=${encodeURIComponent(property.title || 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
+    aria-label="WhatsApp"
+  >
+    <Image
+      src={whatsapp}
+      alt="WhatsApp"
+      width={20}
+      height={20}
+      className="object-contain transition-all duration-300 hover:scale-110"
+    />
+  </a>
+</div>
+
                     </div>
                     
                   </div>
@@ -485,6 +601,7 @@ export default function PropertyCards() {
           }
         `}</style>
       </section>
+      <CalculatorSection />
       <TopDevelopers />
 
       {/* Popup Modal */}
@@ -499,10 +616,7 @@ export default function PropertyCards() {
             <p className="text-[#F1F1F4] mt-1">We'd love to hear from you!</p>
           </div>
           <button
-            onClick={() => {
-              setShowPopup(false);
-              setPopupDismissed(true);
-            }}
+            onClick={handleClosePopup}
             className="text-white hover:text-[#F1F1F4] transition-colors duration-200 p-2 hover:bg-white hover:bg-opacity-20 rounded-full"
           >
             <X className="w-6 h-6" />
@@ -572,7 +686,6 @@ export default function PropertyCards() {
 </div>
 
 
-
         {/* Action Buttons */}
         <div className="flex gap-3 pt-2">
           <button
@@ -584,10 +697,7 @@ export default function PropertyCards() {
           </button>
           <button
             type="button"
-            onClick={() => {
-              setShowPopup(false);
-              setPopupDismissed(true);
-            }}
+            onClick={handleClosePopup}
             className="flex-1 bg-white text-[#6E6E73] py-3 px-6 rounded-xl hover:bg-[#F1F1F4] transition-all duration-200 font-semibold border border-gray-300 hover:border-gray-400"
           >
             Cancel

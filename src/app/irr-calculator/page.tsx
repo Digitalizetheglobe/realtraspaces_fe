@@ -3,41 +3,102 @@
 import { useState, useEffect } from 'react';
 
 export default function IRRCalculator() {
-  const [principal, setPrincipal] = useState(10000);
-  const [years, setYears] = useState(20);
-  const [rate, setRate] = useState(9.85);
-  const [interestType, setInterestType] = useState('simple');
+  const [initialInvestment, setInitialInvestment] = useState(100000);
+  const [cashFlows, setCashFlows] = useState([20000, 25000, 30000, 35000, 40000]);
   const [results, setResults] = useState({
-    totalAmount: 10000,
-    monthlyInterest: 0.005,
-    yearlyInterest: 0.005
+    irr: 0,
+    npv: 0,
+    totalCashFlow: 0,
+    roi: 0
   });
 
-  const calculateInterest = () => {
-    let totalAmount;
-    let totalInterest;
+  // IRR calculation using Newton-Raphson method
+  const calculateIRR = (initialInv, flows) => {
+    const maxIterations = 1000;
+    const tolerance = 1e-7;
+    let rate = 0.1; // Starting guess of 10%
 
-    if (interestType === 'simple') {
-      totalInterest = (principal * rate * years) / 100;
-      totalAmount = principal + totalInterest;
-    } else {
-      totalAmount = principal * Math.pow((1 + rate / 100), years);
-      totalInterest = totalAmount - principal;
+    for (let i = 0; i < maxIterations; i++) {
+      let npv = -initialInv;
+      let dnpv = 0;
+
+      // Calculate NPV and derivative
+      for (let j = 0; j < flows.length; j++) {
+        const period = j + 1;
+        const factor = Math.pow(1 + rate, period);
+        npv += flows[j] / factor;
+        dnpv -= (flows[j] * period) / Math.pow(1 + rate, period + 1);
+      }
+
+      // Newton-Raphson iteration
+      const newRate = rate - npv / dnpv;
+      
+      if (Math.abs(newRate - rate) < tolerance) {
+        return newRate;
+      }
+      
+      rate = newRate;
+    }
+    
+    return rate;
+  };
+
+  const calculateNPV = (rate, initialInv, flows) => {
+    let npv = -initialInv;
+    for (let i = 0; i < flows.length; i++) {
+      npv += flows[i] / Math.pow(1 + rate, i + 1);
+    }
+    return npv;
+  };
+
+  const calculateResults = () => {
+    const validFlows = cashFlows.filter(flow => flow !== 0);
+    
+    if (validFlows.length === 0 || initialInvestment <= 0) {
+      setResults({
+        irr: 0,
+        npv: 0,
+        totalCashFlow: 0,
+        roi: 0
+      });
+      return;
     }
 
-    const monthlyInterest = totalInterest / (years * 12);
-    const yearlyInterest = totalInterest / years;
+    const irr = calculateIRR(initialInvestment, validFlows);
+    const npv = calculateNPV(irr, initialInvestment, validFlows);
+    const totalCashFlow = validFlows.reduce((sum, flow) => sum + flow, 0);
+    const roi = ((totalCashFlow - initialInvestment) / initialInvestment) * 100;
 
     setResults({
-      totalAmount: Math.round(totalAmount),
-      monthlyInterest: Number(monthlyInterest.toFixed(3)),
-      yearlyInterest: Number(yearlyInterest.toFixed(3))
+      irr: isNaN(irr) ? 0 : irr,
+      npv: isNaN(npv) ? 0 : npv,
+      totalCashFlow,
+      roi: isNaN(roi) ? 0 : roi
     });
   };
 
   useEffect(() => {
-    calculateInterest();
-  }, [principal, years, rate, interestType]);
+    calculateResults();
+  }, [initialInvestment, cashFlows]);
+
+  const handleCashFlowChange = (index, value) => {
+    const newCashFlows = [...cashFlows];
+    newCashFlows[index] = Number(value) || 0;
+    setCashFlows(newCashFlows);
+  };
+
+  const addCashFlow = () => {
+    if (cashFlows.length < 10) {
+      setCashFlows([...cashFlows, 0]);
+    }
+  };
+
+  const removeCashFlow = (index) => {
+    if (cashFlows.length > 1) {
+      const newCashFlows = cashFlows.filter((_, i) => i !== index);
+      setCashFlows(newCashFlows);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-2 sm:p-5 flex items-center justify-center">
@@ -46,105 +107,77 @@ export default function IRRCalculator() {
           {/* Left Panel */}
           <div className="w-full md:w-1/2 p-4 sm:p-6 bg-white flex flex-col">
             <h1 className="text-lg sm:text-xl font-normal text-gray-800 mb-2">
-              IRR - Interest Calculator
+              IRR - Internal Rate of Return Calculator
             </h1>
             <p className="text-gray-600 text-xs sm:text-sm mb-5">
-              Figure out your loan amount and monthly repayments with our Calculator
+              Calculate the IRR for your investment project with irregular cash flows
             </p>
 
-            {/* Interest Type */}
+            {/* Initial Investment */}
             <div className="mb-4">
               <label className="block text-gray-800 font-semibold mb-1 text-xs sm:text-sm">
-                Choose Interest Type
-              </label>
-              <select
-                value="select"
-                onChange={(e) => setInterestType(e.target.value)}
-                className="w-full p-2 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none text-xs sm:text-sm"
-              >
-                <option >Select</option>
-                <option value="simple">Simple Interest</option>
-                <option value="compound">Compound Interest</option>
-              </select>
-            </div>
-
-            {/* Principal */}
-            <div className="mb-4">
-              <label className="block text-gray-800 font-semibold mb-1 text-xs sm:text-sm">
-                Principal in Rupees
+                Initial Investment (₹)
               </label>
               <input
                 type="number"
-                value={principal}
-                onChange={(e) => setPrincipal(Number(e.target.value) || 0)}
+                value={initialInvestment}
+                onChange={(e) => setInitialInvestment(Number(e.target.value) || 0)}
                 className="w-full p-2 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none text-xs sm:text-sm"
                 min="0"
+                placeholder="Enter initial investment"
               />
             </div>
 
-            {/* Years */}
+            {/* Cash Flows */}
             <div className="mb-4">
-              <div className="flex flex-col sm:flex-row items-center gap-2 mb-3">
-                <label className="text-gray-800 font-semibold text-xs sm:text-sm">For</label>
-                <input
-                  type="number"
-                  value={years}
-                  onChange={(e) => setYears(Number(e.target.value) || 1)}
-                  className="w-16 p-2 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none text-xs sm:text-sm text-center"
-                  min="1"
-                  max="50"
-                />
-                <span className="text-gray-800 text-xs sm:text-sm">years</span>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-gray-800 font-semibold text-xs sm:text-sm">
+                  Annual Cash Flows (₹)
+                </label>
+                <button
+                  onClick={addCashFlow}
+                  className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium"
+                  disabled={cashFlows.length >= 10}
+                >
+                  + Add Year
+                </button>
               </div>
-              <div className="mb-3">
-                <input
-                  type="range"
-                  min="1"
-                  max="50"
-                  value={years}
-                  onChange={(e) => setYears(Number(e.target.value))}
-                  className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer slider"
-                />
-                <div className="flex justify-between text-xs text-gray-600 mt-1">
-                  <span>1year</span>
-                  <span>50year</span>
-                </div>
+              
+              <div className="max-h-48 overflow-y-auto space-y-2">
+                {cashFlows.map((flow, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <span className="text-xs sm:text-sm text-gray-600 w-12">
+                      Year {index + 1}:
+                    </span>
+                    <input
+                      type="number"
+                      value={flow}
+                      onChange={(e) => handleCashFlowChange(index, e.target.value)}
+                      className="flex-1 p-2 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none text-xs sm:text-sm"
+                      placeholder="Enter cash flow"
+                    />
+                    {cashFlows.length > 1 && (
+                      <button
+                        onClick={() => removeCashFlow(index)}
+                        className="text-red-600 hover:text-red-800 text-xs sm:text-sm font-medium px-2"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Interest Rate */}
-            <div className="mb-4">
-              <div className="mb-3">
-                <label className="block text-gray-800 font-semibold mb-1 text-xs sm:text-sm">
-                  Interest rate
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="number"
-                    value={rate}
-                    onChange={(e) => setRate(Number(e.target.value) || 0)}
-                    className="w-16 p-2 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none text-xs sm:text-sm text-center"
-                    min="0"
-                    max="100"
-                    step="0.01"
-                  />
-                  <span className="text-gray-800 text-xs sm:text-sm">%</span>
-                </div>
-              </div>
-              <div>
-                <input
-                  type="range"
-                  min="0"
-                  max="25"
-                  value={rate}
-                  onChange={(e) => setRate(Number(e.target.value))}
-                  step="0.01"
-                  className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer slider"
-                />
-                <div className="flex justify-between text-xs text-gray-600 mt-1">
-                  <span>8.23%</span>
-                  <span>12.35%</span>
-                </div>
+            {/* Project Summary */}
+            <div className="mb-4 p-3 bg-gray-50 rounded">
+              <h3 className="text-xs sm:text-sm font-semibold text-gray-800 mb-2">
+                Project Summary
+              </h3>
+              <div className="text-xs text-gray-600 space-y-1">
+                <div>Project Duration: {cashFlows.length} years</div>
+                <div>Total Cash Inflows: ₹{results.totalCashFlow.toLocaleString()}</div>
+                <div>Simple ROI: {results.roi.toFixed(2)}%</div>
               </div>
             </div>
           </div>
@@ -152,25 +185,40 @@ export default function IRRCalculator() {
           {/* Right Panel */}
           <div className="w-full md:w-1/2 bg-gray-800 text-white p-4 sm:p-6 flex flex-col justify-center">
             <div className="mb-6">
-              <h2 className="text-xs sm:text-sm font-normal mb-3">Total Amount is</h2>
-              <div className="text-3xl sm:text-4xl font-bold mb-4">
-                {results.totalAmount.toLocaleString()}
+              <h2 className="text-xs sm:text-sm font-normal mb-3">Internal Rate of Return (IRR)</h2>
+              <div className="text-3xl sm:text-4xl font-bold mb-2">
+                {(results.irr * 100).toFixed(2)}%
               </div>
+              <p className="text-xs text-gray-300">
+                {results.irr > 0.12 ? 'Potentially Good Investment' : 
+                 results.irr > 0.08 ? 'Moderate Investment' : 
+                 'Consider Alternatives'}
+              </p>
             </div>
 
             <div>
-              <h3 className="text-xs sm:text-sm font-normal mb-3">Interest</h3>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="border-2 border-gray-600 rounded p-3 text-center flex-1">
-                  <div className="text-xs mb-1">Monthly</div>
+              <h3 className="text-xs sm:text-sm font-normal mb-3">Additional Metrics</h3>
+              <div className="space-y-3">
+                <div className="border-2 border-gray-600 rounded p-3">
+                  <div className="text-xs mb-1">Net Present Value (NPV)</div>
                   <div className="text-base font-bold">
-                    {results.monthlyInterest}
+                    ₹{Math.abs(results.npv) < 1000 ? 
+                      results.npv.toFixed(2) : 
+                      results.npv.toLocaleString()}
                   </div>
                 </div>
-                <div className="border-2 border-gray-600 rounded p-3 text-center flex-1">
-                  <div className="text-xs mb-1">Yearly</div>
+                
+                <div className="border-2 border-gray-600 rounded p-3">
+                  <div className="text-xs mb-1">Total Cash Flows</div>
                   <div className="text-base font-bold">
-                    {results.yearlyInterest}
+                    ₹{results.totalCashFlow.toLocaleString()}
+                  </div>
+                </div>
+                
+                <div className="border-2 border-gray-600 rounded p-3">
+                  <div className="text-xs mb-1">Simple ROI</div>
+                  <div className="text-base font-bold">
+                    {results.roi.toFixed(2)}%
                   </div>
                 </div>
               </div>
