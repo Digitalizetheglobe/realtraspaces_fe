@@ -7,6 +7,7 @@ const WhatsAppPopup = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [phoneNumber] = useState("+91 8384848485"); // ✅ Default WhatsApp number
   const [message, setMessage] = useState("");
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleSendMessage = () => {
     if (!message.trim() || !phoneNumber.trim()) return;
@@ -24,6 +25,8 @@ const WhatsAppPopup = () => {
       {/* WhatsApp Floating Button */}
       <button
         onClick={() => setShowPopup(!showPopup)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         style={{
           position: "fixed",
           bottom: "40px",
@@ -31,8 +34,8 @@ const WhatsAppPopup = () => {
           backgroundColor: "rgb(33, 202, 95)",
           border: "none",
           borderRadius: "50%",
-          width: "60px",
-          height: "60px",
+          width: isHovered ? "60px" : "40px",
+          height: isHovered ? "60px" : "40px",
           cursor: "pointer",
           boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.2)",
           padding: 0,
@@ -40,6 +43,7 @@ const WhatsAppPopup = () => {
           alignItems: "center",
           justifyContent: "center",
           zIndex: 1000,
+          transition: "width 0.2s, height 0.2s",
         }}
       >
         <Image src={wp} alt="WhatsApp" width={35} height={35} />

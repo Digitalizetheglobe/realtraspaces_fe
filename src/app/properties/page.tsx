@@ -53,6 +53,7 @@ export default function Similarproperties() {
   const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [bookmarkedProperties, setBookmarkedProperties] = useState<Set<string>>(new Set());
   const [showBookmarkModal, setShowBookmarkModal] = useState(false);
   const [propertyToBookmark, setPropertyToBookmark] = useState<string | null>(null);
@@ -121,24 +122,48 @@ export default function Similarproperties() {
     fetchProperties();
   }, []);
 
+  // Add location to selectedLocations
+  const addLocation = (location: string) => {
+    if (!location.trim()) return;
+    if (!selectedLocations.includes(location)) {
+      setSelectedLocations((prev) => [...prev, location]);
+    }
+    setSearchTerm("");
+  };
+
+  // Remove location from selectedLocations
+  const removeLocation = (location: string) => {
+    setSelectedLocations((prev) => prev.filter((loc) => loc !== location));
+  };
+
+  // Handle Enter key in input for adding location
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && searchTerm.trim()) {
+      addLocation(searchTerm.trim());
+    }
+  };
+
   // Apply filters whenever search term or filters change
   useEffect(() => {
     let results = properties;
 
-    // Apply search term filter
-    if (searchTerm) {
+    // Multi-location search logic
+    if (selectedLocations.length > 0) {
+      results = results.filter((property) =>
+        selectedLocations.some((loc) =>
+          (property.address?.subLocality?.toLowerCase().includes(loc.toLowerCase()) ?? false) ||
+          (property.address?.city?.toLowerCase().includes(loc.toLowerCase()) ?? false)
+        )
+      );
+    } else if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
       results = results.filter((property) => {
-        const searchLower = searchTerm.toLowerCase();
         return (
           property.title?.toLowerCase().includes(searchLower) ||
           property.address?.subLocality?.toLowerCase().includes(searchLower) ||
           property.address?.city?.toLowerCase().includes(searchLower) ||
-          property.propertyType?.displayName
-            ?.toLowerCase()
-            .includes(searchLower) ||
-          property.propertyType?.childType?.displayName
-            ?.toLowerCase()
-            .includes(searchLower)
+          property.propertyType?.displayName?.toLowerCase().includes(searchLower) ||
+          property.propertyType?.childType?.displayName?.toLowerCase().includes(searchLower)
         );
       });
     }
@@ -219,7 +244,7 @@ export default function Similarproperties() {
     }
 
     setFilteredProperties(results);
-  }, [searchTerm, filters, properties]);
+  }, [searchTerm, filters, properties, selectedLocations]);
 
   // Helper function to get attribute value by ID
   const getAttributeValue = (property: Property, attributeId: string) => {
@@ -256,6 +281,7 @@ export default function Similarproperties() {
 
   const resetFilters = () => {
     setSearchTerm("");
+    setSelectedLocations([]);
     setFilters({
       propertyType: "",
       priceRange: "",
@@ -355,6 +381,7 @@ export default function Similarproperties() {
       className="w-full text-black text-sm sm:text-base p-3 sm:p-4 pl-10 sm:pl-12 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500"
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
+      onKeyDown={handleInputKeyDown}
     />
     <svg
       className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-black"
@@ -370,6 +397,38 @@ export default function Similarproperties() {
         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
       />
     </svg>
+    {/* Chips overlay (right side, inside input) */}
+    <div className="absolute inset-y-0 right-3 flex items-center space-x-2 pointer-events-none" style={{ zIndex: 10 }}>
+      {selectedLocations.length > 0 && (
+        <div className="flex items-center space-x-2 pointer-events-auto">
+          {selectedLocations.map((loc) => (
+            <div key={loc} className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium mr-1">
+              {loc}
+              <button
+                type="button"
+                className="ml-1 text-white hover:text-gray-200 focus:outline-none"
+                style={{ pointerEvents: 'auto' }}
+                onClick={() => removeLocation(loc)}
+              >
+                <span className="ml-1">×</span>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      {/* +Add button */}
+      <button
+        type="button"
+        className="border border-black text-black bg-white px-3 py-1 rounded-full text-xs font-medium hover:bg-black hover:text-white transition-colors ml-1 pointer-events-auto"
+        onClick={() => {
+          // Focus the input field
+          const input = document.querySelector<HTMLInputElement>('input[placeholder="Search by property name, location, or type..."]');
+          input?.focus();
+        }}
+      >
+        + Add
+      </button>
+    </div>
   </div>
 
   <div className="text-sm text-gray-600 mb-4 text-center sm:text-left">

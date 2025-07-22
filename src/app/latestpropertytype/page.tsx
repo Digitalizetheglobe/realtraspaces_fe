@@ -246,8 +246,8 @@ export default function PropertyCards() {
   // Filter properties based on selected locations (if any), else by search
   const filteredProperties = properties.filter((property) => {
     if (selectedLocations.length > 0) {
-      // Match only if ALL selected locations match subLocality or city (AND logic)
-      return selectedLocations.every((loc) =>
+      // Match if ANY selected location matches subLocality or city (OR logic)
+      return selectedLocations.some((loc) =>
         (property.address?.subLocality?.toLowerCase().includes(loc.toLowerCase()) ?? false) ||
         (property.address?.city?.toLowerCase().includes(loc.toLowerCase()) ?? false)
       );
@@ -369,24 +369,19 @@ export default function PropertyCards() {
           <div className="absolute inset-y-0 right-3 flex items-center space-x-2 pointer-events-none" style={{ zIndex: 10 }}>
             {selectedLocations.length > 0 && (
               <div className="flex items-center space-x-2 pointer-events-auto">
-                {/* Show first location chip */}
-                <div className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium mr-1">
-                  {selectedLocations[0]}
-                  <button
-                    type="button"
-                    className="ml-1 text-white hover:text-gray-200 focus:outline-none"
-                    style={{ pointerEvents: 'auto' }}
-                    onClick={() => removeLocation(selectedLocations[0])}
-                  >
-                    <span className="ml-1">×</span>
-                  </button>
-                </div>
-                {/* Show +N more chip if more than 1 */}
-                {selectedLocations.length > 1 && (
-                  <div className="bg-black text-white px-3 py-1 rounded-full text-xs font-medium mr-1">
-                    +{selectedLocations.length - 1} more
+                {selectedLocations.map((loc) => (
+                  <div key={loc} className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium mr-1">
+                    {loc}
+                    <button
+                      type="button"
+                      className="ml-1 text-white hover:text-gray-200 focus:outline-none"
+                      style={{ pointerEvents: 'auto' }}
+                      onClick={() => removeLocation(loc)}
+                    >
+                      <span className="ml-1">×</span>
+                    </button>
                   </div>
-                )}
+                ))}
               </div>
             )}
             {/* +Add button */}
