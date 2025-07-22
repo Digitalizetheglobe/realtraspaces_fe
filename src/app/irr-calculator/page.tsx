@@ -13,7 +13,7 @@ export default function IRRCalculator() {
   });
 
   // IRR calculation using Newton-Raphson method
-  const calculateIRR = (initialInv, flows) => {
+  const calculateIRR = (initialInv: number, flows: number[]): number => {
     const maxIterations = 1000;
     const tolerance = 1e-7;
     let rate = 0.1; // Starting guess of 10%
@@ -43,7 +43,7 @@ export default function IRRCalculator() {
     return rate;
   };
 
-  const calculateNPV = (rate, initialInv, flows) => {
+  const calculateNPV = (rate: number, initialInv: number, flows: number[]): number => {
     let npv = -initialInv;
     for (let i = 0; i < flows.length; i++) {
       npv += flows[i] / Math.pow(1 + rate, i + 1);
@@ -81,7 +81,7 @@ export default function IRRCalculator() {
     calculateResults();
   }, [initialInvestment, cashFlows]);
 
-  const handleCashFlowChange = (index, value) => {
+  const handleCashFlowChange = (index: number, value: string | number) => {
     const newCashFlows = [...cashFlows];
     newCashFlows[index] = Number(value) || 0;
     setCashFlows(newCashFlows);
@@ -93,7 +93,7 @@ export default function IRRCalculator() {
     }
   };
 
-  const removeCashFlow = (index) => {
+  const removeCashFlow = (index: number) => {
     if (cashFlows.length > 1) {
       const newCashFlows = cashFlows.filter((_, i) => i !== index);
       setCashFlows(newCashFlows);

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 const CalculatorSection = () => {
   const router = useRouter();
-  const [hoveredCard, setHoveredCard] = useState(null);
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
 
   const calculators = [
     {
@@ -34,7 +34,7 @@ const CalculatorSection = () => {
     }
   ];
 
-  const handleCardClick = (route) => {
+  const handleCardClick = (route: string) => {
     router.push(route);
   };
 
