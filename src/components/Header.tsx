@@ -167,20 +167,19 @@ const Header = () => {
         {isMenuOpen && (
           <div className="fixed inset-0 top-16 z-40 flex justify-end">
             {/* Empty space that closes menu when clicked */}
-            {/* <div className="flex-1 bg-black/20 hover:bg-white " onClick={toggleMenu} /> */}
+            <div className="flex-1 bg-black/20 hover:bg-white " onClick={toggleMenu} />
 
             {/* Menu content with blur effect */}
             <div className="w-full sm:w-80 bg-[#FEFEFE4D] backdrop-blur-md shadow-lg h-full sm:h-auto">
               <div className="py-4">
                 {menuItems.map((item, index) => (
                   <div key={item.name}>
-                    <Link
-                      href={item.href}
+                    <button
                       className="text-black hover:bg-gray-100 block px-6 py-3 text-sm font-medium"
                       onClick={() => setIsMenuOpen(false)}
                     >
                       {item.name}
-                    </Link>
+                    </button>
                     {item.divider && (
                       <hr className="border-gray-200 mx-6 my-2" />
                     )}

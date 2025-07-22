@@ -728,7 +728,7 @@ export default function PropertyDetails() {
 
       <main className="min-h-screen bg-white">
         {/* Hero Section */}
-        <section className="relative h-[60vh] w-full">
+        <section className="relative h-[30vh] w-full">
           <div className="absolute inset-0">
             <Image
               src={propertydetails}
@@ -757,7 +757,7 @@ export default function PropertyDetails() {
         </section>
 
         {/* Property Details Section */}
-        <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex flex-col md:flex-row gap-8">
             {/* Left Side - Image Gallery */}
             <div
@@ -766,22 +766,12 @@ export default function PropertyDetails() {
               }`}
             >
               {/* Main Image */}
-              <div className="mb-4 rounded-lg overflow-hidden shadow-lg border border-gray-200">
-                <Image
-                  src={mainImage}
-                  alt="Main View"
-                  className="w-full h-[400px] object-cover"
-                  width={800}
-                  height={600}
-                />
-              </div>
-
-              {/* Thumbnails with arrows */}
-              <div className="flex items-center justify-center gap-2">
+              <div className="mb-4 rounded-lg overflow-hidden shadow-lg border border-gray-200 relative">
+                {/* Previous Button */}
                 <button
                   onClick={handlePrev}
                   disabled={startIndex === 0}
-                  className={`p-2 rounded-full bg-white shadow-md ${
+                  className={`absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md ${
                     startIndex === 0
                       ? "opacity-30 cursor-not-allowed"
                       : "hover:bg-gray-100"
@@ -802,6 +792,52 @@ export default function PropertyDetails() {
                     />
                   </svg>
                 </button>
+                {/* Main Image */}
+                <Image
+                  src={mainImage}
+                  alt="Main View"
+                  className="w-full h-[400px] object-cover"
+                  width={600}
+                  height={450}
+                />
+                {/* Next Button */}
+                <button
+                  onClick={handleNext}
+                  disabled={
+                    startIndex + visibleCount >=
+                    (imageUrls.length > 0
+                      ? imageUrls.length
+                      : thumbnails.length)
+                  }
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md ${
+                    startIndex + visibleCount >=
+                    (imageUrls.length > 0
+                      ? imageUrls.length
+                      : thumbnails.length)
+                      ? "opacity-30 cursor-not-allowed"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-gray-700"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Thumbnails with arrows */}
+              <div className="flex items-center justify-center gap-2">
+               
 
                 <div className="flex gap-3 overflow-hidden">
                   {visibleImages.map((img, index) => (
@@ -833,38 +869,7 @@ export default function PropertyDetails() {
                   ))}
                 </div>
 
-                <button
-                  onClick={handleNext}
-                  disabled={
-                    startIndex + visibleCount >=
-                    (imageUrls.length > 0
-                      ? imageUrls.length
-                      : thumbnails.length)
-                  }
-                  className={`p-2 rounded-full bg-white shadow-md ${
-                    startIndex + visibleCount >=
-                    (imageUrls.length > 0
-                      ? imageUrls.length
-                      : thumbnails.length)
-                      ? "opacity-30 cursor-not-allowed"
-                      : "hover:bg-gray-100"
-                  }`}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 text-gray-700"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </button>
+               
               </div>
             </div>
 
@@ -1136,7 +1141,7 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Quoted Rent</p>
+                      <p className="text-sm text-gray-500">Quoted Total Rent</p>
                       <p className="font-medium text-gray-800">
                         {formatPrice(
                           property.monetaryInfo?.expectedPrice ||

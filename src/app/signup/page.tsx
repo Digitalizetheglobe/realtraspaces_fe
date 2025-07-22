@@ -12,6 +12,8 @@ import {
   Briefcase,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
+import Image from "next/image";
+import signupImg from "../../../public/assets/signup.jpg";
 
 type FormData = {
   fullName: string;
@@ -141,7 +143,7 @@ const SignUpPage = () => {
   <div
     className="hidden lg:block relative p-12 bg-cover bg-center col-span-1"
     style={{
-      backgroundImage: "url('https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1400&q=80')"
+      backgroundImage: `url(${signupImg.src})`
     }}
   >
   {/* Black Overlay */}

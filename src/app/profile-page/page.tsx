@@ -123,7 +123,7 @@ const ProfilePage = () => {
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     toast.success('Logged out successfully');
-    router.push('/login');
+    router.push('/signin');
   };
 
   const formatDate = (dateString: string) => {

@@ -55,6 +55,7 @@ export default function PropertyCards() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [selectedLocations, setSelectedLocations] = useState<string[]>([]); // NEW
   const [showPopup, setShowPopup] = useState(false);
   const [popupDismissed, setPopupDismissed] = useState(false);
   const [formData, setFormData] = useState({
@@ -221,6 +222,46 @@ export default function PropertyCards() {
     return `₹ ${crores} Cr`;
   };
 
+  // Add location to selectedLocations
+  const addLocation = (location: string) => {
+    if (!location.trim()) return;
+    if (!selectedLocations.includes(location)) {
+      setSelectedLocations((prev) => [...prev, location]);
+    }
+    setSearch("");
+  };
+
+  // Remove location from selectedLocations
+  const removeLocation = (location: string) => {
+    setSelectedLocations((prev) => prev.filter((loc) => loc !== location));
+  };
+
+  // Handle Enter key in input for adding location
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && search.trim()) {
+      addLocation(search.trim());
+    }
+  };
+
+  // Filter properties based on selected locations (if any), else by search
+  const filteredProperties = properties.filter((property) => {
+    if (selectedLocations.length > 0) {
+      // Match only if ALL selected locations match subLocality or city (AND logic)
+      return selectedLocations.every((loc) =>
+        (property.address?.subLocality?.toLowerCase().includes(loc.toLowerCase()) ?? false) ||
+        (property.address?.city?.toLowerCase().includes(loc.toLowerCase()) ?? false)
+      );
+    } else {
+      const searchLower = search.toLowerCase();
+      return (
+        (property.title?.toLowerCase().includes(searchLower) ?? false) ||
+        (property.address?.subLocality?.toLowerCase().includes(searchLower) ?? false) ||
+        (property.address?.city?.toLowerCase().includes(searchLower) ?? false) ||
+        (property.dimension?.area?.toString().toLowerCase().includes(searchLower) ?? false)
+      );
+    }
+  });
+
   if (loading) {
     return (
       <div className={raleway.className}>
@@ -233,17 +274,6 @@ export default function PropertyCards() {
     );
   }
 
-  // Filter properties based on search input
-  const filteredProperties = properties.filter((property) => {
-    const searchLower = search.toLowerCase();
-    return (
-      (property.title?.toLowerCase().includes(searchLower) ?? false) ||
-      (property.address?.subLocality?.toLowerCase().includes(searchLower) ?? false) ||
-      (property.address?.city?.toLowerCase().includes(searchLower) ?? false) ||
-      (property.dimension?.area?.toString().toLowerCase().includes(searchLower) ?? false)
-    );
-  });
-
   return (
     <div className={raleway.className}>
        <section className="relative w-full h-[220px] sm:h-[320px] md:h-[420px]">
@@ -255,89 +285,126 @@ export default function PropertyCards() {
           className="object-cover"
         />
 
-        {/* Search bar positioned at the bottom center of the banner */}
     <div className="absolute bottom-4 w-full flex justify-center px-4 py-20">
-  <div className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-3 px-4 py-3 rounded-2xl border border-gray-300 bg-white/60 backdrop-blur-md shadow-lg overflow-visible">
-    
-    {/* Dropdown */}
-    <div
-      className="relative w-full sm:w-auto"
-      onMouseEnter={() => setDropdownOpen(true)}
-      onMouseLeave={() => setDropdownOpen(false)}
-    >
-      <button
-        type="button"
-        className="appearance-none w-full sm:min-w-[200px] bg-black text-white text-sm font-medium pl-5 pr-10 py-3 rounded-full outline-none cursor-pointer flex justify-between items-center"
-        onClick={() => setDropdownOpen(true)}
-      >
-        {selectedType
-          ? selectedType === "commercial"
-            ? "Commercial"
-            : selectedType === "coworking"
-            ? "Co-working"
-            : selectedType
-          : "Select Search Type"}
-        <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white text-xs">
-          ▼
-        </span>
-      </button>
-      {dropdownOpen && (
-        <div className="absolute left-0 right-0 mt-2 bg-black text-white rounded-lg shadow-lg z-50" style={{ zIndex: 9999 }}>
-          <div
-            className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-t-lg ${selectedType === "commercial" ? "bg-gray-700" : ""}`}
-            onClick={() => { setSelectedType("commercial"); setDropdownOpen(false); }}
-          >
-            Commercial
+      <div className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-3 px-4 py-3 rounded-2xl border border-gray-300 bg-white/60 backdrop-blur-md shadow-lg overflow-visible relative">
+        {/* Suggestions Dropdown - now directly above the search bar */}
+        {search && filteredProperties.length > 0 && (
+          <div className="absolute left-0 right-0 bottom-full mb-2 max-w-3xl justify-center items-center bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-72 overflow-y-auto">
+            {filteredProperties.slice(0, 8).map((property, idx) => (
+              <div
+                key={property.id}
+                className="px-5 py-3 cursor-pointer hover:bg-gray-100 flex justify-between items-center"
+                onClick={() => {
+                  addLocation(property.address?.subLocality || property.address?.city || property.title || "");
+                }}
+              >
+                <div>
+                  <div className="font-medium text-black">{property.title}</div>
+                  <div className="text-xs text-gray-500">
+                    {(property.address?.subLocality || property.address?.city) && (
+                      <>
+                        {property.address?.subLocality
+                          ? `${property.address.subLocality}, `
+                          : ""}
+                        {property.address?.city}
+                      </>
+                    )}
+                  </div>
+                </div>
+                <span className="text-xs text-gray-400">LOCALITY</span>
+              </div>
+            ))}
           </div>
-          <div
-            className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "coworking" ? "bg-gray-700" : ""}`}
-            onClick={() => { setSelectedType("coworking"); setDropdownOpen(false); }}
+        )}
+        {/* Dropdown */}
+        <div
+          className="relative w-full sm:w-auto"
+          onMouseEnter={() => setDropdownOpen(true)}
+          onMouseLeave={() => setDropdownOpen(false)}
+        >
+          <button
+            type="button"
+            className="appearance-none w-full sm:min-w-[200px] bg-black text-white text-sm font-medium pl-5 pr-10 py-3 rounded-full outline-none cursor-pointer flex justify-between items-center"
+            onClick={() => setDropdownOpen(true)}
           >
-            Co-working
-          </div>
-        </div>
-      )}
-    </div>
-
-    {/* Autocomplete Dropdown (now above the search input) */}
-    {search && filteredProperties.length > 0 && (
-      <div className="absolute left-0 right-0 -top-2 mb-2 bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-72 overflow-y-auto">
-        {filteredProperties.slice(0, 8).map((property, idx) => (
-          <div
-            key={property.id}
-            className="px-5 py-3 cursor-pointer hover:bg-gray-100 flex justify-between items-center"
-            onClick={() => {
-              setSearch(property.title || "");
-              // Optionally, you can trigger navigation or selection here
-            }}
-          >
-            <div>
-              <div className="font-medium text-black">{property.title}</div>
-              <div className="text-xs text-gray-500">
-                {(property.address?.subLocality || property.address?.city) && (
-                  <>
-                    {property.address?.subLocality
-                      ? `${property.address.subLocality}, `
-                      : ""}
-                    {property.address?.city}
-                  </>
-                )}
+            {selectedType
+              ? selectedType === "commercial"
+                ? "Commercial"
+                : selectedType === "coworking"
+                ? "Co-working"
+                : selectedType
+              : "Select Search Type"}
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white text-xs">
+              ▼
+            </span>
+          </button>
+          {dropdownOpen && (
+            <div className="absolute left-0 right-0 mt-2 bg-black text-white rounded-lg shadow-lg z-50" style={{ zIndex: 9999 }}>
+              <div
+                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-t-lg ${selectedType === "commercial" ? "bg-gray-700" : ""}`}
+                onClick={() => { setSelectedType("commercial"); setDropdownOpen(false); }}
+              >
+                Commercial
+              </div>
+              <div
+                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "coworking" ? "bg-gray-700" : ""}`}
+                onClick={() => { setSelectedType("coworking"); setDropdownOpen(false); }}
+              >
+                Co-working
               </div>
             </div>
-            <span className="text-xs text-gray-400">LOCALITY</span>
+          )}
+        </div>
+        {/* Multi-location chips UI inside input area, right-aligned */}
+        <div className="relative w-full">
+          <input
+            type="text"
+            placeholder="Search by property name, location, or type..."
+            className="w-full bg-white text-gray-900 px-5 py-3 text-sm rounded-full outline-none pr-44" // add right padding for chips
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={handleInputKeyDown}
+          />
+          {/* Chips overlay (right side, inside input) */}
+          <div className="absolute inset-y-0 right-3 flex items-center space-x-2 pointer-events-none" style={{ zIndex: 10 }}>
+            {selectedLocations.length > 0 && (
+              <div className="flex items-center space-x-2 pointer-events-auto">
+                {/* Show first location chip */}
+                <div className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium mr-1">
+                  {selectedLocations[0]}
+                  <button
+                    type="button"
+                    className="ml-1 text-white hover:text-gray-200 focus:outline-none"
+                    style={{ pointerEvents: 'auto' }}
+                    onClick={() => removeLocation(selectedLocations[0])}
+                  >
+                    <span className="ml-1">×</span>
+                  </button>
+                </div>
+                {/* Show +N more chip if more than 1 */}
+                {selectedLocations.length > 1 && (
+                  <div className="bg-black text-white px-3 py-1 rounded-full text-xs font-medium mr-1">
+                    +{selectedLocations.length - 1} more
+                  </div>
+                )}
+              </div>
+            )}
+            {/* +Add button */}
+            <button
+              type="button"
+              className="border border-black text-black bg-white px-3 py-1 rounded-full text-xs font-medium hover:bg-black hover:text-white transition-colors ml-1 pointer-events-auto"
+              onClick={() => {
+                // Focus the input field
+                const input = document.querySelector<HTMLInputElement>('input[placeholder="Search by property name, location, or type..."]');
+                input?.focus();
+              }}
+            >
+              + Add
+            </button>
           </div>
-        ))}
+        </div>
       </div>
-    )}
-    <input
-      type="text"
-      placeholder="Search by property name, location, or type..."
-      className="w-full bg-white text-gray-900 px-5 py-3 text-sm rounded-full outline-none"
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-    />
-  </div>
-</div>
+    </div>
 
 
       </section>

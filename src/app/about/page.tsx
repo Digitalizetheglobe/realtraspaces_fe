@@ -32,9 +32,30 @@ const galleryImages = [
 
 // Team data
 const teamMembers = [
-  { id: 1, name: 'Sarah Johnson', role: 'Senior Manager', image: DUMMY_IMAGES.team1 },
-  { id: 2, name: 'Michael Chen', role: 'Sales Director', image: DUMMY_IMAGES.team2 },
-  { id: 3, name: 'Emily Davis', role: 'Marketing Lead', image: DUMMY_IMAGES.team3 }
+  {
+    id: 1,
+    name: 'Sarah Johnson',
+    role: 'Senior Manager',
+    image: DUMMY_IMAGES.team1,
+    description: 'Sarah leads our team with over a decade of real estate experience, specializing in luxury properties and client relations.',
+    linkedin: 'https://www.linkedin.com/in/sarah-johnson/'
+  },
+  {
+    id: 2,
+    name: 'Michael Chen',
+    role: 'Sales Director',
+    image: DUMMY_IMAGES.team2,
+    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
+    linkedin: 'https://www.linkedin.com/in/michael-chen/'
+  },
+  {
+    id: 3,
+    name: 'Emily Davis',
+    role: 'Marketing Lead',
+    image: DUMMY_IMAGES.team3,
+    description: 'Emily crafts our brand story and marketing campaigns, ensuring our properties reach the right audience.',
+    linkedin: 'https://www.linkedin.com/in/emily-davis/'
+  }
 ];
 
 // Awards data
@@ -159,8 +180,10 @@ export default function RealtraSpacesAbout() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src={developer3.src ? developer3.src : developer3}
+            src={developer3}
             alt="Modern Real Estate"
+            width={800}
+            height={600}
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/30"></div>
@@ -203,7 +226,7 @@ export default function RealtraSpacesAbout() {
       </section>
 
       {/* Stats Section */}
-      <section className="bg-black py-20">
+      <section className="bg-black py-10">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Years in Business */}
@@ -332,43 +355,81 @@ export default function RealtraSpacesAbout() {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-black mb-6">
-              Our Team
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Meet the dedicated professionals who make Realtra Spaces exceptional.
-            </p>
-          </div>
+     {/* Team Section - Modern Redesign */}
+<section className="py-24 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
+  {/* Background Elements */}
+  <div className="absolute inset-0 opacity-10">
+    <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400 rounded-full blur-3xl"></div>
+    <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400 rounded-full blur-3xl"></div>
+  </div>
+  
+  <div className="container mx-auto px-4 relative z-10">
+    {/* Header */}
+    <div className="text-center mb-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="inline-block"
+      >
+        <span className="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold mb-4">
+          Meet Our Team
+        </span>
+      </motion.div>
+      
+    
+    </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {teamMembers.map((member, index) => (
-              <motion.div
-                key={member.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-300"
-              >
-                <div className="h-80 overflow-hidden">
-                  <img
-                    src={member.image}
-                    alt={member.name}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
+    {/* Team Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {teamMembers.map((member, index) => (
+        <motion.div
+          key={member.id}
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, delay: index * 0.15 }}
+          className="group relative"
+        >
+          {/* Card Container */}
+          <div className="relative bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-gray-200">
+            <div className="relative h-96 overflow-hidden">
+              <img
+                src={member.image}
+                alt={member.name}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              />
+              {/* Hover Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 w-11/12 mx-auto text-center">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">{member.name}</h3>
+                  <p className="text-blue-600 font-semibold text-lg mb-2">{member.role}</p>
+                  <p className="text-gray-700 mb-4">{member.description}</p>
+                  <a
+                    href={member.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-300"
+                  >
+                    {/* LinkedIn SVG icon */}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.785-1.75-1.75s.784-1.75 1.75-1.75 1.75.785 1.75 1.75-.784 1.75-1.75 1.75zm13.5 11.268h-3v-5.604c0-1.337-.025-3.063-1.868-3.063-1.868 0-2.154 1.459-2.154 2.968v5.699h-3v-10h2.881v1.367h.041c.401-.761 1.379-1.563 2.838-1.563 3.036 0 3.6 2.001 3.6 4.601v5.595z"/></svg>
+                    LinkedIn
+                  </a>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-black mb-2">{member.name}</h3>
-                  <p className="text-gray-600 font-medium">{member.role}</p>
-                </div>
-              </motion.div>
-            ))}
+              </div>
+            </div>
+            {/* Always visible name and role */}
+            <div className="p-6 text-center">
+              <h3 className="text-2xl font-bold text-gray-800 mb-1">{member.name}</h3>
+              <p className="text-blue-600 font-semibold text-lg">{member.role}</p>
+            </div>
           </div>
-        </div>
-      </section>
+          {/* Floating Background Shape */}
+          <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-3xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
 
       {/* Gallery Section */}
       <section className="py-20" style={{ backgroundColor: '#F5F5FF99' }}>
