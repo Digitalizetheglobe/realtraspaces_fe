@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import type { StaticImageData } from "next/image";
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
@@ -92,7 +93,7 @@ export default function PropertyDetails() {
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
   const [startIndex, setStartIndex] = useState(0);
-  const [mainImage, setMainImage] = useState(propertydetails);
+  const [mainImage, setMainImage] = useState<string | StaticImageData>(propertydetails);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const propertyOverviewRef = useRef<HTMLDivElement | null>(null);
   const [isSticky, setIsSticky] = useState(true);
@@ -155,10 +156,10 @@ export default function PropertyDetails() {
             typeof properties[0].imageUrls === "object" &&
             Object.keys(properties[0].imageUrls).length > 0
           ) {
-            setImageUrls(Object.values(properties[0].imageUrls));
-            // setMainImage(Object.values(properties[0].imageUrls)[0]);
+            const urls = Object.values(properties[0].imageUrls) as string[];
+            setImageUrls(urls);
+            setMainImage(urls[0] as any); // Set main image to first API image (string)
           } else {
-            // setImageUrls([propertydetails, propertydetails1, propertydetails2, propertydetails3]);
             setMainImage(propertydetails); // Ensure mainImage is set to a default image
           }
         } else {
@@ -190,12 +191,28 @@ export default function PropertyDetails() {
   }, [propertyTitle]);
 
   const handlePrev = () => {
-    setStartIndex((prev) => Math.max(prev - 1, 0));
+    if (startIndex > 0) {
+      const newStartIndex = startIndex - 1;
+      setStartIndex(newStartIndex);
+      // Update mainImage to the new first visible image
+      const newVisibleImages =
+        imageUrls.length > 0
+          ? imageUrls.slice(newStartIndex, newStartIndex + visibleCount)
+          : thumbnails.slice(newStartIndex, newStartIndex + visibleCount);
+      setMainImage(newVisibleImages[0]);
+    }
   };
 
   const handleNext = () => {
-    if (startIndex + visibleCount < thumbnails.length) {
-      setStartIndex((prev) => prev + 1);
+    if (startIndex + visibleCount < (imageUrls.length > 0 ? imageUrls.length : thumbnails.length)) {
+      const newStartIndex = startIndex + 1;
+      setStartIndex(newStartIndex);
+      // Update mainImage to the new first visible image
+      const newVisibleImages =
+        imageUrls.length > 0
+          ? imageUrls.slice(newStartIndex, newStartIndex + visibleCount)
+          : thumbnails.slice(newStartIndex, newStartIndex + visibleCount);
+      setMainImage(newVisibleImages[0]);
     }
   };
 
@@ -419,6 +436,14 @@ export default function PropertyDetails() {
       .filter(Boolean)
       .join(", ");
   };
+
+  // Determine if mainImage is the first or last in visibleImages
+  const isFirstImageActive =
+    (typeof mainImage === "string" && mainImage === visibleImages[0]) ||
+    (typeof mainImage !== "string" && mainImage === visibleImages[0]);
+  const isLastImageActive =
+    (typeof mainImage === "string" && mainImage === visibleImages[visibleImages.length - 1]) ||
+    (typeof mainImage !== "string" && mainImage === visibleImages[visibleImages.length - 1]);
 
   if (loading) {
     return (
@@ -775,7 +800,7 @@ export default function PropertyDetails() {
                     startIndex === 0
                       ? "opacity-30 cursor-not-allowed"
                       : "hover:bg-gray-100"
-                  }`}
+                  } ${isFirstImageActive ? "ring-2 ring-blue-500" : ""}`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -793,13 +818,23 @@ export default function PropertyDetails() {
                   </svg>
                 </button>
                 {/* Main Image */}
-                <Image
-                  src={mainImage}
-                  alt="Main View"
-                  className="w-full h-[400px] object-cover"
-                  width={600}
-                  height={450}
-                />
+                {typeof mainImage === "string" ? (
+                  <img
+                    src={mainImage}
+                    alt="Main View"
+                    className="w-full h-[400px] object-cover"
+                    width={600}
+                    height={450}
+                  />
+                ) : (
+                  <Image
+                    src={mainImage}
+                    alt="Main View"
+                    className="w-full h-[400px] object-cover"
+                    width={600}
+                    height={450}
+                  />
+                )}
                 {/* Next Button */}
                 <button
                   onClick={handleNext}
@@ -816,7 +851,7 @@ export default function PropertyDetails() {
                       : thumbnails.length)
                       ? "opacity-30 cursor-not-allowed"
                       : "hover:bg-gray-100"
-                  }`}
+                  } ${isLastImageActive ? "ring-2 ring-blue-500" : ""}`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -840,33 +875,37 @@ export default function PropertyDetails() {
                
 
                 <div className="flex gap-3 overflow-hidden">
-                  {visibleImages.map((img, index) => (
-                    <div
-                      key={index}
-                      className={`cursor-pointer rounded-md overflow-hidden border-2 transition ${
-                        mainImage === img
-                          ? "border-blue-500"
-                          : "border-transparent"
-                      }`}
-                      onClick={() => handleThumbnailClick(img)}
-                    >
-                      {typeof img === "string" ? (
-                        <img
-                          src={img}
-                          alt={`Thumbnail ${index + 1}`}
-                          className="w-24 h-24 object-cover"
-                        />
-                      ) : (
-                        <Image
-                          src={img}
-                          alt={`Thumbnail ${index + 1}`}
-                          className="w-24 h-24 object-cover"
-                          width={96}
-                          height={80}
-                        />
-                      )}
-                    </div>
-                  ))}
+                  {visibleImages.map((img, index) => {
+                    const isActive =
+                      (typeof img === "string" && typeof mainImage === "string" && img === mainImage) ||
+                      (typeof img !== "string" && typeof mainImage !== "string" && mainImage === img);
+
+                    return (
+                      <div
+                        key={index}
+                        className={`cursor-pointer rounded-md overflow-hidden border-2 transition ${
+                          isActive ? "border-blue-500" : "border-transparent"
+                        }`}
+                        onClick={() => handleThumbnailClick(img)}
+                      >
+                        {typeof img === "string" ? (
+                          <img
+                            src={img}
+                            alt={`Thumbnail ${index + 1}`}
+                            className="w-24 h-24 object-cover"
+                          />
+                        ) : (
+                          <Image
+                            src={img}
+                            alt={`Thumbnail ${index + 1}`}
+                            className="w-24 h-24 object-cover"
+                            width={96}
+                            height={80}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
 
                
