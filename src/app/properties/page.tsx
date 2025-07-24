@@ -417,7 +417,7 @@ export default function Similarproperties() {
         </div>
       )}
       {/* +Add button */}
-      <button
+      {/* <button
         type="button"
         className="border border-black text-black bg-white px-3 py-1 rounded-full text-xs font-medium hover:bg-black hover:text-white transition-colors ml-1 pointer-events-auto"
         onClick={() => {
@@ -427,7 +427,7 @@ export default function Similarproperties() {
         }}
       >
         + Add
-      </button>
+      </button> */}
     </div>
   </div>
 

@@ -431,8 +431,8 @@ const FeaturedProperties = () => {
                         </span>
                       </div>
 
-                      <div className="flex items-center space-x-3">
-                        <button className="bookmark-btn p-1">
+                      <div className="flex items-center cursor-pointer space-x-3">
+                        <button className="bookmark-btn p-1 cursor-pointer">
                           <Image
                             src={bookmark}
                             alt="Bookmark"

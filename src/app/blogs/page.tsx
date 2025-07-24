@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import latestpropertytype from "../../../public/assets/images/latestpropertytype.svg";
 import { Raleway } from "next/font/google";
 import Link from "next/link";
+import CalculatorSection from "@/components/calculate";
 
 // Load Raleway font
 const raleway = Raleway({
@@ -153,19 +154,7 @@ const Blogs = () => {
                             ? blog.blogDescription.split(' ').slice(0, 10).join(' ') + '...'
                             : blog.blogDescription}
                         </p>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                           
-                            <div className="flex items-center space-x-2">
-                              <span className="text-sm text-gray-500">
-                                ❤️ {blog.likes}
-                              </span>
-                              <span className="text-sm text-gray-500">
-                                🔖 {blog.bookmarks}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
+                        
                        
                       </div>
                     </div>
@@ -180,6 +169,7 @@ const Blogs = () => {
           )}
         </div>
       </section>
+      <CalculatorSection />
 
       {/* FAQ */}
       <section className="bg-white flex justify-center items-center min-h-screen">

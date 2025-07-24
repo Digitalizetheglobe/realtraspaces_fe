@@ -67,6 +67,9 @@ export default function PropertyCards() {
   const [openShareIndex, setOpenShareIndex] = useState<number | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<string>("");
+  const [bookmarkedProperties, setBookmarkedProperties] = useState<Set<string>>(new Set());
+  const [showBookmarkModal, setShowBookmarkModal] = useState(false);
+  const [propertyToBookmark, setPropertyToBookmark] = useState<string | null>(null);
 
   // Click-away listener for share dropdown
   useEffect(() => {
@@ -262,6 +265,31 @@ export default function PropertyCards() {
     }
   });
 
+  // Handle bookmark button click
+  const handleCheckboxClick = (propertyId: string) => {
+    if (bookmarkedProperties.has(propertyId)) {
+      setBookmarkedProperties(prev => {
+        const newBookmarks = new Set(prev);
+        newBookmarks.delete(propertyId);
+        return newBookmarks;
+      });
+    } else {
+      setPropertyToBookmark(propertyId);
+      setShowBookmarkModal(true);
+    }
+  };
+  const confirmBookmark = (confirm: boolean) => {
+    if (confirm && propertyToBookmark) {
+      setBookmarkedProperties(prev => {
+        const newBookmarks = new Set(prev);
+        newBookmarks.add(propertyToBookmark);
+        return newBookmarks;
+      });
+    }
+    setShowBookmarkModal(false);
+    setPropertyToBookmark(null);
+  };
+
   if (loading) {
     return (
       <div className={raleway.className}>
@@ -385,7 +413,7 @@ export default function PropertyCards() {
               </div>
             )}
             {/* +Add button */}
-            <button
+            {/* <button
               type="button"
               className="border border-black text-black bg-white px-3 py-1 rounded-full text-xs font-medium hover:bg-black hover:text-white transition-colors ml-1 pointer-events-auto"
               onClick={() => {
@@ -395,7 +423,7 @@ export default function PropertyCards() {
               }}
             >
               + Add
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
@@ -459,7 +487,7 @@ export default function PropertyCards() {
                       </div>
                     </div>
                     </Link>
-                    <div className="w-5 h-5 border border-gray-600 rounded flex items-center justify-center transition-all duration-300 hover:border-gray-800 hover:bg-gray-100 hover:scale-110">
+                    {/* <div className="w-5 h-5 border border-gray-600 rounded flex items-center justify-center transition-all duration-300 hover:border-gray-800 hover:bg-gray-100 hover:scale-110">
                       <svg
                         className="w-3 h-3 text-black transition-all duration-300 hover:scale-110"
                         fill="none"
@@ -474,7 +502,32 @@ export default function PropertyCards() {
                           d="M5 13l4 4L19 7"
                         />
                       </svg>
-                    </div>
+                    </div> */}
+                      <button
+                          onClick={() => handleCheckboxClick(property.id)}
+                          className={`w-5 h-5 border rounded flex items-center justify-center cursor-pointer ${
+                            bookmarkedProperties.has(property.id)
+                              ? "border-green-500 bg-green-500"
+                              : "border-gray-400"
+                          }`}
+                        >
+                          {bookmarkedProperties.has(property.id) && (
+                            <svg
+                              className="w-3 h-3 text-white"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
+                          )}
+                        </button>
                   </div>
 
                   {/* Property Image */}
@@ -552,88 +605,77 @@ export default function PropertyCards() {
                       </div>
                       </Link>
                       <div className="flex space-x-1 relative">
-  {/* Bookmark button */}
-  <button className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-yellow-300 hover:scale-110 hover:shadow-md active:scale-95">
-    <Image
-      src={bookmark}
-      alt="Bookmark"
-      width={20}
-      height={20}
-      className="object-contain transition-all duration-300 hover:scale-110"
-    />
-  </button>
-
-  {/* Location button */}
-  <button
-    className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-red-200 hover:scale-110 hover:shadow-md active:scale-95"
-    aria-label="View on Map"
-    onClick={() => {
-      const address = [
-        property.address?.subLocality,
-        property.address?.city,
-        property.address?.state
-      ].filter(Boolean).join(", ");
-      const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-      window.open(mapUrl, '_blank');
-    }}
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      strokeWidth={1.5}
-      stroke="currentColor"
-      className="w-5 h-5 text-red-500"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M12 21c-4.418 0-8-5.373-8-10A8 8 0 0112 3a8 8 0 018 8c0 4.627-3.582 10-8 10zm0-7a3 3 0 100-6 3 3 0 000 6z"
-      />
-    </svg>
-  </button>
-
-  {/* Share button */}
-  <div className="relative">
-    <button
-      className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
-      onClick={() => setOpenShareIndex(openShareIndex === index ? null : index)}
-      aria-label="Share"
-      type="button"
-    >
-      <Image
-        src={share}
-        alt="Share"
-        width={20}
-        height={20}
-        className="object-contain transition-all duration-300 hover:scale-110"
-      />
-    </button>
-    <ShareModal
-      open={openShareIndex === index}
-      onClose={() => setOpenShareIndex(null)}
-      property={property}
-      getPropertyUrl={getPropertyUrl}
-    />
-  </div>
-
-  {/* WhatsApp button */}
-  <a
-    href={`https://wa.me/7039311539?text=${encodeURIComponent(property.title || 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
-    aria-label="WhatsApp"
-  >
-    <Image
-      src={whatsapp}
-      alt="WhatsApp"
-      width={20}
-      height={20}
-      className="object-contain transition-all duration-300 hover:scale-110"
-    />
-  </a>
-</div>
+                        {/* Bookmark button (functional) */}
+                      
+                        {/* Location button */}
+                        <button
+                          className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-red-200 hover:scale-110 hover:shadow-md active:scale-95"
+                          aria-label="View on Map"
+                          onClick={() => {
+                            const address = [
+                              property.address?.subLocality,
+                              property.address?.city,
+                              property.address?.state
+                            ].filter(Boolean).join(", ");
+                            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+                            window.open(mapUrl, '_blank');
+                          }}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth={1.5}
+                            stroke="currentColor"
+                            className="w-5 h-5 text-red-500"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 21c-4.418 0-8-5.373-8-10A8 8 0 0112 3a8 8 0 018 8c0 4.627-3.582 10-8 10zm0-7a3 3 0 100-6 3 3 0 000 6z"
+                            />
+                          </svg>
+                        </button>
+                        {/* Share button */}
+                        <div className="relative">
+                          <button
+                            className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
+                            onClick={() => setOpenShareIndex(openShareIndex === index ? null : index)}
+                            aria-label="Share"
+                            type="button"
+                          >
+                            <Image
+                              src={share}
+                              alt="Share"
+                              width={20}
+                              height={20}
+                              className="object-contain transition-all duration-300 hover:scale-110"
+                            />
+                          </button>
+                          <ShareModal
+                            open={openShareIndex === index}
+                            onClose={() => setOpenShareIndex(null)}
+                            property={property}
+                            getPropertyUrl={getPropertyUrl}
+                          />
+                        </div>
+                        {/* WhatsApp button */}
+                        <a
+                          href={`https://wa.me/7039311539?text=${encodeURIComponent(property.title || 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
+                          aria-label="WhatsApp"
+                        >
+                          <Image
+                            src={whatsapp}
+                            alt="WhatsApp"
+                            width={20}
+                            height={20}
+                            className="object-contain transition-all duration-300 hover:scale-110"
+                          />
+                        </a>
+                      </div>
 
                     </div>
                     
@@ -663,7 +705,7 @@ export default function PropertyCards() {
           }
         `}</style>
       </section>
-      <CalculatorSection />
+      
       <TopDevelopers />
 
       {/* Popup Modal */}
@@ -769,6 +811,30 @@ export default function PropertyCards() {
     </div>
   </div>
 )}
+
+    {/* Bookmark Confirmation Modal */}
+    {showBookmarkModal && (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-lg max-w-sm w-full mx-4">
+          <h3 className="text-lg font-medium mb-4">Confirm Bookmark</h3>
+          <p className="mb-6">Hello, do you want to bookmark this property?</p>
+          <div className="flex justify-end space-x-3">
+            <button
+              onClick={() => confirmBookmark(false)}
+              className="px-4 py-2 border border-gray-300 cursor-pointer rounded-md text-gray-700 hover:bg-gray-50"
+            >
+              No
+            </button>
+            <button
+              onClick={() => confirmBookmark(true)}
+              className="px-4 py-2 bg-green-600 cursor-pointer text-white rounded-md hover:bg-green-700"
+            >
+              Yes
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
 
     </div>
   );
