@@ -5,6 +5,9 @@ import latestpropertytype from "../../../public/assets/images/latestpropertytype
 import { Raleway } from "next/font/google";
 import Link from "next/link";
 import CalculatorSection from "@/components/calculate";
+import SeoHead from "../../components/SeoHead";
+
+// Removed metadata and head exports
 
 // Load Raleway font
 const raleway = Raleway({

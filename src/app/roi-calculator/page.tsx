@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import SeoHead from "../../components/SeoHead";
 
 export default function ROICalculator() {
   const [propertyPrice, setPropertyPrice] = useState(10000);

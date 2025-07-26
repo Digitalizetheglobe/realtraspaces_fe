@@ -23,9 +23,6 @@ const Header = () => {
   };
 
   const menuItems: MenuItem[] = [
-    { name: "Home", href: "/" },
-    { name: "About", href: "/about" },
-    { name: "Properties", href: "/properties" },
     { name: "Blog", href: "/blogs" },
     { name: "Career", href: "/career" },
     { name: "Contact", href: "/contact" },
@@ -97,7 +94,7 @@ const Header = () => {
               </Link>
 
               {/* Conditional Button */}
-              {isLoggedIn ? (
+              {/* {isLoggedIn ? (
                 <Link
                   href="/profile-page"
                   className="hidden sm:inline-flex bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
@@ -111,15 +108,36 @@ const Header = () => {
                 >
                   Sign Up
                 </Link>
-              )}
+              )} */}
 
               {/* List Your Property Button */}
+              <Link
+                href="/"
+                className="hidden sm:inline-flex bg-[#F5F5FF99] text-black hover:bg-gray-100  px-4 py-2 rounded-md text-sm font-bold transition-colors uppercase tracking-wider shadow-md "
+                style={{ boxShadow: '0 2px 8px rgba(255,180,0,0.15)' }}
+              >
+               Home
+              </Link>
+              <Link
+                href="/about"
+                className="hidden sm:inline-flex bg-[#F5F5FF99] text-black hover:bg-gray-100  px-4 py-2 rounded-md text-sm font-bold transition-colors uppercase tracking-wider shadow-md "
+                style={{ boxShadow: '0 2px 8px rgba(255,180,0,0.15)' }}
+              >
+               About
+              </Link>
+              <Link
+                href="/properties"
+                className="hidden sm:inline-flex bg-[#F5F5FF99] text-black hover:bg-gray-100  px-4 py-2 rounded-md text-sm font-bold transition-colors uppercase tracking-wider shadow-md "
+                style={{ boxShadow: '0 2px 8px rgba(255,180,0,0.15)' }}
+              >
+               Properties
+              </Link>
               <Link
                 href="/list-property"
                 className="hidden sm:inline-flex bg-[#F5F5FF99] text-black hover:bg-gray-100  px-4 py-2 rounded-md text-sm font-bold transition-colors uppercase tracking-wider shadow-md "
                 style={{ boxShadow: '0 2px 8px rgba(255,180,0,0.15)' }}
               >
-                List Your Property
+                List Property free
               </Link>
 
               {/* Menu Button - X when open, hamburger when closed */}
@@ -174,15 +192,15 @@ const Header = () => {
 
         {/* Menu dropdown */}
         {isMenuOpen && (
-          <div className="fixed inset-0 top-16 z-40 flex justify-end">
+          <div className="absolute right-0 top-16 z-40 flex justify-end w-full sm:w-auto">
           
             {/* Menu content with blur effect */}
-            <div className="w-full sm:w-80 bg-[#FEFEFE4D] backdrop-blur-md shadow-lg h-full sm:h-auto">
-              <div className="py-4">
+            {/* <div className="w-full sm:w-80  sm:h-auto"> */}
+              <div className="py-4 bg-[#FEFEFE4D] backdrop-blur-md shadow-lg">
                 {menuItems.map((item, index) => (
                   <div key={item.name}>
                     <Link href={item.href} className="block" onClick={() => setIsMenuOpen(false)}>
-                      <span className="text-black hover:bg-gray-100 block px-6 py-3 text-sm font-medium w-full text-left cursor-pointer">
+                      <span className="text-black hover:bg-gray-100 block px-6 py-3 text-sm font-bold w-full text-left cursor-pointer">
                         {item.name}
                       </span>
                     </Link>
@@ -192,15 +210,47 @@ const Header = () => {
                   </div>
                 ))}
                 {/* List Your Property in mobile menu */}
-                <div>
+                {/* <div>
                   <Link href="/list-property" className="block" onClick={() => setIsMenuOpen(false)}>
                     <span className="bg-[#FFB400] text-black font-bold hover:bg-yellow-400 block px-6 py-3 text-sm rounded-md w-full text-left cursor-pointer shadow-md border border-yellow-400" style={{ boxShadow: '0 2px 8px rgba(255,180,0,0.15)' }}>
                       List Your Property
                     </span>
                   </Link>
+                </div> */}
+                {/* Conditional Profile/Sign Up and Logout in menu */}
+                <div className="mt-4 px-6 flex flex-col items-center justify-center text-center">
+                  {isLoggedIn ? (
+                    <>
+                      <Link
+                        href="/profile-page"
+                        className="block bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider mb-2"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      <button
+                        className="block w-full bg-red-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-600 transition-colors uppercase tracking-wider"
+                        onClick={() => {
+                          localStorage.removeItem('authToken');
+                          setIsLoggedIn(false);
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                     <Link
+                  href="/signin"
+                      className="block bg-black text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Sign In
+                    </Link>
+                  )}
                 </div>
               </div>
-            </div>
+            {/* </div> */}
           </div>
         )}
       </header>

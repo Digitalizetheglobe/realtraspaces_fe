@@ -8,6 +8,9 @@ import bookmark from "../../../public/assets/Frame 28.png";
 import whatsapp from "../../../public/assets/WhatsApp.png";
 import Link from "next/link";
 import contactimg from "../../../public/assets/images/contactimg.png";
+import SeoHead from "../../components/SeoHead";
+
+// Removed metadata and head exports
 
 // Load Raleway font with more weight options
 const raleway = Raleway({
@@ -66,6 +69,14 @@ export default function Similarproperties() {
     transactionType: "", // sale or rent
   });
 
+  // Add these new states at the top of the component (after useState declarations)
+  const [allCities, setAllCities] = useState<string[]>([]);
+  const [allSublocalities, setAllSublocalities] = useState<{ [city: string]: Set<string> }>({});
+  const [allPropertyTypes, setAllPropertyTypes] = useState<string[]>([]);
+  const [allUniversal, setAllUniversal] = useState<string[]>([]); // for universal search
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestionType, setSuggestionType] = useState<string>(""); // city, sublocality, type, universal
+
   // Available filter options
   // const propertyTypes = [
   //   "Office space",
@@ -122,6 +133,95 @@ export default function Similarproperties() {
     fetchProperties();
   }, []);
 
+  // After fetching properties, preprocess unique values
+  useEffect(() => {
+    if (properties.length === 0) return;
+    // Unique cities
+    const cities = Array.from(new Set(properties.map(p => p.address?.city).filter((c): c is string => Boolean(c))));
+    // Unique sublocalities grouped by city
+    const sublocalities: { [city: string]: Set<string> } = {};
+    properties.forEach(p => {
+      if (p.address?.city && p.address?.subLocality) {
+        if (!sublocalities[p.address.city]) sublocalities[p.address.city] = new Set();
+        sublocalities[p.address.city].add(p.address.subLocality);
+      }
+    });
+    // Unique property types
+    const propertyTypes = Array.from(new Set(properties.map(p => p.propertyType?.displayName).filter((t): t is string => Boolean(t))));
+    // Universal search: collect all searchable strings
+    const universal = new Set<string>();
+    properties.forEach(p => {
+      if (p.title) universal.add(p.title);
+      if (p.address?.city) universal.add(p.address.city);
+      if (p.address?.subLocality) universal.add(p.address.subLocality);
+      if (p.propertyType?.displayName) universal.add(p.propertyType.displayName);
+      if (p.propertyType?.childType?.displayName) universal.add(p.propertyType.childType.displayName);
+      if (p.monetaryInfo?.expectedPrice) universal.add(p.monetaryInfo.expectedPrice.toString());
+      if (p.monetaryInfo?.expectedRent) universal.add(p.monetaryInfo.expectedRent.toString());
+      if (p.unitNo) universal.add(p.unitNo.toString());
+      if (p.attributes) p.attributes.forEach(attr => {
+        if (attr.displayName) universal.add(attr.displayName);
+        if (attr.value) universal.add(attr.value.toString());
+      });
+      // Add more fields as needed
+    });
+    setAllCities(cities);
+    setAllSublocalities(sublocalities);
+    setAllPropertyTypes(propertyTypes);
+    setAllUniversal(Array.from(universal));
+  }, [properties]);
+
+  // Update suggestions as user types
+  useEffect(() => {
+    if (!searchTerm) {
+      setSuggestions([]);
+      setSuggestionType("");
+      return;
+    }
+    const searchLower = searchTerm.toLowerCase();
+    // If searching for a city
+    const cityMatches = allCities.filter(city => city.toLowerCase().includes(searchLower));
+    if (cityMatches.length > 0) {
+      setSuggestions(cityMatches);
+      setSuggestionType("city");
+      return;
+    }
+    // If a city is selected, suggest sublocalities for that city
+    if (selectedLocations.length > 0) {
+      const city = selectedLocations[0]; // Only first city for now
+      const subs = Array.from(allSublocalities[city] || []);
+      const subMatches = subs.filter(sub => sub.toLowerCase().includes(searchLower));
+      if (subMatches.length > 0) {
+        setSuggestions(subMatches);
+        setSuggestionType("sublocality");
+        return;
+      }
+    }
+    // If searching for property type
+    const typeMatches = allPropertyTypes.filter(type => type.toLowerCase().includes(searchLower));
+    if (typeMatches.length > 0) {
+      setSuggestions(typeMatches);
+      setSuggestionType("type");
+      return;
+    }
+    // Universal search: suggest any matching value from properties
+    const universalMatches = allUniversal.filter(val => val.toLowerCase().includes(searchLower));
+    if (universalMatches.length > 0) {
+      setSuggestions(universalMatches);
+      setSuggestionType("universal");
+      return;
+    }
+    setSuggestions([]);
+    setSuggestionType("");
+  }, [searchTerm, allCities, allSublocalities, allPropertyTypes, allUniversal, selectedLocations]);
+
+  // Add suggestion as chip (city, sublocality, type, or universal)
+  const handleSuggestionClick = (suggestion: string) => {
+    addLocation(suggestion);
+    setSearchTerm("");
+    setSuggestions([]);
+  };
+
   // Add location to selectedLocations
   const addLocation = (location: string) => {
     if (!location.trim()) return;
@@ -143,17 +243,30 @@ export default function Similarproperties() {
     }
   };
 
-  // Apply filters whenever search term or filters change
+  // Update filtering logic to use all selected chips (city, sublocality, type, universal)
   useEffect(() => {
     let results = properties;
 
     // Multi-location search logic
     if (selectedLocations.length > 0) {
       results = results.filter((property) =>
-        selectedLocations.some((loc) =>
-          (property.address?.subLocality?.toLowerCase().includes(loc.toLowerCase()) ?? false) ||
-          (property.address?.city?.toLowerCase().includes(loc.toLowerCase()) ?? false)
-        )
+        selectedLocations.some((loc) => {
+          const locLower = loc.toLowerCase();
+          return (
+            (property.address?.subLocality?.toLowerCase().includes(locLower) ?? false) ||
+            (property.address?.city?.toLowerCase().includes(locLower) ?? false) ||
+            (property.propertyType?.displayName?.toLowerCase().includes(locLower) ?? false) ||
+            (property.propertyType?.childType?.displayName?.toLowerCase().includes(locLower) ?? false) ||
+            (property.title?.toLowerCase().includes(locLower) ?? false) ||
+            (property.monetaryInfo?.expectedPrice?.toString().includes(loc) ?? false) ||
+            (property.monetaryInfo?.expectedRent?.toString().includes(loc) ?? false) ||
+            (property.unitNo?.toString().toLowerCase().includes(locLower) ?? false) ||
+            (property.attributes?.some(attr =>
+              (attr.displayName?.toLowerCase().includes(locLower) ?? false) ||
+              (attr.value?.toString().toLowerCase().includes(locLower) ?? false)
+            ) ?? false)
+          );
+        })
       );
     } else if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
@@ -382,6 +495,7 @@ export default function Similarproperties() {
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
       onKeyDown={handleInputKeyDown}
+      autoComplete="off"
     />
     <svg
       className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-black"
@@ -416,19 +530,21 @@ export default function Similarproperties() {
           ))}
         </div>
       )}
-      {/* +Add button */}
-      {/* <button
-        type="button"
-        className="border border-black text-black bg-white px-3 py-1 rounded-full text-xs font-medium hover:bg-black hover:text-white transition-colors ml-1 pointer-events-auto"
-        onClick={() => {
-          // Focus the input field
-          const input = document.querySelector<HTMLInputElement>('input[placeholder="Search by property name, location, or type..."]');
-          input?.focus();
-        }}
-      >
-        + Add
-      </button> */}
     </div>
+    {/* Suggestions dropdown */}
+    {suggestions.length > 0 && (
+      <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto" style={{ zIndex: 9999 }}>
+        {suggestions.map((s, idx) => (
+          <div
+            className="px-5 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+            onClick={() => handleSuggestionClick(s)}
+            key={s + idx}
+          >
+            {s}
+          </div>
+        ))}
+      </div>
+    )}
   </div>
 
   <div className="text-sm text-gray-600 mb-4 text-center sm:text-left">

@@ -8,6 +8,7 @@ import phone from "../../../public/assets/images/phone.png";
 import ctabg from "../../../public/assets/images/ctabg.png";
 import Link from "next/link";
 import { useState } from "react";
+import SeoHead from "../../components/SeoHead";
 
 export default function Home() {
   const [formData, setFormData] = useState({

@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
+import SeoHead from "../../components/SeoHead";
 
 export default function EmiCalculator() {
   const [loanAmount, setLoanAmount] = useState(10000);

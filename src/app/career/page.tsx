@@ -6,6 +6,7 @@ import { ArrowRight, Upload, MapPin, Clock, Users, Award, Target, Heart } from "
 import Link from 'next/link';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import SeoHead from "../../components/SeoHead";
 
 // Define TypeScript interfaces outside the component
 interface Job {

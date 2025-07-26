@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import SeoHead from "../../components/SeoHead";
 
 export default function IRRCalculator() {
   const [initialInvestment, setInitialInvestment] = useState(100000);

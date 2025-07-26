@@ -27,6 +27,7 @@ const ProfilePage = () => {
   const [savedPropertiesCount, setSavedPropertiesCount] = useState(0);
   const [comparedPropertiesCount, setComparedPropertiesCount] = useState(0);
   const [loadingCounts, setLoadingCounts] = useState(true);
+  const [clearing, setClearing] = useState(false);
 
   const fetchSavedPropertiesCount = async () => {
     const token = localStorage.getItem('authToken');
@@ -73,6 +74,65 @@ const ProfilePage = () => {
       console.error("Error fetching compared properties count:", error);
     } finally {
       setLoadingCounts(false);
+    }
+  };
+
+  // Helper to fetch all saved property IDs
+  const fetchAllSavedPropertyIds = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) return [];
+    let ids: string[] = [];
+    let page = 1;
+    let hasMore = true;
+    while (hasMore) {
+      const response = await fetch(`https://api.realtraspaces.com/api/webusers/saved-properties?page=${page}&limit=50`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!response.ok) break;
+      const data = await response.json();
+      const properties = data.data || [];
+      ids.push(...properties.map((p: any) => p.propertyId));
+      hasMore = data.pagination && data.pagination.total > page * 50;
+      page++;
+    }
+    return ids;
+  };
+
+  // Clear all saved and compared properties
+  const handleClearAll = async () => {
+    setClearing(true);
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      toast.error('Not authenticated');
+      setClearing(false);
+      return;
+    }
+    try {
+      // 1. Clear compared properties
+      await fetch('https://api.realtraspaces.com/api/webusers/compare/clear', {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      // 2. Clear all saved properties (loop)
+      const ids = await fetchAllSavedPropertyIds();
+      await Promise.all(
+        ids.map(id =>
+          fetch(`https://api.realtraspaces.com/api/webusers/saved-properties/${id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${token}` },
+          })
+        )
+      );
+      toast.success('All saved and compared properties cleared!');
+      // Refresh counts
+      await Promise.all([
+        fetchSavedPropertiesCount(),
+        fetchComparedPropertiesCount()
+      ]);
+    } catch (err) {
+      toast.error('Failed to clear all properties');
+    } finally {
+      setClearing(false);
     }
   };
 
@@ -325,6 +385,7 @@ const ProfilePage = () => {
                         <span className="h-2 w-2 bg-green-500 rounded-full mr-2"></span>
                         <span style={{ color: '#1A1A1A' }}>Active</span>
                       </div>
+                      
                     </div>
                     
                     <div>
@@ -339,7 +400,9 @@ const ProfilePage = () => {
                 
                 {/* Additional Sections */}
                 <div className="space-y-6">
-                  <div>
+             
+                 <div className='flex flex-col md:flex-row gap-4'>  
+                 <div>
                     <h3 className="text-lg font-semibold mb-4" style={{ color: '#1A1A1A' }}>
                       Saved Properties
                     </h3>
@@ -374,7 +437,19 @@ const ProfilePage = () => {
                       </button>
                     </div>
                   </div>
+                 </div>
+                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+                    
+                    <button
+                      onClick={handleClearAll}
+                      disabled={clearing}
+                      className="mt-2 md:mt-0 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:opacity-50"
+                    >
+                      {clearing ? 'Clearing...' : 'Clear All Saved & Compared'}
+                    </button>
+                  </div>
                 </div>
+                
               </div>
             </div>
             

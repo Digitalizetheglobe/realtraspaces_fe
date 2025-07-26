@@ -70,6 +70,13 @@ export default function PropertyCards() {
   const [bookmarkedProperties, setBookmarkedProperties] = useState<Set<string>>(new Set());
   const [showBookmarkModal, setShowBookmarkModal] = useState(false);
   const [propertyToBookmark, setPropertyToBookmark] = useState<string | null>(null);
+  // Add these new states at the top of the component
+  const [allCities, setAllCities] = useState<string[]>([]);
+  const [allSublocalities, setAllSublocalities] = useState<{ [city: string]: Set<string> }>({});
+  const [allPropertyTypes, setAllPropertyTypes] = useState<string[]>([]);
+  const [allUniversal, setAllUniversal] = useState<string[]>([]); // for universal search
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestionType, setSuggestionType] = useState<string>(""); // city, sublocality, type, universal
 
   // Click-away listener for share dropdown
   useEffect(() => {
@@ -133,6 +140,95 @@ export default function PropertyCards() {
 
     fetchProperties();
   }, []);
+
+  // After fetching properties, preprocess unique values
+  useEffect(() => {
+    if (properties.length === 0) return;
+    // Unique cities
+    const cities = Array.from(new Set(properties.map(p => p.address?.city).filter((c): c is string => Boolean(c))));
+    // Unique sublocalities grouped by city
+    const sublocalities: { [city: string]: Set<string> } = {};
+    properties.forEach(p => {
+      if (p.address?.city && p.address?.subLocality) {
+        if (!sublocalities[p.address.city]) sublocalities[p.address.city] = new Set();
+        sublocalities[p.address.city].add(p.address.subLocality);
+      }
+    });
+    // Unique property types
+    const propertyTypes = Array.from(new Set(properties.map(p => p.propertyType?.displayName).filter((t): t is string => Boolean(t))));
+    // Universal search: collect all searchable strings
+    const universal = new Set<string>();
+    properties.forEach(p => {
+      if (p.title) universal.add(p.title);
+      if (p.address?.city) universal.add(p.address.city);
+      if (p.address?.subLocality) universal.add(p.address.subLocality);
+      if (p.propertyType?.displayName) universal.add(p.propertyType.displayName);
+      if (p.propertyType?.childType?.displayName) universal.add(p.propertyType.childType.displayName);
+      if (p.monetaryInfo?.expectedPrice) universal.add(p.monetaryInfo.expectedPrice.toString());
+      if (p.monetaryInfo?.expectedRent) universal.add(p.monetaryInfo.expectedRent.toString());
+      if (p.unitNo) universal.add(p.unitNo.toString());
+      if (p.attributes) p.attributes.forEach(attr => {
+        if (attr.displayName) universal.add(attr.displayName);
+        if (attr.value) universal.add(attr.value.toString());
+      });
+      // Add more fields as needed
+    });
+    setAllCities(cities);
+    setAllSublocalities(sublocalities);
+    setAllPropertyTypes(propertyTypes);
+    setAllUniversal(Array.from(universal));
+  }, [properties]);
+
+  // Update suggestions as user types
+  useEffect(() => {
+    if (!search) {
+      setSuggestions([]);
+      setSuggestionType("");
+      return;
+    }
+    const searchLower = search.toLowerCase();
+    // If searching for a city
+    const cityMatches = allCities.filter(city => city.toLowerCase().includes(searchLower));
+    if (cityMatches.length > 0) {
+      setSuggestions(cityMatches);
+      setSuggestionType("city");
+      return;
+    }
+    // If a city is selected, suggest sublocalities for that city
+    if (selectedLocations.length > 0) {
+      const city = selectedLocations[0]; // Only first city for now
+      const subs = Array.from(allSublocalities[city] || []);
+      const subMatches = subs.filter(sub => sub.toLowerCase().includes(searchLower));
+      if (subMatches.length > 0) {
+        setSuggestions(subMatches);
+        setSuggestionType("sublocality");
+        return;
+      }
+    }
+    // If searching for property type
+    const typeMatches = allPropertyTypes.filter(type => type.toLowerCase().includes(searchLower));
+    if (typeMatches.length > 0) {
+      setSuggestions(typeMatches);
+      setSuggestionType("type");
+      return;
+    }
+    // Universal search: suggest any matching value from properties
+    const universalMatches = allUniversal.filter(val => val.toLowerCase().includes(searchLower));
+    if (universalMatches.length > 0) {
+      setSuggestions(universalMatches);
+      setSuggestionType("universal");
+      return;
+    }
+    setSuggestions([]);
+    setSuggestionType("");
+  }, [search, allCities, allSublocalities, allPropertyTypes, allUniversal, selectedLocations]);
+
+  // Add suggestion as chip (city, sublocality, type, or universal)
+  const handleSuggestionClick = (suggestion: string) => {
+    addLocation(suggestion);
+    setSearch("");
+    setSuggestions([]);
+  };
 
   // Handle scroll to show popup
   useEffect(() => {
@@ -246,14 +342,27 @@ export default function PropertyCards() {
     }
   };
 
-  // Filter properties based on selected locations (if any), else by search
+  // Update filtering logic to use all selected chips (city, sublocality, type, universal)
   const filteredProperties = properties.filter((property) => {
     if (selectedLocations.length > 0) {
-      // Match if ANY selected location matches subLocality or city (OR logic)
-      return selectedLocations.some((loc) =>
-        (property.address?.subLocality?.toLowerCase().includes(loc.toLowerCase()) ?? false) ||
-        (property.address?.city?.toLowerCase().includes(loc.toLowerCase()) ?? false)
-      );
+      // Match if ANY selected location matches city, subLocality, property type, or universal fields
+      return selectedLocations.some((loc) => {
+        const locLower = loc.toLowerCase();
+        return (
+          (property.address?.subLocality?.toLowerCase().includes(locLower) ?? false) ||
+          (property.address?.city?.toLowerCase().includes(locLower) ?? false) ||
+          (property.propertyType?.displayName?.toLowerCase().includes(locLower) ?? false) ||
+          (property.propertyType?.childType?.displayName?.toLowerCase().includes(locLower) ?? false) ||
+          (property.title?.toLowerCase().includes(locLower) ?? false) ||
+          (property.monetaryInfo?.expectedPrice?.toString().includes(loc) ?? false) ||
+          (property.monetaryInfo?.expectedRent?.toString().includes(loc) ?? false) ||
+          (property.unitNo?.toString().toLowerCase().includes(locLower) ?? false) ||
+          (property.attributes?.some(attr =>
+            (attr.displayName?.toLowerCase().includes(locLower) ?? false) ||
+            (attr.value?.toString().toLowerCase().includes(locLower) ?? false)
+          ) ?? false)
+        );
+      });
     } else {
       const searchLower = search.toLowerCase();
       return (
@@ -304,46 +413,25 @@ export default function PropertyCards() {
 
   return (
     <div className={raleway.className}>
-       <section className="relative w-full h-[220px] sm:h-[320px] md:h-[420px]">
-        <Image
-          src={home}
-          alt="City skyline"
-          fill
-          priority
-          className="object-cover"
-        />
+       <section className="relative w-full h-[220px] sm:h-[320px] md:h-[480px]">
+         <div className="absolute inset-0 z-0">
+    <video
+      autoPlay
+      muted
+      loop
+      playsInline
+      className="w-full h-full object-cover"
+    >
+      <source src="/assets/main_vedio.mp4" type="video/mp4" />
+      Your browser does not support the video tag.
+    </video>
+    <div className="absolute inset-0 bg-black opacity-50"></div>
+  </div>
 
-    <div className="absolute bottom-4 w-full flex justify-center px-4 py-20">
+    <div className="absolute bottom-4 w-full flex justify-center px-4 py-40">
       <div className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-3 px-4 py-3 rounded-2xl border border-gray-300 bg-white/60 backdrop-blur-md shadow-lg overflow-visible relative">
         {/* Suggestions Dropdown - now directly above the search bar */}
-        {search && filteredProperties.length > 0 && (
-          <div className="absolute left-0 right-0 bottom-full mb-2 max-w-3xl justify-center items-center bg-white border border-gray-300 rounded-lg shadow-lg z-50 max-h-72 overflow-y-auto">
-            {filteredProperties.slice(0, 8).map((property, idx) => (
-              <div
-                key={property.id}
-                className="px-5 py-3 cursor-pointer hover:bg-gray-100 flex justify-between items-center"
-                onClick={() => {
-                  addLocation(property.address?.subLocality || property.address?.city || property.title || "");
-                }}
-              >
-                <div>
-                  <div className="font-medium text-black">{property.title}</div>
-                  <div className="text-xs text-gray-500">
-                    {(property.address?.subLocality || property.address?.city) && (
-                      <>
-                        {property.address?.subLocality
-                          ? `${property.address.subLocality}, `
-                          : ""}
-                        {property.address?.city}
-                      </>
-                    )}
-                  </div>
-                </div>
-                <span className="text-xs text-gray-400">LOCALITY</span>
-              </div>
-            ))}
-          </div>
-        )}
+       
         {/* Dropdown */}
         <div
           className="relative w-full sm:w-auto"
@@ -352,14 +440,16 @@ export default function PropertyCards() {
         >
           <button
             type="button"
-            className="appearance-none w-full sm:min-w-[200px] bg-black text-white text-sm font-medium pl-5 pr-10 py-3 rounded-full outline-none cursor-pointer flex justify-between items-center"
+            className="appearance-none w-full sm:min-w-[200px] bg-black text-white text-sm font-medium pl-5 pr-10 py-3 rounded-2xl outline-none cursor-pointer flex justify-between items-center"
             onClick={() => setDropdownOpen(true)}
           >
             {selectedType
-              ? selectedType === "commercial"
-                ? "Commercial"
-                : selectedType === "coworking"
-                ? "Co-working"
+              ? selectedType === "rent"
+                ? "Rent"
+                : selectedType === "investment"
+                ? "Investment"
+                : selectedType === "research"
+                ? "Research"
                 : selectedType
               : "Select Search Type"}
             <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white text-xs">
@@ -369,16 +459,22 @@ export default function PropertyCards() {
           {dropdownOpen && (
             <div className="absolute left-0 right-0 mt-2 bg-black text-white rounded-lg shadow-lg z-50" style={{ zIndex: 9999 }}>
               <div
-                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-t-lg ${selectedType === "commercial" ? "bg-gray-700" : ""}`}
-                onClick={() => { setSelectedType("commercial"); setDropdownOpen(false); }}
+                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-t-lg ${selectedType === " Rent" ? "bg-gray-700" : ""}`}
+                onClick={() => { setSelectedType(" Rent"); setDropdownOpen(false); }}
               >
-                Commercial
+                Rent
               </div>
               <div
-                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "coworking" ? "bg-gray-700" : ""}`}
-                onClick={() => { setSelectedType("coworking"); setDropdownOpen(false); }}
+                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "Investment" ? "bg-gray-700" : ""}`}
+                onClick={() => { setSelectedType("Investment"); setDropdownOpen(false); }}
               >
-                Co-working
+                Investment
+              </div>
+              <div
+                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "Research" ? "bg-gray-700" : ""}`}
+                onClick={() => { setSelectedType("Research"); setDropdownOpen(false); }}
+              >
+                Research
               </div>
             </div>
           )}
@@ -388,10 +484,11 @@ export default function PropertyCards() {
           <input
             type="text"
             placeholder="Search by property name, location, or type..."
-            className="w-full bg-white text-gray-900 px-5 py-3 text-sm rounded-full outline-none pr-44" // add right padding for chips
+            className="w-full bg-white text-gray-900 px-5 py-3 text-sm rounded-2xl outline-none pr-44"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={handleInputKeyDown}
+            autoComplete="off"
           />
           {/* Chips overlay (right side, inside input) */}
           <div className="absolute inset-y-0 right-3 flex items-center space-x-2 pointer-events-none" style={{ zIndex: 10 }}>
@@ -412,19 +509,21 @@ export default function PropertyCards() {
                 ))}
               </div>
             )}
-            {/* +Add button */}
-            {/* <button
-              type="button"
-              className="border border-black text-black bg-white px-3 py-1 rounded-full text-xs font-medium hover:bg-black hover:text-white transition-colors ml-1 pointer-events-auto"
-              onClick={() => {
-                // Focus the input field
-                const input = document.querySelector<HTMLInputElement>('input[placeholder="Search by property name, location, or type..."]');
-                input?.focus();
-              }}
-            >
-              + Add
-            </button> */}
           </div>
+          {/* Suggestions dropdown */}
+          {suggestions.length > 0 && (
+            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto" style={{ zIndex: 9999 }}>
+              {suggestions.map((s, idx) => (
+                <div
+                  className="px-5 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                  onClick={() => handleSuggestionClick(s)}
+                  key={s + idx}
+                >
+                  {s}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -436,7 +535,7 @@ export default function PropertyCards() {
           <div className="w-full">
             {/* Heading */}
             <div className="mb-8 sm:mb-[60px] w-full">
-              <h2 className="mt-6 sm:mt-10 font-normal text-xl sm:text-2xl md:text-[32px] leading-[120%] tracking-normal text-center transform transition-all duration-700 hover:scale-105">
+              <h2 className="mt-2 sm:mt-10 font-normal text-xl sm:text-2xl md:text-[32px] leading-[120%] tracking-normal text-center transform transition-all duration-700 hover:scale-105">
                 <span className="text-black">The Latest.</span>{" "}
                 <span className="text-[#6E6E73]">
                   Take a look at whats new right now.
@@ -710,10 +809,10 @@ export default function PropertyCards() {
 
       {/* Popup Modal */}
       {showPopup && (
-  <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-    <div className="bg-white border-2 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 opacity-100">
+  <div className="fixed inset-0 bg-gray-500 bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+    <div className="bg-white  rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 opacity-100">
       {/* Header with gradient background */}
-      <div className="bg-gray-500 text-white p-6 rounded-t-2xl">
+      <div className="bg-black text-white p-6 rounded-t-2xl">
         <div className="flex justify-between items-center">
           <div>
             <h3 className="text-2xl font-bold">Get in Touch</h3>
@@ -732,11 +831,11 @@ export default function PropertyCards() {
       <div className="p-6 space-y-6 bg-[#F1F1F4]">
         {/* Name Field */}
         <div className="space-y-2">
-          <label htmlFor="name" className="block text-sm font-semibold text-[#6E6E73]">
+          <label htmlFor="name" className="block text-sm font-semibold text-black">
             Full Name *
           </label>
           <div className="relative">
-            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6E6E73] w-5 h-5" />
+            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
             <input
               type="text"
               id="name"
@@ -744,7 +843,7 @@ export default function PropertyCards() {
               value={formData.name}
               onChange={handleInputChange}
               required
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
               placeholder="Enter your full name"
             />
           </div>
@@ -752,11 +851,11 @@ export default function PropertyCards() {
 
         {/* Email Field */}
         <div className="space-y-2">
-          <label htmlFor="email" className="block text-sm font-semibold text-[#6E6E73]">
+          <label htmlFor="email" className="block text-sm font-semibold text-black">
             Email Address *
           </label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#6E6E73] w-5 h-5" />
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
             <input
               type="email"
               id="email"
@@ -764,23 +863,23 @@ export default function PropertyCards() {
               value={formData.email}
               onChange={handleInputChange}
               required
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
               placeholder="Enter your email address"
             />
           </div>
         </div>
 
         {/* Phone Field */}
-        <div className="text-gray-700 space-y-2">
+        <div className="text-black space-y-2">
   <p>
     <span className="font-semibold">Contact No:</span>{' '}
-    <a href="tel:+919730156575" className="text-blue-600 hover:text-blue-800 hover:underline">
+    <a href="tel:+919730156575" className="text-black hover:text-blue-800 hover:underline">
       +91 9730156575
     </a>
   </p>
   <p>
     <span className="font-semibold">Email:</span>{' '}
-    <a href="mailto:info@realtraspaces.com" className="text-blue-600 hover:text-blue-800 hover:underline">
+    <a href="mailto:info@realtraspaces.com" className="text-black hover:text-blue-800 hover:underline">
       info@realtraspaces.com
     </a>
   </p>
@@ -794,7 +893,7 @@ export default function PropertyCards() {
         <div className="flex gap-3 pt-2">
           <button
             onClick={handleSubmit}
-            className="flex-1 bg-gray-500 text-white py-3 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2"
+            className="flex-1 bg-black text-white py-3 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2"
           >
             <Send className="w-5 h-5" />
             Send Message
@@ -802,7 +901,7 @@ export default function PropertyCards() {
           <button
             type="button"
             onClick={handleClosePopup}
-            className="flex-1 bg-white text-[#6E6E73] py-3 px-6 rounded-xl hover:bg-[#F1F1F4] transition-all duration-200 font-semibold border border-gray-300 hover:border-gray-400"
+            className="flex-1 bg-white text-black border border-black  py-3 px-6 rounded-xl hover:bg-[#F1F1F4] transition-all duration-200 font-semibold  hover:border-gray-400"
           >
             Cancel
           </button>

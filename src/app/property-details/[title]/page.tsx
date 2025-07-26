@@ -907,8 +907,22 @@ export default function PropertyDetails() {
                     );
                   })}
                 </div>
-
+                  
                
+              </div>
+              <div className="mt-4">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                  Property Overview
+                </h2>
+                <div className="bg-gray-100 p-6 rounded-xl max-w-2xl">
+                  <p className="text-gray-700 leading-relaxed">
+                    Located in the bustling commercial hub of Andheri East, 215
+                    Atrium offers a prime leasing opportunity with 35,000 sq.ft.
+                    chargeable space. With excellent connectivity and 70%
+                    efficiency, this bare shell property is ideal for companies
+                    looking for scalable office space.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -1043,7 +1057,7 @@ export default function PropertyDetails() {
                   Property Highlights
                 </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gray-100">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-100">
                   <div className="flex items-start gap-4 p-2">
                     <Image
                       src={pin}
@@ -1517,20 +1531,7 @@ export default function PropertyDetails() {
                 </div>
               </div>
 
-              <div className="mt-10">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                  Property Overview
-                </h2>
-                <div className="bg-gray-100 p-6 rounded-xl">
-                  <p className="text-gray-700 leading-relaxed">
-                    Located in the bustling commercial hub of Andheri East, 215
-                    Atrium offers a prime leasing opportunity with 35,000 sq.ft.
-                    chargeable space. With excellent connectivity and 70%
-                    efficiency, this bare shell property is ideal for companies
-                    looking for scalable office space.
-                  </p>
-                </div>
-              </div>
+             
 
               <div className="max-w-5xl mx-auto mt-10">
                 <h1 className="text-black text-xl font-semibold">

@@ -14,6 +14,7 @@ import {
 import { toast } from "react-hot-toast";
 import Image from "next/image";
 import signupImg from "../../../public/assets/signup.jpg";
+import SeoHead from "../../components/SeoHead";
 
 type FormData = {
   fullName: string;
