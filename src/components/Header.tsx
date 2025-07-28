@@ -229,8 +229,8 @@ const Header = () => {
                         Profile
                       </Link>
                       <button
-                        className="block w-full bg-red-500 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-red-600 transition-colors uppercase tracking-wider"
-                        onClick={() => {
+                         className="block bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                         onClick={() => {
                           localStorage.removeItem('authToken');
                           setIsLoggedIn(false);
                           setIsMenuOpen(false);
