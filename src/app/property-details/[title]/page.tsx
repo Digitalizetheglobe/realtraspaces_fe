@@ -1575,7 +1575,9 @@ export default function PropertyDetails() {
       </main>
        <Similarproperties />
       
-     
+     {/* ,snbkjdashdkjhsadkjsakdjaspod
+     ,xmcnkdjkodn
+     d;jaoidjsaoidja */}
     </div>
   );
 }
