@@ -8,7 +8,6 @@ import share from "../../../public/assets/Frame 29.png";
 import bookmark from "../../../public/assets/Frame 28.png";
 import whatsapp from "../../../public/assets/WhatsApp.png";
 import TopDevelopers from "../topdevelopers/page";
-import home from "../../../public/assets/hero.jpg";
 import Link from "next/link";
 import ShareModal from "../../components/ShareModal";
 import CalculatorSection from "@/components/calculate";

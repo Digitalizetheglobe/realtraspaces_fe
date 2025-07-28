@@ -8,7 +8,6 @@ import { toast } from "react-hot-toast";
 import { 
   User, Home, Search, LogOut, GitCompare, 
 } from 'lucide-react';
-import heroImage from "../../../public/assets/hero.jpg";
 
 type Property = {
   id: string;
@@ -248,7 +247,7 @@ const SavedProperties = () => {
                   >
                     <div className="relative h-60">
                       <Image
-                        src={property.propertyData.imageUrls?.main || heroImage}
+                        src={property.propertyData.imageUrls?.main || "/assets/hero.jpg"}
                         alt={property.propertyData.title}
                         fill
                         className="object-cover"
