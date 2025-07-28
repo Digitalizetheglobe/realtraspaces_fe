@@ -347,7 +347,7 @@ const FeaturedProperties = () => {
                     <h3 className="font-semibold text-xl text-gray-900 transition-colors duration-300">
                       {property.title || "ONE BKC C Wing"}
                     </h3>
-                    <h4 className="text-base text-gray-500 mb-4 transition-colors duration-300">
+                    <h4 className="text-base text-gray-500 font-mono mb-4 transition-colors duration-300">
                       {formatPrice(
                         property.monetaryInfo?.expectedPrice ||
                           property.monetaryInfo?.monthlyRentAmount,

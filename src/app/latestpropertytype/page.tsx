@@ -754,10 +754,10 @@ export default function PropertyCards() {
                   </div>
                   </Link>
                   {/* Property Details */}
-                  <div className="p-2 sm:p-3 flex-grow transition-all duration-300 hover:bg-gray-50/30">
+                  <div className="p-2 sm:p-3 flex-grow font-monotransition-all duration-300 hover:bg-gray-50/30">
                   <Link href={`/property-details/${property.title}`} key={property.title} className="block">
                     <div className="grid grid-cols-2 gap-1 text-xs">
-                      <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Carpet Area</div>
+                      <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Carpet Area</div>
                       <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
                         {property.dimension?.area || "5490"} sqft
                       </div>
@@ -787,7 +787,7 @@ export default function PropertyCards() {
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
                     <Link href={`/property-details/${property.title}`} key={property.title} className="block">
                       <div className="transition-all duration-300 hover:scale-105">
-                        <div className="text-base text-black font-semibold transition-all duration-300 hover:text-gray-800">
+                        <div className="text-base text-black font-mono font-semibold transition-all duration-300 hover:text-gray-800">
                           {property.forRent
                             ? `₹ ${property.monetaryInfo?.expectedRent || 4500}`
                             : formatPrice(property.monetaryInfo?.expectedPrice)}
@@ -967,8 +967,8 @@ export default function PropertyCards() {
         {/* Phone Field */}
         <div className="text-black space-y-2">
   <p>
-    <span className="font-semibold">Contact No:</span>{' '}
-    <a href="tel:+919730156575" className="text-black hover:text-blue-800 hover:underline">
+    <span className="font-semibold ">Contact No:</span>{' '}
+    <a href="tel:+919730156575" className="text-black hover:text-blue-800 font-mono hover:underline">
       +91 9730156575
     </a>
   </p>
