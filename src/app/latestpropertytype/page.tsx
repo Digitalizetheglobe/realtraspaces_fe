@@ -68,8 +68,6 @@ export default function PropertyCards() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<string>("");
   const [bookmarkedProperties, setBookmarkedProperties] = useState<Set<string>>(new Set());
-  const [showBookmarkModal, setShowBookmarkModal] = useState(false);
-  const [propertyToBookmark, setPropertyToBookmark] = useState<string | null>(null);
   // Add these new states at the top of the component
   const [allCities, setAllCities] = useState<string[]>([]);
   const [allSublocalities, setAllSublocalities] = useState<{ [city: string]: Set<string> }>({});
@@ -162,16 +160,28 @@ export default function PropertyCards() {
       if (p.title) universal.add(p.title);
       if (p.address?.city) universal.add(p.address.city);
       if (p.address?.subLocality) universal.add(p.address.subLocality);
+      if (p.address?.state) universal.add(p.address.state);
       if (p.propertyType?.displayName) universal.add(p.propertyType.displayName);
       if (p.propertyType?.childType?.displayName) universal.add(p.propertyType.childType.displayName);
       if (p.monetaryInfo?.expectedPrice) universal.add(p.monetaryInfo.expectedPrice.toString());
       if (p.monetaryInfo?.expectedRent) universal.add(p.monetaryInfo.expectedRent.toString());
       if (p.unitNo) universal.add(p.unitNo.toString());
+      if (p.dimension?.area) universal.add(p.dimension.area.toString());
       if (p.attributes) p.attributes.forEach(attr => {
         if (attr.displayName) universal.add(attr.displayName);
         if (attr.value) universal.add(attr.value.toString());
       });
-      // Add more fields as needed
+      // Add property status
+      if (p.forSale) universal.add("For Sale");
+      if (p.forRent) universal.add("For Rent");
+      // Add price ranges
+      if (p.monetaryInfo?.expectedPrice) {
+        const price = p.monetaryInfo.expectedPrice;
+        if (price < 1000000) universal.add("Under 10 Lakhs");
+        else if (price < 5000000) universal.add("Under 50 Lakhs");
+        else if (price < 10000000) universal.add("Under 1 Crore");
+        else universal.add("Above 1 Crore");
+      }
     });
     setAllCities(cities);
     setAllSublocalities(sublocalities);
@@ -342,15 +352,57 @@ export default function PropertyCards() {
     }
   };
 
-  // Update filtering logic to use all selected chips (city, sublocality, type, universal)
+  // Enhanced filtering logic with multiple filter types
   const filteredProperties = properties.filter((property) => {
-    if (selectedLocations.length > 0) {
-      // Match if ANY selected location matches city, subLocality, property type, or universal fields
-      return selectedLocations.some((loc) => {
+    // Filter by search type (Rent/Investment/Research)
+    if (selectedType) {
+      const typeLower = selectedType.toLowerCase().trim();
+      
+      // Filter by property type based on search type
+      if (typeLower === "rent") {
+        if (!property.forRent) return false;
+      } else if (typeLower === "investment") {
+        if (!property.forSale) return false;
+      } else if (typeLower === "research") {
+        // For research, show both sale and rent properties
+        if (!property.forSale && !property.forRent) return false;
+      }
+    }
+
+    // Filter by search text and selected locations
+    if (search.trim() || selectedLocations.length > 0) {
+      const searchLower = search.toLowerCase().trim();
+      const hasSearchMatch = search.trim() ? (
+        (property.title?.toLowerCase().includes(searchLower) ?? false) ||
+        (property.address?.subLocality?.toLowerCase().includes(searchLower) ?? false) ||
+        (property.address?.city?.toLowerCase().includes(searchLower) ?? false) ||
+        (property.address?.state?.toLowerCase().includes(searchLower) ?? false) ||
+        (property.propertyType?.displayName?.toLowerCase().includes(searchLower) ?? false) ||
+        (property.propertyType?.childType?.displayName?.toLowerCase().includes(searchLower) ?? false) ||
+        (property.dimension?.area?.toString().toLowerCase().includes(searchLower) ?? false) ||
+        (property.monetaryInfo?.expectedPrice?.toString().includes(searchLower) ?? false) ||
+        (property.monetaryInfo?.expectedRent?.toString().includes(searchLower) ?? false) ||
+        (property.unitNo?.toString().toLowerCase().includes(searchLower) ?? false) ||
+        (property.attributes?.some(attr =>
+          (attr.displayName?.toLowerCase().includes(searchLower) ?? false) ||
+          (attr.value?.toString().toLowerCase().includes(searchLower) ?? false)
+        ) ?? false) ||
+        // Price range matching
+        (searchLower.includes("under 10 lakhs") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice < 1000000) ||
+        (searchLower.includes("under 50 lakhs") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice < 5000000) ||
+        (searchLower.includes("under 1 crore") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice < 10000000) ||
+        (searchLower.includes("above 1 crore") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice >= 10000000) ||
+        // Property status matching
+        (searchLower.includes("for sale") && property.forSale) ||
+        (searchLower.includes("for rent") && property.forRent)
+      ) : true;
+
+      const hasLocationMatch = selectedLocations.length > 0 ? selectedLocations.some((loc) => {
         const locLower = loc.toLowerCase();
         return (
           (property.address?.subLocality?.toLowerCase().includes(locLower) ?? false) ||
           (property.address?.city?.toLowerCase().includes(locLower) ?? false) ||
+          (property.address?.state?.toLowerCase().includes(locLower) ?? false) ||
           (property.propertyType?.displayName?.toLowerCase().includes(locLower) ?? false) ||
           (property.propertyType?.childType?.displayName?.toLowerCase().includes(locLower) ?? false) ||
           (property.title?.toLowerCase().includes(locLower) ?? false) ||
@@ -360,43 +412,36 @@ export default function PropertyCards() {
           (property.attributes?.some(attr =>
             (attr.displayName?.toLowerCase().includes(locLower) ?? false) ||
             (attr.value?.toString().toLowerCase().includes(locLower) ?? false)
-          ) ?? false)
+          ) ?? false) ||
+          // Price range matching for location chips
+          (locLower.includes("under 10 lakhs") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice < 1000000) ||
+          (locLower.includes("under 50 lakhs") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice < 5000000) ||
+          (locLower.includes("under 1 crore") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice < 10000000) ||
+          (locLower.includes("above 1 crore") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice >= 10000000) ||
+          // Property status matching for location chips
+          (locLower.includes("for sale") && property.forSale) ||
+          (locLower.includes("for rent") && property.forRent)
         );
-      });
-    } else {
-      const searchLower = search.toLowerCase();
-      return (
-        (property.title?.toLowerCase().includes(searchLower) ?? false) ||
-        (property.address?.subLocality?.toLowerCase().includes(searchLower) ?? false) ||
-        (property.address?.city?.toLowerCase().includes(searchLower) ?? false) ||
-        (property.dimension?.area?.toString().toLowerCase().includes(searchLower) ?? false)
-      );
+      }) : true;
+
+      return hasSearchMatch && hasLocationMatch;
     }
+
+    // If no filters applied, show all properties
+    return true;
   });
 
   // Handle bookmark button click
   const handleCheckboxClick = (propertyId: string) => {
-    if (bookmarkedProperties.has(propertyId)) {
-      setBookmarkedProperties(prev => {
-        const newBookmarks = new Set(prev);
+    setBookmarkedProperties(prev => {
+      const newBookmarks = new Set(prev);
+      if (newBookmarks.has(propertyId)) {
         newBookmarks.delete(propertyId);
-        return newBookmarks;
-      });
-    } else {
-      setPropertyToBookmark(propertyId);
-      setShowBookmarkModal(true);
-    }
-  };
-  const confirmBookmark = (confirm: boolean) => {
-    if (confirm && propertyToBookmark) {
-      setBookmarkedProperties(prev => {
-        const newBookmarks = new Set(prev);
-        newBookmarks.add(propertyToBookmark);
-        return newBookmarks;
-      });
-    }
-    setShowBookmarkModal(false);
-    setPropertyToBookmark(null);
+      } else {
+        newBookmarks.add(propertyId);
+      }
+      return newBookmarks;
+    });
   };
 
   if (loading) {
@@ -444,11 +489,11 @@ export default function PropertyCards() {
             onClick={() => setDropdownOpen(true)}
           >
             {selectedType
-              ? selectedType === "rent"
+              ? selectedType === "Rent"
                 ? "Rent"
-                : selectedType === "investment"
+                : selectedType === "Investment"
                 ? "Investment"
-                : selectedType === "research"
+                : selectedType === "Research"
                 ? "Research"
                 : selectedType
               : "Select Search Type"}
@@ -457,10 +502,10 @@ export default function PropertyCards() {
             </span>
           </button>
           {dropdownOpen && (
-            <div className="absolute left-0 right-0 mt-2 bg-black text-white rounded-lg shadow-lg z-50" style={{ zIndex: 9999 }}>
+            <div className="absolute left-0 right-0  bg-black text-white rounded-lg shadow-lg z-50" style={{ zIndex: 9999 }}>
               <div
-                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-t-lg ${selectedType === " Rent" ? "bg-gray-700" : ""}`}
-                onClick={() => { setSelectedType(" Rent"); setDropdownOpen(false); }}
+                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-t-lg ${selectedType === "Rent" ? "bg-gray-700" : ""}`}
+                onClick={() => { setSelectedType("Rent"); setDropdownOpen(false); }}
               >
                 Rent
               </div>
@@ -525,6 +570,21 @@ export default function PropertyCards() {
             </div>
           )}
         </div>
+        
+        {/* Clear Filters Button */}
+        {/* {(selectedType || selectedLocations.length > 0 || search.trim()) && (
+          <button
+            onClick={() => {
+              setSelectedType("");
+              setSelectedLocations([]);
+              setSearch("");
+              setSuggestions([]);
+            }}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200 hover:scale-105"
+          >
+            Clear
+          </button>
+        )} */}
       </div>
     </div>
 
@@ -541,9 +601,43 @@ export default function PropertyCards() {
                   Take a look at whats new right now.
                 </span>
               </h2>
+              
+              {/* Results Counter */}
+              {(selectedType || selectedLocations.length > 0 || search.trim()) && (
+                <div className="mt-4 text-center">
+                  <p className="text-sm text-gray-600">
+                    Showing {filteredProperties.length} of {properties.length} properties
+                    {selectedType && ` • Type: ${selectedType}`}
+                    {selectedLocations.length > 0 && ` • Locations: ${selectedLocations.join(", ")}`}
+                    {search.trim() && ` • Search: "${search}"`}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Property Cards */}
+            {filteredProperties.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="text-gray-500 text-lg mb-4">
+                  <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <p className="text-xl font-medium text-gray-700 mb-2">No properties found</p>
+                  <p className="text-gray-500">Try adjusting your search criteria or filters</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedType("");
+                    setSelectedLocations([]);
+                    setSearch("");
+                    setSuggestions([]);
+                  }}
+                  className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                >
+                  Clear All Filters
+                </button>
+              </div>
+            ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {filteredProperties.slice(0, 4).map((property, index) => (
                 
@@ -783,6 +877,7 @@ export default function PropertyCards() {
                
               ))}
             </div>
+            )}
           </div>
         </div>
 
@@ -910,30 +1005,6 @@ export default function PropertyCards() {
     </div>
   </div>
 )}
-
-    {/* Bookmark Confirmation Modal */}
-    {showBookmarkModal && (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white p-6 rounded-lg max-w-sm w-full mx-4">
-          <h3 className="text-lg font-medium mb-4">Confirm Bookmark</h3>
-          <p className="mb-6">Hello, do you want to bookmark this property?</p>
-          <div className="flex justify-end space-x-3">
-            <button
-              onClick={() => confirmBookmark(false)}
-              className="px-4 py-2 border border-gray-300 cursor-pointer rounded-md text-gray-700 hover:bg-gray-50"
-            >
-              No
-            </button>
-            <button
-              onClick={() => confirmBookmark(true)}
-              className="px-4 py-2 bg-green-600 cursor-pointer text-white rounded-md hover:bg-green-700"
-            >
-              Yes
-            </button>
-          </div>
-        </div>
-      </div>
-    )}
 
     </div>
   );
