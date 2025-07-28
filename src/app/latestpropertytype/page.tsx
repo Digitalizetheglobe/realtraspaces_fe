@@ -674,9 +674,9 @@ export default function PropertyCards() {
                             d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                           />
                         </svg>
-                        {property.address?.subLocality ||
-                          property.address?.city ||
-                          "Location Name"}
+                        {[property.address?.subLocality, property.address?.city]
+  .filter(Boolean)
+  .join(", ") || "Location Name"}
                       </div>
                     </div>
                     </Link>
