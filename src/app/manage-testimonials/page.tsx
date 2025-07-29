@@ -124,77 +124,78 @@ const ManageTestimonialsPage = () => {
     <ProtectedRoute>
       <div className="">
         <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Manage Testimonials</h1>
-        <Link
-          href="/manage-testimonials/create"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Add New Testimonial
-        </Link>
-      </div>
-
-      {testimonials.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-gray-600">No testimonials found.</p>
+          <h1 className="text-3xl font-bold text-gray-900">Manage Testimonials</h1>
+          <Link
+            href="/manage-testimonials/create"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Add New Testimonial
+          </Link>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testimonials.map((testimonial) => (
-            <div
-              key={testimonial.id}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-            >
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <h2 className="text-xl font-semibold text-gray-700">{testimonial.name}</h2>
-                  <span className={`px-2 py-1 rounded-full text-xs ${
-                    testimonial.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {testimonial.isActive ? 'Active' : 'Inactive'}
-                  </span>
-                </div>
 
-                <div className="mb-4">
-                  <div className="flex mb-2">
-                    {renderStars(testimonial.rating)}
+        {testimonials.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-600">No testimonials found.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {testimonials.map((testimonial) => (
+              <div
+                key={testimonial.id}
+                className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h2 className="text-xl font-semibold text-gray-700">{testimonial.name}</h2>
+                    <span className={`px-2 py-1 rounded-full text-xs ${
+                      testimonial.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {testimonial.isActive ? 'Active' : 'Inactive'}
+                    </span>
                   </div>
-                  <p className="text-gray-600">{testimonial.testimonial}</p>
-                </div>
 
-                <div className="flex justify-between items-center">
-                  <p className="text-sm text-gray-500">
-                    Added: {new Date(testimonial.createdAt).toLocaleDateString()}
-                  </p>
-                  <div className="space-x-2">
-                    <button
-                      onClick={() => router.push(`/manage-testimonials/edit/${testimonial.id}`)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(testimonial.id)}
-                      className="text-red-600 hover:text-red-800"
-                    >
-                      Delete
-                    </button>
-                    <button
-                      onClick={() => handleStatusChange(testimonial.id, !testimonial.isActive)}
-                      className={`text-sm px-2 py-1 rounded ${
-                        testimonial.isActive
-                          ? 'bg-red-100 text-red-800 hover:bg-red-200'
-                          : 'bg-green-100 text-green-800 hover:bg-green-200'
-                      }`}
-                    >
-                      {testimonial.isActive ? 'Deactivate' : 'Activate'}
-                    </button>
+                  <div className="mb-4">
+                    <div className="flex mb-2">
+                      {renderStars(testimonial.rating)}
+                    </div>
+                    <p className="text-gray-600">{testimonial.testimonial}</p>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-gray-500">
+                      Added: {new Date(testimonial.createdAt).toLocaleDateString()}
+                    </p>
+                    <div className="space-x-2">
+                      <button
+                        onClick={() => router.push(`/manage-testimonials/edit/${testimonial.id}`)}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(testimonial.id)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        Delete
+                      </button>
+                      <button
+                        onClick={() => handleStatusChange(testimonial.id, !testimonial.isActive)}
+                        className={`text-sm px-2 py-1 rounded ${
+                          testimonial.isActive
+                            ? 'bg-red-100 text-red-800 hover:bg-red-200'
+                            : 'bg-green-100 text-green-800 hover:bg-green-200'
+                        }`}
+                      >
+                        {testimonial.isActive ? 'Deactivate' : 'Activate'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
     </ProtectedRoute>
   );
 };
