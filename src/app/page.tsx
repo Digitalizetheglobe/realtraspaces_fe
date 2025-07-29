@@ -1,30 +1,31 @@
 import Image from "next/image";
+import { Metadata } from "next";
+import { generateMetadata as generateSeoMetadata } from "../utils/serverSeo";
 
 import Latestpropertytype from "./latestpropertytype/page";
 import CookiesBanner from "../components/CookiesBanner";
 import SeoHead from "../components/SeoHead";
+import PageWithSeo from "../components/PageWithSeo";
 
-export const metadata = {
-  title: "Realtra Spaces | Premium Real Estate in Pune",
-  description: "Discover the best real estate opportunities in Pune with Realtra Spaces. Explore properties, connect with developers, and invest smartly.",
-  keywords: "Real estate Pune, buy property Pune, real estate investment, residential plots, commercial properties",
-  robots: "index, follow",
-  alternates: {
-    canonical: "https://Realtraspaces.com/",
-  },
-};
-
-
+// Generate metadata server-side
+export async function generateMetadata(): Promise<Metadata> {
+  return await generateSeoMetadata("home");
+}
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-gray-100">
-      <CookiesBanner />
-      {/* ─────────  HERO SECTION  ───────── */}
-     
+    <PageWithSeo page="home">
+      <main className="min-h-screen bg-gray-100">
+        {/* Static SEO Head - provides additional meta tags */}
+        <SeoHead />
+        
+        <CookiesBanner />
+        {/* ─────────  HERO SECTION  ───────── */}
+       
 
-      {/* Remaining content */}
-      <Latestpropertytype />
-    </main>
+        {/* Remaining content */}
+        <Latestpropertytype />
+      </main>
+    </PageWithSeo>
   );
 }
