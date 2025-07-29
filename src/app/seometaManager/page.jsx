@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FiPlus, FiEdit2, FiX, FiCheck, FiArrowLeft } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiX, FiCheck, FiArrowLeft, FiTrash2 } from 'react-icons/fi';
 
 const SEOMetaManager = () => {
   const [metaTags, setMetaTags] = useState([]);
@@ -57,6 +57,23 @@ const SEOMetaManager = () => {
       setFormData(response.data.data);
     } catch (err) {
       showNotification(`Failed to fetch ${page} meta tags`, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle delete meta tags
+  const handleDelete = async (page) => {
+    if (!confirm(`Are you sure you want to delete the meta tags for ${page}?`)) return;
+    
+    setLoading(true);
+    try {
+      await axios.delete(`https://api.realtraspaces.com/api/seo/meta-tags/${page}`);
+      showNotification('Meta tags deleted successfully!', 'success');
+      setCurrentPage(null);
+      fetchAllMetaTags();
+    } catch (err) {
+      showNotification('Failed to delete meta tags', 'error');
     } finally {
       setLoading(false);
     }
@@ -122,7 +139,28 @@ const SEOMetaManager = () => {
             <h1 className="text-3xl font-bold" style={{ color: colors.dark }}>SEO Meta Tags Manager</h1>
             <p className="text-gray-600 mt-1">Manage your website's search engine optimization</p>
           </div>
-         
+          <button
+            onClick={() => {
+              setCurrentPage(null);
+              setIsEditing(false);
+              setFormData({
+                page: '',
+                metaTitle: '',
+                metaDescription: '',
+                metaKeywords: '',
+                canonicalUrl: ''
+              });
+            }}
+            className="flex items-center px-4 py-3 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg"
+            style={{ 
+              backgroundColor: colors.primary,
+              color: 'white',
+              cursor: 'pointer'
+            }}
+          >
+            <FiPlus className="mr-2" />
+            Add New
+          </button>
         </div>
 
         {/* Main Content */}
@@ -155,22 +193,32 @@ const SEOMetaManager = () => {
                   >
                     <div className="flex justify-between items-center">
                       <h3 className="font-medium" style={{ color: colors.dark }}>{meta.page}</h3>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          fetchPageMeta(meta.page);
-                          setIsEditing(true);
-                        }}
-                        className="flex items-center text-sm"
-                        style={{ color: colors.secondary, cursor: 'pointer' }}
-                      >
-                        <FiEdit2 className="mr-1" />
-                        Edit
-                      </button>
+                      <div className="flex space-x-2">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            fetchPageMeta(meta.page);
+                            setIsEditing(true);
+                          }}
+                          className="flex items-center text-sm p-1 rounded hover:bg-gray-200"
+                          style={{ color: colors.secondary, cursor: 'pointer' }}
+                        >
+                          <FiEdit2 className="mr-1" />
+                        </button>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(meta.page);
+                          }}
+                          className="flex items-center text-sm p-1 rounded hover:bg-gray-200"
+                          style={{ color: colors.error, cursor: 'pointer' }}
+                        >
+                          <FiTrash2 className="mr-1" />
+                        </button>
+                      </div>
                     </div>
                     <p className="text-sm text-gray-500 mt-1 truncate">{meta.metaTitle}</p>
                   </div>
-                  
                 ))
               ) : (
                 <div className="p-5 text-center text-gray-500">
@@ -219,8 +267,8 @@ const SEOMetaManager = () => {
                         className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
                         style={{ 
                           borderColor: colors.secondary,
+                          focusRing: colors.accent,
                           color: '#000000',
-                          focusRing: colors.accent
                         }}
                         required
                         disabled={isEditing}
@@ -241,8 +289,8 @@ const SEOMetaManager = () => {
                         className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
                         style={{ 
                           borderColor: colors.secondary,
+                          focusRing: colors.accent,
                           color: '#000000',
-                          focusRing: colors.accent
                         }}
                         required
                         placeholder="Page title for search engines"
@@ -265,8 +313,8 @@ const SEOMetaManager = () => {
                         className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
                         style={{ 
                           borderColor: colors.secondary,
+                          focusRing: colors.accent,
                           color: '#000000',
-                          focusRing: colors.accent
                         }}
                         required
                         placeholder="Brief description of the page"
@@ -289,8 +337,8 @@ const SEOMetaManager = () => {
                         className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
                         style={{ 
                           borderColor: colors.secondary,
+                          focusRing: colors.accent,
                           color: '#000000',
-                          focusRing: colors.accent
                         }}
                         placeholder="Comma separated keywords"
                       />
@@ -312,11 +360,11 @@ const SEOMetaManager = () => {
                         className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
                         style={{ 
                           borderColor: colors.secondary,
+                          focusRing: colors.accent,
                           color: '#000000',
-                          focusRing: colors.accent
                         }}
                         required
-                        placeholder="https://example.com/page"
+                        placeholder="https://realtraspaces.com/pagename"
                       />
                     </div>
                   </div>
@@ -367,17 +415,25 @@ const SEOMetaManager = () => {
                   style={{ backgroundColor: colors.primary }}
                 >
                   <h2 className="text-xl font-semibold text-white capitalize">{currentPage.page} Meta Tags</h2>
-                  <button
-                    onClick={() => {
-                      fetchPageMeta(currentPage.page);
-                      setIsEditing(true);
-                    }}
-                    className="flex items-center text-sm text-white"
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <FiEdit2 className="mr-1" />
-                    Edit
-                  </button>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => {
+                        fetchPageMeta(currentPage.page);
+                        setIsEditing(true);
+                      }}
+                      className="flex items-center text-sm text-white p-1 rounded hover:bg-blue-700"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <FiEdit2 className="mr-1" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(currentPage.page)}
+                      className="flex items-center text-sm text-white p-1 rounded hover:bg-blue-700"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <FiTrash2 className="mr-1" />
+                    </button>
+                  </div>
                 </div>
                 <div className="p-6 space-y-5">
                   <DetailItem 

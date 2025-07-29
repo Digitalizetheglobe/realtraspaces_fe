@@ -11,10 +11,11 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
     { name: "Career Management", icon: "💼", href: "/career-management" },
     { name: "Blog", icon: "📝", href: "/blog", active: true },
     { name: "Manage Testimonials", icon: "⭐", href: "/manage-testimonials" },
+    { name: "SEO Meta Manager", icon: "🌐", href: "/seometaManager" },
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50 mt-12">
+    <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <aside
         className={`${
@@ -26,7 +27,7 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
           {isSidebarOpen ? (
             <h2 className="text-sm font-bold text-indigo-600">
               {" "}
-              Realtraspaces Dashboard
+              Dashboard
             </h2>
           ) : (
             <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">

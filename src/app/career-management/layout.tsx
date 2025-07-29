@@ -15,10 +15,11 @@ const CareerManagementLayout = ({
     { name: 'Career Management', icon: '💼', href: '/career-management' , active: true },
     { name: 'Blog', icon: '📝', href: '/blog'  },
     { name: 'Manage Testimonials', icon: '⭐', href: '/manage-testimonials'},
+    { name: 'SEO Meta Manager', icon: '🌐', href: '/seometaManager' },
   ];
 
   return (
-    <div className="flex h-screen bg-gray-50 mt-12">
+    <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <aside
         className={`${
@@ -28,7 +29,7 @@ const CareerManagementLayout = ({
         {/* Sidebar Header */}
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
           {isSidebarOpen ? (
-            <h4 className="text-sm font-bold text-indigo-600"> Realtraspaces Dashboard</h4>
+            <h4 className="text-sm font-bold text-indigo-600"> Dashboard</h4>
           ) : (
             <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
               <span className="text-indigo-600">R D</span>
