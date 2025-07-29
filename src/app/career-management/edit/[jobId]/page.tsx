@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { use } from 'react';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface Job {
   id: number;
@@ -109,8 +110,9 @@ const EditJobPage = ({ params }: PageProps) => {
   }
 
   return (
-    <div className="p-8">
-      <div className="max-w-4xl mx-auto">
+    <ProtectedRoute>
+      <div className="p-8">
+        <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Edit Job</h1>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -254,7 +256,7 @@ const EditJobPage = ({ params }: PageProps) => {
           </div>
         </form>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 };
 

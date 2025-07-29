@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface Testimonial {
   id: number;
@@ -120,8 +121,9 @@ const ManageTestimonialsPage = () => {
   }
 
   return (
-    <div className="">
-      <div className="flex justify-between items-center">
+    <ProtectedRoute>
+      <div className="">
+        <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Manage Testimonials</h1>
         <Link
           href="/manage-testimonials/create"
@@ -193,7 +195,7 @@ const ManageTestimonialsPage = () => {
           ))}
         </div>
       )}
-    </div>
+    </ProtectedRoute>
   );
 };
 

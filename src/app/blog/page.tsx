@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 interface Blog {
   id: number;
@@ -146,8 +147,9 @@ const BlogPage = () => {
   }
 
   return (
-    <div className="p-8 mt-10">
-      <div className="flex justify-between items-center mb-8">
+    <ProtectedRoute>
+      <div className="p-8 mt-10">
+        <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-gray-900">Blog Posts</h1>
         <Link href="/blog/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
           Create New Blog
@@ -243,7 +245,7 @@ const BlogPage = () => {
           </div>
         ))}
       </div>
-    </div>
+    </ProtectedRoute>
   );
 };
 

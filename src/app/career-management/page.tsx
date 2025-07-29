@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface Job {
   id: number;
@@ -94,8 +95,9 @@ const CareerManagementPage = () => {
   }
 
   return (
-    <>
-      <div className="flex justify-between items-center ml-5 p-8">
+    <ProtectedRoute>
+      <>
+        <div className="flex justify-between items-center ml-5 p-8">
         <h1 className="text-3xl font-bold text-gray-900">Career Management</h1>
         <Link
           href="/career-management/create"
@@ -165,7 +167,8 @@ const CareerManagementPage = () => {
           </div>
         ))}
       </div>
-    </>
+      </>
+    </ProtectedRoute>
   );
 };
 

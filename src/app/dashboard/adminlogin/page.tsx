@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "../../../hooks/useAuth";
 
 interface LoginFormData {
   mobileNumber: string;
@@ -29,6 +30,7 @@ interface ApiResponse {
 
 const AdminLoginPage = () => {
   const router = useRouter();
+  const { isAuthenticated, login } = useAuth();
   const [formData, setFormData] = useState<LoginFormData>({
     mobileNumber: "",
     password: "",
@@ -38,6 +40,13 @@ const AdminLoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string>("");
   const [showPassword, setShowPassword] = useState(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/dashboard");
+    }
+  }, [isAuthenticated, router]);
 
   const validateForm = (): boolean => {
     const newErrors: Partial<LoginFormData> = {};
@@ -99,9 +108,8 @@ const AdminLoginPage = () => {
       const data: ApiResponse = await response.json();
 
       if (response.ok && data.success) {
-        // Store token and admin data in localStorage
-        localStorage.setItem("adminToken", data.token);
-        localStorage.setItem("adminData", JSON.stringify(data.data.admin));
+        // Use the login function from useAuth hook
+        login(data.token, data.data.admin);
         
         // Redirect to dashboard
         router.push("/dashboard");
