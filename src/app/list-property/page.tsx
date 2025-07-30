@@ -148,7 +148,7 @@ export default function ListPropertyPage() {
                     name="location" 
                     value={form.location} 
                     onChange={handleChange}
-                    placeholder="e.g., Koregaon Park, Pune"
+                    placeholder="e.g., Koregaon Park, Mumbai"
                     className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.location ? 'border-red-500' : 'border-gray-300'}`}
                   />
                 </div>

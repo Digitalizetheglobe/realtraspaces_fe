@@ -291,13 +291,13 @@ const Footer = () => {
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                   </svg>
                   <a 
-                    href="https://maps.google.com/?q=Marvel+Edge+Viman+Nagar+Pune+Maharashtra+411014" 
+                    href="https://maps.google.com/?q=Mickey+Square,+Road+No.+17,+MIDC,+Andheri+East,+Mumbai+Maharashtra+400069" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-gray-200 dark:text-gray-200 hover:text-teal-400 transition-colors"
                   >
-                    Office No. 501, Marvel Edge, Viman Nagar, Pune,<br />
-                    Maharashtra 411014
+                    Mickey Square, Road No. 17, MIDC, Andheri East,<br />
+                    Mumbai 400069
                   </a>
                 </li>
 
@@ -306,10 +306,10 @@ const Footer = () => {
                     <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
                   </svg>
                   <a 
-                    href="tel:+919145688167" 
+                    href="tel:+917039311539" 
                     className="text-gray-200 dark:text-gray-200 hover:text-teal-400 transition-colors"
                   >
-                    +91 91456 88167
+                    +91 70393 1539
                   </a>
                 </li>
 
@@ -320,10 +320,10 @@ const Footer = () => {
                     <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
                   </svg>
                   <a 
-                    href="tel:+919145688167" 
+                    href="tel:+917039311539" 
                     className="text-gray-200 dark:text-gray-200 hover:text-teal-400 transition-colors"
                   >
-                    +91 91456 88167
+                    +91 70393 1539
                   </a>
                 </li>
                 <li className="flex items-center gap-3">

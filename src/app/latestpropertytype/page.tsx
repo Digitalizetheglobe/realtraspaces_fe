@@ -978,7 +978,7 @@ export default function PropertyCards() {
     </a>
   </p>
   <p>
-    <span className="font-semibold">Address:</span> Pune, Maharashtra, India
+    <span className="font-semibold">Address:</span> Mumbai, Maharashtra, India
   </p>
 </div>
 

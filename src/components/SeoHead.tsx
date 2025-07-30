@@ -11,9 +11,9 @@ interface SeoHeadProps {
 
 export default function SeoHead({ 
   seoData, 
-  fallbackTitle = "Realtra Spaces | Premium Real Estate in Pune",
-  fallbackDescription = "Discover the best real estate opportunities in Pune with Realtra Spaces. Explore properties, connect with developers, and invest smartly.",
-  fallbackKeywords = "Real estate Pune, buy property Pune, real estate investment, residential plots, commercial properties",
+  fallbackTitle = "Realtra Spaces | Premium Real Estate in Mumbai",
+  fallbackDescription = "Discover the best real estate opportunities in Mumbai with Realtra Spaces. Explore properties, connect with developers, and invest smartly.",
+  fallbackKeywords = "Real estate Mumbai, buy property Mumbai, real estate investment, residential plots, commercial properties",
   fallbackCanonical = "https://Realtraspaces.com/"
 }: SeoHeadProps) {
   // Use API data if available, otherwise use fallback values

@@ -110,8 +110,7 @@ export default function Home() {
                         Head office
                       </small>
                       <span className="text-gray-500 text-md font-medium">
-                        Office No. 501, Marvel Edge, Viman Nagar, Pune,
-                        Maharashtra 411014
+                      Mickey Square, Road No. 17, MIDC, Andheri East, 400069
                       </span>
                     </a>
                   </li>

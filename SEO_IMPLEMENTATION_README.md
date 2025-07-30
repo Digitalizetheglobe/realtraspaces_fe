@@ -196,7 +196,7 @@ const API_BASE_URL = 'https://api.realtraspaces.com/api';
 ### Default Fallback Values
 Update default values in components as needed:
 ```typescript
-fallbackTitle = "Realtra Spaces | Premium Real Estate in Pune"
+fallbackTitle = "Realtra Spaces | Premium Real Estate in Mumbai"
 fallbackDescription = "Discover the best real estate opportunities..."
 ```
 

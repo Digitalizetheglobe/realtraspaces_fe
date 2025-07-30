@@ -54,24 +54,24 @@ export async function generateMetadata(page: string, fallbackConfig?: MetadataCo
 
   // Return fallback metadata if API fails or no data
   return {
-    title: fallbackConfig?.title || "Realtra Spaces | Premium Real Estate in Pune",
-    description: fallbackConfig?.description || "Discover the best real estate opportunities in Pune with Realtra Spaces. Explore properties, connect with developers, and invest smartly.",
-    keywords: fallbackConfig?.keywords || "Real estate Pune, buy property Pune, real estate investment, residential plots, commercial properties",
+    title: fallbackConfig?.title || "Realtra Spaces | Premium Real Estate in Mumbai",
+    description: fallbackConfig?.description || "Discover the best real estate opportunities in Mumbai with Realtra Spaces. Explore properties, connect with developers, and invest smartly.",
+    keywords: fallbackConfig?.keywords || "Real estate Mumbai, buy property Mumbai, real estate investment, residential plots, commercial properties",
     alternates: {
       canonical: fallbackConfig?.canonical || "https://Realtraspaces.com/",
     },
     robots: fallbackConfig?.robots || 'index, follow',
     openGraph: {
-      title: fallbackConfig?.openGraph?.title || fallbackConfig?.title || "Realtra Spaces | Premium Real Estate in Pune",
-      description: fallbackConfig?.openGraph?.description || fallbackConfig?.description || "Discover the best real estate opportunities in Pune with Realtra Spaces. Explore properties, connect with developers, and invest smartly.",
+      title: fallbackConfig?.openGraph?.title || fallbackConfig?.title || "Realtra Spaces | Premium Real Estate in Mumbai",
+      description: fallbackConfig?.openGraph?.description || fallbackConfig?.description || "Discover the best real estate opportunities in Mumbai with Realtra Spaces. Explore properties, connect with developers, and invest smartly.",
       url: fallbackConfig?.openGraph?.url || fallbackConfig?.canonical || "https://Realtraspaces.com/",
       type: fallbackConfig?.openGraph?.type || 'website',
       image: fallbackConfig?.openGraph?.image,
     },
     twitter: {
       card: fallbackConfig?.twitter?.card || 'summary_large_image',
-      title: fallbackConfig?.twitter?.title || fallbackConfig?.title || "Realtra Spaces | Premium Real Estate in Pune",
-      description: fallbackConfig?.twitter?.description || fallbackConfig?.description || "Discover the best real estate opportunities in Pune with Realtra Spaces. Explore properties, connect with developers, and invest smartly.",
+      title: fallbackConfig?.twitter?.title || fallbackConfig?.title || "Realtra Spaces | Premium Real Estate in Mumbai",
+      description: fallbackConfig?.twitter?.description || fallbackConfig?.description || "Discover the best real estate opportunities in Mumbai with Realtra Spaces. Explore properties, connect with developers, and invest smartly.",
       image: fallbackConfig?.twitter?.image,
     },
   };
