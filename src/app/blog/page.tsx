@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { FiEdit2, FiTrash2, FiHeart, FiBookmark, FiPlus, FiArrowRight } from "react-icons/fi";
+import router from "next/router";
 
 interface Blog {
   id: number;
@@ -24,7 +25,7 @@ const BlogPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Color scheme
+  // Enhanced color scheme
   const colors = {
     primary: '#2D5F7D',
     secondary: '#5B9CBD',
@@ -32,7 +33,9 @@ const BlogPage = () => {
     light: '#F5F9FC',
     dark: '#1A3A4A',
     success: '#4CAF50',
-    error: '#F44336'
+    error: '#F44336',
+    gradientStart: '#2D5F7D',
+    gradientEnd: '#5B9CBD'
   };
 
   useEffect(() => {
@@ -84,6 +87,22 @@ const BlogPage = () => {
     };
     fetchBlogs();
   }, []);
+
+  const handleDelete = async (id: number) => {
+    try {
+      const response = await fetch(`https://api.realtraspaces.com/api/blogs/${id}`, {
+        method: 'DELETE',
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to delete blog');
+      }
+  
+      router.push('/blog');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'An error occurred');
+    }
+  };
 
   if (loading) {
     return (
@@ -168,13 +187,13 @@ const BlogPage = () => {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
             <div>
               <h1 className="text-3xl font-bold" style={{ color: colors.dark }}>Blog Posts</h1>
-              <p className="text-gray-600 mt-2">Manage and organize your blog content</p>
+              <p className="text-gray-600 mt-2">Discover the latest insights and trends in real estate</p>
             </div>
             <Link 
               href="/blog/create" 
               className="flex items-center px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all"
               style={{ 
-                backgroundColor: colors.primary,
+                background: `linear-gradient(135deg, ${colors.gradientStart} 0%, ${colors.gradientEnd} 100%)`,
                 color: 'white'
               }}
             >
@@ -188,34 +207,14 @@ const BlogPage = () => {
             {blogs.map((blog) => (
               <div
                 key={blog.id}
-                className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-all"
+                className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 group"
               >
-                {/* Blog Image */}
-                <div className="h-56 w-full relative bg-gray-100">
-                  {blog.blogImage ? (
-                    <Image
-                      src={blog.blogImage}
-                      alt={blog.blogTitle}
-                      fill
-                      className="object-cover"
-                      onError={(e) => {
-                        const img = e.currentTarget;
-                        img.style.display = 'none';
-                      }}
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
-                      <span className="text-gray-400">No Image</span>
-                    </div>
-                  )}
-                </div>
-
                 {/* Blog Content */}
-                <div className="p-6">
+                <div className="p-6 h-full flex flex-col">
                   {/* Category and Author */}
-                  <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center justify-between mb-4">
                     <span 
-                      className="px-3 py-1 rounded-full text-xs font-medium"
+                      className="px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider"
                       style={{ 
                         backgroundColor: colors.light,
                         color: colors.primary
@@ -223,65 +222,69 @@ const BlogPage = () => {
                     >
                       {blog.category}
                     </span>
-                    <span className="text-sm text-gray-500">By {blog.writer}</span>
+                    <span className="text-xs text-gray-500">By {blog.writer}</span>
                   </div>
 
                   {/* Title and Description */}
-                  <h2 className="text-xl font-semibold mb-3" style={{ color: colors.dark }}>
-                    {blog.blogTitle}
-                  </h2>
-                  <p className="text-gray-600 mb-4 line-clamp-2">
-                    {blog.blogDescription}
-                  </p>
+                  <div className="flex-grow">
+                    <h2 className="text-xl font-bold mb-3 group-hover:text-blue-600 transition-colors" style={{ color: colors.dark }}>
+                      {blog.blogTitle}
+                    </h2>
+                    <p className="text-gray-600 mb-4 line-clamp-3">
+                      {blog.blogDescription}
+                    </p>
+                  </div>
 
                   {/* Tags */}
                   <div className="flex flex-wrap gap-2 mb-6">
                     {blog.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="px-3 py-1 rounded-full text-xs"
+                        className="px-3 py-1 rounded-full text-xs font-medium"
                         style={{ 
                           backgroundColor: colors.light,
                           color: colors.secondary
                         }}
                       >
-                        {tag}
+                        #{tag}
                       </span>
                     ))}
                   </div>
 
                   {/* Footer */}
-                  <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                  <div className="flex justify-between items-center pt-4 border-t border-gray-100 mt-auto">
                     <div className="flex gap-4">
-                      <span className="flex items-center gap-1 text-gray-500">
-                        <FiHeart className={blog.likes > 0 ? "text-red-400" : ""} />
-                        {blog.likes}
+                      {/* <span className="flex items-center gap-1 text-gray-500 text-sm">
+                        <FiHeart className={`${blog.likes > 0 ? "text-red-400 fill-red-400" : ""}`} />
+                        {blog.likes > 0 ? blog.likes : 'Like'}
                       </span>
-                      <span className="flex items-center gap-1 text-gray-500">
-                        <FiBookmark className={blog.bookmarks > 0 ? "text-blue-400" : ""} />
-                        {blog.bookmarks}
-                      </span>
+                      <span className="flex items-center gap-1 text-gray-500 text-sm">
+                        <FiBookmark className={`${blog.bookmarks > 0 ? "text-blue-400 fill-blue-400" : ""}`} />
+                        {blog.bookmarks > 0 ? blog.bookmarks : 'Save'}
+                      </span> */}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center">
                       <Link
                         href={`/blog/edit/${blog.slug}`}
-                        className="p-2 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-50 transition-colors"
+                        className="p-2 text-gray-500 hover:text-blue-600 rounded-full hover:bg-blue-50 transition-colors"
                         title="Edit"
                       >
-                        <FiEdit2 />
+                        <FiEdit2 size={16} />
                       </Link>
                       <button
-                        className="p-2 text-red-600 hover:text-red-800 rounded-full hover:bg-red-50 transition-colors"
+                        className="p-2 text-gray-500 hover:text-red-600 rounded-full hover:bg-red-50 transition-colors"
                         title="Delete"
+                        onClick={() => handleDelete(blog.id)}
                       >
-                        <FiTrash2 />
+                        <FiTrash2 size={16} />
                       </button>
                       <Link
                         href={`/blog/${blog.slug}`}
-                        className="flex items-center text-sm font-medium"
+                        className="flex items-center text-sm font-medium px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors group/readmore"
                         style={{ color: colors.primary }}
                       >
-                        Read <FiArrowRight className="ml-1" />
+                        Read more
+                        <FiArrowRight className="ml-1 group-hover/readmore:translate-x-1 transition-transform" />
                       </Link>
                     </div>
                   </div>

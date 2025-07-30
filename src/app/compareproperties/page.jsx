@@ -15,6 +15,7 @@ import {
 } from "react-icons/fi";
 import { FaWhatsapp } from "react-icons/fa";
 import contactimg from "../../../public/assets/images/contactimg.png";
+import PageWithSeo from "../../components/PageWithSeo";
 
 const ATTRIBUTES = [
   "Carpet Area",
@@ -179,6 +180,7 @@ const CompareProperties = () => {
 
   return (
     <>
+    <PageWithSeo page="compareproperties">
       <section className="relative h-[60vh] w-full">
         <Image
           src={contactimg}
@@ -361,6 +363,7 @@ const CompareProperties = () => {
           </div>
         </div>
       </section>
+      </PageWithSeo>
     </>
   );
 };

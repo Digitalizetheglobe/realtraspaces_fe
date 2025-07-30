@@ -1,9 +1,12 @@
 // pages/privacy-policy.js
 import Head from 'next/head';
 import Image from 'next/image';
+import PageWithSeo from "../../components/PageWithSeo";
 export default function PrivacyPolicy() {
   return (
     <>
+    <PageWithSeo page="privacy-policy">
+    
       <Head>
         <title>Privacy Policy | RealtraSpaces</title>
         <meta name="description" content="Privacy Policy for RealtraSpaces" />
@@ -121,6 +124,7 @@ export default function PrivacyPolicy() {
          
         </div>
       </div>
+      </PageWithSeo>
     </>
   );
 }

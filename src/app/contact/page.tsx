@@ -9,6 +9,7 @@ import ctabg from "../../../public/assets/images/ctabg.png";
 import Link from "next/link";
 import { useState } from "react";
 import SeoHead from "../../components/SeoHead";
+import PageWithSeo from "../../components/PageWithSeo";
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -26,6 +27,7 @@ export default function Home() {
 
   return (
     <>
+    <PageWithSeo page="contact">
       <main className="min-h-screen bg-gray-100">
         {/* Hero Section */}
         <section className="relative h-[60vh] w-full">
@@ -273,6 +275,7 @@ export default function Home() {
           </div>
         </div>
       </main>
+      </PageWithSeo>
     </>
   );
 }

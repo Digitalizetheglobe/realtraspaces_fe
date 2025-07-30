@@ -6,7 +6,7 @@ import { ArrowRight, Upload, MapPin, Clock, Users, Award, Target, Heart } from "
 import Link from 'next/link';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import SeoHead from "../../components/SeoHead";
+import PageWithSeo from "../../components/PageWithSeo";
 
 // Define TypeScript interfaces outside the component
 interface Job {
@@ -194,6 +194,7 @@ const BenefitsSection = () => {
   }, []);
 
   return (
+    <PageWithSeo page="career">
     <div style={{ fontFamily: 'Raleway, sans-serif', fontWeight: 400, fontSize: '16px', lineHeight: '140%' }}>
       {/* Hero Section */}
       <section
@@ -594,6 +595,7 @@ const BenefitsSection = () => {
         </div>
       </section>
     </div>
+    </PageWithSeo>
   );
 };
 

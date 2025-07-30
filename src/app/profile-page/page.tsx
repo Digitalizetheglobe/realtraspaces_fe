@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import PageWithSeo from "../../components/PageWithSeo";
 
 type UserProfile = {
   fullName: string;
@@ -248,6 +249,7 @@ const ProfilePage = () => {
   }
 
   return (
+    <PageWithSeo page="profile-page">
     <div 
       className="min-h-screen flex"
       style={{ 
@@ -471,6 +473,7 @@ const ProfilePage = () => {
         </div>
       </div>
     </div>
+    </PageWithSeo>
   );
 };
 

@@ -5,6 +5,7 @@ import latestpropertytype from "../../../public/assets/images/latestpropertytype
 import { Raleway } from "next/font/google";
 import Link from "next/link";
 import CalculatorSection from "@/components/calculate";
+import PageWithSeo from "../../components/PageWithSeo";
 import SeoHead from "../../components/SeoHead";
 
 // Removed metadata and head exports
@@ -92,6 +93,8 @@ const Blogs = () => {
   const [openFaq, setOpenFaq] = useState(0); // 0: first open by default
 
   return (
+    <>
+    <PageWithSeo page="blogs">
     <div className={raleway.className}>
       <section className="py-16 bg-gray-50 flex justify-center items-center">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
@@ -395,6 +398,8 @@ const Blogs = () => {
 </div>
 
     </div>
+    </PageWithSeo>
+    </>
   );
 };
 

@@ -10,6 +10,7 @@ import Link from "next/link";
 import contactimg from "../../../public/assets/images/contactimg.png";
 import SeoHead from "../../components/SeoHead";
 import ShareModal from "../../components/ShareModal";
+import PageWithSeo from "../../components/PageWithSeo";
 
 // Removed metadata and head exports
 
@@ -467,6 +468,7 @@ export default function Similarproperties() {
 
   return (
     <>
+    <PageWithSeo page="properties">
       <div className={raleway.className}>
         <section className="relative h-[60vh] w-full ">
           {/* Background Image */}
@@ -818,6 +820,7 @@ export default function Similarproperties() {
           animation: fade-in-up 0.8s ease-out both;
         }
       `}</style>
+      </PageWithSeo>
     </>
   );
 }

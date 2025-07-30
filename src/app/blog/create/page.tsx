@@ -51,7 +51,7 @@ const CreateBlogContent = () => {
       // Convert tags string to array
       const tagsArray = formData.tags.split(',').map(tag => tag.trim());
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/blogs/`, {
+      const response = await fetch(`https://api.realtraspaces.com/api/blogs/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,6 +78,8 @@ const CreateBlogContent = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+
+  
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.light }}>
@@ -125,6 +127,7 @@ const CreateBlogContent = () => {
                   className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
                   style={{ 
                     borderColor: colors.secondary,
+                    color:"black"
                   }}
                   placeholder="Enter your blog title"
                 />
@@ -145,6 +148,7 @@ const CreateBlogContent = () => {
                   className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
                   style={{ 
                     borderColor: colors.secondary,
+                    color:"black"
                   }}
                   placeholder="Write a brief description of your blog..."
                 />
@@ -165,13 +169,14 @@ const CreateBlogContent = () => {
                   className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
                   style={{ 
                     borderColor: colors.secondary,
+                    color:"black"
                   }}
                   placeholder="Write your blog content here..."
                 />
               </div>
 
               {/* Blog Image URL */}
-              <div>
+              {/* <div>
                 <label htmlFor="blogImage" className="block text-sm font-medium mb-2" style={{ color: colors.dark }}>
                   Blog Image URL
                 </label>
@@ -184,10 +189,10 @@ const CreateBlogContent = () => {
                   className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
                   style={{ 
                     borderColor: colors.secondary,
-                  }}
+                    }}
                   placeholder="https://example.com/image.jpg"
                 />
-              </div>
+              </div> */}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Writer */}
@@ -205,6 +210,7 @@ const CreateBlogContent = () => {
                     className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
                     style={{ 
                       borderColor: colors.secondary,
+                      color:"black"
                     }}
                     placeholder="Enter writer name"
                   />
@@ -224,9 +230,11 @@ const CreateBlogContent = () => {
                     className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
                     style={{ 
                       borderColor: colors.secondary,
-                    }}
+                      color:"black"
+                      }}
                   >
                     <option value="">Select a category</option>
+                    <option value="RealEstate">Real Estate</option>
                     <option value="Technology">Technology</option>
                     <option value="Business">Business</option>
                     <option value="Lifestyle">Lifestyle</option>
@@ -252,7 +260,8 @@ const CreateBlogContent = () => {
                     className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
                     style={{ 
                       borderColor: colors.secondary,
-                    }}
+                      color:"black"
+                      }}
                     placeholder="tag1, tag2, tag3"
                   />
                 </div>
@@ -272,6 +281,7 @@ const CreateBlogContent = () => {
                     className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
                     style={{ 
                       borderColor: colors.secondary,
+                      color:"black"
                       }}
                     placeholder="blog-post-title"
                   />

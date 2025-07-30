@@ -4,7 +4,9 @@ import { motion } from 'framer-motion';
 import { X, Globe, Book, Zap, ArrowRight, Star, Award, Users } from 'lucide-react';
 import developer3 from "../../../public/assets/developer3.jpg";
 import Image from "next/image";
-// Dummy images using placeholder services
+import SeoHead from "../../components/SeoHead";
+import PageWithSeo from "../../components/PageWithSeo";
+
 const DUMMY_IMAGES = {
   heroVideo: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&h=1080&fit=crop",
   founder: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop",
@@ -121,6 +123,7 @@ const useCounter = (end: number, duration: number = 2000) => {
 };
 
 export default function RealtraSpacesAbout() {
+
   const [modalImage, setModalImage] = useState<string | null>(null);
   const [isCarouselHovered, setIsCarouselHovered] = useState(false);
 
@@ -174,7 +177,9 @@ export default function RealtraSpacesAbout() {
   };
 
   return (
+    <PageWithSeo page="about">
     <div className="w-full bg-white">
+      <SeoHead />
       {/* Hero Section */}
       <section className="relative  flex items-center justify-center overflow-hidden">
         {/* Background Image */}
@@ -294,8 +299,8 @@ export default function RealtraSpacesAbout() {
               transition={{ duration: 0.8 }}
             >
               <h2 className="text-4xl md:text-5xl font-bold text-black mb-6">
-                Who We Are
-              </h2>
+                Who We Are 
+              </h2> 
               <p className="text-lg text-gray-600 leading-relaxed">
                 Realtra Spaces is a premier real estate company dedicated to providing exceptional service in residential and commercial properties. We specialize in luxury homes, modern apartments, commercial spaces, and investment opportunities across multiple cities.
               </p>
@@ -599,5 +604,6 @@ export default function RealtraSpacesAbout() {
         }
       `}</style>
     </div>
+    </PageWithSeo>
   );
 }
