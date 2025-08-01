@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const SeoMetaManagerLayout = ({ children }: { children: React.ReactNode }) => {
+const TeamLayout = ({ children }: { children: React.ReactNode }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const modules = [
@@ -11,8 +11,8 @@ const SeoMetaManagerLayout = ({ children }: { children: React.ReactNode }) => {
     { name: "Career Management", icon: "💼", href: "/career-management" },
     { name: "Blog", icon: "📝", href: "/blog" },
     { name: "Manage Testimonials", icon: "⭐", href: "/manage-testimonials" },
-    { name: "SEO Meta Manager", icon: "🌐", href: "/seometaManager", active: true },
-    { name: "Team Management", icon: "👥", href: "/dashboardteam" },
+    { name: "SEO Meta Manager", icon: "🌐", href: "/seometaManager" },
+    { name: "Team Management", icon: "👥", href: "/dashboardteam", active: true },
   ];
 
   return (
@@ -138,4 +138,4 @@ const SeoMetaManagerLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default SeoMetaManagerLayout;
+export default TeamLayout;

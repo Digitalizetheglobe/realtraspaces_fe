@@ -8,7 +8,6 @@ import phone from "../../../public/assets/images/phone.png";
 import ctabg from "../../../public/assets/images/ctabg.png";
 import Link from "next/link";
 import { useState } from "react";
-import SeoHead from "../../components/SeoHead";
 import PageWithSeo from "../../components/PageWithSeo";
 
 export default function Home() {
