@@ -32,7 +32,6 @@ const galleryImages = [
   { id: 8, src: "https://images.unsplash.com/photo-1502005229762-cf1b2da60e2f?w=300&h=300&fit=crop", alt: 'Luxury Home', size: 'small' }
 ];
 
-// Team data
 const teamMembers = [
   {
     id: 1,
@@ -57,7 +56,63 @@ const teamMembers = [
     image: DUMMY_IMAGES.team3,
     description: 'Emily crafts our brand story and marketing campaigns, ensuring our properties reach the right audience.',
     linkedin: 'https://www.linkedin.com/in/emily-davis/'
-  }
+  },
+    {
+    id: 4,
+    name: 'Michael Chen',
+    role: 'Sales Director',
+    image: DUMMY_IMAGES.team2,
+    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
+    linkedin: 'https://www.linkedin.com/in/michael-chen/'
+  },
+    {
+    id: 5,
+    name: 'Michael Chen',
+    role: 'Sales Director',
+    image: DUMMY_IMAGES.team2,
+    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
+    linkedin: 'https://www.linkedin.com/in/michael-chen/'
+  },
+    {
+    id: 6,
+    name: 'Michael Chen',
+    role: 'Sales Director',
+    image: DUMMY_IMAGES.team2,
+    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
+    linkedin: 'https://www.linkedin.com/in/michael-chen/'
+  },
+    {
+    id: 7,
+    name: 'Michael Chen',
+    role: 'Sales Director',
+    image: DUMMY_IMAGES.team2,
+    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
+    linkedin: 'https://www.linkedin.com/in/michael-chen/'
+  },
+    {
+    id: 8,
+    name: 'Michael Chen',
+    role: 'Sales Director',
+    image: DUMMY_IMAGES.team2,
+    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
+    linkedin: 'https://www.linkedin.com/in/michael-chen/'
+  },
+    {
+    id: 9,
+    name: 'Michael Chen',
+    role: 'Sales Director',
+    image: DUMMY_IMAGES.team2,
+    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
+    linkedin: 'https://www.linkedin.com/in/michael-chen/'
+  },
+    {
+    id: 10,
+    name: 'Michael Chen',
+    role: 'Sales Director',
+    image: DUMMY_IMAGES.team2,
+    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
+    linkedin: 'https://www.linkedin.com/in/michael-chen/'
+  },
 ];
 
 // Awards data
@@ -385,54 +440,42 @@ export default function RealtraSpacesAbout() {
     
     </div>
 
-    {/* Team Grid */}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {teamMembers.map((member, index) => (
-        <motion.div
-          key={member.id}
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7, delay: index * 0.15 }}
-          className="group relative"
-        >
-          {/* Card Container */}
-          <div className="relative bg-white rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 border border-gray-200">
-            <div className="relative h-96 overflow-hidden">
+<div className="relative bg-white py-12 overflow-hidden">
+
+
+  {/* Scrolling container */}
+  <div className="relative w-full overflow-hidden">
+      <div className="flex gap-6 animate-scroll whitespace-nowrap">
+        {[...teamMembers, ...teamMembers].map((member, index) => (
+          <div
+            key={index}
+            className="group relative flex-shrink-0 w-64 rounded-2xl overflow-hidden border border-gray-200 transition-shadow duration-500"
+          >
+            <div className="relative">
+              {/* Image */}
               <img
                 src={member.image}
                 alt={member.name}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                className="w-full h-72 object-cover grayscale group-hover:grayscale-0 transition-all duration-500 cursor-pointer"
               />
-              {/* Hover Overlay */}
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 w-11/12 mx-auto text-center">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">{member.name}</h3>
-                  <p className="text-blue-600 font-semibold text-lg mb-2">{member.role}</p>
-                  <p className="text-gray-700 mb-4">{member.description}</p>
-                  <a
-                    href={member.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors duration-300"
-                  >
-                    {/* LinkedIn SVG icon */}
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.785-1.75-1.75s.784-1.75 1.75-1.75 1.75.785 1.75 1.75-.784 1.75-1.75 1.75zm13.5 11.268h-3v-5.604c0-1.337-.025-3.063-1.868-3.063-1.868 0-2.154 1.459-2.154 2.968v5.699h-3v-10h2.881v1.367h.041c.401-.761 1.379-1.563 2.838-1.563 3.036 0 3.6 2.001 3.6 4.601v5.595z"/></svg>
-                    LinkedIn
-                  </a>
-                </div>
+              {/* Name and Role Overlay */}
+              <div className="absolute bottom-3 w-50 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
+                <h3 className="text-sm font-semibold text-gray-800">
+                  {member.name}
+                </h3>
+                <p className="text-xs text-gray-500">{member.role}</p>
               </div>
             </div>
-            {/* Always visible name and role */}
-            <div className="p-6 text-center">
-              <h3 className="text-2xl font-bold text-gray-800 mb-1">{member.name}</h3>
-              <p className="text-blue-600 font-semibold text-lg">{member.role}</p>
-            </div>
+            {/* Shadow on hover */}
+            <div className="absolute inset-0 rounded-2xl pointer-events-none group-hover:shadow-xl transition-shadow duration-500" />
           </div>
-          {/* Floating Background Shape */}
-          <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-3xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl"></div>
-        </motion.div>
-      ))}
-    </div>
+        ))}
+      </div>
+  </div>
+
+</div>
+
+
   </div>
 </section>
 
