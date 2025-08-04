@@ -54,7 +54,7 @@ const DevelopersPage = () => {
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
-        const response = await fetch("https://api.realtraspaces.com/developers");
+        const response = await fetch("https://api.realtraspaces.com/api/developers");
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
@@ -152,8 +152,8 @@ const DevelopersPage = () => {
       }
 
       const url = currentDeveloper
-        ? `https://api.realtraspaces.com/developers/${currentDeveloper.id}`
-        : "https://api.realtraspaces.com/developers";
+        ? `https://api.realtraspaces.com/api/developers/${currentDeveloper.id}`
+        : "https://api.realtraspaces.com/api/developers";
 
       const method = currentDeveloper ? "PUT" : "POST";
 
@@ -196,7 +196,7 @@ const DevelopersPage = () => {
     setIsDeleting(id);
     try {
       const response = await fetch(
-        `https://api.realtraspaces.com/developers/${id}`,
+        `https://api.realtraspaces.com/api/developers/${id}`,
         {
           method: "DELETE",
         }
