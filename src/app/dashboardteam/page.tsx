@@ -60,7 +60,7 @@ const TeamPage = () => {
   useEffect(() => {
     const fetchTeamMembers = async () => {
       try {
-        const response = await fetch("http://localhost:8000/api/team/");
+        const response = await fetch("https://api.realtraspaces.com/api/team/");
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
@@ -135,7 +135,7 @@ const TeamPage = () => {
       }
 
       const url = currentMember
-        ? `https://api.realtraspaces.com/team/${currentMember.id}`
+        ? `https://api.realtraspaces.com/api/team/${currentMember.id}`
         : "https://api.realtraspaces.com/team/";
 
       const method = currentMember ? "PUT" : "POST";
@@ -180,7 +180,7 @@ const TeamPage = () => {
 
     setIsDeleting(id);
     try {
-      const response = await fetch(`https://api.realtraspaces.com/team/${id}`, {
+      const response = await fetch(`https://api.realtraspaces.com/api/team/${id}`, {
         method: "DELETE",
       });
 
