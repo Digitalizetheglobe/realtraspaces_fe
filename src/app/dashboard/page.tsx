@@ -68,7 +68,9 @@ const DashboardPage = () => {
     { name: "Blog", icon: "📝", href: "/blog" },
     { name: "Manage Testimonials", icon: "⭐", href: "/manage-testimonials" },
     {name :'All properties', icon:"🏠", href: '/PropertyListing'},
-    {name :'SEO Meta Manager',icon:"🌐", href: '/seometaManager'}
+    {name :'SEO Meta Manager',icon:"🌐", href: '/seometaManager'},
+    {name :'Team Management',icon:"👥", href: '/dashboardteam'},
+    {name :'Developer Management',icon:"🛠️", href: '/dashboarddeveloper'}
   ];
 
   if (loading) {

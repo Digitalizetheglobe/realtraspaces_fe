@@ -12,6 +12,8 @@ const BlogLayout = ({ children }: { children: React.ReactNode }) => {
     { name: "Blog", icon: "📝", href: "/blog", active: true },
     { name: "Manage Testimonials", icon: "⭐", href: "/manage-testimonials" },
     { name: "SEO Meta Manager", icon: "🌐", href: "/seometaManager" },
+    { name: "Team Management", icon: "👥", href: "/dashboardteam" },
+    { name: "Developer Management", icon: "🛠️", href: "/dashboarddeveloper" },
   ];
 
   return (

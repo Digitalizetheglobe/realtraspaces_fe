@@ -13,6 +13,7 @@ const SeoMetaManagerLayout = ({ children }: { children: React.ReactNode }) => {
     { name: "Manage Testimonials", icon: "⭐", href: "/manage-testimonials" },
     { name: "SEO Meta Manager", icon: "🌐", href: "/seometaManager", active: true },
     { name: "Team Management", icon: "👥", href: "/dashboardteam" },
+    { name: "Developer Management", icon: "🛠️", href: "/dashboarddeveloper" },
   ];
 
   return (
