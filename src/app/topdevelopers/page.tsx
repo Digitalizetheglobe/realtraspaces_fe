@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import devloperimg1 from "../../../public/assets/images/developername1.png";
 import devloperimg2 from "../../../public/assets/signin1.jpeg";
 import devloperimg3 from "../../../public/assets/developer3.jpg";
@@ -8,6 +8,7 @@ import devloperimg4 from "../../../public/assets/developer4.jpg";
 import FeaturedProperties from "../featuredproperties/page";
 import { Raleway } from 'next/font/google';
 import Link from "next/link";
+
 // Load Raleway font
 const raleway = Raleway({
   subsets: ['latin'],
@@ -15,13 +16,77 @@ const raleway = Raleway({
   display: 'swap',
 });
 
+// Type definitions
+interface Developer {
+  name: string;
+  logo: any; // StaticImageData type
+  description?: string;
+  projects?: string[];
+}
+
+interface ApiDeveloper {
+  id: number;
+  buildername: string;
+  builder_logo: string | null;
+  descriptions: string;
+  project_name: string[];
+  status: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// Default developer images array
+const defaultImages = [devloperimg1, devloperimg2, devloperimg3, devloperimg4];
+
 const TopDevelopers = () => {
-  const developers = [
-    { name: "Developer Name 1", logo: devloperimg1 },
-    { name: "Developer Name 2", logo: devloperimg2 },
-    { name: "Developer Name 3", logo: devloperimg3 },
-    { name: "Developer Name 4", logo: devloperimg4 },
-  ];
+  const [developers, setDevelopers] = useState<Developer[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDevelopers = async () => {
+      try {
+        const response = await fetch('https://api.realtraspaces.com/api/developers');
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          // Take only the first 4 developers and map them with default images
+          const limitedDevelopers = data.data.slice(0, 4).map((developer: ApiDeveloper, index: number) => ({
+            name: developer.buildername,
+            logo: defaultImages[index] || defaultImages[0], // Fallback to first image if index exceeds
+            description: developer.descriptions,
+            projects: developer.project_name
+          }));
+          
+          setDevelopers(limitedDevelopers);
+        }
+      } catch (error) {
+        console.error('Error fetching developers:', error);
+        // Fallback to default developers if API fails
+        setDevelopers([
+          { name: "Developer Name 1", logo: devloperimg1 },
+          { name: "Developer Name 2", logo: devloperimg2 },
+          { name: "Developer Name 3", logo: devloperimg3 },
+          { name: "Developer Name 4", logo: devloperimg4 },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDevelopers();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="py-12 px-4 sm:px-6 lg:px-8 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <>
@@ -95,6 +160,11 @@ const TopDevelopers = () => {
               ))}
             </div>
           </div>
+          <Link href="/developers">
+            <button className="bg-black text-white px-4 py-2 mt-4 rounded-md">
+              View All Developers
+            </button>
+          </Link>
         </div>
       </section>
 

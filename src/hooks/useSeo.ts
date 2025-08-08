@@ -16,7 +16,8 @@ export const useSeo = (page: string) => {
         if (data) {
           setSeoData(data);
         } else {
-          setError('Failed to load SEO data');
+          // Don't set error if data is null - this is expected when API endpoint doesn't exist
+          console.log(`No SEO data available for page: ${page}`);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');

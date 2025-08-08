@@ -1057,7 +1057,7 @@ export default function PropertyDetails() {
                   Property Highlights
                 </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-100">
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-gray-100">
                   <div className="flex items-start gap-4 p-2">
                     <Image
                       src={pin}
@@ -1067,8 +1067,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Category</p>
-                      <p className="font-medium text-gray-800">
+                      <p className="text-[14px] text-gray-500">Category</p>
+                      <p className="font-medium text-[12px] text-gray-800">
                         {property.propertyType?.childType?.displayName ||
                           property.propertyType?.displayName ||
                           "Office Space"}

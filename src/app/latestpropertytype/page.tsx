@@ -9,6 +9,7 @@ import bookmark from "../../../public/assets/Frame 28.png";
 import whatsapp from "../../../public/assets/WhatsApp.png";
 import TopDevelopers from "../topdevelopers/page";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import ShareModal from "../../components/ShareModal";
 import CalculatorSection from "@/components/calculate";
 // Load Raleway font with more weight options
@@ -48,9 +49,11 @@ type Property = {
   }>;
   forSale?: boolean;
   forRent?: boolean;
+  enquiredFor?: string;
 };
 
 export default function PropertyCards() {
+  const router = useRouter();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -66,6 +69,7 @@ export default function PropertyCards() {
   const [openShareIndex, setOpenShareIndex] = useState<number | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<string>("");
+  const [enquiredForFilter, setEnquiredForFilter] = useState<string>("");
   const [bookmarkedProperties, setBookmarkedProperties] = useState<Set<string>>(new Set());
   // Add these new states at the top of the component
   const [allCities, setAllCities] = useState<string[]>([]);
@@ -125,9 +129,10 @@ export default function PropertyCards() {
         const data = await response.json();
         // Inspect the response structure and set the correct array
         // Example: if data.items is the array
-        setProperties(
-          Array.isArray(data) ? data : data.items || data.data || []
-        );
+        const propertiesData = Array.isArray(data) ? data : data.items || data.data || [];
+        console.log('Fetched properties:', propertiesData);
+        console.log('Sample property structure:', propertiesData[0]);
+        setProperties(propertiesData);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching properties:", error);
@@ -351,10 +356,40 @@ export default function PropertyCards() {
     }
   };
 
+  // Helper function to check if a property matches the enquiredFor filter
+  const propertyMatchesEnquiredFor = (property: Property, filter: string): boolean => {
+    // If enquiredFor is explicitly set, check it directly
+    if (property.enquiredFor) {
+      return property.enquiredFor === filter;
+    }
+    
+    // Otherwise, check based on forSale/forRent
+    if (filter === "Rent") {
+      return property.forRent === true;
+    } else if (filter === "Sale") {
+      return property.forSale === true;
+    }
+    
+    return false;
+  };
+
   // Enhanced filtering logic with multiple filter types
+  console.log('Filtering properties with enquiredForFilter:', enquiredForFilter);
+  console.log('Total properties to filter:', properties.length);
+  
   const filteredProperties = properties.filter((property) => {
-    // Filter by search type (Rent/Investment/Research)
-    if (selectedType) {
+    // Filter by enquiredFor (Rent/Investment)
+    if (enquiredForFilter) {
+      console.log('Property:', property.title, 'enquiredFor:', property.enquiredFor, 'forRent:', property.forRent, 'forSale:', property.forSale);
+      
+      if (!propertyMatchesEnquiredFor(property, enquiredForFilter)) {
+        console.log('Filtered out - does not match enquiredFor filter:', property.title, 'filter:', enquiredForFilter);
+        return false;
+      }
+    }
+    
+    // Filter by search type (Rent/Investment/Research) - keep this for backward compatibility
+    if (selectedType && !enquiredForFilter) {
       const typeLower = selectedType.toLowerCase().trim();
       
       // Filter by property type based on search type
@@ -429,6 +464,28 @@ export default function PropertyCards() {
     // If no filters applied, show all properties
     return true;
   });
+  
+  console.log('Filtered properties count:', filteredProperties.length);
+
+  // Helper function to determine enquiredFor value for a property
+  const getPropertyEnquiredFor = (property: Property): string | null => {
+    // If enquiredFor is explicitly set, use it
+    if (property.enquiredFor) {
+      return property.enquiredFor;
+    }
+    
+    // Otherwise, derive from forSale/forRent
+    if (property.forRent && !property.forSale) {
+      return "Rent";
+    } else if (property.forSale && !property.forRent) {
+      return "Sale";
+    } else if (property.forSale && property.forRent) {
+      // If both are true, we can't determine - return null
+      return null;
+    }
+    
+    return null;
+  };
 
   // Handle bookmark button click
   const handleCheckboxClick = (propertyId: string) => {
@@ -457,7 +514,7 @@ export default function PropertyCards() {
 
   return (
     <div className={raleway.className}>
-       <section className="relative w-full h-[220px] sm:h-[320px] md:h-[480px]">
+       <section className="relative w-full h-[220px] sm:h-[320px] md:h-[400px]">
          <div className="absolute inset-0 z-0">
     <video
       autoPlay
@@ -503,20 +560,33 @@ export default function PropertyCards() {
           {dropdownOpen && (
             <div className="absolute left-0 right-0  bg-black text-white rounded-lg shadow-lg z-50" style={{ zIndex: 9999 }}>
               <div
-                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-t-lg ${selectedType === "Rent" ? "bg-gray-700" : ""}`}
-                onClick={() => { setSelectedType("Rent"); setDropdownOpen(false); }}
+                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-t-lg ${enquiredForFilter === "Rent" ? "bg-gray-700" : ""}`}
+                onClick={() => { 
+                  setSelectedType("Rent"); 
+                  setEnquiredForFilter("Rent");
+                  setDropdownOpen(false); 
+                }}
               >
                 Rent
               </div>
               <div
-                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "Investment" ? "bg-gray-700" : ""}`}
-                onClick={() => { setSelectedType("Investment"); setDropdownOpen(false); }}
+                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${enquiredForFilter === "Sale" ? "bg-gray-700" : ""}`}
+                onClick={() => { 
+                  setSelectedType("Investment"); 
+                  setEnquiredForFilter("Sale");
+                  setDropdownOpen(false); 
+                }}
               >
                 Investment
               </div>
               <div
                 className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "Research" ? "bg-gray-700" : ""}`}
-                onClick={() => { setSelectedType("Research"); setDropdownOpen(false); }}
+                onClick={() => { 
+                  setSelectedType("Research"); 
+                  setEnquiredForFilter("");
+                  setDropdownOpen(false); 
+                  router.push('/research');
+                }}
               >
                 Research
               </div>
@@ -571,10 +641,11 @@ export default function PropertyCards() {
         </div>
         
         {/* Clear Filters Button */}
-        {/* {(selectedType || selectedLocations.length > 0 || search.trim()) && (
+        {/* {(selectedType || enquiredForFilter || selectedLocations.length > 0 || search.trim()) && (
           <button
             onClick={() => {
               setSelectedType("");
+              setEnquiredForFilter("");
               setSelectedLocations([]);
               setSearch("");
               setSuggestions([]);
@@ -593,7 +664,7 @@ export default function PropertyCards() {
         <div className="container mx-auto px-2 sm:px-4">
           <div className="w-full">
             {/* Heading */}
-            <div className="mb-8 sm:mb-[60px] w-full">
+            <div className="mb-8 sm:mb-[30px] w-full">
               <h2 className="mt-2 sm:mt-10 font-normal text-xl sm:text-2xl md:text-[32px] leading-[120%] tracking-normal text-center transform transition-all duration-700 hover:scale-105">
                 <span className="text-black">The Latest.</span>{" "}
                 <span className="text-[#6E6E73]">
@@ -601,22 +672,35 @@ export default function PropertyCards() {
                 </span>
               </h2>
               
-              {/* Results Counter */}
-              {(selectedType || selectedLocations.length > 0 || search.trim()) && (
-                <div className="mt-4 text-center">
-                  <p className="text-sm text-gray-600">
-                    Showing {filteredProperties.length} of {properties.length} properties
-                    {selectedType && ` • Type: ${selectedType}`}
-                    {selectedLocations.length > 0 && ` • Locations: ${selectedLocations.join(", ")}`}
-                    {search.trim() && ` • Search: "${search}"`}
-                  </p>
-                </div>
-              )}
+                             {/* Results Counter */}
+               {(selectedType || enquiredForFilter || selectedLocations.length > 0 || search.trim()) && (
+                 <div className="mt-4 text-center">
+                   <p className="text-sm text-gray-600">
+                     Showing {filteredProperties.length} of {properties.length} properties
+                     {selectedType && ` • Type: ${selectedType}`}
+                     {enquiredForFilter && ` • Enquired For: ${enquiredForFilter}`}
+                     {selectedLocations.length > 0 && ` • Locations: ${selectedLocations.join(", ")}`}
+                     {search.trim() && ` • Search: "${search}"`}
+                   </p>
+                 </div>
+               )}
+               
+               {/* Debug Info */}
+               {/* <div className="mt-4 text-center">
+                 <p className="text-xs text-gray-500">
+                   Debug: Properties with enquiredFor="Rent": {properties.filter(p => p.enquiredFor === "Rent").length} | 
+                   Properties with enquiredFor="Sale": {properties.filter(p => p.enquiredFor === "Sale").length} |
+                   Properties with forRent=true: {properties.filter(p => p.forRent).length} |
+                   Properties with forSale=true: {properties.filter(p => p.forSale).length} |
+                   Properties that would show for Rent filter: {properties.filter(p => propertyMatchesEnquiredFor(p, "Rent")).length} |
+                   Properties that would show for Sale filter: {properties.filter(p => propertyMatchesEnquiredFor(p, "Sale")).length}
+                 </p>
+               </div> */}
             </div>
 
             {/* Property Cards */}
             {filteredProperties.length === 0 ? (
-              <div className="text-center py-12">
+              <div className="text-center ">
                 <div className="text-gray-500 text-lg mb-4">
                   <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -627,6 +711,7 @@ export default function PropertyCards() {
                 <button
                   onClick={() => {
                     setSelectedType("");
+                    setEnquiredForFilter("");
                     setSelectedLocations([]);
                     setSearch("");
                     setSuggestions([]);

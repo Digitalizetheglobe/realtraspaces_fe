@@ -136,7 +136,7 @@ const TeamPage = () => {
 
       const url = currentMember
         ? `https://api.realtraspaces.com/api/team/${currentMember.id}`
-        : "https://api.realtraspaces.com/team/";
+        : "https://api.realtraspaces.com/api/team/";
 
       const method = currentMember ? "PUT" : "POST";
 

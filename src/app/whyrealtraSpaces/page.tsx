@@ -1,6 +1,7 @@
 "use client";
 import Blogs from "../blogs/page";
 import { Raleway } from 'next/font/google';
+import Testimonial from "../testimonial/page";
 
 // Load Raleway font
 const raleway = Raleway({
@@ -254,6 +255,7 @@ export default function WhyrealtraSpaces() {
                     </div>
                 </div>
             </div>
+            <Testimonial/>
 
             <Blogs />
 

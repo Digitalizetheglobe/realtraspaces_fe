@@ -25,12 +25,24 @@ export default function PageWithSeo({
 }: PageWithSeoProps) {
   const { seoData, isLoading, error } = useSeo(page);
 
-  // Update document metadata when SEO data is available
+  // Update document metadata when SEO data is available or when loading is complete
   React.useEffect(() => {
     if (seoData) {
       updateDocumentMetadata(seoData, fallbackTitle, fallbackDescription, fallbackKeywords, fallbackCanonical);
+    } else if (!isLoading && !error) {
+      // Use fallback metadata when no SEO data is available
+      updateDocumentMetadata({
+        id: 0,
+        page: page,
+        metaTitle: fallbackTitle,
+        metaDescription: fallbackDescription,
+        metaKeywords: fallbackKeywords,
+        canonicalUrl: fallbackCanonical,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }, fallbackTitle, fallbackDescription, fallbackKeywords, fallbackCanonical);
     }
-  }, [seoData, fallbackTitle, fallbackDescription, fallbackKeywords, fallbackCanonical]);
+  }, [seoData, isLoading, error, page, fallbackTitle, fallbackDescription, fallbackKeywords, fallbackCanonical]);
 
   const updateDocumentMetadata = (
     seoData: SeoMetaData,
