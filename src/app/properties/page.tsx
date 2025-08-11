@@ -516,6 +516,12 @@ export default function Similarproperties() {
 
                 {/* Search and Filter Section */}
                 <div className="mb-8 px-4 sm:px-0">
+                  {/* Note about cross-page search */}
+                  <div className="mb-2 text-center">
+                    <p className="text-xs text-gray-600">
+                      🔍 This search is also available on the Latest Properties page
+                    </p>
+                  </div>
                   {/* Search Bar */}
                   <div className="relative mb-6">
                     <input

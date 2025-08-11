@@ -7,6 +7,23 @@ import Image from "next/image";
 import SeoHead from "../../components/SeoHead";
 import PageWithSeo from "../../components/PageWithSeo";
 
+// Team member interface
+interface TeamMember {
+  id: number;
+  full_name: string;
+  description: string;
+  linkedin_url: string;
+  designation: string;
+  photo: string | null;
+  is_working: number;
+  created_at: string;
+  updated_at: string;
+  image: string;
+  name: string;
+  role: string;
+  linkedin: string;
+}
+
 const DUMMY_IMAGES = {
   heroVideo: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&h=1080&fit=crop",
   founder: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop",
@@ -32,88 +49,7 @@ const galleryImages = [
   { id: 8, src: "https://images.unsplash.com/photo-1502005229762-cf1b2da60e2f?w=300&h=300&fit=crop", alt: 'Luxury Home', size: 'small' }
 ];
 
-const teamMembers = [
-  {
-    id: 1,
-    name: 'Sarah Johnson',
-    role: 'Senior Manager',
-    image: DUMMY_IMAGES.team1,
-    description: 'Sarah leads our team with over a decade of real estate experience, specializing in luxury properties and client relations.',
-    linkedin: 'https://www.linkedin.com/in/sarah-johnson/'
-  },
-  {
-    id: 2,
-    name: 'Michael Chen',
-    role: 'Sales Director',
-    image: DUMMY_IMAGES.team2,
-    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
-    linkedin: 'https://www.linkedin.com/in/michael-chen/'
-  },
-  {
-    id: 3,
-    name: 'Emily Davis',
-    role: 'Marketing Lead',
-    image: DUMMY_IMAGES.team3,
-    description: 'Emily crafts our brand story and marketing campaigns, ensuring our properties reach the right audience.',
-    linkedin: 'https://www.linkedin.com/in/emily-davis/'
-  },
-    {
-    id: 4,
-    name: 'Michael Chen',
-    role: 'Sales Director',
-    image: DUMMY_IMAGES.team2,
-    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
-    linkedin: 'https://www.linkedin.com/in/michael-chen/'
-  },
-    {
-    id: 5,
-    name: 'Michael Chen',
-    role: 'Sales Director',
-    image: DUMMY_IMAGES.team2,
-    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
-    linkedin: 'https://www.linkedin.com/in/michael-chen/'
-  },
-    {
-    id: 6,
-    name: 'Michael Chen',
-    role: 'Sales Director',
-    image: DUMMY_IMAGES.team2,
-    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
-    linkedin: 'https://www.linkedin.com/in/michael-chen/'
-  },
-    {
-    id: 7,
-    name: 'Michael Chen',
-    role: 'Sales Director',
-    image: DUMMY_IMAGES.team2,
-    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
-    linkedin: 'https://www.linkedin.com/in/michael-chen/'
-  },
-    {
-    id: 8,
-    name: 'Michael Chen',
-    role: 'Sales Director',
-    image: DUMMY_IMAGES.team2,
-    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
-    linkedin: 'https://www.linkedin.com/in/michael-chen/'
-  },
-    {
-    id: 9,
-    name: 'Michael Chen',
-    role: 'Sales Director',
-    image: DUMMY_IMAGES.team2,
-    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
-    linkedin: 'https://www.linkedin.com/in/michael-chen/'
-  },
-    {
-    id: 10,
-    name: 'Michael Chen',
-    role: 'Sales Director',
-    image: DUMMY_IMAGES.team2,
-    description: 'Michael drives our sales strategy and has a proven track record in closing high-value deals across the region.',
-    linkedin: 'https://www.linkedin.com/in/michael-chen/'
-  },
-];
+
 
 // Awards data
 const awards = [
@@ -181,6 +117,55 @@ export default function RealtraSpacesAbout() {
 
   const [modalImage, setModalImage] = useState<string | null>(null);
   const [isCarouselHovered, setIsCarouselHovered] = useState(false);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch team members function
+  const fetchTeamMembers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch('https://api.realtraspaces.com/api/team/');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      if (data.success && data.data) {
+        console.log('Team API response:', data.data);
+        // Filter only active team members and add default image if photo is null
+        const activeMembers = data.data
+          .filter((member: TeamMember) => member.is_working === 1)
+          .map((member: TeamMember) => ({
+            ...member,
+            image: member.photo || DUMMY_IMAGES.team1, // Use default image if no photo
+            name: member.full_name,
+            role: member.designation,
+            linkedin: member.linkedin_url
+          }));
+        console.log('Processed team members:', activeMembers);
+        setTeamMembers(activeMembers);
+      } else {
+        console.warn('API response indicates no success or no data');
+        setTeamMembers([]);
+        setError('No team data available');
+      }
+    } catch (error) {
+      console.error('Error fetching team members:', error);
+      // Fallback to empty array
+      setTeamMembers([]);
+      setError('Failed to load team members. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch team members from API on component mount
+  useEffect(() => {
+    fetchTeamMembers();
+  }, []);
 
   // Create counter components outside of render
   const YearsCounter = () => {
@@ -416,68 +401,132 @@ export default function RealtraSpacesAbout() {
       </section>
 
      {/* Team Section - Modern Redesign */}
-<section className="py-24 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
-  {/* Background Elements */}
-  <div className="absolute inset-0 opacity-10">
-    <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400 rounded-full blur-3xl"></div>
-    <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400 rounded-full blur-3xl"></div>
-  </div>
-  
-  <div className="container mx-auto px-4 relative z-10">
-    {/* Header */}
-    <div className="text-center mb-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="inline-block"
-      >
-        <span className="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold mb-4">
-          Meet Our Team
-        </span>
-      </motion.div>
-      
-    
+{teamMembers && teamMembers.length > 0 && (
+  <section className="py-24 bg-gradient-to-br from-gray-50 via-white to-blue-50 relative overflow-hidden">
+    {/* Background Elements */}
+    <div className="absolute inset-0 opacity-10">
+      <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-400 rounded-full blur-3xl"></div>
     </div>
-
-<div className="relative bg-white py-12 overflow-hidden">
-
-
-  {/* Scrolling container */}
-  <div className="relative w-full overflow-hidden">
-      <div className="flex gap-6 animate-scroll whitespace-nowrap">
-        {[...teamMembers, ...teamMembers].map((member, index) => (
-          <div
-            key={index}
-            className="group relative flex-shrink-0 w-64 rounded-2xl overflow-hidden border border-gray-200 transition-shadow duration-500"
-          >
-            <div className="relative">
-              {/* Image */}
-              <img
-                src={member.image}
-                alt={member.name}
-                className="w-full h-72 object-cover grayscale group-hover:grayscale-0 transition-all duration-500 cursor-pointer"
-              />
-              {/* Name and Role Overlay */}
-              <div className="absolute bottom-3 w-50 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
-                <h3 className="text-sm font-semibold text-gray-800">
-                  {member.name}
-                </h3>
-                <p className="text-xs text-gray-500">{member.role}</p>
-              </div>
-            </div>
-            {/* Shadow on hover */}
-            <div className="absolute inset-0 rounded-2xl pointer-events-none group-hover:shadow-xl transition-shadow duration-500" />
-          </div>
-        ))}
+    
+    <div className="container mx-auto px-4 relative z-10">
+      {/* Header */}
+      <div className="text-center mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="inline-block"
+        >
+          <span className="inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold mb-4">
+            Meet Our Team
+          </span>
+        </motion.div>
+        
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
+        >
+          Our Expert Team
+        </motion.h2>
+        
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="text-xl text-gray-600 max-w-3xl mx-auto"
+        >
+          Meet the dedicated professionals who make Realtraspaces your trusted partner in real estate.
+          {!loading && teamMembers.length > 0 && (
+            <span className="block mt-2 text-sm text-blue-600 font-medium">
+              {teamMembers.length} team member{teamMembers.length !== 1 ? 's' : ''} available
+            </span>
+          )}
+        </motion.p>
       </div>
+
+  <div className="relative bg-white py-12 overflow-hidden">
+    {/* Loading State */}
+    {loading && (
+      <div className="flex justify-center items-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )}
+
+    {/* Team Members */}
+    {!loading && teamMembers.length > 0 && (
+      <div className="relative w-full overflow-hidden">
+        <div className="flex gap-6 animate-scroll whitespace-nowrap">
+          {[...teamMembers, ...teamMembers].map((member, index) => (
+            <div
+              key={`${member.id}-${index}`}
+              className="group relative flex-shrink-0 w-64 rounded-2xl overflow-hidden border border-gray-200 transition-shadow duration-500 cursor-pointer"
+              onClick={() => member.linkedin && window.open(member.linkedin, '_blank')}
+            >
+              <div className="relative">
+                {/* Image */}
+                <img
+                  src={member.image}
+                  alt={member.name}
+                  className="w-full h-72 object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                />
+                {/* Name and Role Overlay */}
+                <div className="absolute bottom-3 w-50 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg text-center">
+                  <h3 className="text-sm font-semibold text-gray-800">
+                    {member.name}
+                  </h3>
+                  <p className="text-xs text-gray-500">{member.role}</p>
+                </div>
+                {/* LinkedIn indicator */}
+                {member.linkedin && (
+                  <div className="absolute top-3 right-3 bg-blue-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.047-1.852-3.047-1.853 0-2.136 1.445-2.136 2.939v5.677H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                  </div>
+                )}
+              </div>
+              {/* Shadow on hover */}
+              <div className="absolute inset-0 rounded-2xl pointer-events-none group-hover:shadow-xl transition-shadow duration-500" />
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {/* Error State */}
+    {!loading && error && (
+      <div className="text-center py-12">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+          <p className="text-red-600 text-lg mb-4">{error}</p>
+          <button
+            onClick={() => {
+              setError(null);
+              setLoading(true);
+              fetchTeamMembers();
+            }}
+            className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-300"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    )}
+
+    {/* No Team Members State */}
+    {!loading && !error && teamMembers.length === 0 && (
+      <div className="text-center py-12">
+        <p className="text-gray-500 text-lg">No team members available at the moment.</p>
+      </div>
+    )}
   </div>
 
-</div>
 
-
-  </div>
-</section>
+    </div>
+  </section>
+)}
 
       {/* Gallery Section */}
       <section className="py-20" style={{ backgroundColor: '#F5F5FF99' }}>

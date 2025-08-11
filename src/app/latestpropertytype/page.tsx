@@ -66,6 +66,7 @@ type Property = {
 export default function PropertyCards() {
   const router = useRouter();
   const [properties, setProperties] = useState<Property[]>([]);
+  const [allProperties, setAllProperties] = useState<Property[]>([]); // NEW: Combined properties from both pages
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]); // NEW
@@ -129,6 +130,7 @@ export default function PropertyCards() {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
+        // Fetch properties from latestpropertytype page
         const response = await fetch(
           "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=20",
           {
@@ -140,12 +142,30 @@ export default function PropertyCards() {
           }
         );
         const data = await response.json();
-        // Inspect the response structure and set the correct array
-        // Example: if data.items is the array
         const propertiesData = Array.isArray(data) ? data : data.items || data.data || [];
-        console.log('Fetched properties:', propertiesData);
-        console.log('Sample property structure:', propertiesData[0]);
+        console.log('Fetched latestpropertytype properties:', propertiesData);
+        
+        // Fetch properties from properties page
+        const propertiesResponse = await fetch(
+          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=100",
+          {
+            method: "GET",
+            headers: {
+              accept: "application/json",
+              tenant: "realtraspaces",
+            },
+          }
+        );
+        const propertiesData2 = await propertiesResponse.json();
+        const propertiesPageData = Array.isArray(propertiesData2) ? propertiesData2 : propertiesData2.items || propertiesData2.data || [];
+        console.log('Fetched properties page properties:', propertiesPageData);
+        
+        // Combine both sets of properties
+        const combinedProperties = [...propertiesData, ...propertiesPageData];
+        console.log('Combined properties:', combinedProperties);
+        
         setProperties(propertiesData);
+        setAllProperties(combinedProperties);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching properties:", error);
@@ -170,10 +190,10 @@ export default function PropertyCards() {
       }
     });
     // Unique property types
-    const propertyTypes = Array.from(new Set(properties.map(p => p.propertyType?.displayName).filter((t): t is string => Boolean(t))));
+    const propertyTypes = Array.from(new Set(allProperties.map(p => p.propertyType?.displayName).filter((t): t is string => Boolean(t))));
     // Universal search: collect all searchable strings
     const universal = new Set<string>();
-    properties.forEach(p => {
+    allProperties.forEach(p => {
       if (p.title) universal.add(p.title);
       if (p.address?.city) universal.add(p.address.city);
       if (p.address?.subLocality) universal.add(p.address.subLocality);
@@ -204,7 +224,7 @@ export default function PropertyCards() {
     setAllSublocalities(sublocalities);
     setAllPropertyTypes(propertyTypes);
     setAllUniversal(Array.from(universal));
-  }, [properties]);
+  }, [allProperties]);
 
   // Update suggestions as user types
   useEffect(() => {
@@ -403,8 +423,8 @@ export default function PropertyCards() {
     return false;
   };
 
-  // Enhanced filtering logic with multiple filter types
-  const filteredProperties = properties.filter((property) => {
+  // Enhanced filtering logic with multiple filter types - now searches across both pages
+  const filteredProperties = allProperties.filter((property) => {
     // Filter by enquiredFor (Rent/Investment)
     if (enquiredForFilter) {
       if (!propertyMatchesEnquiredFor(property, enquiredForFilter)) {
@@ -616,10 +636,15 @@ export default function PropertyCards() {
           )}
         </div>
         {/* Multi-location chips UI inside input area, right-aligned */}
+        <div className="mb-2 text-center">
+          <p className="text-xs text-gray-600">
+            🔍 Searching across both Latest Properties and All Properties pages
+          </p>
+        </div>
         <div className="relative w-full">
           <input
             type="text"
-            placeholder="Search by property name, location, or type..."
+            placeholder="Search across both pages: property name, location, or type..."
             className="w-full bg-white text-gray-900 px-5 py-3 text-sm rounded-2xl outline-none pr-44"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -698,7 +723,7 @@ export default function PropertyCards() {
                {(selectedType || enquiredForFilter || selectedLocations.length > 0 || search.trim()) && (
                  <div className="mt-4 text-center">
                    <p className="text-sm text-gray-600">
-                     Showing {filteredProperties.length} of {properties.length} properties
+                     Showing {filteredProperties.length} of {allProperties.length} properties (searching across both pages)
                      {selectedType && ` • Type: ${selectedType}`}
                      {enquiredForFilter && ` • Enquired For: ${enquiredForFilter}`}
                      {selectedLocations.length > 0 && ` • Locations: ${selectedLocations.join(", ")}`}
