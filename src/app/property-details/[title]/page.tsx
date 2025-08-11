@@ -33,7 +33,13 @@ const raleway = Raleway({
 type Property = {
   id: string;
   title?: string;
-  imageUrls: { [key: string]: string };
+  imageUrls?: {
+    Images?: Array<{
+      imageFilePath: string;
+      isCoverImage: boolean;
+      orderRank?: number | null;
+    }>;
+  };
   propertyType?: {
     displayName?: string;
     childType?: {
@@ -120,6 +126,27 @@ export default function PropertyDetails() {
   ];
   const visibleCount = 4;
   const [isComparing, setIsComparing] = useState(false);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set()); // Track failed image URLs
+  const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set()); // Track loading image URLs
+
+  // Helper function to get the best image URL for a property
+  const getPropertyImage = (property: Property | null): string => {
+    if (!property) return propertydetails.src;
+    
+    if (property.imageUrls?.Images && property.imageUrls.Images.length > 0) {
+      // First try to find a cover image
+      const coverImage = property.imageUrls.Images.find(img => img.isCoverImage);
+      if (coverImage && !failedImages.has(coverImage.imageFilePath)) {
+        return coverImage.imageFilePath;
+      }
+      // If no cover image or cover image failed, return the first non-failed image
+      const firstImage = property.imageUrls.Images.find(img => !failedImages.has(img.imageFilePath));
+      if (firstImage) {
+        return firstImage.imageFilePath;
+      }
+    }
+    return propertydetails.src;
+  };
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
@@ -149,16 +176,26 @@ export default function PropertyDetails() {
 
         if (properties.length > 0) {
           setProperty(properties[0]);
+          
+          // Reset failed and loading images for new property
+          setFailedImages(new Set());
+          setLoadingImages(new Set());
 
           // Set image URLs from API if available, otherwise use default images
           if (
-            properties[0].imageUrls &&
-            typeof properties[0].imageUrls === "object" &&
-            Object.keys(properties[0].imageUrls).length > 0
+            properties[0].imageUrls?.Images &&
+            properties[0].imageUrls.Images.length > 0
           ) {
-            const urls = Object.values(properties[0].imageUrls) as string[];
+            const urls = properties[0].imageUrls.Images.map((img: { imageFilePath: string; isCoverImage: boolean; orderRank?: number | null }) => img.imageFilePath);
             setImageUrls(urls);
-            setMainImage(urls[0] as any); // Set main image to first API image (string)
+            // Use the helper function to get the best image
+            const bestImage = getPropertyImage(properties[0]);
+            setMainImage(bestImage);
+            
+            // Set loading state for the new main image if it's a string URL
+            if (bestImage !== propertydetails.src) {
+              setLoadingImages(prev => new Set(prev).add(bestImage));
+            }
           } else {
             setMainImage(propertydetails); // Ensure mainImage is set to a default image
           }
@@ -199,7 +236,8 @@ export default function PropertyDetails() {
         imageUrls.length > 0
           ? imageUrls.slice(newStartIndex, newStartIndex + visibleCount)
           : thumbnails.slice(newStartIndex, newStartIndex + visibleCount);
-      setMainImage(newVisibleImages[0]);
+      const newMainImage = newVisibleImages[0];
+      setMainImage(newMainImage);
     }
   };
 
@@ -212,7 +250,8 @@ export default function PropertyDetails() {
         imageUrls.length > 0
           ? imageUrls.slice(newStartIndex, newStartIndex + visibleCount)
           : thumbnails.slice(newStartIndex, newStartIndex + visibleCount);
-      setMainImage(newVisibleImages[0]);
+      const newMainImage = newVisibleImages[0];
+      setMainImage(newMainImage);
     }
   };
 
@@ -324,11 +363,11 @@ export default function PropertyDetails() {
     }
   };
 
-  const handleThumbnailClick = (img: any) => {
+  const handleThumbnailClick = (img: string | StaticImageData) => {
     setMainImage(img);
   };
 
-  const visibleImages =
+  const visibleImages: (string | StaticImageData)[] =
     imageUrls.length > 0
       ? imageUrls.slice(startIndex, startIndex + visibleCount)
       : thumbnails.slice(startIndex, startIndex + visibleCount);
@@ -819,13 +858,43 @@ export default function PropertyDetails() {
                 </button>
                 {/* Main Image */}
                 {typeof mainImage === "string" ? (
-                  <img
-                    src={mainImage}
-                    alt="Main View"
-                    className="w-full h-[400px] object-cover"
-                    width={600}
-                    height={450}
-                  />
+                  <div className="relative">
+                    <img
+                      src={mainImage}
+                      alt="Main View"
+                      className="w-full h-[400px] object-cover"
+                      width={600}
+                      height={450}
+                      onLoad={() => {
+                        // Remove from loading state when image loads successfully
+                        if (mainImage !== propertydetails.src) {
+                          setLoadingImages(prev => {
+                            const newSet = new Set(prev);
+                            newSet.delete(mainImage);
+                            return newSet;
+                          });
+                        }
+                      }}
+                      onError={(e) => {
+                        // Add failed image URL to state and fallback to default image
+                        const target = e.target as HTMLImageElement;
+                        const failedUrl = target.src;
+                        setFailedImages(prev => new Set(prev).add(failedUrl));
+                        setLoadingImages(prev => {
+                          const newSet = new Set(prev);
+                          newSet.delete(failedUrl);
+                          return newSet;
+                        });
+                        target.src = propertydetails.src;
+                      }}
+                    />
+                    {/* Loading overlay */}
+                    {loadingImages.has(mainImage) && (
+                      <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600"></div>
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <Image
                     src={mainImage}
@@ -889,11 +958,41 @@ export default function PropertyDetails() {
                         onClick={() => handleThumbnailClick(img)}
                       >
                         {typeof img === "string" ? (
-                          <img
-                            src={img}
-                            alt={`Thumbnail ${index + 1}`}
-                            className="w-24 h-24 object-cover"
-                          />
+                          <div className="relative">
+                            <img
+                              src={img}
+                              alt={`Thumbnail ${index + 1}`}
+                              className="w-24 h-24 object-cover"
+                              onLoad={() => {
+                                // Remove from loading state when image loads successfully
+                                if (img !== propertydetails.src) {
+                                  setLoadingImages(prev => {
+                                    const newSet = new Set(prev);
+                                    newSet.delete(img);
+                                    return newSet;
+                                  });
+                                }
+                              }}
+                              onError={(e) => {
+                                // Add failed image URL to state and fallback to default image
+                                const target = e.target as HTMLImageElement;
+                                const failedUrl = target.src;
+                                setFailedImages(prev => new Set(prev).add(failedUrl));
+                                setLoadingImages(prev => {
+                                  const newSet = new Set(prev);
+                                  newSet.delete(failedUrl);
+                                  return newSet;
+                                });
+                                target.src = propertydetails.src;
+                              }}
+                            />
+                            {/* Loading overlay */}
+                            {loadingImages.has(img) && (
+                              <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
+                              </div>
+                            )}
+                          </div>
                         ) : (
                           <Image
                             src={img}
@@ -916,11 +1015,9 @@ export default function PropertyDetails() {
                 </h2>
                 <div className="bg-gray-100 p-6 rounded-xl max-w-2xl">
                   <p className="text-gray-700 leading-relaxed">
-                    Located in the bustling commercial hub of Andheri East, 215
-                    Atrium offers a prime leasing opportunity with 35,000 sq.ft.
-                    chargeable space. With excellent connectivity and 70%
-                    efficiency, this bare shell property is ideal for companies
-                    looking for scalable office space.
+                    {property.aboutProperty || 
+                      "This property offers excellent investment and living opportunities with prime location benefits. Featuring modern amenities and strategic connectivity, it's perfect for those seeking quality real estate in a well-connected area. Contact us for detailed information about this exceptional property."
+                    }
                   </p>
                 </div>
               </div>
@@ -1085,8 +1182,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Type</p>
-                      <p className="font-medium text-gray-800">
+                      <p className="text-[14px] text-gray-500">Type</p>
+                      <p className="font-medium text-[12px] text-gray-800">
                         {property.enquiredFor || "On Lease"}
                       </p>
                     </div>
@@ -1101,8 +1198,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Floor</p>
-                      <p className="font-medium text-gray-800">
+                      <p className="text-[14px] text-gray-500">Floor</p>
+                      <p className="font-medium text-[12px] text-gray-800">
                         {property.tagInfo?.id ? "Floor info" : "N/A"}
                       </p>
                     </div>
@@ -1117,8 +1214,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Chargeable Area</p>
-                      <p className="font-medium text-gray-800">
+                      <p className="text-[14px] text-gray-500">Chargeable Area</p>
+                      <p className="font-medium text-[12px] text-gray-800">
                         {property.dimension?.area || "N/A"}{" "}
                         {property.dimension?.unit || "sq ft"}
                       </p>
@@ -1134,8 +1231,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Carpet</p>
-                      <p className="font-medium text-gray-800">
+                      <p className="text-[14px] text-gray-500">Carpet</p>
+                      <p className="font-medium text-[12px] text-gray-800">
                         {property.dimension?.carpetArea || "N/A"} sq ft
                       </p>
                     </div>
@@ -1150,10 +1247,10 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-[14px] text-gray-500">
                         Building Structure
                       </p>
-                      <p className="font-medium text-gray-800">
+                      <p className="font-medium text-[12px] text-gray-800">
                         {property.dimension?.length &&
                         property.dimension?.breadth
                           ? `${property.dimension.length} x ${property.dimension.breadth}`
@@ -1171,8 +1268,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Efficiency</p>
-                      <p className="font-medium text-gray-800">
+                      <p className="text-[14px] text-gray-500">Efficiency</p>
+                      <p className="font-medium text-[12px] text-gray-800">
                         {property.dimension?.carpetArea &&
                         property.dimension?.area
                           ? `${Math.round(
@@ -1194,8 +1291,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Quoted Total Rent</p>
-                      <p className="font-medium text-gray-800">
+                      <p className="text-[14px] text-gray-500">Quoted Total Rent</p>
+                      <p className="font-medium text-[12px] text-gray-800">
                         {formatPrice(
                           property.monetaryInfo?.expectedPrice ||
                             property.monetaryInfo?.monthlyRentAmount,
@@ -1214,8 +1311,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Maintenance</p>
-                      <p className="font-medium text-gray-800">
+                      <p className="text-[14px] text-gray-500">Maintenance</p>
+                      <p className="font-medium text-[12px] text-gray-800">
                         {property.monetaryInfo?.maintenanceCost
                           ? `₹ ${property.monetaryInfo.maintenanceCost.toLocaleString()}/month`
                           : "Included in rent"}
@@ -1232,8 +1329,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Taxes</p>
-                      <p className="font-medium text-gray-800">
+                      <p className="text-[14px] text-gray-500">Taxes</p>
+                      <p className="font-medium text-[12px] text-gray-800">
                         Included in rent
                       </p>
                     </div>
@@ -1248,8 +1345,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Possession</p>
-                      <p className="font-medium text-gray-800">
+                      <p className="text-[14px] text-gray-500">Possession</p>
+                      <p className="font-medium text-[12px] text-gray-800">
                         {property.possessionDate
                           ? new Date(property.possessionDate) <= new Date()
                             ? "Immediate"
@@ -1268,8 +1365,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Condition</p>
-                      <p className="font-medium text-gray-800">
+                      <p className="text-[14px] text-gray-500">Condition</p>
+                      <p className="font-medium text-[12px] text-gray-800">
                         {getFurnishStatus(property.furnishStatus)}
                       </p>
                     </div>
@@ -1284,8 +1381,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Car Park Ratio</p>
-                      <p className="font-medium text-gray-800">1:1000 sq.ft.</p>
+                      <p className="text-[14px] text-gray-500">Car Park Ratio</p>
+                      <p className="font-medium text-[12px] text-gray-800">1:1000 sq.ft.</p>
                     </div>
                   </div>
 
@@ -1298,8 +1395,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Car Park Charges</p>
-                      <p className="font-medium text-gray-800">
+                      <p className="text-[14px] text-gray-500">Car Park Charges</p>
+                      <p className="font-medium text-[12px] text-gray-800">
                         ₹7,500 per car park
                       </p>
                     </div>
@@ -1314,8 +1411,8 @@ export default function PropertyDetails() {
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-sm text-gray-500">Security Deposit</p>
-                      <p className="font-medium text-gray-800">
+                      <p className="text-[14px] text-gray-500">Security Deposit</p>
+                      <p className="font-medium text-[12px] text-gray-800">
                         {property.monetaryInfo?.depositAmount
                           ? `₹ ${property.monetaryInfo.depositAmount.toLocaleString()}`
                           : "12 months"}

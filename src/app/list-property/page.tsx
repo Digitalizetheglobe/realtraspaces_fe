@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react";
-import { Camera, MapPin, DollarSign, Home, Phone, Mail, Upload, Check, AlertCircle } from "lucide-react";
+import { Camera, MapPin, DollarSign, Home, Phone, Mail, Upload, Check, AlertCircle, Building2, FileText } from "lucide-react";
 
 export default function ListPropertyPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -9,35 +9,43 @@ export default function ListPropertyPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const [form, setForm] = useState({
-    name: "",
+    propertyName: "",
     location: "",
-    price: "",
     propertyType: "",
-    bedrooms: "",
-    bathrooms: "",
-    sqft: "",
+    transactionType: "",
+    areaCarpet: "",
+    areaBuiltup: "",
+    rent: "",
+    price: "",
+    contactName: "",
+    contactNumber: "",
+    emailAddress: "",
     description: "",
-    contact: "",
-    email: "",
     image: null as File | null,
-    amenities: [] as string[],
   });
 
-  const propertyTypes = ["House", "Apartment", "Condo", "Townhouse", "Villa", "Commercial", "Land"];
-  const amenitiesList = ["Parking", "Swimming Pool", "Gym", "Security", "Garden", "Balcony", "AC", "Furnished"];
+  const propertyTypes = ["Office", "Retail", "Coworking", "Industrial or warehouse", "Land", "Others"];
+  const transactionTypes = ["Lease", "Sale", "BOTH", "Preleased"];
 
   function validateForm() {
     const newErrors: any = {};
-    if (!form.name.trim()) newErrors.name = "Property name is required";
-    if (!form.location.trim()) newErrors.location = "Location is required";
-    if (!form.price || parseFloat(form.price) <= 0) newErrors.price = "Valid price is required";
     if (!form.propertyType) newErrors.propertyType = "Property type is required";
-    if (!form.description.trim() || form.description.length < 20) {
-      newErrors.description = "Description must be at least 20 characters";
+    if (!form.transactionType) newErrors.transactionType = "Transaction type is required";
+    if (!form.areaCarpet.trim()) newErrors.areaCarpet = "Area Carpet is required";
+    if (!form.areaBuiltup.trim()) newErrors.areaBuiltup = "Area Builtup is required";
+    
+    // Conditional validation for Rent and Price
+    if (form.transactionType === "Lease" || form.transactionType === "BOTH") {
+      if (!form.rent.trim()) newErrors.rent = "Rent is required for Lease/BOTH";
     }
-    if (!form.contact.trim()) newErrors.contact = "Contact number is required";
-    if (!form.email.trim() || !/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = "Valid email is required";
+    if (form.transactionType === "Sale" || form.transactionType === "Preleased" || form.transactionType === "BOTH") {
+      if (!form.price.trim()) newErrors.price = "Price is required for Sale/Preleased/BOTH";
+    }
+    
+    if (!form.contactName.trim()) newErrors.contactName = "Contact name is required";
+    if (!form.contactNumber.trim()) newErrors.contactNumber = "Contact number is required";
+    if (!form.emailAddress.trim() || !/\S+@\S+\.\S+/.test(form.emailAddress)) {
+      newErrors.emailAddress = "Valid email is required";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -57,15 +65,6 @@ export default function ListPropertyPage() {
     if (errors[name]) {
       setErrors((prev: any) => ({ ...prev, [name]: "" }));
     }
-  }
-
-  function handleAmenityChange(amenity: string) {
-    setForm(prev => ({
-      ...prev,
-      amenities: prev.amenities.includes(amenity)
-        ? prev.amenities.filter(a => a !== amenity)
-        : [...prev.amenities, amenity]
-    }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -97,7 +96,7 @@ export default function ListPropertyPage() {
             </ul>
           </div>
           <button 
-            onClick={() => {setSubmitted(false); setForm({name: "", location: "", price: "", propertyType: "", bedrooms: "", bathrooms: "", sqft: "", description: "", contact: "", email: "", image: null, amenities: []}); setImagePreview(null);}}
+            onClick={() => {setSubmitted(false); setForm({propertyName: "", location: "", propertyType: "", transactionType: "", areaCarpet: "", areaBuiltup: "", rent: "", price: "", contactName: "", contactNumber: "", emailAddress: "", description: "", image: null}); setImagePreview(null);}}
             className="w-full bg-[#FFB400] text-black font-semibold py-3 rounded-lg hover:bg-[#E6A200] transition-all duration-200 transform hover:scale-105"
           >
             List Another Property
@@ -118,7 +117,7 @@ export default function ListPropertyPage() {
         <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
           <div className="bg-gray-900 p-6">
             <h2 className="text-2xl font-semibold text-white flex items-center">
-              <Home className="mr-3" />
+              <Building2 className="mr-3" />
               Property Details
             </h2>
           </div>
@@ -126,51 +125,34 @@ export default function ListPropertyPage() {
             <div className="grid md:grid-cols-2 gap-6">
               {/* Property Name */}
               <div className="md:col-span-2">
-                <label className="block font-semibold mb-2 text-gray-900">Property Name *</label>
+                <label className="block font-semibold mb-2 text-gray-900">Property Name</label>
                 <div className="relative">
                   <Home className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                   <input 
-                    name="name" 
-                    value={form.name} 
+                    name="propertyName" 
+                    value={form.propertyName} 
                     onChange={handleChange} 
-                    placeholder="e.g., Luxury 3BHK Apartment"
-                    className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
+                    placeholder="e.g., Premium Office Space"
+                    className="w-full border border-gray-300 rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900"
                   />
                 </div>
-                {errors.name && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.name}</p>}
               </div>
+              
               {/* Location */}
               <div className="md:col-span-2">
-                <label className="block font-semibold mb-2 text-gray-900">Location *</label>
+                <label className="block font-semibold mb-2 text-gray-900">Location</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                   <input 
                     name="location" 
                     value={form.location} 
                     onChange={handleChange}
-                    placeholder="e.g., Koregaon Park, Mumbai"
-                    className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.location ? 'border-red-500' : 'border-gray-300'}`}
+                    placeholder="e.g., BKC, Mumbai"
+                    className="w-full border border-gray-300 rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900"
                   />
                 </div>
-                {errors.location && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.location}</p>}
               </div>
-              {/* Price */}
-              <div>
-                <label className="block font-semibold mb-2 text-gray-900">Price (₹) *</label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                  <input 
-                    name="price" 
-                    value={form.price} 
-                    onChange={handleChange}
-                    type="number" 
-                    min="0"
-                    placeholder="5000000"
-                    className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.price ? 'border-red-500' : 'border-gray-300'}`}
-                  />
-                </div>
-                {errors.price && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.price}</p>}
-              </div>
+              
               {/* Property Type */}
               <div>
                 <label className="block font-semibold mb-2 text-gray-900">Property Type *</label>
@@ -187,110 +169,154 @@ export default function ListPropertyPage() {
                 </select>
                 {errors.propertyType && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.propertyType}</p>}
               </div>
-              {/* Bedrooms */}
+              
+              {/* Transaction Type */}
               <div>
-                <label className="block font-semibold mb-2 text-gray-900">Bedrooms</label>
-                <input 
-                  name="bedrooms" 
-                  value={form.bedrooms} 
+                <label className="block font-semibold mb-2 text-gray-900">Transaction Type *</label>
+                <select 
+                  name="transactionType" 
+                  value={form.transactionType} 
                   onChange={handleChange}
-                  type="number" 
-                  min="0"
-                  placeholder="3"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900"
-                />
+                  className={`w-full border rounded-lg px-3 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 bg-white ${errors.transactionType ? 'border-red-500' : 'border-gray-300'}`}
+                >
+                  <option value="">Select Type</option>
+                  {transactionTypes.map(type => (
+                    <option key={type} value={type}>{type}</option>
+                  ))}
+                </select>
+                {errors.transactionType && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.transactionType}</p>}
               </div>
-              {/* Bathrooms */}
+              
+              {/* Area Carpet */}
               <div>
-                <label className="block font-semibold mb-2 text-gray-900">Bathrooms</label>
+                <label className="block font-semibold mb-2 text-gray-900">Area Carpet *</label>
                 <input 
-                  name="bathrooms" 
-                  value={form.bathrooms} 
+                  name="areaCarpet" 
+                  value={form.areaCarpet} 
                   onChange={handleChange}
-                  type="number" 
-                  min="0"
-                  placeholder="2"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900"
+                  type="text"
+                  placeholder="e.g., 2000 sq ft"
+                  className={`w-full border rounded-lg px-3 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.areaCarpet ? 'border-red-500' : 'border-gray-300'}`}
                 />
+                {errors.areaCarpet && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.areaCarpet}</p>}
               </div>
-              {/* Square Feet */}
+              
+              {/* Area Builtup */}
               <div>
-                <label className="block font-semibold mb-2 text-gray-900">Area (sq ft)</label>
+                <label className="block font-semibold mb-2 text-gray-900">Area Builtup *</label>
                 <input 
-                  name="sqft" 
-                  value={form.sqft} 
+                  name="areaBuiltup" 
+                  value={form.areaBuiltup} 
                   onChange={handleChange}
-                  type="number" 
-                  min="0"
-                  placeholder="1200"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900"
+                  type="text"
+                  placeholder="e.g., 2500 sq ft"
+                  className={`w-full border rounded-lg px-3 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.areaBuiltup ? 'border-red-500' : 'border-gray-300'}`}
                 />
+                {errors.areaBuiltup && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.areaBuiltup}</p>}
               </div>
-              {/* Contact */}
+              
+              {/* Rent - Conditional */}
+              {(form.transactionType === "Lease" || form.transactionType === "BOTH") && (
+                <div>
+                  <label className="block font-semibold mb-2 text-gray-900">Rent (₹) *</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-3 text-gray-400 font-semibold">₹</span>
+                    <input 
+                      name="rent" 
+                      value={form.rent} 
+                      onChange={handleChange}
+                      type="number" 
+                      min="0"
+                      placeholder="50000"
+                      className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.rent ? 'border-red-500' : 'border-gray-300'}`}
+                    />
+                  </div>
+                  {errors.rent && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.rent}</p>}
+                </div>
+              )}
+              
+              {/* Price - Conditional */}
+              {(form.transactionType === "Sale" || form.transactionType === "Preleased" || form.transactionType === "BOTH") && (
+                <div>
+                  <label className="block font-semibold mb-2 text-gray-900">Price (₹) *</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-3 text-gray-400 font-semibold">₹</span>
+                    <input 
+                      name="price" 
+                      value={form.price} 
+                      onChange={handleChange}
+                      type="number" 
+                      min="0"
+                      placeholder="5000000"
+                      className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.price ? 'border-red-500' : 'border-gray-300'}`}
+                    />
+                  </div>
+                  {errors.price && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.price}</p>}
+                </div>
+              )}
+              
+              {/* Contact Name */}
+              <div>
+                <label className="block font-semibold mb-2 text-gray-900">Contact Name *</label>
+                <input 
+                  name="contactName" 
+                  value={form.contactName} 
+                  onChange={handleChange}
+                  placeholder="Your Name"
+                  className={`w-full border rounded-lg px-3 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.contactName ? 'border-red-500' : 'border-gray-300'}`}
+                />
+                {errors.contactName && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.contactName}</p>}
+              </div>
+              
+              {/* Contact Number */}
               <div>
                 <label className="block font-semibold mb-2 text-gray-900">Contact Number *</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                   <input 
-                    name="contact" 
-                    value={form.contact} 
+                    name="contactNumber" 
+                    value={form.contactNumber} 
                     onChange={handleChange}
                     placeholder="+91 9876543210"
-                    className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.contact ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.contactNumber ? 'border-red-500' : 'border-gray-300'}`}
                   />
                 </div>
-                {errors.contact && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.contact}</p>}
+                {errors.contactNumber && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.contactNumber}</p>}
               </div>
-              {/* Email */}
-              <div>
-                <label className="block font-semibold mb-2 text-gray-900">Email *</label>
+              
+              {/* Email Address */}
+              <div className="md:col-span-2">
+                <label className="block font-semibold mb-2 text-gray-900">Email Address *</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                   <input 
-                    name="email" 
-                    value={form.email} 
+                    name="emailAddress" 
+                    value={form.emailAddress} 
                     onChange={handleChange}
                     type="email"
                     placeholder="your@email.com"
-                    className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.email ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.emailAddress ? 'border-red-500' : 'border-gray-300'}`}
                   />
                 </div>
-                {errors.email && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.email}</p>}
+                {errors.emailAddress && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.emailAddress}</p>}
               </div>
-              {/* Amenities */}
-              <div className="md:col-span-2">
-                <label className="block font-semibold mb-3 text-gray-900">Amenities</label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {amenitiesList.map(amenity => (
-                    <label key={amenity} className="flex items-center space-x-2 cursor-pointer p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                      <input
-                        type="checkbox"
-                        checked={form.amenities.includes(amenity)}
-                        onChange={() => handleAmenityChange(amenity)}
-                        className="w-4 h-4 text-[#FFB400] rounded focus:ring-[#FFB400] border-gray-300"
-                      />
-                      <span className="text-sm text-gray-700">{amenity}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
+              
               {/* Description */}
               <div className="md:col-span-2">
-                <label className="block font-semibold mb-2 text-gray-900">Description *</label>
+                <label className="block font-semibold mb-2 text-gray-900">Description</label>
                 <textarea 
                   name="description" 
                   value={form.description} 
                   onChange={handleChange}
                   rows={4}
                   placeholder="Describe your property in detail..."
-                  className={`w-full border rounded-lg px-3 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 resize-none ${errors.description ? 'border-red-500' : 'border-gray-300'}`}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 resize-none"
                 />
-                <p className="text-sm text-gray-500 mt-1">{form.description.length}/20 characters minimum</p>
-                {errors.description && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.description}</p>}
               </div>
+              
               {/* Image Upload */}
               <div className="md:col-span-2">
-                <label className="block font-semibold mb-2 text-gray-900">Property Image</label>
+                <label className="block font-semibold mb-2 text-gray-900">Image Upload</label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#FFB400] transition-colors relative">
                   {imagePreview ? (
                     <div className="relative">

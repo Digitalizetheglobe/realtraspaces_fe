@@ -23,10 +23,18 @@ const raleway = Raleway({
 type Property = {
   id: string;
   title?: string;
+  imageUrls?: {
+    Images?: Array<{
+      imageFilePath: string;
+      isCoverImage: boolean;
+      orderRank?: number | null;
+    }>;
+  };
   propertyType?: {
     displayName?: string;
     childType?: {
       displayName?: string;
+      type?: string;
     };
   };
   address?: {
@@ -40,7 +48,10 @@ type Property = {
   };
   dimension?: {
     area?: string | number;
+    carpetArea?: number | null;
+    parking?: number | null;
   };
+  furnishStatus?: string;
   unitNo?: string | number;
   attributes?: Array<{
     masterPropertyAttributeId: string;
@@ -78,6 +89,8 @@ export default function PropertyCards() {
   const [allUniversal, setAllUniversal] = useState<string[]>([]); // for universal search
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [suggestionType, setSuggestionType] = useState<string>(""); // city, sublocality, type, universal
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set()); // Track failed image URLs
+  const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set()); // Track loading image URLs
 
   // Click-away listener for share dropdown
   useEffect(() => {
@@ -235,7 +248,7 @@ export default function PropertyCards() {
     }
     setSuggestions([]);
     setSuggestionType("");
-  }, [search, allCities, allSublocalities, allPropertyTypes, allUniversal, selectedLocations]);
+  }, [search, selectedLocations]); // Removed problematic dependencies that cause infinite loops
 
   // Add suggestion as chip (city, sublocality, type, or universal)
   const handleSuggestionClick = (suggestion: string) => {
@@ -317,6 +330,23 @@ export default function PropertyCards() {
     return attribute?.value || "N/A";
   };
 
+  // Helper function to get the best image for a property
+  const getPropertyImage = (property: Property): string => {
+    if (property.imageUrls?.Images && property.imageUrls.Images.length > 0) {
+      // First try to find a cover image
+      const coverImage = property.imageUrls.Images.find(img => img.isCoverImage);
+      if (coverImage && !failedImages.has(coverImage.imageFilePath)) {
+        return coverImage.imageFilePath;
+      }
+      // If no cover image or cover image failed, return the first non-failed image
+      const firstImage = property.imageUrls.Images.find(img => !failedImages.has(img.imageFilePath));
+      if (firstImage) {
+        return firstImage.imageFilePath;
+      }
+    }
+    return defaultPropertyImage.src;
+  };
+
   // Format price in Indian currency format (e.g., ₹ 45,00,000)
   const formatPrice = (price?: number) => {
     if (!price) return "Price not available";
@@ -374,16 +404,10 @@ export default function PropertyCards() {
   };
 
   // Enhanced filtering logic with multiple filter types
-  console.log('Filtering properties with enquiredForFilter:', enquiredForFilter);
-  console.log('Total properties to filter:', properties.length);
-  
   const filteredProperties = properties.filter((property) => {
     // Filter by enquiredFor (Rent/Investment)
     if (enquiredForFilter) {
-      console.log('Property:', property.title, 'enquiredFor:', property.enquiredFor, 'forRent:', property.forRent, 'forSale:', property.forSale);
-      
       if (!propertyMatchesEnquiredFor(property, enquiredForFilter)) {
-        console.log('Filtered out - does not match enquiredFor filter:', property.title, 'filter:', enquiredForFilter);
         return false;
       }
     }
@@ -464,8 +488,6 @@ export default function PropertyCards() {
     // If no filters applied, show all properties
     return true;
   });
-  
-  console.log('Filtered properties count:', filteredProperties.length);
 
   // Helper function to determine enquiredFor value for a property
   const getPropertyEnquiredFor = (property: Property): string | null => {
@@ -811,12 +833,41 @@ export default function PropertyCards() {
                   <Link href={`/property-details/${property.title}`} key={property.title} className="block">
                   <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
                     <Image
-                      src={defaultPropertyImage}
+                      src={getPropertyImage(property)}
                       alt={property.title || "Property"}
                       className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
                       width={340}
                       height={180}
+                      onLoad={() => {
+                        // Remove from loading state when image loads successfully
+                        const imageUrl = getPropertyImage(property);
+                        if (imageUrl !== defaultPropertyImage.src) {
+                          setLoadingImages(prev => {
+                            const newSet = new Set(prev);
+                            newSet.delete(imageUrl);
+                            return newSet;
+                          });
+                        }
+                      }}
+                      onError={(e) => {
+                        // Add failed image URL to state and fallback to default image
+                        const target = e.target as HTMLImageElement;
+                        const failedUrl = target.src;
+                        setFailedImages(prev => new Set(prev).add(failedUrl));
+                        setLoadingImages(prev => {
+                          const newSet = new Set(prev);
+                          newSet.delete(failedUrl);
+                          return newSet;
+                        });
+                        target.src = defaultPropertyImage.src;
+                      }}
                     />
+                    {/* Loading overlay */}
+                    {loadingImages.has(getPropertyImage(property)) && (
+                      <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600"></div>
+                      </div>
+                    )}
                     {/* For Sale/Rent / Property Type overlay */}
                     {/* <Link href={`/property-details/${property.title}`} key={property.title} className="block"> */}
                     <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
@@ -829,8 +880,8 @@ export default function PropertyCards() {
                       </span>
                       <span className="mx-1 transition-all duration-300 group-hover:scale-110">•</span>
                       <span className="ml-1 transition-all duration-300 group-hover:font-medium">
-                        {property.propertyType?.displayName ||
-                          property.propertyType?.childType?.displayName ||
+                        {
+                          property.propertyType?.childType?.type ||
                           "Office space"}
                       </span>
                     </div>
@@ -841,26 +892,24 @@ export default function PropertyCards() {
                   <div className="p-2 sm:p-3 flex-grow font-monotransition-all duration-300 hover:bg-gray-50/30">
                   <Link href={`/property-details/${property.title}`} key={property.title} className="block">
                     <div className="grid grid-cols-2 gap-1 text-xs">
-                      <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Carpet Area</div>
+                      <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Built up Area</div>
                       <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
                         {property.dimension?.area || "5490"} sqft
                       </div>
 
-                      <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Space Condition</div>
+                      <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Carpet Area</div>
                       <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                        {getAttributeValue(property, "condition-id") ||
-                          "Furnished"}
+                      {property.dimension?.carpetArea ? `${property.dimension.carpetArea} sqft` : "N/A"}
                       </div>
 
-                      <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Seat in office</div>
+                      <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Parking</div>
                       <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                        {getAttributeValue(property, "seating-capacity-id") ||
-                          "120"}
+                      {property.dimension?.parking || "N/A"}
                       </div>
 
                       <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">No of Cabin</div>
                       <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                        {getAttributeValue(property, "cabins-id") || "12"}
+                      {property.furnishStatus || "N/A"}
                       </div>
                     </div>
                           </Link>

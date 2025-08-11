@@ -46,6 +46,13 @@ type Property = {
   }>;
   forSale?: boolean;
   forRent?: boolean;
+  imageUrls?: {
+    Images?: Array<{
+      imageFilePath: string;
+      isCoverImage: boolean;
+      orderRank: number | null;
+    }>;
+  };
 };
 
 export default function Similarproperties() {
@@ -103,6 +110,22 @@ export default function Similarproperties() {
       attr => attr.masterPropertyAttributeId === attributeId
     );
     return attribute?.value || "N/A";
+  };
+
+  // Helper function to get the best available image for a property
+  const getPropertyImage = (property: Property) => {
+    if (!property.imageUrls?.Images || property.imageUrls.Images.length === 0) {
+      return defaultPropertyImage;
+    }
+    
+    // First try to find a cover image
+    const coverImage = property.imageUrls.Images.find(img => img.isCoverImage);
+    if (coverImage) {
+      return coverImage.imageFilePath;
+    }
+    
+    // If no cover image, return the first available image
+    return property.imageUrls.Images[0].imageFilePath;
   };
 
   // Format price in Indian currency format (e.g., ₹ 45,00,000)
@@ -211,7 +234,7 @@ export default function Similarproperties() {
                   <Link href={`/property-details/${encodeURIComponent(property.title ?? "")}`} prefetch={false}>
                     <div className="relative h-[180px]">
                       <Image
-                        src={defaultPropertyImage}
+                        src={getPropertyImage(property)}
                         alt={property.title || "Property"}
                         className="w-full h-full object-cover"
                         width={307}
@@ -223,8 +246,10 @@ export default function Similarproperties() {
                           {property.forSale ? "For Sale" : property.forRent ? "For Rent" : "For Sale"}
                         </span>
                         <span className="mx-1">•</span>
-                        <span className="ml-1">{property.propertyType?.displayName || property.propertyType?.childType?.displayName || "Office space"}</span>
-                      </div>
+                        <span className="ml-1 transition-all duration-300 group-hover:font-medium">
+                              {property.propertyType?.childType?.displayName ||
+                                "Office space"}
+                            </span></div>
                     </div>
                   </Link>
 

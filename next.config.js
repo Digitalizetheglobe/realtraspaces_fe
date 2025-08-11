@@ -11,6 +11,7 @@ const nextConfig = {
     unoptimized: true,
     domains: [
       'example.com', // Add any other domains your images come from
+      'leadrat-black.s3.ap-south-1.amazonaws.com', // S3 bucket for property images
     ],
     remotePatterns: [
       {
@@ -22,6 +23,12 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'api.realtraspaces.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'leadrat-black.s3.ap-south-1.amazonaws.com',
         port: '',
         pathname: '/**',
       },

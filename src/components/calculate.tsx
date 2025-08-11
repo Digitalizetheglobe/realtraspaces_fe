@@ -39,7 +39,7 @@ const CalculatorSection = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F1F1F4] py-10 px-4">
+    <div className=" bg-[#F1F1F4] py-16 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Header Section */}
         {/* <div className="text-center mb-16">

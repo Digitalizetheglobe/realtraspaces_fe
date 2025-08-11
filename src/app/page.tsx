@@ -4,7 +4,6 @@ import { generateMetadata as generateSeoMetadata } from "../utils/serverSeo";
 
 import Latestpropertytype from "./latestpropertytype/page";
 import CookiesBanner from "../components/CookiesBanner";
-import SeoHead from "../components/SeoHead";
 import PageWithSeo from "../components/PageWithSeo";
 
 // Generate metadata server-side
@@ -16,8 +15,7 @@ export default function Home() {
   return (
     <PageWithSeo page="home">
       <main className="min-h-screen bg-gray-100">
-        {/* Static SEO Head - provides additional meta tags */}
-        <SeoHead />
+        {/* PageWithSeo already handles SEO metadata, no need for SeoHead */}
         
         <CookiesBanner />
         {/* ─────────  HERO SECTION  ───────── */}

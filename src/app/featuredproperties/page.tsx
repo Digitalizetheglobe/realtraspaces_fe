@@ -23,7 +23,13 @@ const raleway = Raleway({
 type Property = {
   id: string;
   title?: string;
-  imageUrls: { [key: string]: string };
+  imageUrls?: {
+    Images?: Array<{
+      imageFilePath: string;
+      isCoverImage: boolean;
+      orderRank?: number | null;
+    }>;
+  };
   propertyType?: {
     displayName?: string;
     childType?: {
@@ -309,12 +315,10 @@ const FeaturedProperties = () => {
                   }`}
                 >
                   {/* Image */}
-<div className="w-full sm:w-1/3 p-2 overflow-hidden flex items-center justify-center">
-                    {Object.keys(property.imageUrls || {}).length > 0 ? (
+                  <div className="w-full sm:w-1/3 p-2 overflow-hidden flex items-center justify-center">
+                    {property.imageUrls?.Images && property.imageUrls.Images.length > 0 ? (
                       <img
-                        src={
-                          property.imageUrls[Object.keys(property.imageUrls)[0]]
-                        }
+                        src={property.imageUrls.Images[0].imageFilePath}
                         alt={property.title}
                         className="property-image w-full h-56 object-cover rounded-2xl p-2"
                       />

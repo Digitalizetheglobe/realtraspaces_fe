@@ -12,8 +12,6 @@ import SeoHead from "../../components/SeoHead";
 import ShareModal from "../../components/ShareModal";
 import PageWithSeo from "../../components/PageWithSeo";
 
-// Removed metadata and head exports
-
 // Load Raleway font with more weight options
 const raleway = Raleway({
   subsets: ["latin"],
@@ -25,6 +23,13 @@ const raleway = Raleway({
 type Property = {
   id: string;
   title?: string;
+  imageUrls?: {
+    Images?: Array<{
+      imageFilePath: string;
+      isCoverImage: boolean;
+      orderRank?: number | null;
+    }>;
+  };
   propertyType?: {
     displayName?: string;
     childType?: {
@@ -42,8 +47,11 @@ type Property = {
   };
   dimension?: {
     area?: string | number;
+    carpetArea?: string | number;
+    parking?: string | number;
   };
   unitNo?: string | number;
+  furnishStatus?: string;
   attributes?: Array<{
     masterPropertyAttributeId: string;
     value?: string | number;
@@ -61,6 +69,28 @@ export default function Similarproperties() {
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
   const [bookmarkedProperties, setBookmarkedProperties] = useState<Set<string>>(new Set());
   const [openShareIndex, setOpenShareIndex] = useState<number | null>(null);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set());
+
+  // Helper function to get the best image URL for a property
+  const getPropertyImage = (property: Property | null): string => {
+    if (!property) return defaultPropertyImage.src;
+    
+    if (property.imageUrls?.Images && property.imageUrls.Images.length > 0) {
+      // First try to find a cover image
+      const coverImage = property.imageUrls.Images.find(img => img.isCoverImage);
+      if (coverImage && !failedImages.has(coverImage.imageFilePath)) {
+        return coverImage.imageFilePath;
+      }
+      // If no cover image or cover image failed, return the first non-failed image
+      const firstImage = property.imageUrls.Images.find(img => !failedImages.has(img.imageFilePath));
+      if (firstImage) {
+        return firstImage.imageFilePath;
+      }
+    }
+    return defaultPropertyImage.src;
+  };
+
   useEffect(() => {
     if (openShareIndex === null) return;
     const handleClickOutside = (event: MouseEvent) => {
@@ -93,6 +123,7 @@ export default function Similarproperties() {
     navigator.clipboard.writeText(url);
     alert('Link copied to clipboard!');
   };
+
   const [filters, setFilters] = useState({
     propertyType: "",
     priceRange: "",
@@ -108,31 +139,6 @@ export default function Similarproperties() {
   const [allUniversal, setAllUniversal] = useState<string[]>([]); // for universal search
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [suggestionType, setSuggestionType] = useState<string>(""); // city, sublocality, type, universal
-
-  // Available filter options
-  // const propertyTypes = [
-  //   "Office space",
-  //   "Retail space",
-  //   "Commercial land",
-  //   "Warehouse",
-  //   "Industrial building",
-  // ];
-
-  // const priceRanges = [
-  //   "Under ₹50 Lakhs",
-  //   "₹50 Lakhs - ₹1 Cr",
-  //   "₹1 Cr - ₹2 Cr",
-  //   "₹2 Cr - ₹5 Cr",
-  //   "Over ₹5 Cr",
-  // ];
-
-  // const areaRanges = [
-  //   "Under 1000 sqft",
-  //   "1000 - 5000 sqft",
-  //   "5000 - 10000 sqft",
-  //   "10000 - 20000 sqft",
-  //   "Over 20000 sqft",
-  // ];
 
   const conditions = ["Furnished", "Semi-Furnished", "Unfurnished"];
 
@@ -468,358 +474,382 @@ export default function Similarproperties() {
 
   return (
     <>
-    <PageWithSeo page="properties">
-      <div className={raleway.className}>
-        <section className="relative h-[60vh] w-full ">
-          {/* Background Image */}
-          <div className="absolute inset-0">
-            <Image
-              src={contactimg}
-              alt="Modern Home Interior"
-              fill
-              priority
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-black opacity-60"></div>
-          </div>
-
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-10 text-center space-y-4">
-            <h2 className="mt-10 font-normal text-[32px] leading-[100%] tracking-normal text-center mt-[100px]">
-              <span className="text-white">All Properties</span>{" "}
-             <span className="text-gray-400">Explore our properties</span>
-            </h2>
-            {/* Breadcrumb */}
-            <nav aria-label="breadcrumb">
-              <ol className="text-white text-lg flex space-x-2">
-                <li>
-                  <Link href="/" className="">
-                    Home
-                  </Link>
-                </li>
-                <li>{">"}</li>
-                <li className="">Properties</li>
-              </ol>
-            </nav>
-          </div>
-        </section>
-        <section className="pb-10 lg:pb-20 bg-white dark:bg-dark relative overflow-hidden">
-          <div className="container mx-auto">
-            <div className="w-full px-4">
-              {/* Heading */}
-              <div className="mb-[60px] w-full"></div>
-
-              {/* Search and Filter Section */}
-             <div className="mb-8 px-4 sm:px-0">
-  {/* Search Bar */}
-  <div className="relative mb-6">
-    <input
-      type="text"
-      placeholder="Search by property name, location, or type..."
-      className="w-full text-black text-sm sm:text-base p-3 sm:p-4 pl-10 sm:pl-12 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500"
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      onKeyDown={handleInputKeyDown}
-      autoComplete="off"
-    />
-    <svg
-      className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-black"
-      fill="none"
-      stroke="currentColor"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-      />
-    </svg>
-    {/* Chips overlay (right side, inside input) */}
-    <div className="absolute inset-y-0 right-3 flex items-center space-x-2 pointer-events-none" style={{ zIndex: 10 }}>
-      {selectedLocations.length > 0 && (
-        <div className="flex items-center space-x-2 pointer-events-auto">
-          {selectedLocations.map((loc) => (
-            <div key={loc} className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium mr-1">
-              {loc}
-              <button
-                type="button"
-                className="ml-1 text-white hover:text-gray-200 focus:outline-none"
-                style={{ pointerEvents: 'auto' }}
-                onClick={() => removeLocation(loc)}
-              >
-                <span className="ml-1">×</span>
-              </button>
+      <PageWithSeo page="properties">
+        <div className={raleway.className}>
+          <section className="relative h-[60vh] w-full ">
+            {/* Background Image */}
+            <div className="absolute inset-0">
+              <Image
+                src={contactimg}
+                alt="Modern Home Interior"
+                fill
+                priority
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-black opacity-60"></div>
             </div>
-          ))}
-        </div>
-      )}
-    </div>
-    {/* Suggestions dropdown */}
-    {suggestions.length > 0 && (
-      <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto" style={{ zIndex: 9999 }}>
-        {suggestions.map((s, idx) => (
-          <div
-            className="px-5 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
-            onClick={() => handleSuggestionClick(s)}
-            key={s + idx}
-          >
-            {s}
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
 
-  <div className="text-sm text-gray-600 mb-4 text-center sm:text-left">
-    Showing {filteredProperties.length} of {properties.length} properties
-  </div>
-</div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 text-center space-y-4">
+              <h2 className="mt-10 font-normal text-[32px] leading-[100%] tracking-normal text-center mt-[100px]">
+                <span className="text-white">All Properties</span>{" "}
+                <span className="text-gray-400">Explore our properties</span>
+              </h2>
+              {/* Breadcrumb */}
+              <nav aria-label="breadcrumb">
+                <ol className="text-white text-lg flex space-x-2">
+                  <li>
+                    <Link href="/" className="">
+                      Home
+                    </Link>
+                  </li>
+                  <li>{">"}</li>
+                  <li className="">Properties</li>
+                </ol>
+              </nav>
+            </div>
+          </section>
+          <section className="pb-10 lg:pb-20 bg-white dark:bg-dark relative overflow-hidden">
+            <div className="container mx-auto">
+              <div className="w-full px-4">
+                {/* Heading */}
+                <div className="mb-[60px] w-full"></div>
 
-
-              {/* Property Cards */}
-              {filteredProperties.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-gray-500 text-lg mb-4">
-                    <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    <p className="text-xl font-medium text-gray-700 mb-2">No properties found</p>
-                    <p className="text-gray-500">Try adjusting your search criteria or filters</p>
-                  </div>
-                  <button
-                    onClick={resetFilters}
-                    className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200"
-                  >
-                    Clear All Filters
-                  </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                  {filteredProperties.map((property, index) => (
-                    <div
-                      key={property.id}
-                      className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col transform transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-gray-400/20 hover:-translate-y-2 hover:border-gray-300 animate-fade-in-up"
-                      style={{ animationDelay: `${index * 150}ms` }}
+                {/* Search and Filter Section */}
+                <div className="mb-8 px-4 sm:px-0">
+                  {/* Search Bar */}
+                  <div className="relative mb-6">
+                    <input
+                      type="text"
+                      placeholder="Search by property name, location, or type..."
+                      className="w-full text-black text-sm sm:text-base p-3 sm:p-4 pl-10 sm:pl-12 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      onKeyDown={handleInputKeyDown}
+                      autoComplete="off"
+                    />
+                    <svg
+                      className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-black"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      {/* Header with title and checkbox */}
-                      <div className="p-2 sm:p-3 flex justify-between items-center transition-all duration-300 hover:bg-gray-50/50">
-                        <Link href={`/property-details/${property.title}`} className="block">
-                          <div className="h-14">
-                            <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
-                              {property.title || "Prime Business Hub"}
-                            </h3>
-                            <div className="flex items-center text-gray-700 text-xs transition-all duration-300 hover:text-gray-900">
-                              <svg
-                                className="w-4 h-4 mr-1 transition-all duration-300 hover:scale-110"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                    {/* Chips overlay (right side, inside input) */}
+                    <div className="absolute inset-y-0 right-3 flex items-center space-x-2 pointer-events-none" style={{ zIndex: 10 }}>
+                      {selectedLocations.length > 0 && (
+                        <div className="flex items-center space-x-2 pointer-events-auto">
+                          {selectedLocations.map((loc) => (
+                            <div key={loc} className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium mr-1">
+                              {loc}
+                              <button
+                                type="button"
+                                className="ml-1 text-white hover:text-gray-200 focus:outline-none"
+                                style={{ pointerEvents: 'auto' }}
+                                onClick={() => removeLocation(loc)}
                               >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                />
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                />
-                              </svg>
-                              {property.address?.subLocality || property.address?.city || "Location Name"}
+                                <span className="ml-1">×</span>
+                              </button>
                             </div>
-                          </div>
-                        </Link>
-                        <button
-                          onClick={() => handleCheckboxClick(property.id)}
-                          className={`w-5 h-5 border rounded flex items-center justify-center cursor-pointer ${
-                            bookmarkedProperties.has(property.id)
-                              ? "border-green-500 bg-green-500"
-                              : "border-gray-400"
-                          }`}
-                        >
-                          {bookmarkedProperties.has(property.id) && (
-                            <svg
-                              className="w-3 h-3 text-white"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                          )}
-                        </button>
-                      </div>
-                      {/* Property Image */}
-                      <Link href={`/property-details/${property.title}`} className="block">
-                        <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
-                          <Image
-                            src={defaultPropertyImage}
-                            alt={property.title || "Property"}
-                            className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
-                            width={340}
-                            height={180}
-                          />
-                          {/* For Sale/Rent / Property Type overlay */}
-                          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
-                            <span className="mr-2 transition-all duration-300 group-hover:font-medium">
-                              {property.forSale
-                                ? "For Sale"
-                                : property.forRent
-                                ? "For Rent"
-                                : "For Sale"}
-                            </span>
-                            <span className="mx-1 transition-all duration-300 group-hover:scale-110">•</span>
-                            <span className="ml-1 transition-all duration-300 group-hover:font-medium">
-                              {property.propertyType?.displayName ||
-                                property.propertyType?.childType?.displayName ||
-                                "Office space"}
-                            </span>
-                          </div>
+                          ))}
                         </div>
-                      </Link>
-                      {/* Property Details */}
-                      <div className="p-2 sm:p-3 flex-grow font-monotransition-all duration-300 hover:bg-gray-50/30">
-                        <Link href={`/property-details/${property.title}`} className="block">
-                          <div className="grid grid-cols-2 gap-1 text-xs">
-                            <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Carpet Area</div>
-                            <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                              {property.dimension?.area || "5490"} sqft
-                            </div>
-                            <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Space Condition</div>
-                            <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                              {getAttributeValue(property, "condition-id") || "Furnished"}
-                            </div>
-                            <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Seat in office</div>
-                            <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                              {getAttributeValue(property, "seating-capacity-id") || "120"}
-                            </div>
-                            <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">No of Cabin</div>
-                            <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                              {getAttributeValue(property, "cabins-id") || "12"}
-                            </div>
+                      )}
+                    </div>
+                    {/* Suggestions dropdown */}
+                    {suggestions.length > 0 && (
+                      <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto" style={{ zIndex: 9999 }}>
+                        {suggestions.map((s, idx) => (
+                          <div
+                            className="px-5 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                            onClick={() => handleSuggestionClick(s)}
+                            key={s + idx}
+                          >
+                            {s}
                           </div>
-                        </Link>
-                        <div className="border-t border-gray-200 my-2 transition-all duration-300 hover:border-gray-300"></div>
-                        {/* Price and Actions */}
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="text-sm text-gray-600 mb-4 text-center sm:text-left">
+                    Showing {filteredProperties.length} of {properties.length} properties
+                  </div>
+                </div>
+
+                {/* Property Cards */}
+                {filteredProperties.length === 0 ? (
+                  <div className="text-center py-12">
+                    <div className="text-gray-500 text-lg mb-4">
+                      <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      <p className="text-xl font-medium text-gray-700 mb-2">No properties found</p>
+                      <p className="text-gray-500">Try adjusting your search criteria or filters</p>
+                    </div>
+                    <button
+                      onClick={resetFilters}
+                      className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+                    >
+                      Clear All Filters
+                    </button>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                    {filteredProperties.map((property, index) => (
+                      <div
+                        key={property.id}
+                        className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col transform transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-gray-400/20 hover:-translate-y-2 hover:border-gray-300 animate-fade-in-up"
+                        style={{ animationDelay: `${index * 150}ms` }}
+                      >
+                        {/* Header with title and checkbox */}
+                        <div className="p-2 sm:p-3 flex justify-between items-center transition-all duration-300 hover:bg-gray-50/50">
                           <Link href={`/property-details/${property.title}`} className="block">
-                            <div className="transition-all duration-300 hover:scale-105">
-                              <div className="text-base text-black font-mono font-semibold transition-all duration-300 hover:text-gray-800">
-                                {property.forRent
-                                  ? `₹ ${(property.monetaryInfo?.expectedRent || 4500).toLocaleString("en-IN")}`
-                                  : formatPrice(property.monetaryInfo?.expectedPrice)}
-                              </div>
-                              <div className="text-gray-500 text-xs transition-all duration-300 hover:text-gray-600">
-                                {property.forRent ? "rent/month" : ""}
+                            <div className="h-14">
+                              <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
+                                {property.title || "Prime Business Hub"}
+                              </h3>
+                              <div className="flex items-center text-gray-700 text-xs transition-all duration-300 hover:text-gray-900">
+                                <svg
+                                  className="w-4 h-4 mr-1 transition-all duration-300 hover:scale-110"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                  />
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                  />
+                                </svg>
+                                {property.address?.subLocality || property.address?.city || "Location Name"}
                               </div>
                             </div>
                           </Link>
-                          <div className="flex space-x-1 relative">
-                            {/* Map button */}
-                            <button
-                              className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-red-200 hover:scale-110 hover:shadow-md active:scale-95"
-                              aria-label="View on Map"
-                              onClick={() => {
-                                const address = [
-                                  property.address?.subLocality,
-                                  property.address?.city,
-                                  property.address?.state
-                                ].filter(Boolean).join(", ");
-                                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-                                window.open(mapUrl, '_blank');
-                              }}
-                            >
+                          <button
+                            onClick={() => handleCheckboxClick(property.id)}
+                            className={`w-5 h-5 border rounded flex items-center justify-center cursor-pointer ${
+                              bookmarkedProperties.has(property.id)
+                                ? "border-green-500 bg-green-500"
+                                : "border-gray-400"
+                            }`}
+                          >
+                            {bookmarkedProperties.has(property.id) && (
                               <svg
-                                xmlns="http://www.w3.org/2000/svg"
+                                className="w-3 h-3 text-white"
                                 fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1.5}
                                 stroke="currentColor"
-                                className="w-5 h-5 text-red-500"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
                               >
                                 <path
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
-                                  d="M12 21c-4.418 0-8-5.373-8-10A8 8 0 0112 3a8 8 0 018 8c0 4.627-3.582 10-8 10zm0-7a3 3 0 100-6 3 3 0 000 6z"
+                                  strokeWidth={2}
+                                  d="M5 13l4 4L19 7"
                                 />
                               </svg>
-                            </button>
-                            {/* Share button */}
-                            <div className="relative">
+                            )}
+                          </button>
+                        </div>
+                        {/* Property Image */}
+                        <Link href={`/property-details/${property.title}`} className="block">
+                          <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
+                            <Image
+                              src={getPropertyImage(property)}
+                              alt={property.title || "Property"}
+                              className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
+                              width={340}
+                              height={180}
+                              onLoad={() => {
+                                // Remove from loading state when image loads successfully
+                                const imageUrl = getPropertyImage(property);
+                                if (imageUrl !== defaultPropertyImage.src) {
+                                  setLoadingImages(prev => {
+                                    const newSet = new Set(prev);
+                                    newSet.delete(imageUrl);
+                                    return newSet;
+                                  });
+                                }
+                              }}
+                              onError={(e) => {
+                                // Add failed image URL to state and fallback to default image
+                                const target = e.target as HTMLImageElement;
+                                const failedUrl = target.src;
+                                setFailedImages(prev => new Set(prev).add(failedUrl));
+                                setLoadingImages(prev => {
+                                  const newSet = new Set(prev);
+                                  newSet.delete(failedUrl);
+                                  return newSet;
+                                });
+                                target.src = defaultPropertyImage.src;
+                              }}
+                            />
+                            {/* For Sale/Rent / Property Type overlay */}
+                            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
+                              <span className="mr-2 transition-all duration-300 group-hover:font-medium">
+                                {property.forSale
+                                  ? "For Sale"
+                                  : property.forRent
+                                  ? "For Rent"
+                                  : "For Sale"}
+                              </span>
+                              <span className="mx-1 transition-all duration-300 group-hover:scale-110">•</span>
+                              <span className="ml-1 transition-all duration-300 group-hover:font-medium">
+                                {property.propertyType?.childType?.displayName ||
+                                  "Office space"}
+                              </span>
+                            </div>
+                          </div>
+                        </Link>
+                        {/* Property Details */}
+                        <div className="p-2 sm:p-3 flex-grow font-monotransition-all duration-300 hover:bg-gray-50/30">
+                          <Link href={`/property-details/${property.title}`} className="block">
+                            <div className="grid grid-cols-2 gap-1 text-xs">
+                              <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Built up Area</div>
+                              <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
+                                {property.dimension?.area || "5490"} sqft
+                              </div>
+
+                              <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Carpet Area</div>
+                              <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
+                                {property.dimension?.carpetArea ? `${property.dimension.carpetArea} sqft` : "N/A"}
+                              </div>
+
+                              <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Parking</div>
+                              <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
+                                {property.dimension?.parking || "N/A"}
+                              </div>
+
+                              <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">No of Cabin</div>
+                              <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
+                                {property.furnishStatus || "N/A"}
+                              </div>
+                            </div>
+                          </Link>
+                          <div className="border-t border-gray-200 my-2 transition-all duration-300 hover:border-gray-300"></div>
+                          {/* Price and Actions */}
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
+                            <Link href={`/property-details/${property.title}`} className="block">
+                              <div className="transition-all duration-300 hover:scale-105">
+                                <div className="text-base text-black font-mono font-semibold transition-all duration-300 hover:text-gray-800">
+                                  {property.forRent
+                                    ? `₹ ${(property.monetaryInfo?.expectedRent || 4500).toLocaleString("en-IN")}`
+                                    : formatPrice(property.monetaryInfo?.expectedPrice)}
+                                </div>
+                                <div className="text-gray-500 text-xs transition-all duration-300 hover:text-gray-600">
+                                  {property.forRent ? "rent/month" : ""}
+                                </div>
+                              </div>
+                            </Link>
+                            <div className="flex space-x-1 relative">
+                              {/* Map button */}
                               <button
-                                className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
-                                onClick={() => setOpenShareIndex(openShareIndex === index ? null : index)}
-                                aria-label="Share"
-                                type="button"
+                                className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-red-200 hover:scale-110 hover:shadow-md active:scale-95"
+                                aria-label="View on Map"
+                                onClick={() => {
+                                  const address = [
+                                    property.address?.subLocality,
+                                    property.address?.city,
+                                    property.address?.state
+                                  ].filter(Boolean).join(", ");
+                                  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+                                  window.open(mapUrl, '_blank');
+                                }}
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={1.5}
+                                  stroke="currentColor"
+                                  className="w-5 h-5 text-red-500"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M12 21c-4.418 0-8-5.373-8-10A8 8 0 0112 3a8 8 0 018 8c0 4.627-3.582 10-8 10zm0-7a3 3 0 100-6 3 3 0 000 6z"
+                                  />
+                                </svg>
+                              </button>
+                              {/* Share button */}
+                              <div className="relative">
+                                <button
+                                  className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
+                                  onClick={() => setOpenShareIndex(openShareIndex === index ? null : index)}
+                                  aria-label="Share"
+                                  type="button"
+                                >
+                                  <Image
+                                    src={share}
+                                    alt="Share"
+                                    width={20}
+                                    height={20}
+                                    className="object-contain transition-all duration-300 hover:scale-110"
+                                  />
+                                </button>
+                                <ShareModal
+                                  open={openShareIndex === index}
+                                  onClose={() => setOpenShareIndex(null)}
+                                  property={property}
+                                  getPropertyUrl={getPropertyUrl}
+                                />
+                              </div>
+                              {/* WhatsApp button */}
+                              <a
+                                href={`https://wa.me/7039311539?text=${encodeURIComponent(property.title || 'Check out this property!')}%20${encodeURIComponent(`${window.location.origin}/property-details/${encodeURIComponent(property.title || '')}`)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
+                                aria-label="WhatsApp"
                               >
                                 <Image
-                                  src={share}
-                                  alt="Share"
+                                  src={whatsapp}
+                                  alt="WhatsApp"
                                   width={20}
                                   height={20}
                                   className="object-contain transition-all duration-300 hover:scale-110"
                                 />
-                              </button>
-                              <ShareModal
-                                open={openShareIndex === index}
-                                onClose={() => setOpenShareIndex(null)}
-                                property={property}
-                                getPropertyUrl={getPropertyUrl}
-                              />
+                              </a>
                             </div>
-                            {/* WhatsApp button */}
-                            <a
-                              href={`https://wa.me/7039311539?text=${encodeURIComponent(property.title || 'Check out this property!')}%20${encodeURIComponent(`${window.location.origin}/property-details/${encodeURIComponent(property.title || '')}`)}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
-                              aria-label="WhatsApp"
-                            >
-                              <Image
-                                src={whatsapp}
-                                alt="WhatsApp"
-                                width={20}
-                                height={20}
-                                className="object-contain transition-all duration-300 hover:scale-110"
-                              />
-                            </a>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </section>
-      </div>
-      <style jsx>{`
-        @keyframes fade-in-up {
-          0% {
-            opacity: 0;
-            transform: translateY(30px);
+          </section>
+        </div>
+        <style jsx>{`
+          @keyframes fade-in-up {
+            0% {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            100% {
+              opacity: 1;
+              transform: translateY(0);
+            }
           }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
+          .animate-fade-in-up {
+            animation: fade-in-up 0.8s ease-out both;
           }
-        }
-        .animate-fade-in-up {
-          animation: fade-in-up 0.8s ease-out both;
-        }
-      `}</style>
+        `}</style>
       </PageWithSeo>
     </>
   );

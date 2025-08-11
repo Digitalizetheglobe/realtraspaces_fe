@@ -134,7 +134,7 @@ export default function Testimonial() {
         </div>
       </div>
 
-      <Blogs />
+      {/* <Blogs /> */}
     </>
   );
 }
