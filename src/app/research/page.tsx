@@ -605,11 +605,11 @@ const Research = () => {
                 onClick={() => setActiveGraph(key)}
                 className={`p-4 rounded-lg border-2 transition-all cursor-pointer duration-300 flex flex-col items-center space-y-2 ${
                   activeGraph === key
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:bg-blue-50'
+                    ? 'border-black bg-blue-50 text-black'
+                    : 'border-gray-200 bg-white text-gray-600 hover:border-black/40 hover:bg-gray-100'
                 }`}
               >
-                <div className="text-blue-600">{config.icon}</div>
+                <div className="text-black">{config.icon}</div>
                 <span className="text-sm font-medium text-center">{config.title}</span>
               </button>
             ))}
@@ -648,7 +648,7 @@ const Research = () => {
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-6 mt-8">
           <div className="bg-white rounded-lg shadow-lg p-6">
             <div className="flex items-center space-x-3">
-              <Building className="w-8 h-8 text-blue-600" />
+              <Building className="w-8 h-8 text-black" />
               <div>
                 <p className="text-sm text-gray-600">Total Properties</p>
                 <p className="text-2xl font-bold text-gray-800">{properties.length}</p>
@@ -658,7 +658,7 @@ const Research = () => {
           
           <div className="bg-white rounded-lg shadow-lg p-6">
             <div className="flex items-center space-x-3">
-              <MapPin className="w-8 h-8 text-green-600" />
+              <MapPin className="w-8 h-8 text-black" />
               <div>
                 <p className="text-sm text-gray-600">Cities Covered</p>
                 <p className="text-2xl font-bold text-gray-800">
@@ -670,7 +670,7 @@ const Research = () => {
           
           <div className="bg-white rounded-lg shadow-lg p-6">
             <div className="flex items-center space-x-3">
-              <span className="text-3xl font-bold text-yellow-600">₹</span>
+              <span className="text-3xl font-bold text-black">₹</span>
               <div>
                 <p className="text-sm text-gray-600">Avg Price/Sq.Ft</p>
                 <p className="text-2xl font-bold text-gray-800">
@@ -685,7 +685,7 @@ const Research = () => {
           
           <div className="bg-white rounded-lg shadow-lg p-6">
             <div className="flex items-center space-x-3">
-              <TrendingUp className="w-8 h-8 text-purple-600" />
+              <TrendingUp className="w-8 h-8 text-black" />
               <div>
                 <p className="text-sm text-gray-600">Hot Markets</p>
                 <p className="text-2xl font-bold text-gray-800">

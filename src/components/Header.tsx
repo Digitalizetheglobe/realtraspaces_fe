@@ -27,6 +27,7 @@ const Header = () => {
     { name: "Career", href: "/career" },
     { name: "Contact", href: "/contact" },
     { name: "Compare Properties", href: "/compareproperties" },
+    { name: "Research", href: "/research" },
     { name: "IRR Calculator", href: "/irr-calculator" },
     { name: "LRD Calculator", href: "/lrd-calculator" },
     { name: "ROI Calculator", href: "/roi-calculator" },
