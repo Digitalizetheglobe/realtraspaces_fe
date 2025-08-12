@@ -636,11 +636,11 @@ export default function PropertyCards() {
           )}
         </div>
         {/* Multi-location chips UI inside input area, right-aligned */}
-        <div className="mb-2 text-center">
+        {/* <div className="mb-2 text-center">
           <p className="text-xs text-gray-600">
             🔍 Searching across both Latest Properties and All Properties pages
           </p>
-        </div>
+        </div> */}
         <div className="relative w-full">
           <input
             type="text"
