@@ -228,31 +228,45 @@ export default function PropertyDetails() {
   }, [propertyTitle]);
 
   const handlePrev = () => {
-    if (startIndex > 0) {
-      const newStartIndex = startIndex - 1;
-      setStartIndex(newStartIndex);
-      // Update mainImage to the new first visible image
-      const newVisibleImages =
-        imageUrls.length > 0
-          ? imageUrls.slice(newStartIndex, newStartIndex + visibleCount)
-          : thumbnails.slice(newStartIndex, newStartIndex + visibleCount);
-      const newMainImage = newVisibleImages[0];
-      setMainImage(newMainImage);
+    const totalImages = imageUrls.length > 0 ? imageUrls.length : thumbnails.length;
+    let newStartIndex;
+    
+    if (startIndex === 0) {
+      // If at the beginning, wrap to the end
+      newStartIndex = Math.max(0, totalImages - visibleCount);
+    } else {
+      newStartIndex = startIndex - 1;
     }
+    
+    setStartIndex(newStartIndex);
+    // Update mainImage to the new first visible image
+    const newVisibleImages =
+      imageUrls.length > 0
+        ? imageUrls.slice(newStartIndex, newStartIndex + visibleCount)
+        : thumbnails.slice(newStartIndex, newStartIndex + visibleCount);
+    const newMainImage = newVisibleImages[0];
+    setMainImage(newMainImage);
   };
 
   const handleNext = () => {
-    if (startIndex + visibleCount < (imageUrls.length > 0 ? imageUrls.length : thumbnails.length)) {
-      const newStartIndex = startIndex + 1;
-      setStartIndex(newStartIndex);
-      // Update mainImage to the new first visible image
-      const newVisibleImages =
-        imageUrls.length > 0
-          ? imageUrls.slice(newStartIndex, newStartIndex + visibleCount)
-          : thumbnails.slice(newStartIndex, newStartIndex + visibleCount);
-      const newMainImage = newVisibleImages[0];
-      setMainImage(newMainImage);
+    const totalImages = imageUrls.length > 0 ? imageUrls.length : thumbnails.length;
+    let newStartIndex;
+    
+    if (startIndex + visibleCount >= totalImages) {
+      // If at the end, wrap to the beginning
+      newStartIndex = 0;
+    } else {
+      newStartIndex = startIndex + 1;
     }
+    
+    setStartIndex(newStartIndex);
+    // Update mainImage to the new first visible image
+    const newVisibleImages =
+      imageUrls.length > 0
+        ? imageUrls.slice(newStartIndex, newStartIndex + visibleCount)
+        : thumbnails.slice(newStartIndex, newStartIndex + visibleCount);
+    const newMainImage = newVisibleImages[0];
+    setMainImage(newMainImage);
   };
 
   const handleEnquireClick = () => {
@@ -834,12 +848,9 @@ export default function PropertyDetails() {
                 {/* Previous Button */}
                 <button
                   onClick={handlePrev}
-                  disabled={startIndex === 0}
-                  className={`absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md ${
-                    startIndex === 0
-                      ? "opacity-30 cursor-not-allowed"
-                      : "hover:bg-gray-100"
-                  } ${isFirstImageActive ? "ring-2 ring-blue-500" : ""}`}
+                  className={`absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 ${
+                    isFirstImageActive ? "ring-2 ring-blue-500" : ""
+                  }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -907,20 +918,9 @@ export default function PropertyDetails() {
                 {/* Next Button */}
                 <button
                   onClick={handleNext}
-                  disabled={
-                    startIndex + visibleCount >=
-                    (imageUrls.length > 0
-                      ? imageUrls.length
-                      : thumbnails.length)
-                  }
-                  className={`absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md ${
-                    startIndex + visibleCount >=
-                    (imageUrls.length > 0
-                      ? imageUrls.length
-                      : thumbnails.length)
-                      ? "opacity-30 cursor-not-allowed"
-                      : "hover:bg-gray-100"
-                  } ${isLastImageActive ? "ring-2 ring-blue-500" : ""}`}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 ${
+                    isLastImageActive ? "ring-2 ring-blue-500" : ""
+                  }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1149,23 +1149,23 @@ export default function PropertyDetails() {
 
               </div>
 
-              <div className="mt-8 bg-gray-100 p-4 rounded-xl">
+              <div className="mt-8  rounded-xl">
                 <h2 className="text-xl font-semibold text-gray-800 p-4">
                   Property Highlights
                 </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 bg-gray-100">
-                  <div className="flex items-start gap-4 p-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 ">
+                  <div className="flex items-start gap-2 py-2 pl-2">
                     <Image
                       src={pin}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Category</p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="text-[13px] text-gray-500">Category</p>
+                      <p className="font-medium text-[11px] text-gray-800">
                         {property.propertyType?.childType?.displayName ||
                           property.propertyType?.displayName ||
                           "Office Space"}
@@ -1177,13 +1177,13 @@ export default function PropertyDetails() {
                     <Image
                       src={pin}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Type</p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="text-[13px] text-gray-500">Type</p>
+                      <p className="font-medium text-[11px] text-gray-800">
                         {property.enquiredFor || "On Lease"}
                       </p>
                     </div>
@@ -1193,13 +1193,13 @@ export default function PropertyDetails() {
                     <Image
                       src={floor}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Floor</p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="text-[13px] text-gray-500">Floor</p>
+                      <p className="font-medium text-[11px] text-gray-800">
                         {property.tagInfo?.id ? "Floor info" : "N/A"}
                       </p>
                     </div>
@@ -1209,13 +1209,13 @@ export default function PropertyDetails() {
                     <Image
                       src={sqft}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Chargeable Area</p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="text-[13px] text-gray-500">Chargeable Area</p>
+                      <p className="font-medium text-[11px] text-gray-800">
                         {property.dimension?.area || "N/A"}{" "}
                         {property.dimension?.unit || "sq ft"}
                       </p>
@@ -1226,13 +1226,13 @@ export default function PropertyDetails() {
                     <Image
                       src={sqft}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Carpet</p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="text-[13px] text-gray-500">Carpet</p>
+                      <p className="font-medium text-[11px] text-gray-800">
                         {property.dimension?.carpetArea || "N/A"} sq ft
                       </p>
                     </div>
@@ -1242,15 +1242,15 @@ export default function PropertyDetails() {
                     <Image
                       src={pin}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">
+                      <p className="text-[13px] text-gray-500">
                         Building Structure
                       </p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="font-medium text-[11px] text-gray-800">
                         {property.dimension?.length &&
                         property.dimension?.breadth
                           ? `${property.dimension.length} x ${property.dimension.breadth}`
@@ -1263,13 +1263,13 @@ export default function PropertyDetails() {
                     <Image
                       src={pin}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Efficiency</p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="text-[13px] text-gray-500">Efficiency</p>
+                      <p className="font-medium text-[11px] text-gray-800">
                         {property.dimension?.carpetArea &&
                         property.dimension?.area
                           ? `${Math.round(
@@ -1286,13 +1286,13 @@ export default function PropertyDetails() {
                     <Image
                       src={pin}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Quoted Total Rent</p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="text-[13px] text-gray-500">Quoted Total Rent</p>
+                      <p className="font-medium text-[11px] text-gray-800">
                         {formatPrice(
                           property.monetaryInfo?.expectedPrice ||
                             property.monetaryInfo?.monthlyRentAmount,
@@ -1306,13 +1306,13 @@ export default function PropertyDetails() {
                     <Image
                       src={pin}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Maintenance</p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="text-[13px] text-gray-500">Maintenance</p>
+                      <p className="font-medium text-[11px] text-gray-800">
                         {property.monetaryInfo?.maintenanceCost
                           ? `₹ ${property.monetaryInfo.maintenanceCost.toLocaleString()}/month`
                           : "Included in rent"}
@@ -1324,13 +1324,13 @@ export default function PropertyDetails() {
                     <Image
                       src={pin}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Taxes</p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="text-[13px] text-gray-500">Taxes</p>
+                      <p className="font-medium text-[11px] text-gray-800">
                         Included in rent
                       </p>
                     </div>
@@ -1340,13 +1340,13 @@ export default function PropertyDetails() {
                     <Image
                       src={pin}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Possession</p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="text-[13px] text-gray-500">Possession</p>
+                      <p className="font-medium text-[11px] text-gray-800">
                         {property.possessionDate
                           ? new Date(property.possessionDate) <= new Date()
                             ? "Immediate"
@@ -1360,13 +1360,13 @@ export default function PropertyDetails() {
                     <Image
                       src={pin}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Condition</p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="text-[13px] text-gray-500">Condition</p>
+                      <p className="font-medium text-[11px] text-gray-800">
                         {getFurnishStatus(property.furnishStatus)}
                       </p>
                     </div>
@@ -1376,13 +1376,13 @@ export default function PropertyDetails() {
                     <Image
                       src={parking}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Car Park Ratio</p>
-                      <p className="font-medium text-[12px] text-gray-800">1:1000 sq.ft.</p>
+                      <p className="text-[13px] text-gray-500">Car Park Ratio</p>
+                      <p className="font-medium text-[11px] text-gray-800">1:1000 sq.ft.</p>
                     </div>
                   </div>
 
@@ -1390,13 +1390,13 @@ export default function PropertyDetails() {
                     <Image
                       src={parking}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Car Park Charges</p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="text-[13px] text-gray-500">Car Park Charges</p>
+                      <p className="font-medium text-[11px] text-gray-800">
                         ₹7,500 per car park
                       </p>
                     </div>
@@ -1406,13 +1406,13 @@ export default function PropertyDetails() {
                     <Image
                       src={pin}
                       alt="icon"
-                      width={20}
-                      height={20}
+                      width={16}
+                      height={16}
                       className="mt-1"
                     />
                     <div>
-                      <p className="text-[14px] text-gray-500">Security Deposit</p>
-                      <p className="font-medium text-[12px] text-gray-800">
+                      <p className="text-[13px] text-gray-500">Security Deposit</p>
+                      <p className="font-medium text-[11px] text-gray-800">
                         {property.monetaryInfo?.depositAmount
                           ? `₹ ${property.monetaryInfo.depositAmount.toLocaleString()}`
                           : "12 months"}
@@ -1422,8 +1422,8 @@ export default function PropertyDetails() {
                 </div>
               </div>
 
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-6 mt-12">
+              <div className="bg-gray-100 p-4 rounded-xl">
+                <h2 className="text-2xl font-bold  text-gray-800 mb-6 mt-12">
                   Features and Amenities
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

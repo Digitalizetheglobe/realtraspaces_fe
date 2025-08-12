@@ -591,7 +591,7 @@ export default function PropertyCards() {
                 ? "Rent"
                 : selectedType === "Investment"
                 ? "Investment"
-                : selectedType === "Research"
+                : selectedType === ""
                 ? "Research"
                 : selectedType
               : "Select Search Type"}
@@ -622,7 +622,7 @@ export default function PropertyCards() {
                 Investment
               </div>
               <div
-                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "Research" ? "bg-gray-700" : ""}`}
+                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "" ? "bg-gray-700" : ""}`}
                 onClick={() => { 
                   setSelectedType("Research"); 
                   setEnquiredForFilter("");

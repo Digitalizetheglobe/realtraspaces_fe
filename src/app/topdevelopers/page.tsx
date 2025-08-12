@@ -161,7 +161,7 @@ const TopDevelopers = () => {
             </div>
           </div>
           <Link href="/developers">
-            <button className="bg-black text-white px-4 py-2 mt-4 rounded-md">
+            <button className="bg-black text-white justify-center items-center cursor-pointer px-4 py-2 mt-4 rounded-md">
               View All Developers
             </button>
           </Link>
