@@ -138,7 +138,7 @@ const Header = () => {
                 className="hidden sm:inline-flex bg-[#F5F5FF99] text-black hover:bg-gray-100  px-4 py-2 rounded-md text-sm font-bold transition-colors uppercase tracking-wider shadow-md "
                 style={{ boxShadow: '0 2px 8px rgba(255,180,0,0.15)' }}
               >
-                List Property free
+                List Your Property 
               </Link>
 
               {/* Menu Button - X when open, hamburger when closed */}

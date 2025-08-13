@@ -70,7 +70,9 @@ const DashboardPage = () => {
     {name :'All properties', icon:"🏠", href: '/PropertyListing'},
     {name :'SEO Meta Manager',icon:"🌐", href: '/seometaManager'},
     {name :'Team Management',icon:"👥", href: '/dashboardteam'},
-    {name :'Developer Management',icon:"🛠️", href: '/dashboarddeveloper'}
+    {name :'Developer Management',icon:"🛠️", href: '/dashboarddeveloper'},
+    {name :'List Properties',icon:"💼", href: '/dashboardlistproperty'},
+    {name :'Cookie Policy',icon:"📝", href: '/dashboardcookiepolicy'}
   ];
 
   if (loading) {

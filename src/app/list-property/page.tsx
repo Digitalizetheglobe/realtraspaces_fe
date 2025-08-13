@@ -2,6 +2,25 @@
 import { useState } from "react";
 import { Camera, MapPin, DollarSign, Home, Phone, Mail, Upload, Check, AlertCircle, Building2, FileText } from "lucide-react";
 
+// API utility function
+const callAPI = async (endpoint: string, data: any) => {
+  const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://api.realtraspaces.com';
+  
+  const response = await fetch(`${baseURL}${endpoint}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data)
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return await response.json();
+};
+
 export default function ListPropertyPage() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -71,9 +90,46 @@ export default function ListPropertyPage() {
     e.preventDefault();
     if (!validateForm()) return;
     setIsSubmitting(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsSubmitting(false);
-    setSubmitted(true);
+    
+    try {
+      // Prepare the data for API
+      const formData = {
+        propertyName: form.propertyName,
+        location: form.location,
+        propertyType: form.propertyType,
+        transactionType: form.transactionType,
+        areaCarpet: form.areaCarpet,
+        areaBuiltup: form.areaBuiltup,
+        rent: form.rent ? parseFloat(form.rent) : null,
+        price: form.price ? parseFloat(form.price) : null,
+        contactName: form.contactName,
+        contactNumber: form.contactNumber,
+        emailAddress: form.emailAddress,
+        description: form.description,
+        imageUrl: null // You can implement image upload separately
+      };
+
+      // Call the API using utility function
+      const result = await callAPI('/api/property-listings/create', formData);
+
+      if (result.success) {
+        setSubmitted(true);
+        // Clear any previous errors
+        setErrors({});
+      } else {
+        // Handle API errors
+        setErrors({ submit: result.message || 'Failed to submit property listing' });
+      }
+    } catch (error) {
+      console.error('Error submitting property listing:', error);
+      if (error instanceof Error) {
+        setErrors({ submit: `Error: ${error.message}` });
+      } else {
+        setErrors({ submit: 'Network error. Please try again.' });
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   if (submitted) {
@@ -348,6 +404,18 @@ export default function ListPropertyPage() {
             </div>
             {/* Submit Button */}
             <div className="mt-8 text-center">
+              {errors.submit && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg flex items-center">
+                  <AlertCircle className="w-4 h-4 mr-2" />
+                  {errors.submit}
+                </div>
+              )}
+              {isSubmitting && (
+                <div className="mb-4 p-3 bg-blue-100 border border-blue-400 text-blue-700 rounded-lg flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-700 mr-2"></div>
+                  Submitting your property listing...
+                </div>
+              )}
               <button 
                 type="submit" 
                 disabled={isSubmitting}

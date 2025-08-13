@@ -6,47 +6,76 @@ import quotation from "../../../public/assets/images/quotation.png";
 import smallquotation from "../../../public/assets/images/smallquotation.png";
 import reversequoatation from "../../../public/assets/images/reversequotaion.png";
 
-export default function Testimonial() {
-  const testimonials = [
-    {
-      id: 1,
-      name: "Adam Wightman",
-      image: "https://readymadeui.com/team-2.webp",
-      rating: 5,
-      text: "Professional, reliable, and creative. The team delivered exactly what we envisioned.",
-    },
-    {
-      id: 2,
-      name: "Adam Wightman",
-      image: "https://readymadeui.com/team-3.webp",
-      rating: 5,
-      text: "Professional, reliable, and creative. The team delivered exactly what we envisioned.",
-    },
-    {
-      id: 3,
-      name: "Adam Wightman",
-      image: "https://readymadeui.com/team-4.webp",
-      rating: 5,
-      text: "Professional, reliable, and creative. The team delivered exactly what we envisioned.",
-    },
-    {
-      id: 4,
-      name: "Adam Wightman",
-      image: "https://readymadeui.com/team-1.webp",
-      rating: 5,
-      text: "Professional, reliable, and creative. The team delivered exactly what we envisioned.",
-    },
-  ];
+interface Testimonial {
+  id: number;
+  name: string;
+  testimonial: string;
+  rating: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
+export default function Testimonial() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Fetch testimonials from API
   useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('https://api.realtraspaces.com/api/testimonials');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+          setTestimonials(result.data);
+        } else {
+          throw new Error('Failed to fetch testimonials');
+        }
+      } catch (err) {
+        console.error('Error fetching testimonials:', err);
+        setError(err instanceof Error ? err.message : 'Failed to fetch testimonials');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
+
+  // Auto-rotate testimonials
+  useEffect(() => {
+    if (testimonials.length === 0) return;
+
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
     }, 5000); // Change slide every 5 seconds
 
     return () => clearInterval(interval);
   }, [testimonials.length]);
+
+  // Default avatar for testimonials without images
+  const getDefaultAvatar = (name: string) => {
+    const colors = [
+      'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500', 
+      'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-teal-500'
+    ];
+    const colorIndex = name.charCodeAt(0) % colors.length;
+    return colors[colorIndex];
+  };
+
+  // Hide section completely if loading, error, or no testimonials
+  if (loading || error || testimonials.length === 0) {
+    return null;
+  }
 
   return (
     <>
@@ -88,7 +117,7 @@ export default function Testimonial() {
                         />
                         {/* Testimonial text */}
                         <p className="text-md text-gray-600 mb-6 mt-4">
-                          {testimonial.text}
+                          {testimonial.testimonial}
                         </p>
                         <div className="flex justify-end w-full">
                           <Image
@@ -98,13 +127,10 @@ export default function Testimonial() {
                         </div>
                         {/* User info with avatar and name */}
                         <div className="flex items-center gap-3 mt-4">
-                          <Image
-                            src={testimonial.image}
-                            width={32}
-                            height={32}
-                            className="w-8 h-8 rounded-full"
-                            alt={testimonial.name}
-                          />
+                          {/* Default avatar with initials */}
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${getDefaultAvatar(testimonial.name)}`}>
+                            {testimonial.name.charAt(0).toUpperCase()}
+                          </div>
                           <div>
                             <h4 className="text-sm font-medium text-slate-900">
                               {testimonial.name}
@@ -114,7 +140,7 @@ export default function Testimonial() {
                               {[...Array(5)].map((_, i) => (
                                 <svg
                                   key={i}
-                                  className="w-3 h-3 fill-yellow-400"
+                                  className={`w-3 h-3 ${i < testimonial.rating ? 'fill-yellow-400' : 'fill-gray-300'}`}
                                   viewBox="0 0 14 13"
                                   xmlns="http://www.w3.org/2000/svg"
                                 >
