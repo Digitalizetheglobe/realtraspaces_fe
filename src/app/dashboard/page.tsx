@@ -72,7 +72,7 @@ const DashboardPage = () => {
     {name :'Team Management',icon:"👥", href: '/dashboardteam'},
     {name :'Developer Management',icon:"🛠️", href: '/dashboarddeveloper'},
     {name :'List Properties',icon:"💼", href: '/dashboardlistproperty'},
-    {name :'Cookie Policy',icon:"📝", href: '/dashboardcookiepolicy'}
+    {name :'Cookie Policy',icon:"📝", href: '/dashboardcookies'}
   ];
 
   if (loading) {

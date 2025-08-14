@@ -333,7 +333,7 @@ export default function ListPropertyPage() {
                     name="contactNumber" 
                     value={form.contactNumber} 
                     onChange={handleChange}
-                    placeholder="+91 9876543210"
+                    placeholder="+41 123 456 7890"
                     className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.contactNumber ? 'border-red-500' : 'border-gray-300'}`}
                   />
                 </div>
