@@ -254,14 +254,7 @@ const BlogPage = () => {
                   {/* Footer */}
                   <div className="flex justify-between items-center pt-4 border-t border-gray-100 mt-auto">
                     <div className="flex gap-4">
-                      {/* <span className="flex items-center gap-1 text-gray-500 text-sm">
-                        <FiHeart className={`${blog.likes > 0 ? "text-red-400 fill-red-400" : ""}`} />
-                        {blog.likes > 0 ? blog.likes : 'Like'}
-                      </span>
-                      <span className="flex items-center gap-1 text-gray-500 text-sm">
-                        <FiBookmark className={`${blog.bookmarks > 0 ? "text-blue-400 fill-blue-400" : ""}`} />
-                        {blog.bookmarks > 0 ? blog.bookmarks : 'Save'}
-                      </span> */}
+                     
                     </div>
                     <div className="flex gap-2 items-center">
                       <Link
@@ -278,14 +271,7 @@ const BlogPage = () => {
                       >
                         <FiTrash2 size={16} />
                       </button>
-                      <Link
-                        href={`/blog/${blog.slug}`}
-                        className="flex items-center text-sm font-medium px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors group/readmore"
-                        style={{ color: colors.primary }}
-                      >
-                        Read more
-                        <FiArrowRight className="ml-1 group-hover/readmore:translate-x-1 transition-transform" />
-                      </Link>
+                     
                     </div>
                   </div>
                 </div>

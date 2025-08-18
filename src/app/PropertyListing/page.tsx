@@ -252,15 +252,9 @@ const PropertyListing = () => {
                   )}
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-600 line-clamp-3">
-                    {property.notes.replace(/Notes - /, '').split('\n')[0]}
-                  </p>
-                </div>
+               
 
-                <button className="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-300">
-                  View Details
-                </button>
+              
               </div>
             </div>
           ))}

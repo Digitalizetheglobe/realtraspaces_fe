@@ -11,10 +11,22 @@ interface Developer {
   builder_logo: string | null;
   descriptions: string;
   project_name: string[];
+  images: string[];
   status: boolean;
   created_at: string;
   updated_at: string;
 }
+
+// Utility function to validate image URL
+const isValidImageUrl = (url: string): boolean => {
+  if (!url) return false;
+  try {
+    const urlObj = new URL(url);
+    return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
 
 const DevelopersPage = () => {
   const [developers, setDevelopers] = useState<Developer[]>([]);
@@ -26,6 +38,7 @@ const DevelopersPage = () => {
     null
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
   // Form state
   const [formData, setFormData] = useState({
@@ -36,6 +49,8 @@ const DevelopersPage = () => {
     builder_logo: null as File | null,
     logoPreview: "",
     newProject: "",
+    images: [] as File[],
+    imagePreviews: [] as string[],
   });
 
   // Color scheme
@@ -54,17 +69,25 @@ const DevelopersPage = () => {
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
-        const response = await fetch("https://api.realtraspaces.com/api/developers");
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
+        const response = await fetch("http://localhost:8000/api/developers");
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error("API endpoint not found. Please check if the backend server is running.");
+          } else if (response.status >= 500) {
+            throw new Error("Server error. Please try again later.");
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        }
         const data = await response.json();
         setDevelopers(data.data || []);
       } catch (error) {
-        setError(
-          `Failed to load developers: ${
-            error instanceof Error ? error.message : "Unknown error"
-          }`
-        );
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        if (errorMessage.includes("Failed to fetch")) {
+          setError("Cannot connect to server. Please check if the backend server is running on http://localhost:8000");
+        } else {
+          setError(`Failed to load developers: ${errorMessage}`);
+        }
       } finally {
         setLoading(false);
       }
@@ -94,6 +117,74 @@ const DevelopersPage = () => {
         builder_logo: file,
         logoPreview: URL.createObjectURL(file),
       }));
+    }
+  };
+
+  // Handle multiple image uploads
+  const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const files = Array.from(e.target.files);
+      const newPreviews = files.map(file => URL.createObjectURL(file));
+      
+      setFormData((prev) => ({
+        ...prev,
+        images: [...prev.images, ...files],
+        imagePreviews: [...prev.imagePreviews, ...newPreviews],
+      }));
+    }
+  };
+
+  // Remove image from preview
+  const handleRemoveImage = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+      imagePreviews: prev.imagePreviews.filter((_, i) => i !== index),
+    }));
+  };
+
+  // Upload images to server
+  const uploadImages = async (developerId: number, imageFiles: File[]) => {
+    if (imageFiles.length === 0) return;
+
+    const formData = new FormData();
+    imageFiles.forEach(file => {
+      formData.append('images', file);
+    });
+
+    try {
+      const response = await fetch(`http://localhost:8000/api/developers/${developerId}/images`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload images');
+      }
+
+      const result = await response.json();
+      return result.data.uploadedImages;
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      throw error;
+    }
+  };
+
+  // Delete image from server
+  const deleteImage = async (developerId: number, imageIndex: number) => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/developers/${developerId}/images/${imageIndex}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete image');
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      throw error;
     }
   };
 
@@ -127,6 +218,8 @@ const DevelopersPage = () => {
       builder_logo: null,
       logoPreview: developer?.builder_logo || "",
       newProject: "",
+      images: [],
+      imagePreviews: developer?.images || [],
     });
     setShowModal(true);
   };
@@ -148,12 +241,12 @@ const DevelopersPage = () => {
       });
 
       if (formData.builder_logo) {
-        formDataToSend.append("builderLogo", formData.builder_logo);
+        formDataToSend.append("builder_logo", formData.builder_logo);
       }
 
       const url = currentDeveloper
-        ? `https://api.realtraspaces.com/api/developers/${currentDeveloper.id}`
-        : "https://api.realtraspaces.com/api/developers";
+        ? `http://localhost:8000/api/developers/${currentDeveloper.id}`
+        : "http://localhost:8000/api/developers";
 
       const method = currentDeveloper ? "PUT" : "POST";
 
@@ -168,6 +261,31 @@ const DevelopersPage = () => {
       }
 
       const result = await response.json();
+
+      // Upload images if any were selected
+      if (formData.images.length > 0) {
+        try {
+          const uploadedImages = await uploadImages(result.data.id, formData.images);
+          // Update the developer with the new images
+          const updatedDeveloper = {
+            ...result.data,
+            images: [...(result.data.images || []), ...uploadedImages]
+          };
+          
+          if (currentDeveloper) {
+            setDevelopers((prev) =>
+              prev.map((d) => (d.id === currentDeveloper.id ? updatedDeveloper : d))
+            );
+          } else {
+            setDevelopers((prev) => 
+              prev.map((d) => (d.id === result.data.id ? updatedDeveloper : d))
+            );
+          }
+        } catch (error) {
+          console.error('Error uploading images:', error);
+          toast.warning('Developer saved but some images failed to upload');
+        }
+      }
 
       if (currentDeveloper) {
         setDevelopers((prev) =>
@@ -196,7 +314,7 @@ const DevelopersPage = () => {
     setIsDeleting(id);
     try {
       const response = await fetch(
-        `https://api.realtraspaces.com/api/developers/${id}`,
+        `http://localhost:8000/api/developers/${id}`,
         {
           method: "DELETE",
         }
@@ -245,9 +363,29 @@ const DevelopersPage = () => {
               <FiPlus className="mr-2" /> Add Developer
             </button>
           </div>
-          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
-            <p>{error}</p>
-          </div>
+                                  <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+              <p className="font-medium mb-2">Error Loading Developers</p>
+              <p className="text-sm mb-3">{error}</p>
+              <div className="text-xs text-red-600 mb-4">
+                <p className="mb-1">Troubleshooting tips:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Make sure the backend server is running on http://localhost:8000</li>
+                  <li>Check if the API endpoint is accessible</li>
+                  <li>Verify your internet connection</li>
+                  <li>Try refreshing the page</li>
+                </ul>
+              </div>
+              <button
+                onClick={() => {
+                  setError(null);
+                  setLoading(true);
+                  window.location.reload();
+                }}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm"
+              >
+                Retry Loading
+              </button>
+            </div>
         </div>
       </div>
     );
@@ -301,7 +439,7 @@ const DevelopersPage = () => {
               >
                 {/* Developer Logo */}
                 <div className="h-48 w-full relative bg-gray-100 flex items-center justify-center">
-                  {developer.builder_logo ? (
+                  {developer.builder_logo && isValidImageUrl(developer.builder_logo) ? (
                     <img
                       src={developer.builder_logo}
                       alt={developer.buildername}
@@ -309,19 +447,68 @@ const DevelopersPage = () => {
                       onError={(e) => {
                         const img = e.currentTarget as HTMLImageElement;
                         img.style.display = "none";
+                        // Track failed images
+                        setFailedImages(prev => new Set(prev).add(developer.builder_logo || ''));
+                        // Show fallback when image fails to load
+                        const fallback = img.parentElement?.querySelector('.image-fallback') as HTMLElement;
+                        if (fallback) {
+                          fallback.style.display = "flex";
+                        }
                       }}
+                      onLoad={(e) => {
+                        // Image loaded successfully - hide any fallback
+                        const fallback = e.currentTarget.parentElement?.querySelector('.image-fallback') as HTMLElement;
+                        if (fallback) {
+                          fallback.style.display = "none";
+                        }
+                      }}
+                      crossOrigin="anonymous"
                     />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-gray-400">
-                      <div
-                        className="text-4xl font-bold"
-                        style={{ color: colors.primary }}
-                      >
-                        {developer.buildername.charAt(0).toUpperCase()}
-                      </div>
-                      <span className="mt-2">No Logo</span>
+                  ) : null}
+                  {/* Fallback when no logo or image fails to load */}
+                  <div 
+                    className={`flex flex-col items-center justify-center text-gray-400 ${developer.builder_logo && isValidImageUrl(developer.builder_logo) ? 'image-fallback' : ''}`}
+                    style={{ 
+                      display: (developer.builder_logo && isValidImageUrl(developer.builder_logo) && !failedImages.has(developer.builder_logo)) ? 'none' : 'flex' 
+                    }}
+                  >
+                    <div
+                      className="text-4xl font-bold"
+                      style={{ color: colors.primary }}
+                    >
+                      {developer.buildername.charAt(0).toUpperCase()}
                     </div>
-                  )}
+                    <span className="mt-2 text-sm">
+                      {developer.builder_logo && !isValidImageUrl(developer.builder_logo) 
+                        ? 'Invalid Image URL' 
+                        : developer.builder_logo && failedImages.has(developer.builder_logo)
+                          ? 'Image Failed to Load' 
+                          : developer.builder_logo 
+                            ? 'Loading...' 
+                            : 'No Logo'
+                      }
+                    </span>
+                    {developer.builder_logo && failedImages.has(developer.builder_logo) && (
+                      <button
+                        onClick={() => {
+                          setFailedImages(prev => {
+                            const newSet = new Set(prev);
+                            newSet.delete(developer.builder_logo || '');
+                            return newSet;
+                          });
+                          // Force re-render of the image
+                          const img = document.querySelector(`img[src="${developer.builder_logo}"]`) as HTMLImageElement;
+                          if (img) {
+                            img.style.display = 'block';
+                            img.src = developer.builder_logo + '?retry=' + Date.now();
+                          }
+                        }}
+                        className="mt-2 px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                      >
+                        Retry
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Developer Content */}
@@ -366,6 +553,57 @@ const DevelopersPage = () => {
                         </ul>
                       </div>
                     )}
+
+                    {/* {developer.images && developer.images.length > 0 && (
+                      <div className="mb-4">
+                        <h3
+                          className="text-sm font-medium mb-2"
+                          style={{ color: colors.primary }}
+                        >
+                          Images ({developer.images.length}):
+                        </h3>
+                        <div className="grid grid-cols-2 gap-2">
+                          {developer.images.slice(0, 4).map((image, index) => (
+                            <div key={index} className="relative group">
+                              <img
+                                src={image}
+                                alt={`${developer.buildername} image ${index + 1}`}
+                                className="w-full h-20 object-cover rounded-md border border-gray-200"
+                                onError={(e) => {
+                                  const img = e.currentTarget as HTMLImageElement;
+                                  img.style.display = "none";
+                                }}
+                              />
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await deleteImage(developer.id, index);
+                                    setDevelopers((prev) =>
+                                      prev.map((d) =>
+                                        d.id === developer.id
+                                          ? { ...d, images: d.images.filter((_, i) => i !== index) }
+                                          : d
+                                      )
+                                    );
+                                    toast.success("Image deleted successfully!");
+                                  } catch (error) {
+                                    toast.error("Failed to delete image");
+                                  }
+                                }}
+                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs"
+                              >
+                                <FiX size={10} />
+                              </button>
+                            </div>
+                          ))}
+                          {developer.images.length > 4 && (
+                            <div className="w-full h-20 bg-gray-100 rounded-md border border-gray-200 flex items-center justify-center text-gray-500 text-xs">
+                              +{developer.images.length - 4} more
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )} */}
                   </div>
 
                   {/* Action Buttons - Edit and Delete */}
@@ -471,7 +709,7 @@ const DevelopersPage = () => {
                     type="text"
                     value={formData.newProject}
                     onChange={(e) =>
-                      setFormData({ ...formData, newProject: e.target.value })
+                      setFormData((prev) => ({ ...prev, newProject: e.target.value }))
                     }
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Add project name"
@@ -525,6 +763,44 @@ const DevelopersPage = () => {
                   onChange={handleFileChange}
                   className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
+              </div>
+
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Images (Up to 10 images)
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImagesChange}
+                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+                
+                {/* Image Previews */}
+                {(formData.imagePreviews.length > 0 || formData.images.length > 0) && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Selected Images:</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {formData.imagePreviews.map((preview, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={preview}
+                            alt={`Preview ${index + 1}`}
+                            className="h-24 w-full object-cover rounded-md border border-gray-200"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(index)}
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <FiX size={12} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end gap-3">
