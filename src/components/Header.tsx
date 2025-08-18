@@ -26,6 +26,7 @@ const Header = () => {
     { name: "Blog", href: "/blogs" },
     { name: "Career", href: "/career" },
     { name: "Contact", href: "/contact" },
+    { name: "Developers", href: "/developers" },
     { name: "Compare Properties", href: "/compareproperties" },
     { name: "Research", href: "/research" },
     { name: "IRR Calculator", href: "/irr-calculator" },
@@ -67,32 +68,7 @@ const Header = () => {
             {/* Right side buttons */}
             <div className="flex items-center space-x-4">
               {/* Search Button */}
-              <Link href="/">
-                <button
-                  type="button"
-                  className={`p-2 rounded-md cursor-pointer ${
-                    isSearchOpen
-                      ? "bg-black text-white"
-                      : "bg-[#F5F5FF99] text-black hover:bg-gray-100"
-                  } h-8 w-8 flex items-center justify-center transition-colors`}
-                  aria-label="Search"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                </button>
-              </Link>
+             
 
               {/* Conditional Button */}
               {/* {isLoggedIn ? (

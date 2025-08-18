@@ -148,13 +148,55 @@ export default function PropertyDetails() {
     return propertydetails.src;
   };
 
+  // Helper function to extract title from complex slug
+  const extractTitleFromSlug = (slug: string): string => {
+    console.log("Original slug:", slug);
+    
+    // For the specific case: "office-space-dipti-classic-a-wing-rent-furnished"
+    // We want to extract: "dipti-classic-a-wing"
+    
+    const parts = slug.split('-');
+    
+    // Look for the pattern: [prefix]-[title]-[suffix1]-[suffix2]
+    // Remove common prefixes and suffixes
+    
+    // Remove common prefixes
+    const prefixes = ['office-space', 'commercial', 'residential', 'apartment', 'villa'];
+    let startIndex = 0;
+    if (prefixes.includes(parts[0])) {
+      startIndex = 1;
+    }
+    
+    // Remove common suffixes from the end
+    const suffixes = ['rent', 'sale', 'lease', 'furnished', 'semi-furnished', 'unfurnished'];
+    let endIndex = parts.length;
+    
+    // Check last 2-3 parts for suffixes
+    for (let i = parts.length - 1; i >= Math.max(startIndex, parts.length - 3); i--) {
+      if (suffixes.includes(parts[i])) {
+        endIndex = i;
+        break;
+      }
+    }
+    
+    const titleParts = parts.slice(startIndex, endIndex);
+    const extractedTitle = titleParts.join('-');
+    
+    console.log("Extracted title:", extractedTitle);
+    console.log("Parts:", parts);
+    console.log("Start index:", startIndex, "End index:", endIndex);
+    
+    return extractedTitle;
+  };
+
   useEffect(() => {
     const fetchPropertyDetails = async () => {
       try {
-        const decodedTitle = decodeURIComponent(propertyTitle).replace(
-          /-/g,
-          " "
-        );
+        // Extract the actual title from the complex slug
+        const actualTitle = extractTitleFromSlug(propertyTitle);
+        const decodedTitle = decodeURIComponent(actualTitle).replace(/-/g, " ");
+        
+        console.log("API will be called with title:", decodedTitle);
 
         const response = await fetch(
           `https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=100&PropertyTitle=${encodeURIComponent(
@@ -170,6 +212,8 @@ export default function PropertyDetails() {
         );
 
         const data = await response.json();
+        console.log("API response:", data);
+        
         const properties = Array.isArray(data)
           ? data
           : data.items || data.data || [];
@@ -227,6 +271,54 @@ export default function PropertyDetails() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [propertyTitle]);
 
+  // Main image carousel navigation functions
+  const handleMainImagePrev = () => {
+    const allImages = imageUrls.length > 0 ? imageUrls : thumbnails;
+    if (allImages.length === 0) return;
+    
+    let currentIndex = allImages.findIndex(img => 
+      (typeof img === "string" && typeof mainImage === "string" && img === mainImage) ||
+      (typeof img !== "string" && typeof mainImage !== "string" && mainImage === img)
+    );
+    
+    if (currentIndex === -1) {
+      // If mainImage is not found in the array, start from the end
+      currentIndex = allImages.length - 1;
+    } else if (currentIndex === 0) {
+      // If at the first image, wrap to the last
+      currentIndex = allImages.length - 1;
+    } else {
+      // Go to previous image
+      currentIndex = currentIndex - 1;
+    }
+    
+    setMainImage(allImages[currentIndex]);
+  };
+
+  const handleMainImageNext = () => {
+    const allImages = imageUrls.length > 0 ? imageUrls : thumbnails;
+    if (allImages.length === 0) return;
+    
+    let currentIndex = allImages.findIndex(img => 
+      (typeof img === "string" && typeof mainImage === "string" && img === mainImage) ||
+      (typeof img !== "string" && typeof mainImage !== "string" && mainImage === img)
+    );
+    
+    if (currentIndex === -1) {
+      // If mainImage is not found in the array, start from the beginning
+      currentIndex = 0;
+    } else if (currentIndex === allImages.length - 1) {
+      // If at the last image, wrap to the first
+      currentIndex = 0;
+    } else {
+      // Go to next image
+      currentIndex = currentIndex + 1;
+    }
+    
+    setMainImage(allImages[currentIndex]);
+  };
+
+  // Thumbnail navigation functions (keeping original logic)
   const handlePrev = () => {
     const totalImages = imageUrls.length > 0 ? imageUrls.length : thumbnails.length;
     let newStartIndex;
@@ -490,13 +582,9 @@ export default function PropertyDetails() {
       .join(", ");
   };
 
-  // Determine if mainImage is the first or last in visibleImages
-  const isFirstImageActive =
-    (typeof mainImage === "string" && mainImage === visibleImages[0]) ||
-    (typeof mainImage !== "string" && mainImage === visibleImages[0]);
-  const isLastImageActive =
-    (typeof mainImage === "string" && mainImage === visibleImages[visibleImages.length - 1]) ||
-    (typeof mainImage !== "string" && mainImage === visibleImages[visibleImages.length - 1]);
+  // Since we now have continuous navigation, no special styling is needed for first/last images
+  const isFirstImageActive = false;
+  const isLastImageActive = false;
 
   if (loading) {
     return (
@@ -847,7 +935,7 @@ export default function PropertyDetails() {
               <div className="mb-4 rounded-lg overflow-hidden shadow-lg border border-gray-200 relative">
                 {/* Previous Button */}
                 <button
-                  onClick={handlePrev}
+                  onClick={handleMainImagePrev}
                   className={`absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 ${
                     isFirstImageActive ? "ring-2 ring-blue-500" : ""
                   }`}
@@ -917,7 +1005,7 @@ export default function PropertyDetails() {
                 )}
                 {/* Next Button */}
                 <button
-                  onClick={handleNext}
+                  onClick={handleMainImageNext}
                   className={`absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 ${
                     isLastImageActive ? "ring-2 ring-blue-500" : ""
                   }`}

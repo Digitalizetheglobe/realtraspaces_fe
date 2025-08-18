@@ -255,7 +255,7 @@ export default function WhyrealtraSpaces() {
                     </div>
                 </div>
             </div>
-            <Testimonial/>
+            <Testimonial hideOnError={true} />
 
             <Blogs />
 

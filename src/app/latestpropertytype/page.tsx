@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { motion } from 'framer-motion';
 import { Raleway } from "next/font/google";
 import { X, User, Mail, Phone, MessageSquare, Send } from "lucide-react";
 import defaultPropertyImage from "../../../public/assets/images/latestproperty1.png";
@@ -92,6 +93,39 @@ export default function PropertyCards() {
   const [suggestionType, setSuggestionType] = useState<string>(""); // city, sublocality, type, universal
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set()); // Track failed image URLs
   const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set()); // Track loading image URLs
+  const [showSearchBar, setShowSearchBar] = useState(false); // Control search bar visibility
+  const [showHeading, setShowHeading] = useState(true); // Control heading visibility
+  const [initialDelayComplete, setInitialDelayComplete] = useState(false); // Track initial 5-second delay
+
+  // Initial delay effect - hide heading after 5 seconds, then show search bar
+  useEffect(() => {
+    const hideHeadingTimer = setTimeout(() => {
+      setShowHeading(false);
+    }, 7000);
+
+    const showSearchBarTimer = setTimeout(() => {
+      setShowSearchBar(true);
+      setInitialDelayComplete(true);
+    }, 7500); // Show search bar 1 second after heading hides
+
+    return () => {
+      clearTimeout(hideHeadingTimer);
+      clearTimeout(showSearchBarTimer);
+    };
+  }, []);
+
+  // Scroll effect - show search bar on scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setShowSearchBar(true);
+        setShowHeading(false); // Also hide heading when scrolling
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Click-away listener for share dropdown
   useEffect(() => {
@@ -115,18 +149,7 @@ export default function PropertyCards() {
     }
   }, [openShareIndex]);
 
-  // Helper to get property URL
-  const getPropertyUrl = (property: Property) => {
-    if (!property.title) return window.location.href;
-    return `${window.location.origin}/property-details/${encodeURIComponent(property.title)}`;
-  };
-
-  // Helper to copy link
-  const handleCopyLink = (url: string) => {
-    navigator.clipboard.writeText(url);
-    alert('Link copied to clipboard!');
-  };
-
+  // Fetch properties effect
   useEffect(() => {
     const fetchProperties = async () => {
       try {
@@ -270,13 +293,6 @@ export default function PropertyCards() {
     setSuggestionType("");
   }, [search, selectedLocations]); // Removed problematic dependencies that cause infinite loops
 
-  // Add suggestion as chip (city, sublocality, type, or universal)
-  const handleSuggestionClick = (suggestion: string) => {
-    addLocation(suggestion);
-    setSearch("");
-    setSuggestions([]);
-  };
-
   // Handle scroll to show popup
   useEffect(() => {
     const handleScroll = () => {
@@ -316,6 +332,18 @@ export default function PropertyCards() {
       }
     }
   }, []);
+
+  // Helper to get property URL
+  const getPropertyUrl = (property: Property) => {
+    if (!property.title) return window.location.href;
+    return `${window.location.origin}/property-details/${encodeURIComponent(property.title)}`;
+  };
+
+  // Helper to copy link
+  const handleCopyLink = (url: string) => {
+    navigator.clipboard.writeText(url);
+    alert('Link copied to clipboard!');
+  };
 
   // Popup close handler
   const handleClosePopup = () => {
@@ -542,6 +570,13 @@ export default function PropertyCards() {
     });
   };
 
+  // Add suggestion as chip (city, sublocality, type, or universal)
+  const handleSuggestionClick = (suggestion: string) => {
+    addLocation(suggestion);
+    setSearch("");
+    setSuggestions([]);
+  };
+
   if (loading) {
     return (
       <div className={raleway.className}>
@@ -570,9 +605,36 @@ export default function PropertyCards() {
     </video>
     <div className="absolute inset-0 bg-black opacity-50"></div>
   </div>
+ 
+    <div className="absolute bottom-4 w-full flex justify-center px-4">
+      <div className="max-w-4xl mx-auto w-full">
+        {showHeading && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-8 justify-center"
+          >
+            <h1 className="text-3xl md:text-6xl  text-white font-bold mb-2 leading-tight">
+              Transforming <span className="text-gray-300"> Real Estate </span>Dreams
+            </h1>
+            
+            <p className="text-xl md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Realtra Spaces is a forward-thinking real estate company specializing in luxury residential and commercial properties. We combine innovation with expertise to deliver exceptional real estate experiences.
+            </p>
+          </motion.div>
+        )}
 
-    <div className="absolute bottom-4 w-full flex justify-center px-4 py-40">
-      <div className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-3 px-4 py-3 rounded-2xl border border-gray-300 bg-white/60 backdrop-blur-md shadow-lg overflow-visible relative">
+        {/* Search Bar - Conditionally rendered */}
+        {showSearchBar && (
+          <div className="py-40">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-3 px-4 py-3 rounded-2xl border border-gray-300 bg-white/60 backdrop-blur-md shadow-lg overflow-visible relative mx-auto "
+          >
         {/* Suggestions Dropdown - now directly above the search bar */}
        
         {/* Dropdown */}
@@ -702,6 +764,9 @@ export default function PropertyCards() {
             Clear
           </button>
         )} */}
+          </motion.div>
+          </div>
+        )}
       </div>
     </div>
 
