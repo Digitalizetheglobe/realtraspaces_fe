@@ -60,6 +60,14 @@ const FeaturedProperties = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check authentication status
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLoggedIn(!!localStorage.getItem("authToken"));
+    }
+  }, []);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -319,7 +327,7 @@ const FeaturedProperties = () => {
                     {property.imageUrls?.Images && property.imageUrls.Images.length > 0 ? (
                       <img
                         src={property.imageUrls.Images[0].imageFilePath}
-                        alt={property.title}
+                        alt={isLoggedIn ? property.title : "Property Details"}
                         className="property-image w-full h-56 object-cover rounded-2xl p-2"
                       />
                     ) : (
@@ -349,7 +357,7 @@ const FeaturedProperties = () => {
 
                     {/* Title and Price */}
                     <h3 className="font-semibold text-xl text-gray-900 transition-colors duration-300">
-                      {property.title || "ONE BKC C Wing"}
+                      {isLoggedIn ? (property.title || "ONE BKC C Wing") : "Property Details"}
                     </h3>
                     <h4 className="text-base text-gray-500 font-mono mb-4 transition-colors duration-300">
                       {formatPrice(

@@ -7,6 +7,7 @@ import Link from "next/link";
 import CalculatorSection from "@/components/calculate";
 import PageWithSeo from "../../components/PageWithSeo";
 import SeoHead from "../../components/SeoHead";
+import PropertyLocations from "@/components/locality";
 
 // Removed metadata and head exports
 
@@ -398,6 +399,7 @@ const Blogs = () => {
 </div>
 
     </div>
+    <PropertyLocations/>
     </PageWithSeo>
     </>
   );

@@ -139,7 +139,7 @@ export default function Testimonial({ hideOnError = false }: TestimonialProps) {
 
   return (
     <>
-      <div className="py-16 w-full bg-gray-50 overflow-hidden">
+      <div className="py-16 w-full bg-gray-50 overflow-hidden ">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-col md:flex-row gap-12 items-start">
             {/* Left-aligned heading with quote icon */}

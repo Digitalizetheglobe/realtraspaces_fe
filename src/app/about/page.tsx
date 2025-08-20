@@ -235,7 +235,7 @@ export default function RealtraSpacesAbout() {
         </div>
 
         {/* Hero Content */}
-        <div className="relative py-10 z-10 container mx-auto px-4 text-center text-white">
+        <div className="relative  pt-16 z-10 container mx-auto px-4 text-center text-white">
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -248,7 +248,7 @@ export default function RealtraSpacesAbout() {
               </p>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-bold mb-4 leading-tight">
               Transforming Real Estate
               <span className="text-gray-300"> Dreams</span>
             </h1>
@@ -271,7 +271,7 @@ export default function RealtraSpacesAbout() {
       </section>
 
       {/* Stats Section */}
-      <section className="bg-black py-10">
+      <section className="bg-black py-6">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Years in Business */}

@@ -64,6 +64,7 @@ const DashboardPage = () => {
 
   const modules = [
     { name: "Dashboard", icon: "📊", href: "/dashboard" },
+    { name: "All Web Users", icon: "👥", href: "/dashboardallwebusers" },
     { name: "Career Management", icon: "💼", href: "/career-management" },
     { name: "Blog", icon: "📝", href: "/blog" },
     { name: "Manage Testimonials", icon: "⭐", href: "/manage-testimonials" },

@@ -59,6 +59,7 @@ export default function Similarproperties() {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [openShareIndex, setOpenShareIndex] = useState<number | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   // Add bookmarking state
   const [bookmarkedProperties, setBookmarkedProperties] = useState<Set<string>>(new Set());
 
@@ -74,6 +75,13 @@ export default function Similarproperties() {
       return newBookmarks;
     });
   };
+
+  // Check authentication status
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLoggedIn(!!localStorage.getItem("authToken"));
+    }
+  }, []);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -192,7 +200,7 @@ export default function Similarproperties() {
                     <div>
                       <Link href={`/property-details/${encodeURIComponent(property.title ?? "")}`} prefetch={false}>
                         <h3 className="font-medium text-black text-base">
-                          {property.title || "Prime Business Hub"}
+                          {isLoggedIn ? (property.title || "Prime Business Hub") : "Property Details"}
                         </h3>
                       </Link>
                       <div className="flex items-center text-gray-500 text-xs">
@@ -235,7 +243,7 @@ export default function Similarproperties() {
                     <div className="relative h-[180px]">
                       <Image
                         src={getPropertyImage(property)}
-                        alt={property.title || "Property"}
+                        alt={isLoggedIn ? (property.title || "Property") : "Property Details"}
                         className="w-full h-full object-cover"
                         width={307}
                         height={180}
@@ -348,7 +356,7 @@ export default function Similarproperties() {
                                               </div>
                                               {/* WhatsApp button */}
                                               <a
-                                                href={`https://wa.me/7039311539?text=${encodeURIComponent(property.title || 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
+                                                href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"

@@ -58,7 +58,7 @@ const CareerManagementPage = () => {
     fetchJobs();
   }, []);
 
-  const handleDeleteJob = async (jobId: number) => {
+  const handleDeleteJob = async (jobId: string) => {
     if (!confirm('Are you sure you want to delete this job?')) return;
 
     try {
@@ -67,10 +67,11 @@ const CareerManagementPage = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete job');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to delete job');
       }
 
-      setJobs(jobs.filter(job => job.id !== jobId));
+      setJobs(jobs.filter(job => job.jobId !== jobId));
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred');
     }
@@ -149,14 +150,14 @@ const CareerManagementPage = () => {
                   View Applications
                 </Link>
                 <div className="space-x-2">
-                  <button
+                  {/* <button
                     onClick={() => router.push(`/career-management/edit/${job.jobId}`)}
                     className="text-blue-600 hover:text-blue-800"
                   >
                     Edit
-                  </button>
+                  </button> */}
                   <button
-                    onClick={() => handleDeleteJob(job.id)}
+                    onClick={() => handleDeleteJob(job.jobId)}
                     className="text-red-600 hover:text-red-800"
                   >
                     Delete

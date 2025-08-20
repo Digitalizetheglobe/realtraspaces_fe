@@ -4,14 +4,17 @@ import { useState, useEffect } from "react";
 import { FiEdit2, FiTrash2, FiPlus, FiX } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Image from "next/image";
 
 interface Developer {
   id: number;
   buildername: string;
   builder_logo: string | null;
+  builder_logo_url?: string | null;
   descriptions: string;
   project_name: string[];
   images: string[];
+  image_urls?: string[];
   status: boolean;
   created_at: string;
   updated_at: string;
@@ -26,6 +29,31 @@ const isValidImageUrl = (url: string): boolean => {
   } catch {
     return false;
   }
+};
+
+// Utility function to map API response to Developer interface
+const mapApiResponseToDeveloper = (apiData: any): Developer => {
+  console.log('Mapping developer data:', apiData);
+  console.log('Images array:', apiData.images);
+  console.log('Image URLs array:', apiData.image_urls);
+  console.log('Is images array?', Array.isArray(apiData.images));
+  
+  const mapped = {
+    id: apiData.id,
+    buildername: apiData.buildername || '',
+    builder_logo: apiData.builder_logo || null,
+    builder_logo_url: apiData.builder_logo_url || null,
+    descriptions: apiData.descriptions || '',
+    project_name: Array.isArray(apiData.project_name) ? apiData.project_name : [],
+    images: Array.isArray(apiData.images) ? apiData.images : [],
+    image_urls: Array.isArray(apiData.image_urls) ? apiData.image_urls : [],
+    status: Boolean(apiData.status),
+    created_at: apiData.created_at || '',
+    updated_at: apiData.updated_at || ''
+  };
+  
+  console.log('Mapped result:', mapped);
+  return mapped;
 };
 
 const DevelopersPage = () => {
@@ -80,7 +108,10 @@ const DevelopersPage = () => {
           }
         }
         const data = await response.json();
-        setDevelopers(data.data || []);
+        console.log('Raw API response:', data);
+        const mappedDevelopers = (data.data || []).map(mapApiResponseToDeveloper);
+        console.log('Mapped developers:', mappedDevelopers);
+        setDevelopers(mappedDevelopers);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         if (errorMessage.includes("Failed to fetch")) {
@@ -216,10 +247,10 @@ const DevelopersPage = () => {
       project_name: developer?.project_name || [],
       status: developer?.status ?? true,
       builder_logo: null,
-      logoPreview: developer?.builder_logo || "",
+      logoPreview: developer?.builder_logo_url || developer?.builder_logo || "",
       newProject: "",
       images: [],
-      imagePreviews: developer?.images || [],
+      imagePreviews: developer?.image_urls || developer?.images || [],
     });
     setShowModal(true);
   };
@@ -269,7 +300,8 @@ const DevelopersPage = () => {
           // Update the developer with the new images
           const updatedDeveloper = {
             ...result.data,
-            images: [...(result.data.images || []), ...uploadedImages]
+            images: [...(result.data.images || []), ...uploadedImages],
+            image_urls: [...(result.data.image_urls || []), ...uploadedImages]
           };
           
           if (currentDeveloper) {
@@ -285,15 +317,23 @@ const DevelopersPage = () => {
           console.error('Error uploading images:', error);
           toast.warning('Developer saved but some images failed to upload');
         }
+      } else if (currentDeveloper) {
+        // If no new images but updating existing developer, preserve existing images
+        const updatedDeveloper = {
+          ...result.data,
+          images: currentDeveloper.images || [],
+          image_urls: currentDeveloper.image_urls || []
+        };
+        setDevelopers((prev) =>
+          prev.map((d) => (d.id === currentDeveloper.id ? updatedDeveloper : d))
+        );
       }
 
       if (currentDeveloper) {
-        setDevelopers((prev) =>
-          prev.map((d) => (d.id === currentDeveloper.id ? result.data : d))
-        );
         toast.success("Developer updated successfully!");
       } else {
-        setDevelopers((prev) => [...prev, result.data]);
+        const mappedDeveloper = mapApiResponseToDeveloper(result.data);
+        setDevelopers((prev) => [...prev, mappedDeveloper]);
         toast.success("Developer added successfully!");
       }
 
@@ -439,16 +479,18 @@ const DevelopersPage = () => {
               >
                 {/* Developer Logo */}
                 <div className="h-48 w-full relative bg-gray-100 flex items-center justify-center">
-                  {developer.builder_logo && isValidImageUrl(developer.builder_logo) ? (
-                    <img
-                      src={developer.builder_logo}
+                  {developer.builder_logo_url && isValidImageUrl(developer.builder_logo_url) ? (
+                    <Image
+                      src={developer.builder_logo_url}
                       alt={developer.buildername}
+                      width={400}
+                      height={200}
                       className="w-full h-full object-contain p-4"
                       onError={(e) => {
                         const img = e.currentTarget as HTMLImageElement;
                         img.style.display = "none";
                         // Track failed images
-                        setFailedImages(prev => new Set(prev).add(developer.builder_logo || ''));
+                        setFailedImages(prev => new Set(prev).add(developer.builder_logo_url || ''));
                         // Show fallback when image fails to load
                         const fallback = img.parentElement?.querySelector('.image-fallback') as HTMLElement;
                         if (fallback) {
@@ -467,9 +509,9 @@ const DevelopersPage = () => {
                   ) : null}
                   {/* Fallback when no logo or image fails to load */}
                   <div 
-                    className={`flex flex-col items-center justify-center text-gray-400 ${developer.builder_logo && isValidImageUrl(developer.builder_logo) ? 'image-fallback' : ''}`}
+                    className={`flex flex-col items-center justify-center text-gray-400 ${developer.builder_logo_url && isValidImageUrl(developer.builder_logo_url) ? 'image-fallback' : ''}`}
                     style={{ 
-                      display: (developer.builder_logo && isValidImageUrl(developer.builder_logo) && !failedImages.has(developer.builder_logo)) ? 'none' : 'flex' 
+                      display: (developer.builder_logo_url && isValidImageUrl(developer.builder_logo_url) && !failedImages.has(developer.builder_logo_url)) ? 'none' : 'flex' 
                     }}
                   >
                     <div
@@ -479,28 +521,28 @@ const DevelopersPage = () => {
                       {developer.buildername.charAt(0).toUpperCase()}
                     </div>
                     <span className="mt-2 text-sm">
-                      {developer.builder_logo && !isValidImageUrl(developer.builder_logo) 
+                      {developer.builder_logo_url && !isValidImageUrl(developer.builder_logo_url) 
                         ? 'Invalid Image URL' 
-                        : developer.builder_logo && failedImages.has(developer.builder_logo)
+                        : developer.builder_logo_url && failedImages.has(developer.builder_logo_url)
                           ? 'Image Failed to Load' 
-                          : developer.builder_logo 
+                          : developer.builder_logo_url 
                             ? 'Loading...' 
                             : 'No Logo'
                       }
                     </span>
-                    {developer.builder_logo && failedImages.has(developer.builder_logo) && (
+                    {developer.builder_logo_url && failedImages.has(developer.builder_logo_url) && (
                       <button
                         onClick={() => {
                           setFailedImages(prev => {
                             const newSet = new Set(prev);
-                            newSet.delete(developer.builder_logo || '');
+                            newSet.delete(developer.builder_logo_url || '');
                             return newSet;
                           });
                           // Force re-render of the image
-                          const img = document.querySelector(`img[src="${developer.builder_logo}"]`) as HTMLImageElement;
+                          const img = document.querySelector(`img[src="${developer.builder_logo_url}"]`) as HTMLImageElement;
                           if (img) {
                             img.style.display = 'block';
-                            img.src = developer.builder_logo + '?retry=' + Date.now();
+                            img.src = developer.builder_logo_url + '?retry=' + Date.now();
                           }
                         }}
                         className="mt-2 px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
@@ -554,16 +596,16 @@ const DevelopersPage = () => {
                       </div>
                     )}
 
-                    {/* {developer.images && developer.images.length > 0 && (
+                    {developer.images && developer.images.length > 0 && (
                       <div className="mb-4">
                         <h3
                           className="text-sm font-medium mb-2"
                           style={{ color: colors.primary }}
                         >
-                          Images ({developer.images.length}):
+                          Images ({(developer.image_urls || developer.images).length}):
                         </h3>
                         <div className="grid grid-cols-2 gap-2">
-                          {developer.images.slice(0, 4).map((image, index) => (
+                          {(developer.image_urls || developer.images).slice(0, 4).map((image, index) => (
                             <div key={index} className="relative group">
                               <img
                                 src={image}
@@ -572,7 +614,15 @@ const DevelopersPage = () => {
                                 onError={(e) => {
                                   const img = e.currentTarget as HTMLImageElement;
                                   img.style.display = "none";
+                                  // Track failed images
+                                  setFailedImages(prev => new Set(prev).add(image));
                                 }}
+                                onLoad={(e) => {
+                                  // Image loaded successfully
+                                  const img = e.currentTarget as HTMLImageElement;
+                                  img.style.display = "block";
+                                }}
+                                crossOrigin="anonymous"
                               />
                               <button
                                 onClick={async () => {
@@ -581,7 +631,11 @@ const DevelopersPage = () => {
                                     setDevelopers((prev) =>
                                       prev.map((d) =>
                                         d.id === developer.id
-                                          ? { ...d, images: d.images.filter((_, i) => i !== index) }
+                                          ? { 
+                                              ...d, 
+                                              images: d.images.filter((_, i) => i !== index),
+                                              image_urls: d.image_urls?.filter((_, i) => i !== index) || []
+                                            }
                                           : d
                                       )
                                     );
@@ -596,14 +650,14 @@ const DevelopersPage = () => {
                               </button>
                             </div>
                           ))}
-                          {developer.images.length > 4 && (
+                          {(developer.image_urls || developer.images).length > 4 && (
                             <div className="w-full h-20 bg-gray-100 rounded-md border border-gray-200 flex items-center justify-center text-gray-500 text-xs">
-                              +{developer.images.length - 4} more
+                              +{(developer.image_urls || developer.images).length - 4} more
                             </div>
                           )}
                         </div>
                       </div>
-                    )} */}
+                    )}
                   </div>
 
                   {/* Action Buttons - Edit and Delete */}
@@ -750,9 +804,11 @@ const DevelopersPage = () => {
                 </label>
                 {formData.logoPreview && (
                   <div className="mb-2">
-                    <img
+                    <Image
                       src={formData.logoPreview}
                       alt="Preview"
+                      width={128}
+                      height={128}
                       className="h-32 w-32 object-contain rounded-md border border-gray-200"
                     />
                   </div>
@@ -777,16 +833,47 @@ const DevelopersPage = () => {
                   className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
                 
-                {/* Image Previews */}
+                {/* Existing Images (for edit mode) */}
+                {currentDeveloper && currentDeveloper.images && currentDeveloper.images.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Existing Images:</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {currentDeveloper.images.map((image, index) => (
+                        <div key={`existing-${index}`} className="relative group">
+                          <Image
+                            src={image}
+                            alt={`Existing image ${index + 1}`}
+                            width={96}
+                            height={96}
+                            className="h-24 w-full object-cover rounded-md border border-gray-200"
+                            onError={(e) => {
+                              const img = e.currentTarget as HTMLImageElement;
+                              img.style.display = "none";
+                              setFailedImages(prev => new Set(prev).add(image));
+                            }}
+                            crossOrigin="anonymous"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <span className="text-white text-xs">Existing</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* New Image Previews */}
                 {(formData.imagePreviews.length > 0 || formData.images.length > 0) && (
                   <div className="mt-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Selected Images:</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">New Images to Upload:</h4>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {formData.imagePreviews.map((preview, index) => (
-                        <div key={index} className="relative group">
-                          <img
+                        <div key={`new-${index}`} className="relative group">
+                          <Image
                             src={preview}
-                            alt={`Preview ${index + 1}`}
+                            alt={`New image ${index + 1}`}
+                            width={96}
+                            height={96}
                             className="h-24 w-full object-cover rounded-md border border-gray-200"
                           />
                           <button

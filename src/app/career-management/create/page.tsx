@@ -42,24 +42,17 @@ const CreateJobPage = () => {
     setError(null);
 
     try {
-      // Convert requirements and benefits strings to arrays
-      const requirementsArray = formData.requirements.split('\n').filter(req => req.trim());
-      const benefitsArray = formData.benefits.split('\n').filter(benefit => benefit.trim());
-
       const response = await fetch('https://api.realtraspaces.com/api/jobs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          requirements: requirementsArray,
-          benefits: benefitsArray,
-        }),
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create job');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create job');
       }
 
       router.push('/career-management');
@@ -139,7 +132,7 @@ const CreateJobPage = () => {
                       name="location"
                       value={formData.location}
                       onChange={handleChange}
-                      required
+                      
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                       placeholder="Enter job location"
                     />
@@ -155,7 +148,7 @@ const CreateJobPage = () => {
                       name="jobType"
                       value={formData.jobType}
                       onChange={handleChange}
-                      required
+                      
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     >
                       <option value="">Select job type</option>
@@ -176,7 +169,7 @@ const CreateJobPage = () => {
                       name="experienceLevel"
                       value={formData.experienceLevel}
                       onChange={handleChange}
-                      required
+                      
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     >
                       <option value="">Select experience level</option>
@@ -198,7 +191,7 @@ const CreateJobPage = () => {
                       name="salaryRange"
                       value={formData.salaryRange}
                       onChange={handleChange}
-                      required
+                      
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                       placeholder="Enter salary range"
                     />
@@ -214,7 +207,7 @@ const CreateJobPage = () => {
                       name="jobDescription"
                       value={formData.jobDescription}
                       onChange={handleChange}
-                      required
+                      
                       rows={4}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
                       placeholder="Enter job description"
@@ -231,7 +224,7 @@ const CreateJobPage = () => {
                       name="requirements"
                       value={formData.requirements}
                       onChange={handleChange}
-                      required
+                      
                       rows={4}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
                       placeholder="Enter requirements (one per line)"
@@ -248,7 +241,7 @@ const CreateJobPage = () => {
                       name="benefits"
                       value={formData.benefits}
                       onChange={handleChange}
-                      required
+                      
                       rows={4}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-none"
                       placeholder="Enter benefits (one per line)"
@@ -266,7 +259,7 @@ const CreateJobPage = () => {
                       name="applicationDeadline"
                       value={formData.applicationDeadline}
                       onChange={handleChange}
-                      required
+                      
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                     />
                   </div>

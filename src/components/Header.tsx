@@ -116,6 +116,37 @@ const Header = () => {
               >
                 List Your Property 
               </Link>
+              <div className="px-2 items-center justify-center text-center">
+                  {isLoggedIn ? (
+                    <div className="flex flex-row gap-2 justify-center">
+                      <Link
+                        href="/profile-page"
+                        className="block bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Profile
+                      </Link>
+                      <button
+                         className="block bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                         onClick={() => {
+                          localStorage.removeItem('authToken');
+                          setIsLoggedIn(false);
+                          setIsMenuOpen(false);
+                        }}
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  ) : (
+                     <Link
+                  href="/signin"
+                      className="block bg-black text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Sign In
+                    </Link>
+                  )}
+                </div>
 
               {/* Menu Button - X when open, hamburger when closed */}
               <button
@@ -195,37 +226,7 @@ const Header = () => {
                   </Link>
                 </div> */}
                 {/* Conditional Profile/Sign Up and Logout in menu */}
-                <div className="mt-4 px-6 flex flex-col items-center justify-center text-center">
-                  {isLoggedIn ? (
-                    <>
-                      <Link
-                        href="/profile-page"
-                        className="block bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider mb-2"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        Profile
-                      </Link>
-                      <button
-                         className="block bg-black text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
-                         onClick={() => {
-                          localStorage.removeItem('authToken');
-                          setIsLoggedIn(false);
-                          setIsMenuOpen(false);
-                        }}
-                      >
-                        Logout
-                      </button>
-                    </>
-                  ) : (
-                     <Link
-                  href="/signin"
-                      className="block bg-black text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-gray-800 transition-colors uppercase tracking-wider"
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Sign In
-                    </Link>
-                  )}
-                </div>
+                
               </div>
             {/* </div> */}
           </div>

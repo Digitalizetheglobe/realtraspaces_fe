@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion } from 'framer-motion';
 import { Raleway } from "next/font/google";
 import { X, User, Mail, Phone, MessageSquare, Send } from "lucide-react";
+import { toast } from "react-hot-toast";
 import defaultPropertyImage from "../../../public/assets/images/latestproperty1.png";
 import share from "../../../public/assets/Frame 29.png";
 import bookmark from "../../../public/assets/Frame 28.png";
@@ -84,6 +85,8 @@ export default function PropertyCards() {
   const [selectedType, setSelectedType] = useState<string>("");
   const [enquiredForFilter, setEnquiredForFilter] = useState<string>("");
   const [bookmarkedProperties, setBookmarkedProperties] = useState<Set<string>>(new Set());
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isComparing, setIsComparing] = useState(false);
   // Add these new states at the top of the component
   const [allCities, setAllCities] = useState<string[]>([]);
   const [allSublocalities, setAllSublocalities] = useState<{ [city: string]: Set<string> }>({});
@@ -96,6 +99,13 @@ export default function PropertyCards() {
   const [showSearchBar, setShowSearchBar] = useState(false); // Control search bar visibility
   const [showHeading, setShowHeading] = useState(true); // Control heading visibility
   const [initialDelayComplete, setInitialDelayComplete] = useState(false); // Track initial 5-second delay
+
+  // Check authentication status
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLoggedIn(!!localStorage.getItem("authToken"));
+    }
+  }, []);
 
   // Initial delay effect - hide heading after 5 seconds, then show search bar
   useEffect(() => {
@@ -128,6 +138,94 @@ export default function PropertyCards() {
   }, []);
 
   // Click-away listener for share dropdown
+  const handleCompareClick = async () => {
+    // Check if user is logged in
+    const token = localStorage.getItem("authToken");
+    
+    if (!token) {
+      toast.error("Please log in to compare properties");
+      router.push("/signin");
+      return;
+    }
+
+    // Check if any properties are selected for comparison
+    if (bookmarkedProperties.size === 0) {
+      toast.error("Please select at least one property to compare");
+      return;
+    }
+    
+    try {
+      setIsComparing(true);
+      
+      // Get selected properties
+      const selectedProperties = allProperties.filter(prop => bookmarkedProperties.has(prop.id));
+      let addedCount = 0;
+      let alreadyInListCount = 0;
+      
+      // Add each selected property to comparison
+      for (const property of selectedProperties) {
+        try {
+          const response = await fetch("https://api.realtraspaces.com/api/webusers/compare/add", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              propertyId: property.id,
+              propertyData: property
+            })
+          });
+      
+          if (response.status === 401 || response.status === 403) {
+            toast.error("You Are Not Login");
+            router.push("/signin");
+            return;
+          }
+      
+          if (!response.ok) {
+            const errorData = await response.json();
+            const errorMessage = errorData.message || "Failed to add property to comparison";
+            
+            // Check if property is already in comparison list
+            if (errorMessage.toLowerCase().includes("already in comparison") || 
+                errorMessage.toLowerCase().includes("already exists")) {
+              alreadyInListCount++;
+              continue; // Skip this property and continue with others
+            }
+            
+            throw new Error(errorMessage);
+          }
+          
+          addedCount++;
+          
+        } catch (propertyError) {
+          console.error(`Error adding property ${property.id}:`, propertyError);
+          // Continue with other properties even if one fails
+        }
+      }
+  
+      // Show appropriate success message
+      if (addedCount > 0 && alreadyInListCount > 0) {
+        toast.success(`${addedCount} properties added to comparison. ${alreadyInListCount} were already in your list.`);
+      } else if (addedCount > 0) {
+        toast.success(`${addedCount} properties added to comparison`);
+      } else if (alreadyInListCount > 0) {
+        toast.success(`All ${alreadyInListCount} selected properties are already in your comparison list`);
+      }
+      
+      // Navigate to compare page if any properties were added
+      if (addedCount > 0) {
+        router.push("/compareproperties");
+      }
+      
+    } catch (error) {
+      console.error("Error adding to compare:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to add to comparison");
+    } finally {
+      setIsComparing(false);
+    }
+  };
   useEffect(() => {
     if (openShareIndex === null) return;
     const handleClickOutside = (event: MouseEvent) => {
@@ -782,6 +880,7 @@ export default function PropertyCards() {
                 <span className="text-[#6E6E73]">
                   Take a look at whats new right now.
                 </span>
+               
               </h2>
               
                              {/* Results Counter */}
@@ -834,7 +933,17 @@ export default function PropertyCards() {
                 </button>
               </div>
             ) : (
+              <div>
+                {bookmarkedProperties.size > 0 && (
+                  <button
+                    className="block bg-black text-white px-4 py-2 mb-4 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                    onClick={handleCompareClick} 
+                  >
+                    Compare Properties ({bookmarkedProperties.size})
+                  </button>
+                )}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              
               {filteredProperties.slice(0, 4).map((property, index) => (
                 
                 <div
@@ -847,7 +956,7 @@ export default function PropertyCards() {
                   <Link href={`/property-details/${property.title}`} key={property.title} className="block">
                     <div className="h-14">
                       <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
-                        {property.title || "Prime Business Hub"}
+                        {isLoggedIn ? (property.title || "Prime Business Hub") : "Property Details"}
                       </h3>
                       <div className="flex items-center text-gray-700 text-xs transition-all duration-300 hover:text-gray-900">
                         <svg
@@ -924,7 +1033,7 @@ export default function PropertyCards() {
                   <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
                     <Image
                       src={getPropertyImage(property)}
-                      alt={property.title || "Property"}
+                      alt={isLoggedIn ? (property.title || "Property") : "Property Details"}
                       className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
                       width={340}
                       height={180}
@@ -1077,7 +1186,7 @@ export default function PropertyCards() {
                         </div>
                         {/* WhatsApp button */}
                         <a
-                          href={`https://wa.me/7039311539?text=${encodeURIComponent(property.title || 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
+                          href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
@@ -1099,6 +1208,7 @@ export default function PropertyCards() {
                 </div>
                
               ))}
+            </div>
             </div>
             )}
           </div>
@@ -1124,6 +1234,7 @@ export default function PropertyCards() {
       </section>
       
       <TopDevelopers />
+      
 
       {/* Popup Modal */}
       {showPopup && (

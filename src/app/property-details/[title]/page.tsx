@@ -106,6 +106,7 @@ export default function PropertyDetails() {
   const [showEnquirePopup, setShowEnquirePopup] = useState(false);
   const [showSchedulePopup, setShowSchedulePopup] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
@@ -188,6 +189,13 @@ export default function PropertyDetails() {
     
     return extractedTitle;
   };
+
+  // Check authentication status
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLoggedIn(!!localStorage.getItem("authToken"));
+    }
+  }, []);
 
   useEffect(() => {
     const fetchPropertyDetails = async () => {
@@ -907,7 +915,11 @@ export default function PropertyDetails() {
           </div>
 
           <div className="absolute inset-0 flex flex-col items-center justify-center z-10 text-center space-y-4">
-            <h1 className="text-white text-4xl font-bold"> {property.title}</h1>
+            {isLoggedIn ? (
+              <h1 className="text-white text-4xl font-bold"> {property.title}</h1>
+            ) : (
+              <h1 className="text-white text-4xl font-bold">Property Details</h1>
+            )}
             <nav aria-label="breadcrumb">
               <ol className="text-white text-lg flex space-x-2">
                 <li>
@@ -1126,7 +1138,7 @@ export default function PropertyDetails() {
                 }`}
               >
                 <h1 className="text-xl font-semibold text-black">
-                  {property.title || "Property"}
+                  {isLoggedIn ? (property.title || "Property") : "Property Details"}
                 </h1>
                 <div className="flex mt-2">
                   <Image

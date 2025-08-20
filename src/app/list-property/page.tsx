@@ -41,6 +41,7 @@ export default function ListPropertyPage() {
     emailAddress: "",
     description: "",
     image: null as File | null,
+    termsAccepted: false,
   });
 
   const propertyTypes = ["Office", "Retail", "Coworking", "Industrial or warehouse", "Land", "Others"];
@@ -66,18 +67,21 @@ export default function ListPropertyPage() {
     if (!form.emailAddress.trim() || !/\S+@\S+\.\S+/.test(form.emailAddress)) {
       newErrors.emailAddress = "Valid email is required";
     }
+    if (!form.termsAccepted) newErrors.termsAccepted = "You must accept the terms and conditions";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
-    const { name, value, files } = e.target as any;
+    const { name, value, files, type, checked } = e.target as any;
     if (name === "image" && files && files[0]) {
       const file = files[0];
       setForm(prev => ({ ...prev, [name]: file }));
       const reader = new FileReader();
       reader.onload = (e) => setImagePreview(e.target?.result as string);
       reader.readAsDataURL(file);
+    } else if (type === "checkbox") {
+      setForm(prev => ({ ...prev, [name]: checked }));
     } else {
       setForm(prev => ({ ...prev, [name]: value }));
     }
@@ -106,7 +110,8 @@ export default function ListPropertyPage() {
         contactNumber: form.contactNumber,
         emailAddress: form.emailAddress,
         description: form.description,
-        imageUrl: null // You can implement image upload separately
+        imageUrl: null, // You can implement image upload separately
+        termsAccepted: form.termsAccepted,
       };
 
       // Call the API using utility function
@@ -152,7 +157,7 @@ export default function ListPropertyPage() {
             </ul>
           </div>
           <button 
-            onClick={() => {setSubmitted(false); setForm({propertyName: "", location: "", propertyType: "", transactionType: "", areaCarpet: "", areaBuiltup: "", rent: "", price: "", contactName: "", contactNumber: "", emailAddress: "", description: "", image: null}); setImagePreview(null);}}
+            onClick={() => {setSubmitted(false); setForm({propertyName: "", location: "", propertyType: "", transactionType: "", areaCarpet: "", areaBuiltup: "", rent: "", price: "", contactName: "", contactNumber: "", emailAddress: "", description: "", image: null, termsAccepted: false}); setImagePreview(null);}}
             className="w-full bg-[#FFB400] text-black font-semibold py-3 rounded-lg hover:bg-[#E6A200] transition-all duration-200 transform hover:scale-105"
           >
             List Another Property
@@ -400,6 +405,24 @@ export default function ListPropertyPage() {
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />
                 </div>
+              </div>
+
+              {/* Terms and Conditions */}
+              <div className="md:col-span-2">
+                <label className="block font-semibold mb-2 text-gray-900">Terms and Conditions *</label>
+                <div className="flex items-center">
+                  <input 
+                    type="checkbox" 
+                    name="termsAccepted" 
+                    checked={form.termsAccepted} 
+                    onChange={handleChange}
+                    className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  />
+                  <p className="text-sm text-gray-700">
+                    I agree to the <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.
+                  </p>
+                </div>
+                {errors.termsAccepted && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.termsAccepted}</p>}
               </div>
             </div>
             {/* Submit Button */}

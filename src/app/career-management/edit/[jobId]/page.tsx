@@ -77,7 +77,8 @@ const EditJobPage = ({ params }: PageProps) => {
         if (response.status === 404) {
           throw new Error(`Job with ID ${jobId} not found`);
         }
-        throw new Error('Failed to update job');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update job');
       }
 
       router.push('/career-management');

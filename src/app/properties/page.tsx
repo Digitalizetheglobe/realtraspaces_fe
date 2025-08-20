@@ -71,6 +71,14 @@ export default function Similarproperties() {
   const [openShareIndex, setOpenShareIndex] = useState<number | null>(null);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set());
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check authentication status
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsLoggedIn(!!localStorage.getItem("authToken"));
+    }
+  }, []);
 
   // Helper function to get the best image URL for a property
   const getPropertyImage = (property: Property | null): string => {
@@ -194,6 +202,23 @@ export default function Similarproperties() {
   };
 
   const conditions = ["Furnished", "Semi-Furnished", "Unfurnished"];
+
+  // Handle search parameters from sessionStorage for auto-populating search fields
+  useEffect(() => {
+    const searchCity = sessionStorage.getItem('searchCity');
+    const searchSubLocation = sessionStorage.getItem('searchSubLocation');
+    
+    if (searchCity) {
+      setSelectedCity(searchCity);
+    }
+    if (searchSubLocation) {
+      setSelectedSubLocation(searchSubLocation);
+    }
+    
+    // Clear sessionStorage after reading the values
+    sessionStorage.removeItem('searchCity');
+    sessionStorage.removeItem('searchSubLocation');
+  }, []);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -836,7 +861,7 @@ export default function Similarproperties() {
                           <Link href={`/property-details/${property.title}`} className="block">
                             <div className="h-14">
                               <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
-                                {property.title || "Prime Business Hub"}
+                                {isLoggedIn ? (property.title || "Prime Business Hub") : "Property Details"}
                               </h3>
                               <div className="flex items-center text-gray-700 text-xs transition-all duration-300 hover:text-gray-900">
                                 <svg
@@ -894,7 +919,7 @@ export default function Similarproperties() {
                           <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
                             <Image
                               src={getPropertyImage(property)}
-                              alt={property.title || "Property"}
+                              alt={isLoggedIn ? (property.title || "Property") : "Property Details"}
                               className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
                               width={340}
                               height={180}
@@ -1034,7 +1059,7 @@ export default function Similarproperties() {
                               </div>
                               {/* WhatsApp button */}
                               <a
-                                href={`https://wa.me/7039311539?text=${encodeURIComponent(property.title || 'Check out this property!')}%20${encodeURIComponent(`${window.location.origin}/property-details/${encodeURIComponent(property.title || '')}`)}`}
+                                href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(`${window.location.origin}/property-details/${encodeURIComponent(property.title || '')}`)}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
