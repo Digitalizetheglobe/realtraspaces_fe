@@ -1163,26 +1163,38 @@ export default function PropertyCards() {
                         </button>
                         {/* Share button */}
                         <div className="relative">
-                          <button
+                          {/* <button
                             className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
                             onClick={() => setOpenShareIndex(openShareIndex === index ? null : index)}
                             aria-label="Share"
                             type="button"
                           >
-                            <Image
-                              src={share}
-                              alt="Share"
-                              width={20}
-                              height={20}
-                              className="object-contain transition-all duration-300 hover:scale-110"
-                            />
-                          </button>
-                          <ShareModal
-                            open={openShareIndex === index}
-                            onClose={() => setOpenShareIndex(null)}
-                            property={property}
-                            getPropertyUrl={getPropertyUrl}
-                          />
+                           
+                          </button> */}
+                                         <button
+                  type="button"
+                  className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({
+                        title: property.title,
+                        text: `Check out this property: ${property.title}`,
+                        url: `https://realtraspaces.com/property-details/${property.title}`,
+                      });
+                    } else {
+                      alert("Share not supported on this browser.");
+                    }
+                  }}
+                  title="Share"
+                >
+                  <Image
+                    src={share}
+                    alt="Share"
+                    width={20}
+                    height={20}
+                    className="object-contain transition-all duration-300 hover:scale-110"
+                  />
+                </button>
                         </div>
                         {/* WhatsApp button */}
                         <a
@@ -1235,6 +1247,15 @@ export default function PropertyCards() {
       
       <TopDevelopers />
       
+      {/* Share Modal - moved outside cards for proper positioning */}
+      {openShareIndex !== null && properties[openShareIndex] && (
+        <ShareModal
+          open={true}
+          onClose={() => setOpenShareIndex(null)}
+          property={properties[openShareIndex]}
+          getPropertyUrl={getPropertyUrl}
+        />
+      )}
 
       {/* Popup Modal */}
       {showPopup && (

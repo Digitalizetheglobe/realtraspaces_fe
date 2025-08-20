@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import share from "../../public/assets/Frame 29.png";
 import whatsapp from "../../public/assets/WhatsApp.png";
@@ -14,26 +14,16 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onClose, property, getPro
   const [copySuccess, setCopySuccess] = useState(false);
   const [copyError, setCopyError] = useState(false);
 
-  // Debug logging - moved before early return to fix hooks order
-  useEffect(() => {
-    if (open) {
-      console.log('ShareModal opened with property:', property);
-      console.log('Property URL:', getPropertyUrl(property));
-    }
-  }, [open, property, getPropertyUrl]);
-
-  if (!open) return null;
+  if (!open || !property) return null;
 
   const handleCopyLink = async () => {
     try {
       const url = getPropertyUrl(property);
-      console.log('Copying URL:', url);
       
       if (navigator.clipboard && window.isSecureContext) {
         await navigator.clipboard.writeText(url);
         setCopySuccess(true);
         setCopyError(false);
-        console.log('URL copied successfully via clipboard API');
       } else {
         // Fallback for older browsers
         const textArea = document.createElement('textarea');
@@ -49,9 +39,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onClose, property, getPro
           document.execCommand('copy');
           setCopySuccess(true);
           setCopyError(false);
-          console.log('URL copied successfully via execCommand');
         } catch (fallbackErr) {
-          console.error('execCommand failed:', fallbackErr);
           setCopyError(true);
           setCopySuccess(false);
         }
@@ -59,17 +47,14 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onClose, property, getPro
         document.body.removeChild(textArea);
       }
       
-      // Don't auto-close, let user see the success message
       setTimeout(() => {
         setCopySuccess(false);
         setCopyError(false);
       }, 3000);
     } catch (err) {
-      console.error('Copy failed:', err);
       setCopyError(true);
       setCopySuccess(false);
       
-      // Clear error after 3 seconds
       setTimeout(() => {
         setCopyError(false);
       }, 3000);
@@ -84,40 +69,12 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onClose, property, getPro
         url: getPropertyUrl(property),
       };
       
-      console.log('Native share data:', shareData);
-      
       if (navigator.share) {
         await navigator.share(shareData);
-        console.log('Native share successful');
-        // Don't auto-close, let user see the modal
       }
     } catch (err) {
       console.log('Native sharing failed:', err);
     }
-  };
-
-  // Test sharing functionality
-  const testSharing = () => {
-    const testUrl = 'https://example.com/test-property';
-    const testTitle = 'Test Property';
-    
-    // Test WhatsApp
-    window.open(`https://wa.me/?text=${encodeURIComponent(testTitle)}%20${encodeURIComponent(testUrl)}`, '_blank');
-    
-    // Test Facebook
-    setTimeout(() => {
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(testUrl)}`, '_blank');
-    }, 1000);
-    
-    // Test Twitter
-    setTimeout(() => {
-      window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(testTitle)}&url=${encodeURIComponent(testUrl)}`, '_blank');
-    }, 2000);
-    
-    // Test LinkedIn
-    setTimeout(() => {
-      window.open(`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(testUrl)}&title=${encodeURIComponent(testTitle)}`, '_blank');
-    }, 3000);
   };
 
   const propertyUrl = getPropertyUrl(property);
@@ -125,17 +82,9 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onClose, property, getPro
   const encodedUrl = encodeURIComponent(propertyUrl);
   const encodedTitle = encodeURIComponent(propertyTitle);
 
-  // Debug logging for URLs
-  console.log('ShareModal URLs:', {
-    propertyUrl,
-    propertyTitle,
-    encodedUrl,
-    encodedTitle
-  });
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-xs relative">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50" onClick={onClose}>
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-xs relative" onClick={(e) => e.stopPropagation()}>
         <button
           className="absolute top-2 right-2 text-gray-500 hover:text-black text-xl font-bold"
           onClick={onClose}
@@ -147,24 +96,13 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onClose, property, getPro
           Share Property
         </h3>
         
-        {/* Test button for debugging */}
-        <button
-          onClick={testSharing}
-          className="mb-4 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition-colors"
-        >
-          🧪 Test All Sharing
-        </button>
-        
         <div className="flex flex-col gap-2">
           <a
             href={`https://wa.me/?text=${encodedTitle}%20${encodedUrl}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-green-600 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log('WhatsApp share clicked:', `https://wa.me/?text=${encodedTitle}%20${encodedUrl}`);
-            }}
+            onClick={(e) => e.stopPropagation()}
           >
             <Image src={whatsapp} alt="WhatsApp" width={20} height={20} />
             WhatsApp
@@ -174,10 +112,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onClose, property, getPro
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-blue-600 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log('Facebook share clicked:', `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`);
-            }}
+            onClick={(e) => e.stopPropagation()}
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -189,10 +124,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onClose, property, getPro
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-blue-400 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log('Twitter share clicked:', `https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`);
-            }}
+            onClick={(e) => e.stopPropagation()}
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
@@ -204,10 +136,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onClose, property, getPro
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-blue-700 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log('LinkedIn share clicked:', `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}`);
-            }}
+            onClick={(e) => e.stopPropagation()}
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
@@ -218,7 +147,10 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onClose, property, getPro
           {typeof navigator !== 'undefined' && 'share' in navigator && (
             <button
               className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-700 w-full text-left transition-colors"
-              onClick={handleNativeShare}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleNativeShare();
+              }}
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"/>
@@ -231,7 +163,10 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onClose, property, getPro
             className={`flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 w-full text-left transition-colors ${
               copySuccess ? 'text-green-600 bg-green-50' : copyError ? 'text-red-600 bg-red-50' : 'text-gray-700'
             }`}
-            onClick={handleCopyLink}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleCopyLink();
+            }}
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
