@@ -16,13 +16,7 @@ interface Testimonial {
   updatedAt: string;
 }
 
-interface TestimonialProps {
-  hideOnError?: boolean; // Option to completely hide section on API error
-  // When hideOnError=false (default): Shows fallback testimonials if API fails
-  // When hideOnError=true: Completely hides the section if API fails
-}
-
-export default function Testimonial({ hideOnError = false }: TestimonialProps) {
+export default function TestimonialPage() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -118,12 +112,6 @@ export default function Testimonial({ hideOnError = false }: TestimonialProps) {
   // Log when using fallback testimonials for debugging
   if (testimonials.length === 0 && !loading) {
     console.log('Using fallback testimonials due to API failure');
-  }
-
-  // If hideOnError is true and there's an error, completely hide the section
-  if (hideOnError && error) {
-    console.log('Testimonials section hidden due to hideOnError prop and API error');
-    return null;
   }
 
   // Hide section completely if loading, error, or no testimonials

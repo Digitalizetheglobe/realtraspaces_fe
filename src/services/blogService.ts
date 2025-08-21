@@ -33,6 +33,9 @@ class BlogService {
         throw new Error(data.message || 'Failed to fetch blogs');
       }
       
+      if (!data.data) {
+        throw new Error('No data received from API');
+      }
       return Array.isArray(data.data) ? data.data : [data.data];
     } catch (error) {
       console.error('Error fetching blogs:', error);
