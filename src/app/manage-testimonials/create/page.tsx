@@ -28,7 +28,7 @@ const CreateTestimonialPage = () => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:8000/api/testimonials', {
+      const response = await fetch('https://api.realtraspaces.com/api/testimonials', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

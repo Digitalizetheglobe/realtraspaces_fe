@@ -1,7 +1,7 @@
 // Test script to check API response structure
 async function testApiResponse() {
   try {
-    const response = await fetch("http://localhost:8000/api/developers");
+    const response = await fetch("https://api.realtraspaces.com/api/developers");
     const data = await response.json();
     
     console.log('=== API Response Structure ===');
