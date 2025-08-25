@@ -22,8 +22,8 @@ const qwitcherGrypen = Qwitcher_Grypen({
 });
 
 export const metadata: Metadata = {
-  title: "Realtra Space",
-  description: "Realtra Space",
+  title: "Realtra Spaces",
+  description: "Realtra Spaces",
 };
 
 export default function RootLayout({
