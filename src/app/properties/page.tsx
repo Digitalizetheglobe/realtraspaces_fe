@@ -481,17 +481,17 @@ export default function Similarproperties() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className={raleway.className}>
-        <section className="pb-10 lg:pb-20 bg-gray-100 dark:bg-dark relative overflow-hidden">
-          <div className="container mx-auto px-4">
-            <p>Loading properties...</p>
-          </div>
-        </section>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className={raleway.className}>
+  //       <section className="pb-10 lg:pb-20 bg-gray-100 dark:bg-dark relative overflow-hidden">
+  //         <div className="container mx-auto px-4">
+  //           <p>Loading properties...</p>
+  //         </div>
+  //       </section>
+  //     </div>
+  //   );
+  // }
 
   return (
     <>
@@ -832,22 +832,64 @@ export default function Similarproperties() {
                 </div>
 
                 {/* Property Cards */}
-                {filteredProperties.length === 0 ? (
-                  <div className="text-center py-12">
-                    <div className="text-gray-500 text-lg mb-4">
-                      <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
-                      <p className="text-xl font-medium text-gray-700 mb-2">No properties found</p>
-                      <p className="text-gray-500">Try adjusting your search criteria or filters</p>
-                    </div>
-                    <button
-                      onClick={resetFilters}
-                      className="bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors duration-200"
-                    >
-                      Clear All Filters
-                    </button>
+                {loading ? (
+                  // Loading state - show skeleton cards
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                    {[...Array(8)].map((_, index) => (
+                      <div
+                        key={index}
+                        className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col animate-pulse"
+                      >
+                        {/* Header skeleton */}
+                        <div className="p-2 sm:p-3 flex justify-between items-center">
+                          <div className="h-14 w-full">
+                            <div className="h-4 bg-gray-300 rounded mb-2 w-3/4"></div>
+                            <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                          </div>
+                          <div className="w-5 h-5 bg-gray-300 rounded"></div>
+                        </div>
+
+                        {/* Image skeleton */}
+                        <div className="relative h-[140px] sm:h-[180px] bg-gray-300">
+                          <div className="absolute bottom-0 left-0 right-0 bg-gray-400 p-2">
+                            <div className="h-3 bg-gray-300 rounded w-1/3 mb-1"></div>
+                            <div className="h-3 bg-gray-300 rounded w-1/4"></div>
+                          </div>
+                        </div>
+
+                        {/* Details skeleton */}
+                        <div className="p-2 sm:p-3 flex-grow">
+                          <div className="grid grid-cols-2 gap-1 text-xs mb-3">
+                            <div className="h-3 bg-gray-300 rounded w-16"></div>
+                            <div className="h-3 bg-gray-300 rounded w-20 ml-auto"></div>
+                            <div className="h-3 bg-gray-300 rounded w-20"></div>
+                            <div className="h-3 bg-gray-300 rounded w-16 ml-auto"></div>
+                            <div className="h-3 bg-gray-300 rounded w-16"></div>
+                            <div className="h-3 bg-gray-300 rounded w-16 ml-auto"></div>
+                            <div className="h-3 bg-gray-300 rounded w-20"></div>
+                            <div className="h-3 bg-gray-300 rounded w-16 ml-auto"></div>
+                          </div>
+                          
+                          <div className="border-t border-gray-200 my-2"></div>
+                          
+                          <div className="flex justify-between items-center mt-1">
+                            <div>
+                              <div className="h-4 bg-gray-300 rounded w-24 mb-1"></div>
+                              <div className="h-3 bg-gray-300 rounded w-20"></div>
+                            </div>
+                            <div className="flex space-x-1">
+                              <div className="w-8 h-8 bg-gray-300 rounded"></div>
+                              <div className="w-8 h-8 bg-gray-300 rounded"></div>
+                              <div className="w-8 h-8 bg-gray-300 rounded"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
+                ) : filteredProperties.length === 0 ? (
+                  // No properties found state - show empty state
+                  <div></div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                     {filteredProperties.map((property, index) => (
