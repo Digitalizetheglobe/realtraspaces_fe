@@ -11,6 +11,7 @@ import {
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { getTeamImageUrl } from "@/utils/imageUtils";
 
 interface TeamMember {
   id: number;
@@ -60,7 +61,7 @@ const TeamPage = () => {
   useEffect(() => {
     const fetchTeamMembers = async () => {
       try {
-        const response = await fetch("https://api.realtraspaces.com/api/team/");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/team/`);
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
@@ -113,7 +114,7 @@ const TeamPage = () => {
       designation: member?.designation || "",
       is_working: member?.is_working ?? true,
       photo: null,
-      photoPreview: member?.photo_url || "",
+      photoPreview: member?.photo ? getTeamImageUrl(member.photo) : "",
     });
     setShowModal(true);
   };
@@ -135,8 +136,8 @@ const TeamPage = () => {
       }
 
       const url = currentMember
-        ? `https://api.realtraspaces.com/api/team/${currentMember.id}`
-        : "https://api.realtraspaces.com/api/team/";
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/team/${currentMember.id}`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/team/`;
 
       const method = currentMember ? "PUT" : "POST";
 
@@ -180,7 +181,7 @@ const TeamPage = () => {
 
     setIsDeleting(id);
     try {
-      const response = await fetch(`https://api.realtraspaces.com/api/team/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/team/${id}`, {
         method: "DELETE",
       });
 
@@ -282,24 +283,39 @@ const TeamPage = () => {
                 <div className="h-48 w-full relative bg-gray-100 rounded-t-2xl overflow-hidden">
                   {member.photo ? (
                     <img
-                      src={
-                        member.photo.startsWith("http")
-                          ? member.photo
-                          : `https://api.realtraspaces.com/uploads/team/${member.photo}`
-                      }
+                      src={getTeamImageUrl(member.photo)}
                       alt={member.full_name}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         const img = e.currentTarget as HTMLImageElement;
                         img.style.display = "none";
+                        // Show fallback when image fails to load
+                        const fallback = img.parentElement?.querySelector('.photo-fallback') as HTMLElement;
+                        if (fallback) {
+                          fallback.style.display = "flex";
+                        }
+                      }}
+                      onLoad={(e) => {
+                        // Image loaded successfully - hide any fallback
+                        const fallback = e.currentTarget.parentElement?.querySelector('.photo-fallback') as HTMLElement;
+                        if (fallback) {
+                          fallback.style.display = "none";
+                        }
                       }}
                     />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-gray-400 h-full cursor-pointer">
-                      <FiUser size={48} />
-                      <span className="mt-2 text-sm">No Photo</span>
-                    </div>
-                  )}
+                  ) : null}
+                  {/* Fallback when no photo or image fails to load */}
+                  <div 
+                    className={`flex flex-col items-center justify-center text-gray-400 h-full cursor-pointer ${member.photo ? 'photo-fallback' : ''}`}
+                    style={{ 
+                      display: member.photo ? 'none' : 'flex' 
+                    }}
+                  >
+                    <FiUser size={48} />
+                    <span className="mt-2 text-sm">
+                      {member.photo ? 'Image Failed to Load' : 'No Photo'}
+                    </span>
+                  </div>
                 </div>
 
                 {/* Member Content */}

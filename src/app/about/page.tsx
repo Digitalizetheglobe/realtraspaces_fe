@@ -6,6 +6,7 @@ import developer3 from "../../../public/assets/developer3.jpg";
 import Image from "next/image";
 import SeoHead from "../../components/SeoHead";
 import PageWithSeo from "../../components/PageWithSeo";
+import { getTeamImageUrl } from "@/utils/imageUtils";
 
 // Team member interface
 interface TeamMember {
@@ -126,7 +127,7 @@ export default function RealtraSpacesAbout() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('https://api.realtraspaces.com/api/team/');
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/team/`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -140,12 +141,13 @@ export default function RealtraSpacesAbout() {
           .filter((member: TeamMember) => member.is_working === 1)
           .map((member: TeamMember) => ({
             ...member,
-            image: member.photo || DUMMY_IMAGES.team1, // Use default image if no photo
+            image: member.photo ? getTeamImageUrl(member.photo) : DUMMY_IMAGES.team1, // Use proper team image URL
             name: member.full_name,
             role: member.designation,
             linkedin: member.linkedin_url
           }));
         console.log('Processed team members:', activeMembers);
+        console.log('Team member images:', activeMembers.map((m: any) => ({ name: m.name, image: m.image })));
         setTeamMembers(activeMembers);
       } else {
         console.warn('API response indicates no success or no data');
@@ -471,6 +473,10 @@ export default function RealtraSpacesAbout() {
                   src={member.image}
                   alt={member.name}
                   className="w-full h-72 object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+                  onError={(e) => {
+                    const img = e.currentTarget as HTMLImageElement;
+                    img.src = DUMMY_IMAGES.team1; // Fallback to default image
+                  }}
                 />
                 {/* Name and Role Overlay */}
                 <div className="absolute bottom-3 w-50 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-lg text-center">

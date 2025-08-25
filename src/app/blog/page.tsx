@@ -6,12 +6,13 @@ import Image from "next/image";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { FiEdit2, FiTrash2, FiHeart, FiBookmark, FiPlus, FiArrowRight } from "react-icons/fi";
 import router from "next/router";
+import { getBlogImageUrl } from "@/utils/imageUtils";
 
 interface Blog {
   id: number;
   blogTitle: string;
   blogDescription: string;
-  blogImage: string | null;
+  blogImages: string[] | null;
   writer: string;
   category: string;
   tags: string[];
@@ -41,6 +42,7 @@ const BlogPage = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
+        //https://api.realtraspaces.com
         const response = await fetch(`https://api.realtraspaces.com/api/blogs/`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -57,18 +59,10 @@ const BlogPage = () => {
           blogsArray = [data];
         }
         blogsArray = blogsArray.map((blog) => {
-          let cleanImageUrl = null;
-          if (blog.blogImage) {
-            try {
-              const url = new URL(blog.blogImage);
-              if (url.protocol === "http:" || url.protocol === "https:") {
-                cleanImageUrl = blog.blogImage;
-              }
-            } catch (e) {}
-          }
+          console.log('Processing blog:', blog.blogTitle, 'Images:', blog.blogImages);
           return {
             ...blog,
-            blogImage: cleanImageUrl,
+            blogImages: Array.isArray(blog.blogImages) ? blog.blogImages : [],
             tags: Array.isArray(blog.tags) ? blog.tags : [],
             likes: typeof blog.likes === "number" ? blog.likes : 0,
             bookmarks: typeof blog.bookmarks === "number" ? blog.bookmarks : 0,
@@ -209,6 +203,56 @@ const BlogPage = () => {
                 key={blog.id}
                 className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 group"
               >
+                {/* Blog Image */}
+                <div className="relative h-48 overflow-hidden bg-gray-100">
+                  {blog.blogImages && blog.blogImages.length > 0 ? (
+                    <>
+                      {(() => {
+                        const imageUrl = getBlogImageUrl(blog.blogImages[0]);
+                        console.log('Image URL for', blog.blogTitle, ':', imageUrl);
+                        return (
+                          <Image
+                            src={imageUrl}
+                            alt={blog.blogTitle}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              console.error('Image failed to load:', imageUrl);
+                              // Fallback to placeholder if image fails to load
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `
+                                  <div class="flex items-center justify-center h-full">
+                                    <div class="text-center text-gray-400">
+                                      <div class="text-4xl mb-2">📝</div>
+                                      <div class="text-sm">Image Error</div>
+                                    </div>
+                                  </div>
+                                `;
+                              }
+                            }}
+                          />
+                        );
+                      })()}
+                      {/* Multiple images indicator */}
+                      {blog.blogImages.length > 1 && (
+                        <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded-full">
+                          +{blog.blogImages.length - 1} more
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-center text-gray-400">
+                        <div className="text-4xl mb-2">📝</div>
+                        <div className="text-sm">No Image</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
                 {/* Blog Content */}
                 <div className="p-6 h-full flex flex-col">
                   {/* Category and Author */}
@@ -236,7 +280,7 @@ const BlogPage = () => {
                   </div>
 
                   {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-6">
+                  <div className="flex flex-wrap gap-2 mb-4">
                     {blog.tags.map((tag, index) => (
                       <span
                         key={index}
@@ -251,10 +295,21 @@ const BlogPage = () => {
                     ))}
                   </div>
 
+                  {/* Read More Button */}
+                  <div className="mb-4">
+                    <Link
+                      href={`/blog/${blog.slug}`}
+                      className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                    >
+                      Read More <FiArrowRight className="ml-1" size={14} />
+                    </Link>
+                  </div>
+
                   {/* Footer */}
                   <div className="flex justify-between items-center pt-4 border-t border-gray-100 mt-auto">
-                    <div className="flex gap-4">
-                     
+                    <div className="flex gap-4 text-xs text-gray-500">
+                      <span>❤️ {blog.likes}</span>
+                      <span>🔖 {blog.bookmarks}</span>
                     </div>
                     <div className="flex gap-2 items-center">
                       <Link
@@ -271,7 +326,6 @@ const BlogPage = () => {
                       >
                         <FiTrash2 size={16} />
                       </button>
-                     
                     </div>
                   </div>
                 </div>

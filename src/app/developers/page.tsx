@@ -3,12 +3,16 @@
 import { useState, useEffect } from "react";
 import { FiMapPin, FiCalendar, FiStar, FiArrowRight, FiHome, FiCheckCircle } from "react-icons/fi";
 import Image from "next/image";
+import { getDeveloperImageUrl, getDeveloperImageUrls } from "@/utils/imageUtils";
 interface Developer {
   id: number;
   buildername: string;
   builder_logo: string | null;
+  builder_logo_url?: string;
   descriptions: string;
   project_name: string[];
+  images?: string[];
+  image_urls?: string[];
   status: boolean;
   created_at: string;
   updated_at: string;
@@ -38,10 +42,18 @@ const DevelopersPage = () => {
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
-        const response = await fetch("https://api.realtraspaces.com/api/developers");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers`);
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
+        console.log('Developers API response:', data.data);
+        console.log('Developer images:', data.data?.map((dev: any) => ({
+          name: dev.buildername,
+          logo: dev.builder_logo,
+          logo_url: dev.builder_logo_url,
+          images: dev.images,
+          image_urls: dev.image_urls
+        })));
         setDevelopers(data.data || []);
       } catch (error) {
         setError(
@@ -255,19 +267,19 @@ const DevelopersPage = () => {
                   {/* Card Front (Initial View) */}
                   <div className="relative h-80 overflow-hidden">
                     {/* Background Image/Logo */}
-                                         <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200">
-                       <Image
-                         src={developer.builder_logo || '/assets/signin.jpeg'}
-                         alt={developer.buildername}
-                         width={400}
-                         height={320}
-                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                         onError={(e) => {
-                           const img = e.currentTarget as HTMLImageElement;
-                           img.src = '/assets/signin.jpeg';
-                         }}
-                       />
-                     </div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200">
+                      <Image
+                        src={developer.builder_logo ? getDeveloperImageUrl(developer.builder_logo) : '/assets/signin.jpeg'}
+                        alt={developer.buildername}
+                        width={400}
+                        height={320}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        onError={(e) => {
+                          const img = e.currentTarget as HTMLImageElement;
+                          img.src = '/assets/signin.jpeg';
+                        }}
+                      />
+                    </div>
 
                     {/* Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
@@ -327,28 +339,59 @@ const DevelopersPage = () => {
                         </span>
                       </div>
 
-                                             <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                         {developer.descriptions || 'No description available'}
-                       </p>
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                        {developer.descriptions || 'No description available'}
+                      </p>
 
-                                             {(developer.project_name || []).length > 0 && (
-                         <div className="mb-4">
-                           <h4 className="text-sm font-semibold mb-2" style={{ color: colors.primary }}>
-                             Projects ({(developer.project_name || []).length})
-                           </h4>
-                                                     <div className="space-y-1">
-                             {(developer.project_name || []).slice(0, 3).map((project, idx) => (
-                               <div key={idx} className="flex items-center text-sm text-gray-600">
-                                 <FiCheckCircle className="mr-2 text-green-500 flex-shrink-0" size={14} />
-                                 <span className="truncate">{project || 'Unnamed Project'}</span>
-                               </div>
-                             ))}
-                             {(developer.project_name || []).length > 3 && (
-                               <div className="text-xs text-gray-500 mt-1">
-                                 +{(developer.project_name || []).length - 3} more projects
-                               </div>
-                             )}
-                           </div>
+                      {/* Developer Gallery Images */}
+                      {(developer.images && developer.images.length > 0) && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold mb-2" style={{ color: colors.primary }}>
+                            Gallery 
+                          </h4>
+                          <div className="flex gap-2 overflow-x-auto pb-2">
+                            {(developer.images || []).slice(0, 3).map((image, idx) => (
+                              <div key={idx} className="flex-shrink-0">
+                                <img
+                                  src={getDeveloperImageUrl(image)}
+                                  alt={`${developer.buildername} gallery ${idx + 1}`}
+                                  className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                                  onError={(e) => {
+                                    const img = e.currentTarget as HTMLImageElement;
+                                    img.src = '/assets/signin.jpeg';
+                                  }}
+                                />
+                              </div>
+                            ))}
+                            {(developer.images || []).length > 3 && (
+                              <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
+                                <span className="text-xs text-gray-500 font-medium">
+                                  +{(developer.images || []).length - 3}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {(developer.project_name || []).length > 0 && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-semibold mb-2" style={{ color: colors.primary }}>
+                            Projects ({(developer.project_name || []).length})
+                          </h4>
+                          <div className="space-y-1">
+                            {(developer.project_name || []).slice(0, 3).map((project, idx) => (
+                              <div key={idx} className="flex items-center text-sm text-gray-600">
+                                <FiCheckCircle className="mr-2 text-green-500 flex-shrink-0" size={14} />
+                                <span className="truncate">{project || 'Unnamed Project'}</span>
+                              </div>
+                            ))}
+                            {(developer.project_name || []).length > 3 && (
+                              <div className="text-xs text-gray-500 mt-1">
+                                +{(developer.project_name || []).length - 3} more projects
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )}
 

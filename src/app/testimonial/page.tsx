@@ -176,9 +176,9 @@ export default function TestimonialPage() {
                         {/* User info with avatar and name */}
                         <div className="flex items-center gap-3 mt-4">
                           {/* Default avatar with initials */}
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${getDefaultAvatar(testimonial.name)}`}>
+                          {/* <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${getDefaultAvatar(testimonial.name)}`}>
                             {testimonial.name.charAt(0).toUpperCase()}
-                          </div>
+                          </div> */}
                           <div>
                             <h4 className="text-sm font-medium text-slate-900">
                               {testimonial.name}

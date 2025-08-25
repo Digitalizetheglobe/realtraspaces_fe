@@ -5,6 +5,7 @@ import { FiEdit2, FiTrash2, FiPlus, FiX } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Image from "next/image";
+import { getDeveloperImageUrl, getDeveloperImageUrls } from "@/utils/imageUtils";
 
 interface Developer {
   id: number;
@@ -20,16 +21,7 @@ interface Developer {
   updated_at: string;
 }
 
-// Utility function to validate image URL
-const isValidImageUrl = (url: string): boolean => {
-  if (!url) return false;
-  try {
-    const urlObj = new URL(url);
-    return urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
-  } catch {
-    return false;
-  }
-};
+
 
 // Utility function to map API response to Developer interface
 const mapApiResponseToDeveloper = (apiData: any): Developer => {
@@ -97,7 +89,7 @@ const DevelopersPage = () => {
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
-        const response = await fetch("https://api.realtraspaces.com/api/developers");
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers`);
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error("API endpoint not found. Please check if the backend server is running.");
@@ -115,7 +107,7 @@ const DevelopersPage = () => {
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         if (errorMessage.includes("Failed to fetch")) {
-          setError("Cannot connect to server. Please check if the backend server is running on https://api.realtraspaces.com");
+          setError("Cannot connect to server. Please check if the backend server is running on http://localhost:8000");
         } else {
           setError(`Failed to load developers: ${errorMessage}`);
         }
@@ -184,7 +176,7 @@ const DevelopersPage = () => {
     });
 
     try {
-      const response = await fetch(`https://api.realtraspaces.com/api/developers/${developerId}/images`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers/${developerId}/images`, {
         method: 'POST',
         body: formData,
       });
@@ -204,7 +196,7 @@ const DevelopersPage = () => {
   // Delete image from server
   const deleteImage = async (developerId: number, imageIndex: number) => {
     try {
-      const response = await fetch(`https://api.realtraspaces.com/api/developers/${developerId}/images/${imageIndex}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers/${developerId}/images/${imageIndex}`, {
         method: 'DELETE',
       });
 
@@ -247,10 +239,10 @@ const DevelopersPage = () => {
       project_name: developer?.project_name || [],
       status: developer?.status ?? true,
       builder_logo: null,
-      logoPreview: developer?.builder_logo_url || developer?.builder_logo || "",
+      logoPreview: developer?.builder_logo ? getDeveloperImageUrl(developer.builder_logo) : "",
       newProject: "",
       images: [],
-      imagePreviews: developer?.image_urls || developer?.images || [],
+      imagePreviews: developer?.images ? getDeveloperImageUrls(developer.images) : [],
     });
     setShowModal(true);
   };
@@ -276,8 +268,8 @@ const DevelopersPage = () => {
       }
 
       const url = currentDeveloper
-        ? `https://api.realtraspaces.com/api/developers/${currentDeveloper.id}`
-        : "https://api.realtraspaces.com/api/developers";
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers/${currentDeveloper.id}`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers`;
 
       const method = currentDeveloper ? "PUT" : "POST";
 
@@ -354,7 +346,7 @@ const DevelopersPage = () => {
     setIsDeleting(id);
     try {
       const response = await fetch(
-        `https://api.realtraspaces.com/api/developers/${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers/${id}`,
         {
           method: "DELETE",
         }
@@ -409,7 +401,7 @@ const DevelopersPage = () => {
               <div className="text-xs text-red-600 mb-4">
                 <p className="mb-1">Troubleshooting tips:</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Make sure the backend server is running on https://api.realtraspaces.com</li>
+                  <li>Make sure the backend server is running on http://localhost:8000</li>
                   <li>Check if the API endpoint is accessible</li>
                   <li>Verify your internet connection</li>
                   <li>Try refreshing the page</li>
@@ -479,9 +471,9 @@ const DevelopersPage = () => {
               >
                 {/* Developer Logo */}
                 <div className="h-48 w-full relative bg-gray-100 flex items-center justify-center">
-                  {developer.builder_logo_url && isValidImageUrl(developer.builder_logo_url) ? (
+                  {developer.builder_logo && (
                     <Image
-                      src={developer.builder_logo_url}
+                      src={getDeveloperImageUrl(developer.builder_logo)}
                       alt={developer.buildername}
                       width={400}
                       height={200}
@@ -490,7 +482,7 @@ const DevelopersPage = () => {
                         const img = e.currentTarget as HTMLImageElement;
                         img.style.display = "none";
                         // Track failed images
-                        setFailedImages(prev => new Set(prev).add(developer.builder_logo_url || ''));
+                        setFailedImages(prev => new Set(prev).add(developer.builder_logo || ''));
                         // Show fallback when image fails to load
                         const fallback = img.parentElement?.querySelector('.image-fallback') as HTMLElement;
                         if (fallback) {
@@ -506,12 +498,12 @@ const DevelopersPage = () => {
                       }}
                       crossOrigin="anonymous"
                     />
-                  ) : null}
+                  )}
                   {/* Fallback when no logo or image fails to load */}
                   <div 
-                    className={`flex flex-col items-center justify-center text-gray-400 ${developer.builder_logo_url && isValidImageUrl(developer.builder_logo_url) ? 'image-fallback' : ''}`}
+                    className={`flex flex-col items-center justify-center text-gray-400 ${developer.builder_logo ? 'image-fallback' : ''}`}
                     style={{ 
-                      display: (developer.builder_logo_url && isValidImageUrl(developer.builder_logo_url) && !failedImages.has(developer.builder_logo_url)) ? 'none' : 'flex' 
+                      display: (developer.builder_logo && !failedImages.has(developer.builder_logo)) ? 'none' : 'flex' 
                     }}
                   >
                     <div
@@ -521,28 +513,28 @@ const DevelopersPage = () => {
                       {developer.buildername.charAt(0).toUpperCase()}
                     </div>
                     <span className="mt-2 text-sm">
-                      {developer.builder_logo_url && !isValidImageUrl(developer.builder_logo_url) 
-                        ? 'Invalid Image URL' 
-                        : developer.builder_logo_url && failedImages.has(developer.builder_logo_url)
-                          ? 'Image Failed to Load' 
-                          : developer.builder_logo_url 
-                            ? 'Loading...' 
-                            : 'No Logo'
+                      {developer.builder_logo && failedImages.has(developer.builder_logo)
+                        ? 'Image Failed to Load' 
+                        : developer.builder_logo 
+                          ? 'Loading...' 
+                          : 'No Logo'
                       }
                     </span>
-                    {developer.builder_logo_url && failedImages.has(developer.builder_logo_url) && (
+                    {developer.builder_logo && failedImages.has(developer.builder_logo) && (
                       <button
                         onClick={() => {
                           setFailedImages(prev => {
                             const newSet = new Set(prev);
-                            newSet.delete(developer.builder_logo_url || '');
+                            newSet.delete(developer.builder_logo || '');
                             return newSet;
                           });
                           // Force re-render of the image
-                          const img = document.querySelector(`img[src="${developer.builder_logo_url}"]`) as HTMLImageElement;
-                          if (img) {
-                            img.style.display = 'block';
-                            img.src = developer.builder_logo_url + '?retry=' + Date.now();
+                          if (developer.builder_logo) {
+                            const img = document.querySelector(`img[src="${getDeveloperImageUrl(developer.builder_logo)}"]`) as HTMLImageElement;
+                            if (img) {
+                              img.style.display = 'block';
+                              img.src = getDeveloperImageUrl(developer.builder_logo) + '?retry=' + Date.now();
+                            }
                           }
                         }}
                         className="mt-2 px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
@@ -602,13 +594,13 @@ const DevelopersPage = () => {
                           className="text-sm font-medium mb-2"
                           style={{ color: colors.primary }}
                         >
-                          Images ({(developer.image_urls || developer.images).length}):
+                          Images ({developer.images.length}):
                         </h3>
                         <div className="grid grid-cols-2 gap-2">
-                          {(developer.image_urls || developer.images).slice(0, 4).map((image, index) => (
+                          {developer.images.slice(0, 4).map((image, index) => (
                             <div key={index} className="relative group">
                               <img
-                                src={image}
+                                src={getDeveloperImageUrl(image)}
                                 alt={`${developer.buildername} image ${index + 1}`}
                                 className="w-full h-20 object-cover rounded-md border border-gray-200"
                                 onError={(e) => {
@@ -650,9 +642,9 @@ const DevelopersPage = () => {
                               </button>
                             </div>
                           ))}
-                          {(developer.image_urls || developer.images).length > 4 && (
+                          {developer.images.length > 4 && (
                             <div className="w-full h-20 bg-gray-100 rounded-md border border-gray-200 flex items-center justify-center text-gray-500 text-xs">
-                              +{(developer.image_urls || developer.images).length - 4} more
+                              +{developer.images.length - 4} more
                             </div>
                           )}
                         </div>
@@ -841,7 +833,7 @@ const DevelopersPage = () => {
                       {currentDeveloper.images.map((image, index) => (
                         <div key={`existing-${index}`} className="relative group">
                           <Image
-                            src={image}
+                            src={getDeveloperImageUrl(image)}
                             alt={`Existing image ${index + 1}`}
                             width={96}
                             height={96}

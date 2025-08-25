@@ -3,17 +3,21 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
-import { FiPlus, FiArrowLeft, FiSave } from 'react-icons/fi';
+import { FiPlus, FiArrowLeft, FiSave, FiUpload, FiX } from 'react-icons/fi';
 
 interface BlogFormData {
   blogTitle: string;
   blogDescription: string;
   blogContent: string;
-  blogImage: string;
   writer: string;
   category: string;
   tags: string;
   slug: string;
+}
+
+interface BlogImage {
+  file: File;
+  preview: string;
 }
 
 const CreateBlogContent = () => {
@@ -22,12 +26,12 @@ const CreateBlogContent = () => {
     blogTitle: '',
     blogDescription: '',
     blogContent: '',
-    blogImage: '',
     writer: '',
     category: '',
     tags: '',
     slug: '',
   });
+  const [selectedImages, setSelectedImages] = useState<BlogImage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,28 +46,56 @@ const CreateBlogContent = () => {
     error: '#F44336'
   };
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    
+    files.forEach(file => {
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const preview = e.target?.result as string;
+          setSelectedImages(prev => [...prev, { file, preview }]);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  };
+
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      // Convert tags string to array
-      const tagsArray = formData.tags.split(',').map(tag => tag.trim());
+      // Create FormData for multipart/form-data submission
+      const formDataToSend = new FormData();
+      
+      // Add text fields
+      formDataToSend.append('blogTitle', formData.blogTitle);
+      formDataToSend.append('blogDescription', formData.blogDescription);
+      formDataToSend.append('blogContent', formData.blogContent);
+      formDataToSend.append('writer', formData.writer);
+      formDataToSend.append('category', formData.category);
+      formDataToSend.append('tags', formData.tags);
+      formDataToSend.append('slug', formData.slug);
+      
+      // Add images
+      selectedImages.forEach((image, index) => {
+        formDataToSend.append('images', image.file);
+      });
 
       const response = await fetch(`https://api.realtraspaces.com/api/blogs/`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          tags: tagsArray,
-        }),
+        body: formDataToSend, // Don't set Content-Type header, let browser set it with boundary
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create blog');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create blog');
       }
 
       router.push('/blog');
@@ -175,24 +207,60 @@ const CreateBlogContent = () => {
                 />
               </div>
 
-              {/* Blog Image URL */}
-              {/* <div>
-                <label htmlFor="blogImage" className="block text-sm font-medium mb-2" style={{ color: colors.dark }}>
-                  Blog Image URL
+              {/* Blog Images Upload */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: colors.dark }}>
+                  Blog Images
                 </label>
-                <input
-                  type="url"
-                  id="blogImage"
-                  name="blogImage"
-                  value={formData.blogImage}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                  style={{ 
-                    borderColor: colors.secondary,
-                    }}
-                  placeholder="https://example.com/image.jpg"
-                />
-              </div> */}
+                <div className="space-y-4">
+                  {/* Image Upload Input */}
+                  <div className="flex items-center justify-center w-full">
+                    <label
+                      htmlFor="image-upload"
+                      className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                      style={{ borderColor: colors.secondary }}
+                    >
+                      <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                        <FiUpload className="w-8 h-8 mb-2" style={{ color: colors.secondary }} />
+                        <p className="mb-2 text-sm text-gray-500">
+                          <span className="font-semibold">Click to upload</span> or drag and drop
+                        </p>
+                        <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB each</p>
+                      </div>
+                      <input
+                        id="image-upload"
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+
+                  {/* Selected Images Preview */}
+                  {selectedImages.length > 0 && (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {selectedImages.map((image, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={image.preview}
+                            alt={`Preview ${index + 1}`}
+                            className="w-full h-24 object-cover rounded-lg border border-gray-300"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeImage(index)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                          >
+                            <FiX className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Writer */}

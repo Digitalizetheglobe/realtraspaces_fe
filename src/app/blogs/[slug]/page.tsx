@@ -7,6 +7,7 @@ import { ArrowRight, Upload } from "lucide-react";
 import Link from 'next/link';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import { getBlogImageUrl } from '@/utils/imageUtils';
 
 // Define TypeScript interfaces outside the component
 interface Blog {
@@ -147,11 +148,16 @@ const BlogDetail = ({ params }: PageProps) => {
           {/* Use blog image if available, otherwise use default */}
           {blog.blogImages && blog.blogImages.length > 0 ? (
             <Image 
-              src={blog.blogImages[0]}
+              src={getBlogImageUrl(blog.blogImages[0])}
               alt={blog.blogTitle} 
               fill
               style={{ objectFit: "cover" }}
               priority
+              onError={(e) => {
+                // Fallback to default image if blog image fails to load
+                const target = e.target as HTMLImageElement;
+                target.src = "/assets/hero.jpg";
+              }}
             />
           ) : (
             <Image 
@@ -251,11 +257,16 @@ const BlogDetail = ({ params }: PageProps) => {
             <div className="mb-8">
               <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden">
                 <Image 
-                  src={blog.blogImages[0]}
+                  src={getBlogImageUrl(blog.blogImages[0])}
                   alt={blog.blogTitle} 
                   fill
                   style={{ objectFit: "cover" }}
                   priority
+                  onError={(e) => {
+                    // Fallback to default image if blog image fails to load
+                    const target = e.target as HTMLImageElement;
+                    target.src = "/assets/hero.jpg";
+                  }}
                 />
               </div>
             </div>
@@ -284,10 +295,15 @@ const BlogDetail = ({ params }: PageProps) => {
                 {blog.blogImages.slice(1).map((image, index) => (
                   <div key={index} className="relative h-48 rounded-lg overflow-hidden">
                     <Image 
-                      src={image}
+                      src={getBlogImageUrl(image)}
                       alt={`${blog.blogTitle} - Image ${index + 2}`} 
                       fill
                       style={{ objectFit: "cover" }}
+                      onError={(e) => {
+                        // Fallback to default image if blog image fails to load
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/assets/hero.jpg";
+                      }}
                     />
                   </div>
                 ))}

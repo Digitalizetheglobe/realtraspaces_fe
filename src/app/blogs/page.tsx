@@ -8,6 +8,7 @@ import CalculatorSection from "@/components/calculate";
 import PageWithSeo from "../../components/PageWithSeo";
 import SeoHead from "../../components/SeoHead";
 import PropertyLocations from "@/components/locality";
+import { getBlogImageUrl } from "@/utils/imageUtils";
 
 // Removed metadata and head exports
 
@@ -47,8 +48,8 @@ const Blogs = () => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
+        //https://api.realtraspaces.com
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/blogs/`);
-        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -138,11 +139,16 @@ const Blogs = () => {
                     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                       <div className="relative overflow-hidden rounded-lg">
                         <Image
-                          src={blog.blogImages && blog.blogImages.length > 0 ? blog.blogImages[0] : latestpropertytype}
+                          src={blog.blogImages && blog.blogImages.length > 0 ? getBlogImageUrl(blog.blogImages[0]) : latestpropertytype}
                           alt={blog.blogTitle || "blog"}
                           className="object-cover p-3 rounded-2xl h-[220px] transform group-hover:scale-110 transition-transform duration-500"
                           width={400}
                           height={220}
+                          onError={(e) => {
+                            // Fallback to default image if blog image fails to load
+                            const target = e.target as HTMLImageElement;
+                            target.src = latestpropertytype;
+                          }}
                         />
                         {/* Property Type and Location - Positioned absolutely on top of image */}
                         <div className="absolute top-4 right-0 px-4 flex justify-between">
@@ -152,17 +158,54 @@ const Blogs = () => {
                         </div>
                       </div>
                       <div className="p-6">
-                       
+                        {/* Category and Date */}
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="text-sm text-blue-600 font-medium">
+                            {blog.category || 'General'}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {formatDate(blog.createdAt, { year: 'numeric', month: 'short', day: 'numeric' })}
+                          </span>
+                        </div>
+                        
                         <h3 className="text-xl font-semibold text-gray-900 mb-2">
                           {blog.blogTitle}
                         </h3>
                         <p className="text-gray-600 mb-4">
-                          {blog.blogDescription.split(' ').length > 10
-                            ? blog.blogDescription.split(' ').slice(0, 10).join(' ') + '...'
+                          {blog.blogDescription.split(' ').length > 15
+                            ? blog.blogDescription.split(' ').slice(0, 15).join(' ') + '...'
                             : blog.blogDescription}
                         </p>
                         
-                       
+                        {/* Tags */}
+                        {blog.tags && blog.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            {blog.tags.slice(0, 2).map((tag, index) => (
+                              <span
+                                key={index}
+                                className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
+                              >
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        
+                        {/* Author and Stats */}
+                        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                          <span>By {blog.writer || 'Anonymous'}</span>
+                          <div className="flex items-center gap-3">
+                            <span>❤️ {blog.likes || 0}</span>
+                            <span>🔖 {blog.bookmarks || 0}</span>
+                          </div>
+                        </div>
+                        
+                        {/* Read More Button */}
+                        <div className="text-center">
+                          <span className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                            Read More →
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </Link>
