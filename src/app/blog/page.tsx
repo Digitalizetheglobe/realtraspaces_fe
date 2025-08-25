@@ -59,7 +59,7 @@ const BlogPage = () => {
           blogsArray = [data];
         }
         blogsArray = blogsArray.map((blog) => {
-          console.log('Processing blog:', blog.blogTitle, 'Images:', blog.blogImages);
+          console.log('Processing blog:', blog.blogTitle, 'Images:', blog.blogImages, 'Tags:', blog.tags, 'Likes:', blog.likes, 'Bookmarks:', blog.bookmarks);
           return {
             ...blog,
             blogImages: Array.isArray(blog.blogImages) ? blog.blogImages : [],
@@ -196,12 +196,22 @@ const BlogPage = () => {
             </Link>
           </div>
 
+          {/* Debug Info */}
+          <div className="mb-4 p-4 bg-gray-100 rounded-lg">
+            <p className="text-sm text-gray-600">Total blogs loaded: {blogs.length}</p>
+            {blogs.length > 0 && (
+              <p className="text-sm text-gray-600">
+                Sample blog data: {blogs[0].blogTitle} | Tags: {blogs[0].tags?.length || 0} | Likes: {blogs[0].likes || 0}
+              </p>
+            )}
+          </div>
+
           {/* Blog Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogs.map((blog) => (
               <div
                 key={blog.id}
-                className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 group"
+                className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-xl transition-all duration-300 group flex flex-col h-full"
               >
                 {/* Blog Image */}
                 <div className="relative h-48 overflow-hidden bg-gray-100">
@@ -254,7 +264,7 @@ const BlogPage = () => {
                 </div>
                 
                 {/* Blog Content */}
-                <div className="p-6 h-full flex flex-col">
+                <div className="p-6 h-full flex flex-col min-h-[300px]">
                   {/* Category and Author */}
                   <div className="flex items-center justify-between mb-4">
                     <span 
@@ -274,26 +284,34 @@ const BlogPage = () => {
                     <h2 className="text-xl font-bold mb-3 group-hover:text-blue-600 transition-colors" style={{ color: colors.dark }}>
                       {blog.blogTitle}
                     </h2>
-                    <p className="text-gray-600 mb-4 line-clamp-3">
+                    <p className="text-gray-600 mb-4 overflow-hidden" style={{ 
+                      display: '-webkit-box',
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: 'vertical'
+                    }}>
                       {blog.blogDescription}
                     </p>
                   </div>
 
                   {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {blog.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 rounded-full text-xs font-medium"
-                        style={{ 
-                          backgroundColor: colors.light,
-                          color: colors.secondary
-                        }}
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
+                  {/* <div className="flex flex-wrap gap-2 mb-4">
+                    {blog.tags && blog.tags.length > 0 ? (
+                      blog.tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 rounded-full text-xs font-medium"
+                          style={{ 
+                            backgroundColor: colors.light,
+                            color: colors.secondary
+                          }}
+                        >
+                          #{tag}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-xs text-gray-400">No tags</span>
+                    )}
+                  </div> */}
 
                   {/* Read More Button */}
                   <div className="mb-4">
@@ -307,10 +325,10 @@ const BlogPage = () => {
 
                   {/* Footer */}
                   <div className="flex justify-between items-center pt-4 border-t border-gray-100 mt-auto">
-                    <div className="flex gap-4 text-xs text-gray-500">
-                      <span>❤️ {blog.likes}</span>
-                      <span>🔖 {blog.bookmarks}</span>
-                    </div>
+                    {/* <div className="flex gap-4 text-xs text-gray-500">
+                      <span>❤️ {blog.likes || 0}</span>
+                      <span>🔖 {blog.bookmarks || 0}</span>
+                    </div> */}
                     <div className="flex gap-2 items-center">
                       <Link
                         href={`/blog/edit/${blog.slug}`}
@@ -320,7 +338,7 @@ const BlogPage = () => {
                         <FiEdit2 size={16} />
                       </Link>
                       <button
-                        className="p-2 text-gray-500 hover:text-red-600 rounded-full hover:bg-red-50 transition-colors"
+                        className="p-2 text-red-600 hover:text-red-600 rounded-full hover:bg-red-50 transition-colors"
                         title="Delete"
                         onClick={() => handleDelete(blog.id)}
                       >

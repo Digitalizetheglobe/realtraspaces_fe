@@ -170,6 +170,19 @@ export default function Similarproperties() {
   const [showPropertyTypeDropdown, setShowPropertyTypeDropdown] = useState(false);
   const [showCarpetAreaDropdown, setShowCarpetAreaDropdown] = useState(false);
 
+  // Add state for contact form
+  const [showContactForm, setShowContactForm] = useState(false);
+  const [contactFormData, setContactFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    requirement: "",
+    location: "",
+    propertyType: "",
+    budget: "",
+    message: ""
+  });
+
   // Carpet area options
   const carpetAreaOptions = [
     "Under 500 sqft",
@@ -265,7 +278,67 @@ export default function Similarproperties() {
     // Unique property types
     const propertyTypes = Array.from(new Set(properties.map(p => p.propertyType?.displayName).filter((t): t is string => Boolean(t))));
     
-    setAllCities(cities);
+    // Add pre-fed popular cities that might not have properties yet
+    const popularCities = [
+      "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune", 
+      "Ahmedabad", "Jaipur", "Surat", "Lucknow", "Kanpur", "Nagpur", "Indore", 
+      "Thane", "Bhopal", "Visakhapatnam", "Pimpri-Chinchwad", "Patna", "Vadodara",
+      "Ghaziabad", "Ludhiana", "Agra", "Nashik", "Faridabad", "Meerut", "Rajkot",
+      "Kalyan-Dombivli", "Vasai-Virar", "Varanasi", "Srinagar", "Aurangabad",
+      "Dhanbad", "Amritsar", "Allahabad", "Ranchi", "Howrah", "Coimbatore",
+      "Jabalpur", "Gwalior", "Vijayawada", "Jodhpur", "Madurai", "Raipur",
+      "Kota", "Guwahati", "Chandigarh", "Solapur", "Hubli-Dharwad", "Bareilly",
+      "Moradabad", "Mysore", "Gurgaon", "Aligarh", "Jalandhar", "Tiruchirappalli",
+      "Bhubaneswar", "Salem", "Warangal", "Mira-Bhayandar", "Thiruvananthapuram",
+      "Bhiwandi", "Saharanpur", "Guntur", "Amravati", "Bikaner", "Noida",
+      "Jamshedpur", "Bhilai", "Cuttack", "Firozabad", "Kochi", "Nellore",
+      "Bhavnagar", "Dehradun", "Durgapur", "Asansol", "Rourkela", "Nanded",
+      "Kolhapur", "Ajmer", "Akola", "Gulbarga", "Jamnagar", "Ujjain",
+      "Loni", "Siliguri", "Jhansi", "Ulhasnagar", "Jammu", "Mangalore",
+      "Belgaum", "Ambattur", "Tirunelveli", "Malegaon", "Gaya", "Jalgaon",
+      "Udaipur", "Maheshtala", "Tiruppur", "Davanagere", "Kozhikode", "Akola",
+      "Kurnool", "Rajpur Sonarpur", "Bokaro", "South Dumdum", "Bellary",
+      "Patiala", "Gopalpur", "Agartala", "Bhagalpur", "Muzaffarnagar",
+      "Bhatpara", "Panihati", "Latur", "Dhule", "Rohtak", "Sagar",
+      "Korba", "Bhilwara", "Brahmapur", "Muzaffarpur", "Ahmednagar",
+      "Mathura", "Kollam", "Avadi", "Kadapa", "Kamarhati", "Bilaspur",
+      "Shahjahanpur", "Satara", "Bijapur", "Rampur", "Shivamogga",
+      "Chandrapur", "Junagadh", "Thrissur", "Alwar", "Bardhaman",
+      "Kulti", "Kakinada", "Nizamabad", "Parbhani", "Tumkur",
+      "Hisar", "Ozhukarai", "Bihar Sharif", "Panipat", "Darbhanga",
+      "Bally", "Aizawl", "Dewas", "Ichalkaranji", "Tirupati",
+      "Karnal", "Bathinda", "Rampur", "Shivpuri", "Ratlam",
+      "Uluberia", "Murwara", "Sambalpur", "Singrauli", "Unnao",
+      "Hugli-Chinsurah", "Raichur", "Vellore", "Alappuzha",
+      "Khandwa", "Yamunanagar", "Bidar", "Saugor", "Raurkela",
+      "Hapur", "Panvel", "Bharatpur", "Haldia", "Habra",
+      "Barasat", "Kharagpur", "Malkajgiri", "Adoni", "Tenali",
+      "Chittoor", "Bhind", "Bhusawal", "Raebareli", "Khammam",
+      "Bhiwani", "Nagaon", "Udaipur", "Hazaribagh", "Bhimavaram",
+      "Kumbakonam", "Botad", "Sikar", "Hardwar", "Dabgram",
+      "Morena", "Siwan", "Bettiah", "Fatehpur", "Rae Bareli",
+      "Khurja", "Vejalpur", "Gondiya", "Sikar", "Bharuch",
+      "Hajipur", "Sasaram", "Dharmavaram", "Bilaspur", "Batala",
+      "Mandi", "Hoshiarpur", "Etawah", "Saharsa", "Chhapra",
+      "Karnal", "Bathinda", "Rampur", "Shivpuri", "Ratlam",
+      "Uluberia", "Murwara", "Sambalpur", "Singrauli", "Unnao",
+      "Hugli-Chinsurah", "Raichur", "Vellore", "Alappuzha",
+      "Khandwa", "Yamunanagar", "Bidar", "Saugor", "Raurkela",
+      "Hapur", "Panvel", "Bharatpur", "Haldia", "Habra",
+      "Barasat", "Kharagpur", "Malkajgiri", "Adoni", "Tenali",
+      "Chittoor", "Bhind", "Bhusawal", "Raebareli", "Khammam",
+      "Bhiwani", "Nagaon", "Udaipur", "Hazaribagh", "Bhimavaram",
+      "Kumbakonam", "Botad", "Sikar", "Hardwar", "Dabgram",
+      "Morena", "Siwan", "Bettiah", "Fatehpur", "Rae Bareli",
+      "Khurja", "Vejalpur", "Gondiya", "Sikar", "Bharuch",
+      "Hajipur", "Sasaram", "Dharmavaram", "Bilaspur", "Batala",
+      "Mandi", "Hoshiarpur", "Etawah", "Saharsa", "Chhapra"
+    ];
+    
+    // Combine existing cities with popular cities and remove duplicates
+    const allCitiesCombined = Array.from(new Set([...cities, ...popularCities])).sort();
+    
+    setAllCities(allCitiesCombined);
     setAllSublocalities(sublocalities);
     setAllPropertyTypes(propertyTypes);
   }, [properties]);
@@ -408,6 +481,20 @@ export default function Similarproperties() {
     }
 
     setFilteredProperties(results);
+    
+    // Show contact form if no properties found and user has selected specific filters
+    if (results.length === 0 && (selectedCity || selectedSubLocation || selectedPropertyType || selectedCarpetArea || searchTerm)) {
+      setShowContactForm(true);
+      // Pre-fill the form with selected filters
+      setContactFormData(prev => ({
+        ...prev,
+        location: selectedCity || "",
+        propertyType: selectedPropertyType || "",
+        requirement: `${selectedCity ? `City: ${selectedCity}` : ""}${selectedSubLocation ? `, Sub-location: ${selectedSubLocation}` : ""}${selectedPropertyType ? `, Property Type: ${selectedPropertyType}` : ""}${selectedCarpetArea ? `, Area: ${selectedCarpetArea}` : ""}${searchTerm ? `, Search: ${searchTerm}` : ""}`.trim()
+      }));
+    } else {
+      setShowContactForm(false);
+    }
   }, [searchTerm, filters, properties, selectedLocations, selectedCity, selectedSubLocation, selectedPropertyType, selectedCarpetArea]);
 
   // Helper function to get attribute value by ID
@@ -454,6 +541,7 @@ export default function Similarproperties() {
     setShowSubLocationDropdown(false);
     setShowPropertyTypeDropdown(false);
     setShowCarpetAreaDropdown(false);
+    setShowContactForm(false);
     setFilters({
       propertyType: "",
       priceRange: "",
@@ -461,6 +549,36 @@ export default function Similarproperties() {
       condition: "",
       transactionType: "",
     });
+  };
+
+  // Handle contact form submission
+  const handleContactFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Here you would typically send the form data to your backend
+    // For now, we'll just show an alert
+    alert("Thank you for your interest! Our team will contact you soon.");
+    
+    // Reset form
+    setContactFormData({
+      name: "",
+      email: "",
+      phone: "",
+      requirement: "",
+      location: "",
+      propertyType: "",
+      budget: "",
+      message: ""
+    });
+    setShowContactForm(false);
+  };
+
+  // Handle contact form input changes
+  const handleContactFormChange = (field: string, value: string) => {
+    setContactFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleCheckboxClick = (propertyId: string) => {
@@ -831,6 +949,114 @@ export default function Similarproperties() {
                   </div> */}
                 </div>
 
+                {/* Contact Form for Rare Requirements */}
+                {showContactForm && (
+                  <div className="mb-8 px-4 sm:px-0">
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-dashed border-blue-300 rounded-xl p-6 text-center">
+                      <div className="mb-4">
+                        <div className="text-4xl mb-2">🤔</div>
+                        <h3 className="text-xl font-bold text-gray-800 mb-2">
+                          Oooops! Seems like your requirement is rare/specific
+                        </h3>
+                        <p className="text-gray-600 mb-4">
+                          Don't worry! We love unique requirements. Let's connect you with our expert team who will work closely to find exactly what you're looking for.
+                        </p>
+                      </div>
+                      
+                      <form onSubmit={handleContactFormSubmit} className="max-w-2xl mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                            <input
+                              type="text"
+                              required
+                              value={contactFormData.name}
+                              onChange={(e) => handleContactFormChange("name", e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Your full name"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                            <input
+                              type="email"
+                              required
+                              value={contactFormData.email}
+                              onChange={(e) => handleContactFormChange("email", e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="your.email@example.com"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
+                            <input
+                              type="tel"
+                              required
+                              value={contactFormData.phone}
+                              onChange={(e) => handleContactFormChange("phone", e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              placeholder="Your phone number"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Budget Range</label>
+                            <select
+                              value={contactFormData.budget}
+                              onChange={(e) => handleContactFormChange("budget", e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                              <option value="">Select Budget</option>
+                              <option value="Under ₹50 Lakhs">Under ₹50 Lakhs</option>
+                              <option value="₹50 Lakhs - ₹1 Cr">₹50 Lakhs - ₹1 Cr</option>
+                              <option value="₹1 Cr - ₹2 Cr">₹1 Cr - ₹2 Cr</option>
+                              <option value="₹2 Cr - ₹5 Cr">₹2 Cr - ₹5 Cr</option>
+                              <option value="Over ₹5 Cr">Over ₹5 Cr</option>
+                            </select>
+                          </div>
+                        </div>
+                        
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Your Specific Requirement</label>
+                          <textarea
+                            value={contactFormData.requirement}
+                            onChange={(e) => handleContactFormChange("requirement", e.target.value)}
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Tell us more about your specific requirement..."
+                          />
+                        </div>
+                        
+                        <div className="mb-4">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Additional Message</label>
+                          <textarea
+                            value={contactFormData.message}
+                            onChange={(e) => handleContactFormChange("message", e.target.value)}
+                            rows={2}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Any additional details or preferences..."
+                          />
+                        </div>
+                        
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                          <button
+                            type="submit"
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
+                          >
+                            Submit Requirement
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowContactForm(false)}
+                            className="bg-gray-300 hover:bg-gray-400 text-gray-700 font-medium py-2 px-6 rounded-lg transition-colors duration-200"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
+
                 {/* Property Cards */}
                 {loading ? (
                   // Loading state - show skeleton cards
@@ -889,7 +1115,17 @@ export default function Similarproperties() {
                   </div>
                 ) : filteredProperties.length === 0 ? (
                   // No properties found state - show empty state
-                  <div></div>
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">🏠</div>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No properties found</h3>
+                    <p className="text-gray-600 mb-4">Try adjusting your search criteria or browse all available properties.</p>
+                    <button
+                      onClick={resetFilters}
+                      className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-200"
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                     {filteredProperties.map((property, index) => (

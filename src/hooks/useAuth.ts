@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { apiService } from '../utils/api';
 
 interface AdminData {
   id: number;
@@ -12,6 +13,9 @@ interface AdminData {
   updatedAt: string;
 }
 
+// Helper function to check if we're in a browser environment
+const isBrowser = typeof window !== 'undefined';
+
 export const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [adminData, setAdminData] = useState<AdminData | null>(null);
@@ -22,15 +26,30 @@ export const useAuth = () => {
     checkAuthStatus();
   }, []);
 
-  const checkAuthStatus = () => {
+  const checkAuthStatus = async () => {
     try {
-      const token = localStorage.getItem('adminToken');
-      const storedAdminData = localStorage.getItem('adminData');
+      // Only access localStorage if we're in a browser environment
+      const token = isBrowser ? localStorage.getItem('adminToken') : null;
+      const storedAdminData = isBrowser ? localStorage.getItem('adminData') : null;
 
       if (token && storedAdminData) {
-        const parsedAdminData = JSON.parse(storedAdminData);
-        setAdminData(parsedAdminData);
-        setIsAuthenticated(true);
+        // Validate the token with the server using the API service
+        const isValid = await apiService.validateToken();
+        
+        if (isValid) {
+          const parsedAdminData = JSON.parse(storedAdminData);
+          setAdminData(parsedAdminData);
+          setIsAuthenticated(true);
+        } else {
+          // Token is invalid, clear storage and redirect to login
+          if (isBrowser) {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminData');
+          }
+          setAdminData(null);
+          setIsAuthenticated(false);
+          router.push('/dashboard/adminlogin');
+        }
       } else {
         setIsAuthenticated(false);
         setAdminData(null);
@@ -45,15 +64,19 @@ export const useAuth = () => {
   };
 
   const login = (token: string, admin: AdminData) => {
-    localStorage.setItem('adminToken', token);
-    localStorage.setItem('adminData', JSON.stringify(admin));
+    if (isBrowser) {
+      localStorage.setItem('adminToken', token);
+      localStorage.setItem('adminData', JSON.stringify(admin));
+    }
     setAdminData(admin);
     setIsAuthenticated(true);
   };
 
   const logout = () => {
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminData');
+    if (isBrowser) {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminData');
+    }
     setAdminData(null);
     setIsAuthenticated(false);
     router.push('/dashboard/adminlogin');

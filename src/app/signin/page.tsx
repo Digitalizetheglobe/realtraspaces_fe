@@ -68,10 +68,15 @@ const SignInPage = () => {
         }
       );
 
-      const result = await response.json();
+      let result;
+      try {
+        result = await response.json();
+      } catch (parseError) {
+        throw new Error("Invalid response from server");
+      }
 
       if (!response.ok) {
-        throw new Error(result.message || "Login failed");
+        throw new Error(result.message || `Login failed with status: ${response.status}`);
       }
 
       if (result.data?.token) {
@@ -80,11 +85,12 @@ const SignInPage = () => {
         // Redirect to dashboard or home page
         window.location.href = "/";
       } else {
-        throw new Error("No authentication token received");
+        throw new Error("No authentication token received from server");
       }
     } catch (error: any) {
-      toast.error(error.message || "An error occurred during login");
       console.error("Login error:", error);
+      const errorMessage = error.message || "An error occurred during login. Please try again.";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

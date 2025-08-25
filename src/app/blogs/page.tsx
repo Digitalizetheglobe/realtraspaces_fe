@@ -42,6 +42,7 @@ const Blogs = () => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   // Fetch blogs from API
   useEffect(() => {
@@ -89,6 +90,23 @@ const Blogs = () => {
     });
   };
 
+  // Slider navigation functions
+  const nextSlide = () => {
+    const maxSlides = Math.ceil(blogs.length / 3) - 1;
+    setCurrentSlide(current => current < maxSlides ? current + 1 : 0);
+  };
+
+  const prevSlide = () => {
+    const maxSlides = Math.ceil(blogs.length / 3) - 1;
+    setCurrentSlide(current => current > 0 ? current - 1 : maxSlides);
+  };
+
+  // Get current slide blogs
+  const getCurrentSlideBlogs = () => {
+    const startIndex = currentSlide * 3;
+    return blogs.slice(startIndex, startIndex + 3);
+  };
+
   const firstFaqRef = useRef<HTMLDetailsElement>(null);
 
   // FAQ accordion state
@@ -130,89 +148,115 @@ const Blogs = () => {
             </div>
           )}
 
-          {/* Blogs grid */}
+          {/* Blogs slider */}
           {!loading && !error && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {blogs.length > 0 ? (
-                blogs.map((blog, index) => (
-                  <Link href={`/blogs/${blog.slug}`} key={blog.slug} className="block group">
-                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                      <div className="relative overflow-hidden rounded-lg">
-                        <Image
-                          src={blog.blogImages && blog.blogImages.length > 0 ? getBlogImageUrl(blog.blogImages[0]) : latestpropertytype}
-                          alt={blog.blogTitle || "blog"}
-                          className="object-cover p-3 rounded-2xl h-[220px] transform group-hover:scale-110 transition-transform duration-500"
-                          width={400}
-                          height={220}
-                          onError={(e) => {
-                            // Fallback to default image if blog image fails to load
-                            const target = e.target as HTMLImageElement;
-                            target.src = latestpropertytype;
-                          }}
-                        />
-                        {/* Property Type and Location - Positioned absolutely on top of image */}
-                        <div className="absolute top-4 right-0 px-4 flex justify-between">
-                          <span className="text-sm text-black bg-white bg-opacity-70 rounded-full px-3 py-1">
-                            {blog.dynamicFields?.isFeatured ? "Featured" : "Article"}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-6">
-                        {/* Category and Date */}
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-sm text-blue-600 font-medium">
-                            {blog.category || 'General'}
-                          </span>
-                          <span className="text-sm text-gray-500">
-                            {formatDate(blog.createdAt, { year: 'numeric', month: 'short', day: 'numeric' })}
-                          </span>
-                        </div>
-                        
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                          {blog.blogTitle}
-                        </h3>
-                        <p className="text-gray-600 mb-4">
-                          {blog.blogDescription.split(' ').length > 15
-                            ? blog.blogDescription.split(' ').slice(0, 15).join(' ') + '...'
-                            : blog.blogDescription}
-                        </p>
-                        
-                        {/* Tags */}
-                        {blog.tags && blog.tags.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            {blog.tags.slice(0, 2).map((tag, index) => (
-                              <span
-                                key={index}
-                                className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full"
-                              >
-                                #{tag}
-                              </span>
-                            ))}
+            <div className="relative">
+              {/* Navigation buttons */}
+              {blogs.length > 3 && (
+                <>
+                  <button
+                    onClick={prevSlide}
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 bg-white hover:bg-gray-100 text-gray-800 rounded-full p-3 shadow-lg border border-gray-200 transition-all duration-200"
+                    aria-label="Previous slide"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={nextSlide}
+                    className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 z-10 bg-white hover:bg-gray-100 text-gray-800 rounded-full p-3 shadow-lg border border-gray-200 transition-all duration-200"
+                    aria-label="Next slide"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </>
+              )}
+
+              {/* Slider container */}
+              <div className="overflow-hidden">
+                <div className="flex gap-8 transition-transform duration-500 ease-in-out">
+                  {blogs.length > 0 ? (
+                    getCurrentSlideBlogs().map((blog, index) => (
+                      <div key={blog.slug} className="flex-shrink-0 w-full md:w-1/3">
+                        <Link href={`/blogs/${blog.slug}`} className="block group">
+                          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                            <div className="relative overflow-hidden rounded-lg">
+                              <Image
+                                src={blog.blogImages && blog.blogImages.length > 0 ? getBlogImageUrl(blog.blogImages[0]) : latestpropertytype}
+                                alt={blog.blogTitle || "blog"}
+                                className="object-cover p-3 rounded-2xl h-[220px] transform group-hover:scale-110 transition-transform duration-500"
+                                width={400}
+                                height={220}
+                                onError={(e) => {
+                                  // Fallback to default image if blog image fails to load
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = latestpropertytype;
+                                }}
+                              />
+                              {/* Property Type and Location - Positioned absolutely on top of image */}
+                              <div className="absolute top-4 right-0 px-4 flex justify-between">
+                                <span className="text-sm text-black bg-white bg-opacity-70 rounded-full px-3 py-1">
+                                  {blog.dynamicFields?.isFeatured ? "Featured" : "Article"}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="p-6">
+                              {/* Category and Date */}
+                              <div className="flex items-center justify-between mb-3">
+                                <span className="text-sm text-blue-600 font-medium">
+                                  {blog.category || 'General'}
+                                </span>
+                                <span className="text-sm text-gray-500">
+                                  {formatDate(blog.createdAt, { year: 'numeric', month: 'short', day: 'numeric' })}
+                                </span>
+                              </div>
+                              
+                              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                                {blog.blogTitle.split(' ').length > 7
+                                  ? blog.blogTitle.split(' ').slice(0, 7).join(' ') + '...'
+                                  : blog.blogTitle}
+                              </h3>
+                              <p className="text-gray-600 mb-4">
+                                {blog.blogDescription.split(' ').length > 15
+                                  ? blog.blogDescription.split(' ').slice(0, 15).join(' ') + '...'
+                                  : blog.blogDescription}
+                              </p>
+                              
+                              {/* Read More Button */}
+                              <div className="text-center">
+                                <span className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
+                                  Read More →
+                                </span>
+                              </div>
+                            </div>
                           </div>
-                        )}
-                        
-                        {/* Author and Stats */}
-                        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                          <span>By {blog.writer || 'Anonymous'}</span>
-                          <div className="flex items-center gap-3">
-                            <span>❤️ {blog.likes || 0}</span>
-                            <span>🔖 {blog.bookmarks || 0}</span>
-                          </div>
-                        </div>
-                        
-                        {/* Read More Button */}
-                        <div className="text-center">
-                          <span className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
-                            Read More →
-                          </span>
-                        </div>
+                        </Link>
                       </div>
+                    ))
+                  ) : (
+                    <div className="w-full text-center py-8">
+                      <p className="text-gray-600">No blogs available at the moment.</p>
                     </div>
-                  </Link>
-                ))
-              ) : (
-                <div className="col-span-full text-center py-8">
-                  <p className="text-gray-600">No blogs available at the moment.</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Slider indicators */}
+              {blogs.length > 3 && (
+                <div className="flex justify-center mt-8 space-x-2">
+                  {Array.from({ length: Math.ceil(blogs.length / 3) }, (_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentSlide(index)}
+                      className={`w-3 h-3 rounded-full transition-all duration-200 ${
+                        currentSlide === index ? 'bg-blue-600' : 'bg-gray-300 hover:bg-gray-400'
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
                 </div>
               )}
             </div>

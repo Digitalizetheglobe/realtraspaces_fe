@@ -105,7 +105,12 @@ const AdminLoginPage = () => {
         }),
       });
 
-      const data: ApiResponse = await response.json();
+      let data: ApiResponse;
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        throw new Error("Invalid response from server");
+      }
 
       if (response.ok && data.success) {
         // Use the login function from useAuth hook
@@ -114,11 +119,13 @@ const AdminLoginPage = () => {
         // Redirect to dashboard
         router.push("/dashboard");
       } else {
-        setApiError(data.message || "Login failed. Please check your credentials and try again.");
+        const errorMessage = data.message || `Login failed with status: ${response.status}. Please check your credentials and try again.`;
+        setApiError(errorMessage);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      setApiError("Network error. Please check your connection and try again.");
+      const errorMessage = error.message || "Network error. Please check your connection and try again.";
+      setApiError(errorMessage);
     } finally {
       setIsLoading(false);
     }

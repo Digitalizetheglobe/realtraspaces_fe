@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { useAuth } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { apiService } from "@/utils/api";
 
 interface WebUser {
   id: number;
@@ -24,7 +24,7 @@ interface WebUsersResponse {
 }
 
 const DashboardAllWebUsers = () => {
-  const { logout, adminData } = useAuth();
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [webUsers, setWebUsers] = useState<WebUser[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,41 +39,51 @@ const DashboardAllWebUsers = () => {
     fetchWebUsers();
   }, []);
 
-  const fetchWebUsers = async () => {
+  // Debug function to check token status
+
+  // Call debug function on mount
+  // useEffect(() => {
+  //   checkTokenStatus();
+  // }, []);
+
+  const fetchWebUsers = async (retryCount = 0) => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("adminToken");
+      // Don't clear error automatically - only clear on successful retry
+      if (retryCount === 0) {
+        setError(null);
+      }
       
-      if (!token) {
-        setError("Authentication token not found");
-        return;
-      }
-
-      const response = await fetch("https://api.realtraspaces.com/api/webusers", {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result: WebUsersResponse = await response.json();
+      const result = await apiService.getWebUsers();
       
       if (result.status === "success") {
         setWebUsers(result.data);
+        setError(null); // Only clear error on success
       } else {
         setError("Failed to fetch web users");
       }
     } catch (err) {
       console.error("Error fetching web users:", err);
-      setError("Failed to fetch web users. Please try again.");
+      if (err instanceof Error) {
+        if (retryCount < 2) {
+          // Retry up to 2 times for network errors
+          console.log(`Retrying fetchWebUsers (attempt ${retryCount + 1})`);
+          setTimeout(() => fetchWebUsers(retryCount + 1), 1000 * (retryCount + 1));
+          return;
+        } else {
+          setError(err.message || "Failed to fetch web users. Please try again.");
+        }
+      } else {
+        setError("Failed to fetch web users. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRetry = () => {
+    setError(null); // Clear error when user manually retries
+    fetchWebUsers(0);
   };
 
   // Filter users based on search term and location
@@ -105,25 +115,10 @@ const DashboardAllWebUsers = () => {
   const toggleUserStatus = async (userId: number, currentStatus: boolean) => {
     try {
       setUpdatingStatus(userId);
-      const token = localStorage.getItem("adminToken");
       
-      if (!token) {
-        setError("Authentication token not found");
-        return;
-      }
-
-      const response = await fetch(`https://api.realtraspaces.com/api/webusers/${userId}/status`, {
-        method: "PATCH",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          isActive: !currentStatus
-        }),
-      });
-
-      if (response.ok) {
+      const result = await apiService.updateWebUserStatus(userId, !currentStatus);
+      
+      if (result.status === "success") {
         // Update the user status in the local state
         setWebUsers(prevUsers => 
           prevUsers.map(user => 
@@ -133,12 +128,15 @@ const DashboardAllWebUsers = () => {
           )
         );
       } else {
-        const errorData = await response.json();
-        setError(errorData.message || "Failed to update user status");
+        setError(result.message || "Failed to update user status");
       }
     } catch (err) {
       console.error("Error updating user status:", err);
-      setError("Failed to update user status. Please try again.");
+      if (err instanceof Error) {
+        setError(err.message || "Failed to update user status. Please try again.");
+      } else {
+        setError("Failed to update user status. Please try again.");
+      }
     } finally {
       setUpdatingStatus(null);
     }
@@ -172,8 +170,14 @@ const DashboardAllWebUsers = () => {
     return (
       <div className="flex h-screen bg-gray-100">
         <div className="flex-1 flex items-center justify-center">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
+          <div className="text-center">
+            <p className="text-lg font-medium text-gray-700 mb-4">open...</p>
+            <button
+              onClick={handleRetry}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors"
+            >
+              🔄 Retry
+            </button>
           </div>
         </div>
       </div>
@@ -181,8 +185,7 @@ const DashboardAllWebUsers = () => {
   }
 
   return (
-    <ProtectedRoute>
-      <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100">
         {/* Sidebar */}
         <div className={`bg-white shadow-lg ${isSidebarOpen ? 'w-64' : 'w-16'} transition-all duration-300`}>
           <div className="p-4">
@@ -216,7 +219,7 @@ const DashboardAllWebUsers = () => {
 
           <div className="mt-auto p-4">
             <button
-              onClick={logout}
+              // onClick={logout}
               className="w-full flex items-center px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             >
               <span className="text-xl mr-3">🚪</span>
@@ -341,7 +344,7 @@ const DashboardAllWebUsers = () => {
                 </div>
                 <div className="flex items-end">
                   <button
-                    onClick={fetchWebUsers}
+                    onClick={handleRetry}
                     className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
                   >
                     🔄 Refresh Data
@@ -523,9 +526,8 @@ const DashboardAllWebUsers = () => {
             </div>
           </div>
         </div>
-      </div>
-    </ProtectedRoute>
-  );
+             </div>
+   );
 };
 
 export default DashboardAllWebUsers;

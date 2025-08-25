@@ -461,7 +461,7 @@ export default function RealtraSpacesAbout() {
     {!loading && teamMembers.length > 0 && (
       <div className="relative w-full overflow-hidden">
         <div className="flex gap-6 animate-scroll whitespace-nowrap">
-          {[...teamMembers, ...teamMembers].map((member, index) => (
+          {teamMembers.map((member, index) => (
             <div
               key={`${member.id}-${index}`}
               className="group relative flex-shrink-0 w-64 rounded-2xl overflow-hidden border border-gray-200 transition-shadow duration-500 cursor-pointer"
