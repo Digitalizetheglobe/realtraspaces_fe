@@ -53,10 +53,10 @@ export default function DynamicSeoHead({
       }
       canonicalLink.setAttribute('href', seoData.canonicalUrl || fallbackCanonical);
       
-      // Update Open Graph tags
+      
       updateOpenGraphTags(seoData, fallbackTitle, fallbackDescription, fallbackCanonical);
       
-      // Update Twitter Card tags
+     
       updateTwitterCardTags(seoData, fallbackTitle, fallbackDescription);
     }
   }, [seoData, fallbackTitle, fallbackDescription, fallbackKeywords, fallbackCanonical]);
