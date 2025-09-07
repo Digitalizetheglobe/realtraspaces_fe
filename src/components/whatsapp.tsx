@@ -5,7 +5,7 @@ import wp from "../../public/assets/wha.png"; // ✅ Adjusted import path for Wh
 import snd from "../../public/assets/send.png"; // ✅ Adjusted import path for send icon
 const WhatsAppPopup = () => {
   const [showPopup, setShowPopup] = useState(false);
-  const [phoneNumber] = useState("+91 8384848485"); // ✅ Default WhatsApp number
+  const [phoneNumber] = useState("+91 70393 11539"); // ✅ Blue tick WhatsApp number
   const [message, setMessage] = useState("");
   const [isHovered, setIsHovered] = useState(false);
 

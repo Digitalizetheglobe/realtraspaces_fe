@@ -1,7 +1,7 @@
 "use client"
 import { useState } from "react";
 import { Camera, MapPin, DollarSign, Home, Phone, Mail, Upload, Check, AlertCircle, Building2, FileText } from "lucide-react";
-
+import Link from "next/link";
 // API utility function
 const callAPI = async (endpoint: string, data: any) => {
   const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://api.realtraspaces.com';
@@ -419,7 +419,7 @@ export default function ListPropertyPage() {
                     className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
                   <p className="text-sm text-gray-700">
-                    I agree to the <a href="#" className="text-blue-600 hover:underline">Terms of Service</a> and <a href="#" className="text-blue-600 hover:underline">Privacy Policy</a>.
+                    I agree to the <Link href="/terms-and-condition" className="text-blue-600 hover:underline">Terms of Service</Link> and <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link>.
                   </p>
                 </div>
                 {errors.termsAccepted && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.termsAccepted}</p>}

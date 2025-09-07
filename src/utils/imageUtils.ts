@@ -57,8 +57,8 @@ export const getBlogImageApiUrls = (filenames: string[]): string[] => {
 };
 
 // Developer image utilities
-export const getDeveloperImageUrl = (filename: string): string => {
-  if (!filename) return '';
+export const getDeveloperImageUrl = (filename: string | any): string => {
+  if (!filename || typeof filename !== 'string') return '';
   if (filename.startsWith('http://') || filename.startsWith('https://')) {
     return filename;
   }
@@ -79,8 +79,17 @@ export const getTeamImageUrl = (filename: string): string => {
   return `${API_BASE_URL}/team/${filename}`;
 };
 
+// Award image utilities
+export const getAwardImageUrl = (filename: string): string => {
+  if (!filename) return '';
+  if (filename.startsWith('http://') || filename.startsWith('https://')) {
+    return filename;
+  }
+  return `${API_BASE_URL}/awardsimages/${filename}`;
+};
+
 // Generic image URL utility
-export const getImageUrl = (filename: string, type: 'blog' | 'developer' | 'team' = 'blog'): string => {
+export const getImageUrl = (filename: string, type: 'blog' | 'developer' | 'team' | 'award' = 'blog'): string => {
   if (!filename) return '';
   if (filename.startsWith('http://') || filename.startsWith('https://')) {
     return filename;
@@ -90,6 +99,8 @@ export const getImageUrl = (filename: string, type: 'blog' | 'developer' | 'team
       return getDeveloperImageUrl(filename);
     case 'team':
       return getTeamImageUrl(filename);
+    case 'award':
+      return getAwardImageUrl(filename);
     default:
       return getBlogImageUrl(filename);
   }

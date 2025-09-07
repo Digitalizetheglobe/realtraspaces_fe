@@ -80,44 +80,50 @@ const BenefitsSection = () => {
     
     try {
       const submissionData = new FormData();
-      submissionData.append('firstName', formData.firstName);
-      submissionData.append('lastName', formData.lastName);
-      submissionData.append('phone', formData.phone);
-      submissionData.append('email', formData.email);
+      submissionData.append('first_name', formData.firstName);
+      submissionData.append('last_name', formData.lastName);
+      submissionData.append('phone_number', formData.phone);
+      submissionData.append('email_id', formData.email);
       submissionData.append('message', formData.message);
       if (formData.resume) {
-        submissionData.append('resume', formData.resume);
+        submissionData.append('cv_file', formData.resume);
       }
 
-      const response = await fetch('https://api.realtraspaces.com/applications/submit', {
+      const response = await fetch('https://api.realtraspaces.com/api/cv-submissions/submit', {
         method: 'POST',
         body: submissionData,
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit application');
+        throw new Error('Failed to submit CV');
       }
 
-      setSubmitStatus({ 
-        success: true, 
-        message: 'Your application has been submitted successfully!' 
-      });
+      const result = await response.json();
       
-      setFormData({
-        firstName: '',
-        lastName: '',
-        phone: '',
-        email: '',
-        message: '',
-        resume: null
-      });
-      setFileName('');
+      if (result.success) {
+        setSubmitStatus({ 
+          success: true, 
+          message: result.message || 'CV submitted successfully!'
+        });
+        
+        setFormData({
+          firstName: '',
+          lastName: '',
+          phone: '',
+          email: '',
+          message: '',
+          resume: null
+        });
+        setFileName('');
+      } else {
+        throw new Error(result.message || 'Failed to submit CV');
+      }
       
     } catch (error) {
       console.error('Error submitting form:', error);
       setSubmitStatus({ 
         success: false, 
-        message: 'There was an error submitting your application. Please try again.' 
+        message: 'There was an error submitting your CV. Please try again.' 
       });
     } finally {
       setIsSubmitting(false);

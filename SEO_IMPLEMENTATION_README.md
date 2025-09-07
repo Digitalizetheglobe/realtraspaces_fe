@@ -21,7 +21,7 @@ The API returns data in this format:
   "data": {
     "id": 1,
     "page": "home",
-    "metaTitle": "Home Page Title",
+    "metaTitle": "",
     "metaDescription": "Description for home page",
     "metaKeywords": "real estate, property, home",
     "canonicalUrl": "https://example.com",

@@ -1,12 +1,12 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { X, Globe, Book, Zap, ArrowRight, Star, Award, Users } from 'lucide-react';
+import { X, Globe, Book, Zap, ArrowRight, Star, Award, Users, Home, CheckCircle, Calendar } from 'lucide-react';
 import developer3 from "../../../public/assets/developer3.jpg";
 import Image from "next/image";
 import SeoHead from "../../components/SeoHead";
 import PageWithSeo from "../../components/PageWithSeo";
-import { getTeamImageUrl } from "@/utils/imageUtils";
+import { getTeamImageUrl, getDeveloperImageUrl, getAwardImageUrl } from "../../utils/imageUtils";
 
 // Team member interface
 interface TeamMember {
@@ -25,6 +25,63 @@ interface TeamMember {
   linkedin: string;
 }
 
+// Award interface
+interface Award {
+  id: number;
+  award_title: string;
+  award_image: string;
+  demo_field: string;
+  status: boolean;
+  created_at: string;
+  updated_at: string;
+  award_image_url: string;
+}
+
+// Developer interface
+interface Developer {
+  id: number;
+  buildername: string;
+  builder_logo: string;
+  descriptions: string;
+  project_name: string[];
+  status: boolean;
+  created_at: string;
+  updated_at: string;
+  images: string[];
+  image_urls: string[];
+}
+
+// Colors object
+const colors = {
+  primary: '#3B82F6'
+};
+
+// Format date utility function
+const formatDate = (dateString: string) => {
+  try {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  } catch {
+    return 'Invalid Date';
+  }
+};
+
+// Gallery images
+interface GalleryImage {
+  id: string;
+  src: string;
+  alt: string;
+  size: 'small' | 'large';
+  developerName?: string;
+  developerLink?: string;
+  description?: string;
+  projectCount?: number;
+  status?: boolean;
+}
+
 const DUMMY_IMAGES = {
   heroVideo: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1920&h=1080&fit=crop",
   founder: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop",
@@ -39,25 +96,12 @@ const DUMMY_IMAGES = {
 };
 
 // Gallery images
-const galleryImages = [
-  { id: 1, src: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop", alt: 'Modern Office Space', size: 'large' },
-  { id: 2, src: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=300&h=300&fit=crop", alt: 'Luxury Apartment', size: 'small' },
-  { id: 3, src: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop", alt: 'Commercial Building', size: 'large' },
-  { id: 4, src: "https://images.unsplash.com/photo-1605146769289-440113cc3d00?w=300&h=300&fit=crop", alt: 'Residential Complex', size: 'small' },
-  { id: 5, src: "https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=300&fit=crop", alt: 'Villa Project', size: 'large' },
-  { id: 6, src: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?w=300&h=300&fit=crop", alt: 'Office Interior', size: 'small' },
-  { id: 7, src: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop", alt: 'Shopping Complex', size: 'large' },
-  { id: 8, src: "https://images.unsplash.com/photo-1502005229762-cf1b2da60e2f?w=300&h=300&fit=crop", alt: 'Luxury Home', size: 'small' }
-];
+
 
 
 
 // Awards data
-const awards = [
-  { id: 1, src: DUMMY_IMAGES.award1, alt: 'Real Estate Excellence Award 2024' },
-  { id: 2, src: DUMMY_IMAGES.award2, alt: 'Best Customer Service Award' },
-  { id: 3, src: DUMMY_IMAGES.award3, alt: 'Industry Innovation Award' }
-];
+
 
 // Counter hook
 const useCounter = (end: number, duration: number = 2000) => {
@@ -86,7 +130,7 @@ const useCounter = (end: number, duration: number = 2000) => {
       }
     };
   }, []);
-
+  
   useEffect(() => {
     if (!isVisible) return;
 
@@ -119,8 +163,27 @@ export default function RealtraSpacesAbout() {
   const [modalImage, setModalImage] = useState<string | null>(null);
   const [isCarouselHovered, setIsCarouselHovered] = useState(false);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+  const [awards, setAwards] = useState<Award[]>([]);
   const [loading, setLoading] = useState(true);
+  const [awardsLoading, setAwardsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [awardsError, setAwardsError] = useState<string | null>(null);
+  const [selectedDeveloper, setSelectedDeveloper] = useState<Developer | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Modal handlers
+  const openModal = (developer: Developer) => {
+    setSelectedDeveloper(developer);
+    setIsModalOpen(true);
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedDeveloper(null);
+    document.body.style.overflow = 'unset'; // Restore scrolling
+  };
 
   // Fetch team members function
   const fetchTeamMembers = async () => {
@@ -164,9 +227,105 @@ export default function RealtraSpacesAbout() {
     }
   };
 
+  // Fetch developers for gallery
+  const fetchDevelopers = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      if (data.success && data.data) {
+        console.log('Developers API response:', data.data);
+        
+        // Process developers and create gallery images - using image_urls from API response only
+        const processedImages: GalleryImage[] = data.data
+          .filter((developer: any) => developer.image_urls && developer.image_urls.length > 0)
+          .map((developer: any) => {
+            // Get the first image URL from developer.image_urls array (this is the full URL)
+            const firstImageUrl = developer.image_urls[0];
+            console.log(`Processing developer ${developer.buildername}:`, {
+              id: developer.id,
+              image_urls: developer.image_urls,
+              firstImageUrl: firstImageUrl
+            });
+            
+            return {
+              id: developer.id.toString(),
+              src: firstImageUrl, // Use the full URL directly from image_urls
+              alt: `${developer.buildername} - Property Development`,
+              size: Math.random() > 0.5 ? 'large' : 'small' as 'small' | 'large',
+              developerName: developer.buildername,
+              developerLink: `/developers/${developer.id}`,
+              // Add additional properties for better display
+              description: developer.descriptions || 'No description available',
+              projectCount: developer.project_name ? developer.project_name.length : 0,
+              status: developer.status
+            };
+          });
+        
+        console.log('Processed gallery images:', processedImages);
+        setGalleryImages(processedImages);
+      } else {
+        console.warn('Developers API response indicates no success or no data');
+        setGalleryImages([]);
+      }
+    } catch (error) {
+      console.error('Error fetching developers:', error);
+      setGalleryImages([]);
+    }
+  };
+
+  // Fetch awards function
+  const fetchAwards = async () => {
+    try {
+      setAwardsLoading(true);
+      setAwardsError(null);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/awards/`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Awards API response:', data);
+      
+      if (data.success && data.data) {
+        // Filter only active awards and process the data
+        const activeAwards = data.data
+          .filter((award: Award) => award.status === true)
+          .map((award: Award) => ({
+            ...award,
+            id: award.id,
+            src: award.award_image_url,
+            alt: award.award_title || 'Award',
+            title: award.award_title,
+            description: award.demo_field || ''
+          }));
+        
+        console.log('Processed awards:', activeAwards);
+        setAwards(activeAwards);
+      } else {
+        console.warn('Awards API response indicates no success or no data');
+        setAwards([]);
+        setAwardsError('No awards data available');
+      }
+    } catch (error) {
+      console.error('Error fetching awards:', error);
+      setAwards([]);
+      setAwardsError('Failed to load awards. Please try again later.');
+    } finally {
+      setAwardsLoading(false);
+    }
+  };
+
   // Fetch team members from API on component mount
   useEffect(() => {
     fetchTeamMembers();
+    fetchDevelopers();
+    fetchAwards();
   }, []);
 
   // Create counter components outside of render
@@ -546,34 +705,118 @@ export default function RealtraSpacesAbout() {
             </p>
           </div>
 
+
           {/* Infinite Carousel */}
-          <div className="relative overflow-hidden">
-            <div
-              className="flex gap-6 animate-scroll"
-              style={{
-                width: `${galleryImages.length * 2 * 300}px`,
-                animationPlayState: isCarouselHovered ? 'paused' : 'running'
-              }}
-              onMouseEnter={() => setIsCarouselHovered(true)}
-              onMouseLeave={() => setIsCarouselHovered(false)}
-            >
-              {[...galleryImages, ...galleryImages].map((image, index) => (
-                <div
-                  key={`${image.id}-${index}`}
-                  className={`flex-shrink-0 bg-white rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:scale-105 border border-gray-300 ${
-                    image.size === 'large' ? 'w-80 h-60' : 'w-60 h-60'
-                  }`}
-                  onClick={() => setModalImage(image.src)}
-                >
-                  <img
-                    src={image.src}
-                    alt={image.alt}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
+          {galleryImages.length > 0 ? (
+            <div className="relative overflow-hidden">
+              
+              
+              <div
+                className="flex gap-6 animate-scroll"
+                style={{
+                  width: `${galleryImages.length * 2 * 300}px`,
+                  animationPlayState: isCarouselHovered ? 'paused' : 'running'
+                }}
+                onMouseEnter={() => setIsCarouselHovered(true)}
+                onMouseLeave={() => setIsCarouselHovered(false)}
+              >
+                {[...galleryImages, ...galleryImages].map((image, index) => {
+                  // Find the original developer data
+                  const developer: Developer = {
+                    id: parseInt(image.id),
+                    buildername: image.developerName || 'Unknown Developer',
+                    builder_logo: image.src,
+                    descriptions: image.description || 'No description available',
+                    project_name: [],
+                    status: image.status || true,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                    images: [image.src],
+                    image_urls: [image.src]
+                  };
+                  
+                  return (
+                  <div
+                    key={`${image.id}-${index}`}
+                    className={`flex-shrink-0 bg-white rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:scale-105 border border-gray-300 relative group ${
+                      image.size === 'large' ? 'w-80 h-60' : 'w-60 h-60'
+                    }`}
+                    onClick={() => openModal(developer)}
+                  >
+                    <img
+                      src={image.src}
+                      alt={image.alt}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const img = e.currentTarget as HTMLImageElement;
+                        console.log(`Image failed to load: ${image.src}, using fallback`);
+                        img.src = '/assets/signin.jpeg'; // Fallback image
+                      }}
+                      onLoad={() => {
+                        console.log(`Image loaded successfully: ${image.src}`);
+                      }}
+                    />
+                    
+                    {/* Status Badge - Top Right */}
+                    {image.status !== undefined && (
+                      <div className="absolute top-3 right-3">
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          image.status
+                            ? "bg-green-500 text-white"
+                            : "bg-gray-500 text-white"
+                        }`}>
+                          {image.status ? "Active" : "Inactive"}
+                        </span>
+                      </div>
+                    )}
+                    
+                    {/* Project Count - Bottom Left */}
+                    {image.projectCount !== undefined && (
+                      <div className="absolute bottom-3 left-3 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-lg">
+                        <div className="flex items-center text-white text-sm">
+                          <span className="mr-1">🏗️</span>
+                          <span>{image.projectCount} Projects</span>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Developer name overlay on hover */}
+                    {image.developerName && (
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-300 flex items-center justify-center">
+                        <div className="text-white text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <h3 className="text-lg font-semibold mb-2">{image.developerName}</h3>
+                          {image.description && (
+                            <p className="text-sm text-gray-200 mb-2 line-clamp-2 px-4">
+                              {image.description}
+                            </p>
+                          )}
+                          <p className="text-sm text-gray-200">Click to view developer</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Hover Indicator Arrow */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center">
+                      <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
+                        <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-500 text-lg">Loading developer portfolio...</p>
+              <p className="text-sm text-gray-400 mt-2">Fetching images from API...</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -589,28 +832,76 @@ export default function RealtraSpacesAbout() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {awards.map((award, index) => (
-              <motion.div
-                key={award.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.2 }}
-                className="bg-white rounded-2xl overflow-hidden hover:bg-gray-300 transition-all duration-300 transform hover:-translate-y-2"
-              >
-                <div className="h-48 overflow-hidden">
-                  <img
-                    src={award.src}
-                    alt={award.alt}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-black">{award.alt}</h3>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          {/* Loading State */}
+          {awardsLoading && (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+              <p className="text-white ml-4">Loading awards...</p>
+            </div>
+          )}
+
+          {/* Error State */}
+          {!awardsLoading && awardsError && (
+            <div className="text-center py-12">
+              <div className="bg-red-900/50 border border-red-500 rounded-lg p-6 max-w-md mx-auto">
+                <p className="text-red-200 text-lg mb-4">{awardsError}</p>
+                <button
+                  onClick={() => {
+                    setAwardsError(null);
+                    setAwardsLoading(true);
+                    fetchAwards();
+                  }}
+                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors duration-300"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Awards Grid */}
+          {!awardsLoading && !awardsError && awards.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {awards.map((award, index) => (
+                <motion.div
+                  key={award.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.2 }}
+                  className="bg-white rounded-2xl overflow-hidden hover:bg-gray-300 transition-all duration-300 transform hover:-translate-y-2"
+                >
+                  <div className="relative h-48 overflow-hidden group">
+                    <img
+                      src={award.award_image_url || getAwardImageUrl(award.award_image)}
+                      alt={award.award_title}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        const img = e.currentTarget as HTMLImageElement;
+                        img.src = DUMMY_IMAGES.award1; // Fallback to default image
+                      }}
+                    />
+                    
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-opacity-0 group-hover:bg-black/50 group-hover:bg-opacity-70 transition-all duration-300 flex items-center justify-center">
+                      <div className="text-white text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 px-6">
+                        <h3 className="text-lg font-semibold mb-2">{award.award_title}</h3>
+                        {award.demo_field && (
+                          <p className="text-sm text-gray-200">{award.demo_field}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {/* No Awards State */}
+          {!awardsLoading && !awardsError && awards.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-300 text-lg">No awards available at the moment.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -662,30 +953,141 @@ export default function RealtraSpacesAbout() {
       </section>
 
       {/* Modal */}
-      {modalImage && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-          onClick={() => setModalImage(null)}
-        >
-          <div
-            className="relative bg-white rounded-2xl p-4 max-w-4xl w-full mx-4 border border-gray-300"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="absolute top-4 right-4 text-gray-600 hover:text-black z-10 bg-white rounded-full p-2"
-              onClick={() => setModalImage(null)}
-            >
-              <X size={20} />
-            </button>
-            <div className="w-full h-96 relative rounded-xl overflow-hidden">
-              <img
-                src={modalImage}
-                alt="Modal Image"
+      {isModalOpen && selectedDeveloper && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fadeIn"
+            onClick={closeModal}
+          ></div>
+          
+          {/* Modal Content */}
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scaleIn">
+            {/* Modal Header */}
+            <div className="relative h-64">
+              <Image
+                src={selectedDeveloper.builder_logo ? getDeveloperImageUrl(selectedDeveloper.builder_logo) : '/assets/signin.jpeg'}
+                alt={selectedDeveloper.buildername}
+                width={800}
+                height={256}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  const img = e.currentTarget as HTMLImageElement;
+                  img.src = '/assets/signin.jpeg';
+                }}
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+              
+              {/* Close Button */}
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-all"
+              >
+                <X size={24} />
+              </button>
+
+              {/* Status Badge */}
+              <div className="absolute top-4 left-4">
+                <span
+                  className={`px-4 py-2 rounded-full text-sm font-semibold ${
+                    selectedDeveloper.status
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-500 text-white"
+                  }`}
+                >
+                  {selectedDeveloper.status ? "Active" : "Inactive"}
+                </span>
+              </div>
+
+              {/* Developer Name */}
+              <div className="absolute bottom-6 left-6 right-6">
+                <h2 className="text-3xl font-bold text-white mb-2">
+                  {selectedDeveloper.buildername}
+                </h2>
+                <div className="flex items-center text-white/80">
+                  <Home className="mr-2" />
+                  <span>{(selectedDeveloper.project_name || []).length} Projects</span>
+                </div>
+              </div>
             </div>
-            <div className="mt-4 text-center">
-              <h3 className="text-xl font-semibold text-black">Modal Image</h3>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-16rem)]">
+              {/* Description */}
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-3" style={{ color: colors.primary }}>
+                  About the Developer
+                </h3>
+                <p className="text-gray-700 leading-relaxed">
+                  {selectedDeveloper.descriptions || 'No description available for this developer.'}
+                </p>
+              </div>
+
+              {/* Gallery Images */}
+              {(selectedDeveloper.images && selectedDeveloper.images.length > 0) && (
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold mb-4" style={{ color: colors.primary }}>
+                    Gallery ({selectedDeveloper.images.length} images)
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {selectedDeveloper.images.map((image, idx) => (
+                      <div key={idx} className="bg-white rounded-xl border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+                        <div className="aspect-square overflow-hidden">
+                          <img
+                            src={getDeveloperImageUrl(image)}
+                            alt={`${selectedDeveloper.buildername} gallery ${idx + 1}`}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            onError={(e) => {
+                              const img = e.currentTarget as HTMLImageElement;
+                              img.src = '/assets/signin.jpeg';
+                            }}
+                          />
+                        </div>
+                        <div className="p-3 bg-gradient-to-r from-gray-50 to-gray-100">
+                          <p className="text-xs text-gray-600 text-center font-medium">
+                            Image {idx + 1}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Projects */}
+              {(selectedDeveloper.project_name && selectedDeveloper.project_name.length > 0) && (
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold mb-4" style={{ color: colors.primary }}>
+                    Projects ({selectedDeveloper.project_name.length})
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {selectedDeveloper.project_name.map((project, idx) => (
+                      <div key={idx} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <CheckCircle className="mr-3 text-green-500 flex-shrink-0" size={16} />
+                        <span className="text-gray-700 font-medium">{project || 'Unnamed Project'}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Timeline Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center">
+                  <Calendar className="mr-2 text-gray-500" />
+                  <div>
+                    <p className="text-sm text-gray-500">Created</p>
+                    <p className="font-medium text-gray-700">{formatDate(selectedDeveloper.created_at)}</p>
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  <Star className="mr-2 text-gray-500" />
+                  <div>
+                    <p className="text-sm text-gray-500">Last Updated</p>
+                    <p className="font-medium text-gray-700">{formatDate(selectedDeveloper.updated_at)}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -699,6 +1101,13 @@ export default function RealtraSpacesAbout() {
         }
         .animate-scroll {
           animation: scroll 40s linear infinite;
+        }
+        
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
         }
       `}</style>
     </div>

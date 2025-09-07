@@ -73,7 +73,9 @@ const DashboardPage = () => {
     {name :'Team Management',icon:"👥", href: '/dashboardteam'},
     {name :'Developer Management',icon:"🛠️", href: '/dashboarddeveloper'},
     {name :'List Properties',icon:"💼", href: '/dashboardlistproperty'},
-    {name :'Cookie Policy',icon:"📝", href: '/dashboardcookies'}
+    {name :'Cookie Policy',icon:"📝", href: '/dashboardcookies'},
+    {name :'Awards Management',icon:"🏆", href: '/awardmanagement'},
+    
   ];
 
   if (loading) {
@@ -119,7 +121,7 @@ const DashboardPage = () => {
             {/* Logo / Title */}
             {isSidebarOpen && (
               <h1 className="text-xl font-bold text-black whitespace-nowrap">
-                Realtraspace
+                Realtraspaces
               </h1>
             )}
           </div>

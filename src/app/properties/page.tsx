@@ -2,16 +2,18 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Raleway } from "next/font/google";
+import { toast } from "react-hot-toast";
 import defaultPropertyImage from "../../../public/assets/images/latestproperty1.png";
 import share from "../../../public/assets/Frame 29.png";
 import bookmark from "../../../public/assets/Frame 28.png";
 import whatsapp from "../../../public/assets/WhatsApp.png";
 import Link from "next/link";
+
 import contactimg from "../../../public/assets/images/contactimg.png";
 import SeoHead from "../../components/SeoHead";
 import ShareModal from "../../components/ShareModal";
 import PageWithSeo from "../../components/PageWithSeo";
-
+import { useRouter } from "next/navigation";
 // Load Raleway font with more weight options
 const raleway = Raleway({
   subsets: ["latin"],
@@ -62,6 +64,7 @@ type Property = {
 };
 
 export default function Similarproperties() {
+   const router = useRouter();
   const [properties, setProperties] = useState<Property[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,7 +75,7 @@ export default function Similarproperties() {
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set());
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+ const [isComparing, setIsComparing] = useState(false);
   // Check authentication status
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -122,6 +125,9 @@ export default function Similarproperties() {
         setShowSubLocationDropdown(false);
         setShowPropertyTypeDropdown(false);
         setShowCarpetAreaDropdown(false);
+        // Clear search terms when dropdowns are closed
+        setCitySearchTerm("");
+        setSubLocationSearchTerm("");
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -169,18 +175,19 @@ export default function Similarproperties() {
   const [showSubLocationDropdown, setShowSubLocationDropdown] = useState(false);
   const [showPropertyTypeDropdown, setShowPropertyTypeDropdown] = useState(false);
   const [showCarpetAreaDropdown, setShowCarpetAreaDropdown] = useState(false);
-
+  const [citySearchTerm, setCitySearchTerm] = useState<string>("");
+  const [subLocationSearchTerm, setSubLocationSearchTerm] = useState<string>("");
+   const [allProperties, setAllProperties] = useState<Property[]>([]); // NEW: Combined properties from both pages
+ 
   // Add state for contact form
   const [showContactForm, setShowContactForm] = useState(false);
   const [contactFormData, setContactFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    requirement: "",
-    location: "",
     propertyType: "",
-    budget: "",
-    message: ""
+    transactionType: "",
+    inquiry: ""
   });
 
   // Carpet area options
@@ -198,6 +205,51 @@ export default function Similarproperties() {
   const getAvailableSubLocations = () => {
     if (!selectedCity) return [];
     return Array.from(allSublocalities[selectedCity] || []);
+  };
+
+  // Get filtered and organized cities
+  const getFilteredCities = () => {
+    const priorityCities = [
+      "Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", 
+      "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"
+    ];
+    
+    let filteredCities = allCities;
+    
+    // Filter by search term if provided
+    if (citySearchTerm.trim()) {
+      const searchLower = citySearchTerm.toLowerCase();
+      filteredCities = allCities.filter(city => 
+        city.toLowerCase().startsWith(searchLower)
+      );
+    }
+    
+    // Organize cities: priority cities first, then others
+    const priorityCitiesInFiltered = priorityCities.filter(city => 
+      filteredCities.includes(city)
+    );
+    const otherCitiesInFiltered = filteredCities.filter(city => 
+      !priorityCities.includes(city)
+    );
+    
+    return [...priorityCitiesInFiltered, ...otherCitiesInFiltered];
+  };
+
+  // Get filtered sub-locations
+  const getFilteredSubLocations = () => {
+    if (!selectedCity) return [];
+    
+    let filteredSubLocations = Array.from(allSublocalities[selectedCity] || []);
+    
+    // Filter by search term if provided
+    if (subLocationSearchTerm.trim()) {
+      const searchLower = subLocationSearchTerm.toLowerCase();
+      filteredSubLocations = filteredSubLocations.filter(subLocation => 
+        subLocation.toLowerCase().startsWith(searchLower)
+      );
+    }
+    
+    return filteredSubLocations;
   };
 
   // Get available property types (including child types)
@@ -232,7 +284,94 @@ export default function Similarproperties() {
     sessionStorage.removeItem('searchCity');
     sessionStorage.removeItem('searchSubLocation');
   }, []);
+const handleCompareClick = async () => {
+    // Check if user is logged in
+    const token = localStorage.getItem("authToken");
+    
+    if (!token) {
+      toast.error("Please log in to compare properties");
+      router.push("/signin");
+      return;
+    }
 
+    // Check if any properties are selected for comparison
+    if (bookmarkedProperties.size === 0) {
+      toast.error("Please select at least one property to compare");
+      return;
+    }
+    
+    try {
+      setIsComparing(true);
+      
+      // Get selected properties
+      const selectedProperties = allProperties.filter(prop => bookmarkedProperties.has(prop.id));
+      let addedCount = 0;
+      let alreadyInListCount = 0;
+      
+      // Add each selected property to comparison
+      for (const property of selectedProperties) {
+        try {
+          const response = await fetch("https://api.realtraspaces.com/api/webusers/compare/add", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              propertyId: property.id,
+              propertyData: property
+            })
+          });
+      
+          if (response.status === 401 || response.status === 403) {
+            toast.error("You Are Not Login");
+            router.push("/signin");
+            return;
+          }
+      
+          if (!response.ok) {
+            const errorData = await response.json();
+            const errorMessage = errorData.message || "Failed to add property to comparison";
+            
+            // Check if property is already in comparison list
+            if (errorMessage.toLowerCase().includes("already in comparison") || 
+                errorMessage.toLowerCase().includes("already exists")) {
+              alreadyInListCount++;
+              continue; // Skip this property and continue with others
+            }
+            
+            throw new Error(errorMessage);
+          }
+          
+          addedCount++;
+          
+        } catch (propertyError) {
+          console.error(`Error adding property ${property.id}:`, propertyError);
+          // Continue with other properties even if one fails
+        }
+      }
+  
+      // Show appropriate success message
+      if (addedCount > 0 && alreadyInListCount > 0) {
+        toast.success(`${addedCount} properties added to comparison. ${alreadyInListCount} were already in your list.`);
+      } else if (addedCount > 0) {
+        toast.success(`${addedCount} properties added to comparison`);
+      } else if (alreadyInListCount > 0) {
+        toast.success(`All ${alreadyInListCount} selected properties are already in your comparison list`);
+      }
+      
+      // Navigate to compare page if any properties were added
+      if (addedCount > 0) {
+        router.push("/compareproperties");
+      }
+      
+    } catch (error) {
+      console.error("Error adding to compare:", error);
+      toast.error(error instanceof Error ? error.message : "Failed to add to comparison");
+    } finally {
+      setIsComparing(false);
+    }
+  };
   useEffect(() => {
     const fetchProperties = async () => {
       try {
@@ -246,6 +385,7 @@ export default function Similarproperties() {
             },
           }
         );
+        
         const data = await response.json();
         const propertiesArray = Array.isArray(data)
           ? data
@@ -280,9 +420,9 @@ export default function Similarproperties() {
     
     // Add pre-fed popular cities that might not have properties yet
     const popularCities = [
-      "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai", "Kolkata", "Pune", 
+      "Mumbai","New Mumbai","Thane","Pune","Pimpri-Chinchwad", "Bangalore",  "Chennai","Hyderabad", "Kolkata", "Delhi",
       "Ahmedabad", "Jaipur", "Surat", "Lucknow", "Kanpur", "Nagpur", "Indore", 
-      "Thane", "Bhopal", "Visakhapatnam", "Pimpri-Chinchwad", "Patna", "Vadodara",
+       "Bhopal", "Visakhapatnam",  "Patna", "Vadodara",
       "Ghaziabad", "Ludhiana", "Agra", "Nashik", "Faridabad", "Meerut", "Rajkot",
       "Kalyan-Dombivli", "Vasai-Virar", "Varanasi", "Srinagar", "Aurangabad",
       "Dhanbad", "Amritsar", "Allahabad", "Ranchi", "Howrah", "Coimbatore",
@@ -564,11 +704,9 @@ export default function Similarproperties() {
       name: "",
       email: "",
       phone: "",
-      requirement: "",
-      location: "",
       propertyType: "",
-      budget: "",
-      message: ""
+      transactionType: "",
+      inquiry: ""
     });
     setShowContactForm(false);
   };
@@ -708,29 +846,95 @@ export default function Similarproperties() {
                       </svg>
                       {showCityDropdown && (
                         <div className="search-dropdown absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-                          <div
-                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                          {/* Search Input */}
+                          <div className="sticky top-0 bg-white border-b border-gray-200 p-2">
+                            <input
+                              type="text"
+                              placeholder="Search cities..."
+                              value={citySearchTerm}
+                              onChange={(e) => setCitySearchTerm(e.target.value)}
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                          
+                          {/* All Cities Option */}
+                          {/* <div
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black border-b border-gray-100"
                             onClick={() => {
                               setSelectedCity("");
                               setSelectedSubLocation("");
+                              setCitySearchTerm("");
                               setShowCityDropdown(false);
                             }}
                           >
                             All Cities
                           </div>
-                          {allCities.map((city) => (
-                            <div
-                              key={city}
-                              className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
-                              onClick={() => {
-                                setSelectedCity(city);
-                                setSelectedSubLocation("");
-                                setShowCityDropdown(false);
-                              }}
-                            >
-                              {city}
+                           */}
+                          {/* Priority Cities Section */}
+                          {getFilteredCities().filter(city => 
+                            ["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
+                          ).length > 0 && (
+                            <>
+                              {/* <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
+                                Popular Cities
+                              </div> */}
+                              {getFilteredCities()
+                                .filter(city => 
+                                  ["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
+                                )
+                                .map((city) => (
+                                  <div
+                                    key={city}
+                                    className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                                    onClick={() => {
+                                      setSelectedCity(city);
+                                      setSelectedSubLocation("");
+                                      setCitySearchTerm("");
+                                      setShowCityDropdown(false);
+                                    }}
+                                  >
+                                    {city}
+                                  </div>
+                                ))}
+                            </>
+                          )}
+                          
+                          {/* Other Cities Section */}
+                          {getFilteredCities().filter(city => 
+                            !["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
+                          ).length > 0 && (
+                            <>
+                              {/* <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
+                                All Cities
+                              </div> */}
+                              {getFilteredCities()
+                                .filter(city => 
+                                  !["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
+                                )
+                                .map((city) => (
+                                  <div
+                                    key={city}
+                                    className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                                    onClick={() => {
+                                      setSelectedCity(city);
+                                      setSelectedSubLocation("");
+                                      setCitySearchTerm("");
+                                      setShowCityDropdown(false);
+                                    }}
+                                  >
+                                    {city}
+                                  </div>
+                                ))}
+                            </>
+                          )}
+                          
+                          {/* No results message */}
+                          {getFilteredCities().length === 0 && (
+                            <div className="px-4 py-2 text-sm text-gray-500">
+                              No cities found
                             </div>
-                          ))}
+                          )}
                         </div>
                       )}
                     </div>
@@ -761,27 +965,51 @@ export default function Similarproperties() {
                       </svg>
                       {showSubLocationDropdown && selectedCity && (
                         <div className="search-dropdown absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                          {/* Search Input */}
+                          <div className="sticky top-0 bg-white border-b border-gray-200 p-2">
+                            <input
+                              type="text"
+                              placeholder="Search sub-locations..."
+                              value={subLocationSearchTerm}
+                              onChange={(e) => setSubLocationSearchTerm(e.target.value)}
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          </div>
+                          
+                          {/* All Sub-Locations Option */}
                           <div
-                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black border-b border-gray-100"
                             onClick={() => {
                               setSelectedSubLocation("");
+                              setSubLocationSearchTerm("");
                               setShowSubLocationDropdown(false);
                             }}
                           >
                             All Sub-Locations
                           </div>
-                          {getAvailableSubLocations().map((subLocation) => (
+                          
+                          {/* Filtered Sub-Locations */}
+                          {getFilteredSubLocations().map((subLocation) => (
                             <div
                               key={subLocation}
                               className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
                               onClick={() => {
                                 setSelectedSubLocation(subLocation);
+                                setSubLocationSearchTerm("");
                                 setShowSubLocationDropdown(false);
                               }}
                             >
                               {subLocation}
                             </div>
                           ))}
+                          
+                          {/* No results message */}
+                          {getFilteredSubLocations().length === 0 && (
+                            <div className="px-4 py-2 text-sm text-gray-500">
+                              No sub-locations found
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -977,7 +1205,7 @@ export default function Similarproperties() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
                             <input
                               type="email"
                               required
@@ -988,7 +1216,7 @@ export default function Similarproperties() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number *</label>
                             <input
                               type="tel"
                               required
@@ -999,41 +1227,47 @@ export default function Similarproperties() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Budget Range</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Property Type</label>
                             <select
-                              value={contactFormData.budget}
-                              onChange={(e) => handleContactFormChange("budget", e.target.value)}
+                              value={contactFormData.propertyType}
+                              onChange={(e) => handleContactFormChange("propertyType", e.target.value)}
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             >
-                              <option value="">Select Budget</option>
-                              <option value="Under ₹50 Lakhs">Under ₹50 Lakhs</option>
-                              <option value="₹50 Lakhs - ₹1 Cr">₹50 Lakhs - ₹1 Cr</option>
-                              <option value="₹1 Cr - ₹2 Cr">₹1 Cr - ₹2 Cr</option>
-                              <option value="₹2 Cr - ₹5 Cr">₹2 Cr - ₹5 Cr</option>
-                              <option value="Over ₹5 Cr">Over ₹5 Cr</option>
+                              <option value="">Select Property Type</option>
+                              <option value="Apartment">Apartment</option>
+                              <option value="Villa">Villa</option>
+                              <option value="Independent House">Independent House</option>
+                              <option value="Plot">Plot</option>
+                              <option value="Commercial">Commercial</option>
+                              <option value="Office Space">Office Space</option>
+                              <option value="Shop">Shop</option>
+                              <option value="Warehouse">Warehouse</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Transaction Type</label>
+                            <select
+                              value={contactFormData.transactionType}
+                              onChange={(e) => handleContactFormChange("transactionType", e.target.value)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                              <option value="">Select Transaction Type</option>
+                              <option value="Buy">Buy</option>
+                              <option value="Rent">Rent</option>
+                              <option value="Sell">Sell</option>
+                              <option value="Lease">Lease</option>
                             </select>
                           </div>
                         </div>
                         
                         <div className="mb-4">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Your Specific Requirement</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Inquiry</label>
                           <textarea
-                            value={contactFormData.requirement}
-                            onChange={(e) => handleContactFormChange("requirement", e.target.value)}
-                            rows={3}
+                            value={contactFormData.inquiry}
+                            onChange={(e) => handleContactFormChange("inquiry", e.target.value)}
+                            rows={4}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Tell us more about your specific requirement..."
-                          />
-                        </div>
-                        
-                        <div className="mb-4">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Additional Message</label>
-                          <textarea
-                            value={contactFormData.message}
-                            onChange={(e) => handleContactFormChange("message", e.target.value)}
-                            rows={2}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Any additional details or preferences..."
+                            placeholder="Tell us about your inquiry or specific requirements..."
                           />
                         </div>
                         
@@ -1058,6 +1292,7 @@ export default function Similarproperties() {
                 )}
 
                 {/* Property Cards */}
+                
                 {loading ? (
                   // Loading state - show skeleton cards
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
@@ -1127,6 +1362,39 @@ export default function Similarproperties() {
                     </button>
                   </div>
                 ) : (
+                  <div>
+                     <div className="flex gap-4 mb-4">
+                {bookmarkedProperties.size > 0 && (
+                  <button
+                    className="block bg-black cursor-pointer text-white px-4 py-2 mb-4 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                    onClick={handleCompareClick} 
+                  >
+                    Compare Properties ({bookmarkedProperties.size})
+                  </button>
+                 
+                )}
+                                {bookmarkedProperties.size > 0 && (
+                  <button
+                    className="block bg-black cursor-pointer text-white px-4 py-2 mb-4 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                    onClick={() => {
+                      const selectedPropertyLinks = Array.from(bookmarkedProperties).map(propertyId => {
+                        const property = properties.find(p => p.id === propertyId);
+                        if (property) {
+                          const baseUrl = window.location.origin;
+                          return `${baseUrl}/property-details/${property.title}`;
+                        }
+                        return null;
+                      }).filter(Boolean).join('\n');
+                      
+                      const message = `I want to inquire about these properties:\n\n${selectedPropertyLinks}`;
+                      const whatsappUrl = `https://wa.me/918384848485?text=${encodeURIComponent(message)}`;
+                      window.open(whatsappUrl, '_blank');
+                    }}
+                  >
+                    Inquire this ({bookmarkedProperties.size}) properties
+                  </button>
+                )}
+                </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                     {filteredProperties.map((property, index) => (
                       <div
@@ -1356,6 +1624,7 @@ export default function Similarproperties() {
                         </div>
                       </div>
                     ))}
+                  </div>
                   </div>
                 )}
               </div>

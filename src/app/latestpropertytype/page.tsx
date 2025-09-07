@@ -715,7 +715,7 @@ export default function PropertyCards() {
             className="text-center mb-8 justify-center"
           >
             <h1 className="text-3xl md:text-6xl  text-white font-bold mb-2 leading-tight">
-              Transforming <span className="text-gray-300"> Real Estate </span>Dreams
+              We Only  <span className="text-gray-300"> Deals Into Commercial </span>  Properties
             </h1>
             
             <p className="text-xl md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
@@ -870,6 +870,21 @@ export default function PropertyCards() {
 
 
       </section>
+
+      {/* INQUIRE NOW Button - Fixed on right side */}
+      <div className="fixed right-2 top-1/3 transform -translate-y-1/2 z-40">
+        <button
+          onClick={() => setShowPopup(true)}
+          className="bg-black hover:bg-gray-800 text-white px-6 py-2 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 font-bold text-lg uppercase tracking-wider"
+          style={{
+            writingMode: 'vertical-rl',
+            textOrientation: 'mixed'
+          }}
+        >
+          INQUIRE NOW
+        </button>
+      </div>
+
    <section className="pb-8 sm:pb-10 lg:pb-20 bg-white dark:bg-dark relative overflow-hidden">
         <div className="container mx-auto px-2 sm:px-4">
           <div className="w-full">
@@ -969,15 +984,39 @@ export default function PropertyCards() {
               // No properties found state - show empty state
               <div></div>
             ) : (
-              <div>
+              <div >
+                <div className="flex gap-4 mb-4">
                 {bookmarkedProperties.size > 0 && (
                   <button
-                    className="block bg-black text-white px-4 py-2 mb-4 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                    className="block bg-black cursor-pointer text-white px-4 py-2 mb-4 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
                     onClick={handleCompareClick} 
                   >
                     Compare Properties ({bookmarkedProperties.size})
                   </button>
+                 
                 )}
+                                {bookmarkedProperties.size > 0 && (
+                  <button
+                    className="block bg-black cursor-pointer text-white px-4 py-2 mb-4 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                    onClick={() => {
+                      const selectedPropertyLinks = Array.from(bookmarkedProperties).map(propertyId => {
+                        const property = properties.find(p => p.id === propertyId);
+                        if (property) {
+                          const baseUrl = window.location.origin;
+                          return `${baseUrl}/property-details/${property.title}`;
+                        }
+                        return null;
+                      }).filter(Boolean).join('\n');
+                      
+                      const message = `I want to inquire about these properties:\n\n${selectedPropertyLinks}`;
+                      const whatsappUrl = `https://wa.me/918384848485?text=${encodeURIComponent(message)}`;
+                      window.open(whatsappUrl, '_blank');
+                    }}
+                  >
+                    Inquire this ({bookmarkedProperties.size}) properties
+                  </button>
+                )}
+                </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               
               {filteredProperties.slice(0, 4).map((property, index) => (
@@ -1166,9 +1205,7 @@ export default function PropertyCards() {
                       </div>
                       </Link>
                       <div className="flex space-x-1 relative">
-                        {/* Bookmark button (functional) */}
-                      
-                        {/* Location button */}
+                       
                         <button
                           className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-red-200 hover:scale-110 hover:shadow-md active:scale-95"
                           aria-label="View on Map"
@@ -1248,6 +1285,29 @@ export default function PropertyCards() {
                             className="object-contain transition-all duration-300 hover:scale-110"
                           />
                         </a>
+                        {/* Inquiry button */}
+                        <Link href="/contact">
+                          <button
+                            className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-purple-200 hover:scale-110 hover:shadow-md active:scale-95"
+                            aria-label="Inquire"
+                            title="Inquire about this property"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={1.5}
+                              stroke="currentColor"
+                              className="w-5 h-5 text-purple-600"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
+                              />
+                            </svg>
+                          </button>
+                        </Link>
                       </div>
 
                     </div>

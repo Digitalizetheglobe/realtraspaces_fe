@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiMapPin, FiCalendar, FiStar, FiArrowRight, FiHome, FiCheckCircle } from "react-icons/fi";
+import { FiMapPin, FiCalendar, FiStar, FiArrowRight, FiHome, FiCheckCircle, FiX, FiEye } from "react-icons/fi";
 import Image from "next/image";
 import { getDeveloperImageUrl, getDeveloperImageUrls } from "@/utils/imageUtils";
 interface Developer {
@@ -24,6 +24,8 @@ const DevelopersPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all");
+  const [selectedDeveloper, setSelectedDeveloper] = useState<Developer | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Color scheme
   const colors = {
@@ -93,6 +95,31 @@ const DevelopersPage = () => {
       day: 'numeric'
     });
   };
+
+  // Modal handlers
+  const openModal = (developer: Developer) => {
+    setSelectedDeveloper(developer);
+    setIsModalOpen(true);
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedDeveloper(null);
+    document.body.style.overflow = 'unset'; // Restore scrolling
+  };
+
+  // Close modal on escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isModalOpen) {
+        closeModal();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isModalOpen]);
 
   if (loading) {
     return (
@@ -258,13 +285,14 @@ const DevelopersPage = () => {
               {filteredDevelopers.map((developer, index) => (
                 <div
                   key={developer.id}
-                  className="group relative bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-500 hover:scale-105 hover:shadow-2xl"
+                  className="group relative bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer"
                   style={{
                     animationDelay: `${index * 100}ms`,
                     animation: 'fadeInUp 0.6s ease-out forwards'
                   }}
+                  onClick={() => openModal(developer)}
                 >
-                  {/* Card Front (Initial View) */}
+                  {/* Card Content */}
                   <div className="relative h-80 overflow-hidden">
                     {/* Background Image/Logo */}
                     <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200">
@@ -273,7 +301,7 @@ const DevelopersPage = () => {
                         alt={developer.buildername}
                         width={400}
                         height={320}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                         onError={(e) => {
                           const img = e.currentTarget as HTMLImageElement;
                           img.src = '/assets/signin.jpeg';
@@ -297,126 +325,34 @@ const DevelopersPage = () => {
                       </span>
                     </div>
 
+                    {/* View Details Icon */}
+                    <div className="absolute top-4 left-4">
+                      <div className="bg-white/20 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                        <FiEye className="text-white text-lg" />
+                      </div>
+                    </div>
+
                     {/* Developer Info */}
                     <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                       <h3 className="text-2xl font-bold mb-2 group-hover:text-yellow-300 transition-colors">
                         {developer.buildername}
                       </h3>
-                                             <p className="text-sm text-white/80 line-clamp-2">
-                         {developer.descriptions || 'No description available'}
-                       </p>
-                                             <div className="flex items-center mt-3 text-sm text-white/70">
-                         <FiHome className="mr-1" />
-                         <span>{(developer.project_name || []).length} Projects</span>
-                       </div>
-                    </div>
-
-                    {/* Hover Indicator */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300 flex items-center justify-center">
-                      <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
-                        <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
-                          <FiArrowRight className="text-white text-xl" />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Back (Hover Details) */}
-                  <div className="absolute inset-0 bg-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out p-6 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-xl font-bold" style={{ color: colors.dark }}>
-                          {developer.buildername}
-                        </h3>
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            developer.status
-                              ? "bg-green-100 text-green-800"
-                              : "bg-gray-100 text-gray-800"
-                          }`}
-                        >
-                          {developer.status ? "Active" : "Inactive"}
-                        </span>
-                      </div>
-
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                      <p className="text-sm text-white/80 line-clamp-2 mb-3">
                         {developer.descriptions || 'No description available'}
                       </p>
-
-                      {/* Developer Gallery Images */}
-                      {(developer.images && developer.images.length > 0) && (
-                        <div className="mb-4">
-                          <h4 className="text-sm font-semibold mb-2" style={{ color: colors.primary }}>
-                            Gallery 
-                          </h4>
-                          <div className="flex gap-2 overflow-x-auto pb-2">
-                            {(developer.images || []).slice(0, 3).map((image, idx) => (
-                              <div key={idx} className="flex-shrink-0">
-                                <img
-                                  src={getDeveloperImageUrl(image)}
-                                  alt={`${developer.buildername} gallery ${idx + 1}`}
-                                  className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-                                  onError={(e) => {
-                                    const img = e.currentTarget as HTMLImageElement;
-                                    img.src = '/assets/signin.jpeg';
-                                  }}
-                                />
-                              </div>
-                            ))}
-                            {(developer.images || []).length > 3 && (
-                              <div className="flex-shrink-0 w-16 h-16 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-center">
-                                <span className="text-xs text-gray-500 font-medium">
-                                  +{(developer.images || []).length - 3}
-                                </span>
-                              </div>
-                            )}
-                          </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-sm text-white/70">
+                          <FiHome className="mr-1" />
+                          <span>{(developer.project_name || []).length} Projects</span>
                         </div>
-                      )}
-
-                      {(developer.project_name || []).length > 0 && (
-                        <div className="mb-4">
-                          <h4 className="text-sm font-semibold mb-2" style={{ color: colors.primary }}>
-                            Projects ({(developer.project_name || []).length})
-                          </h4>
-                          <div className="space-y-1">
-                            {(developer.project_name || []).slice(0, 3).map((project, idx) => (
-                              <div key={idx} className="flex items-center text-sm text-gray-600">
-                                <FiCheckCircle className="mr-2 text-green-500 flex-shrink-0" size={14} />
-                                <span className="truncate">{project || 'Unnamed Project'}</span>
-                              </div>
-                            ))}
-                            {(developer.project_name || []).length > 3 && (
-                              <div className="text-xs text-gray-500 mt-1">
-                                +{(developer.project_name || []).length - 3} more projects
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="flex items-center justify-between text-xs text-gray-500">
-                        <div className="flex items-center">
-                          <FiCalendar className="mr-1" />
-                          <span>Created: {formatDate(developer.created_at)}</span>
-                        </div>
-                        <div className="flex items-center">
-                          <FiStar className="mr-1" />
-                          <span>Updated: {formatDate(developer.updated_at)}</span>
+                        <div className="text-sm text-white/70">
+                          Click to view details
                         </div>
                       </div>
                     </div>
 
-                    {/* <div className="mt-4 pt-4 border-t border-gray-100">
-                      <button
-                        className="w-full py-3 px-4 rounded-lg text-white font-medium transition-all duration-300 transform hover:scale-105"
-                        style={{
-                          background: `linear-gradient(135deg, ${colors.gradientStart} 0%, ${colors.gradientEnd} 100%)`
-                        }}
-                      >
-                        View Details
-                      </button>
-                    </div> */}
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300"></div>
                   </div>
                 </div>
               ))}
@@ -424,6 +360,147 @@ const DevelopersPage = () => {
           )}
         </div>
       </div>
+
+      {/* Developer Details Modal */}
+      {isModalOpen && selectedDeveloper && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+          {/* Backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fadeIn"
+            onClick={closeModal}
+          ></div>
+          
+          {/* Modal Content */}
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scaleIn">
+            {/* Modal Header */}
+            <div className="relative h-64">
+              <Image
+                src={selectedDeveloper.builder_logo ? getDeveloperImageUrl(selectedDeveloper.builder_logo) : '/assets/signin.jpeg'}
+                alt={selectedDeveloper.buildername}
+                width={800}
+                height={256}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const img = e.currentTarget as HTMLImageElement;
+                  img.src = '/assets/signin.jpeg';
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+              
+              {/* Close Button */}
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-all"
+              >
+                <FiX size={24} />
+              </button>
+
+              {/* Status Badge */}
+              <div className="absolute top-4 left-4">
+                <span
+                  className={`px-4 py-2 rounded-full text-sm font-semibold ${
+                    selectedDeveloper.status
+                      ? "bg-green-500 text-white"
+                      : "bg-gray-500 text-white"
+                  }`}
+                >
+                  {selectedDeveloper.status ? "Active" : "Inactive"}
+                </span>
+              </div>
+
+              {/* Developer Name */}
+              <div className="absolute bottom-6 left-6 right-6">
+                <h2 className="text-3xl font-bold text-white mb-2">
+                  {selectedDeveloper.buildername}
+                </h2>
+                <div className="flex items-center text-white/80">
+                  <FiHome className="mr-2" />
+                  <span>{(selectedDeveloper.project_name || []).length} Projects</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-16rem)]">
+              {/* Description */}
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold mb-3" style={{ color: colors.primary }}>
+                  About the Developer
+                </h3>
+                <p className="text-gray-700 leading-relaxed">
+                  {selectedDeveloper.descriptions || 'No description available for this developer.'}
+                </p>
+              </div>
+
+              {/* Gallery Images */}
+              {(selectedDeveloper.images && selectedDeveloper.images.length > 0) && (
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold mb-4" style={{ color: colors.primary }}>
+                    Gallery ({selectedDeveloper.images.length} images)
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {selectedDeveloper.images.map((image, idx) => (
+                      <div key={idx} className="bg-white rounded-xl border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+                        <div className="aspect-square overflow-hidden">
+                          <img
+                            src={getDeveloperImageUrl(image)}
+                            alt={`${selectedDeveloper.buildername} gallery ${idx + 1}`}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            onError={(e) => {
+                              const img = e.currentTarget as HTMLImageElement;
+                              img.src = '/assets/signin.jpeg';
+                            }}
+                          />
+                        </div>
+                        <div className="p-3 bg-gradient-to-r from-gray-50 to-gray-100">
+                          <p className="text-xs text-gray-600 text-center font-medium">
+                            Image {idx + 1}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Projects */}
+              {(selectedDeveloper.project_name && selectedDeveloper.project_name.length > 0) && (
+                <div className="mb-6">
+                  <h3 className="text-xl font-semibold mb-4" style={{ color: colors.primary }}>
+                    Projects ({selectedDeveloper.project_name.length})
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {selectedDeveloper.project_name.map((project, idx) => (
+                      <div key={idx} className="flex items-center p-3 bg-gray-50 rounded-lg">
+                        <FiCheckCircle className="mr-3 text-green-500 flex-shrink-0" size={16} />
+                        <span className="text-gray-700 font-medium">{project || 'Unnamed Project'}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Timeline Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center">
+                  <FiCalendar className="mr-2 text-gray-500" />
+                  <div>
+                    <p className="text-sm text-gray-500">Created</p>
+                    <p className="font-medium text-gray-700">{formatDate(selectedDeveloper.created_at)}</p>
+                  </div>
+                </div>
+                <div className="flex items-center">
+                  <FiStar className="mr-2 text-gray-500" />
+                  <div>
+                    <p className="text-sm text-gray-500">Last Updated</p>
+                    <p className="font-medium text-gray-700">{formatDate(selectedDeveloper.updated_at)}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* CSS Animations */}
       <style jsx>{`
@@ -436,6 +513,34 @@ const DevelopersPage = () => {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        .animate-scaleIn {
+          animation: scaleIn 0.3s ease-out forwards;
         }
         
         .line-clamp-2 {
