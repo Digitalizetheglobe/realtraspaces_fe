@@ -16,7 +16,7 @@ export default function LayoutWithConditionalHeader({
 }) {
   const pathname = usePathname();
 
-  const hideHeaderOn = ["/dashboard","/career-management" ,"/blog","/seometaManager","/manage-testimonials","/dashboardteam","/dashboarddeveloper", "/dashboardlistproperty", "/dashboardcookies","/dashboardallwebusers", "/blog/create"];
+  const hideHeaderOn = ["/dashboard","/career-management" ,"/blog","/seometaManager","/manage-testimonials","/dashboardteam","/dashboarddeveloper", "/dashboardlistproperty", "/dashboardcookies","/dashboardallwebusers", "/awardmanagement"];
   const shouldHideHeader = hideHeaderOn.includes(pathname);
 
   return (

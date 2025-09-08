@@ -184,7 +184,7 @@ const CompareProperties = () => {
       <section className="relative h-[60vh] w-full">
         <Image
           src={contactimg}
-          alt="Modern Home Interior"
+          alt="Modern Interior"
           fill
           priority
           className="object-cover"

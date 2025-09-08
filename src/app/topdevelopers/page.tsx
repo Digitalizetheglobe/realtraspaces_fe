@@ -137,7 +137,7 @@ const TopDevelopers = () => {
             logo: devloperimg3,
             buildername: "Developer Name 3",
             builder_logo: null,
-            descriptions: "Luxury residential and commercial developer",
+            descriptions: "commercial developer",
             project_name: ["Project X", "Project Y"],
             images: [],
             status: true,

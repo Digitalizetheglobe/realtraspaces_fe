@@ -758,7 +758,7 @@ const handleCompareClick = async () => {
             <div className="absolute inset-0">
               <Image
                 src={contactimg}
-                alt="Modern Home Interior"
+                alt="Modern Interior"
                 fill
                 priority
                 className="object-cover"
@@ -1236,12 +1236,12 @@ const handleCompareClick = async () => {
                               <option value="">Select Property Type</option>
                               <option value="Apartment">Apartment</option>
                               <option value="Villa">Villa</option>
-                              <option value="Independent House">Independent House</option>
+                           
                               <option value="Plot">Plot</option>
                               <option value="Commercial">Commercial</option>
                               <option value="Office Space">Office Space</option>
                               <option value="Shop">Shop</option>
-                              <option value="Warehouse">Warehouse</option>
+                              {/* <option value="Warehouse">Warehouse</option> */}
                             </select>
                           </div>
                           <div>

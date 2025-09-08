@@ -343,7 +343,7 @@ const SEOMetaManager = () => {
                         placeholder="Comma separated keywords"
                       />
                       <p className="mt-1 text-xs" style={{ color: colors.secondary }}>
-                        Example: real estate, property, home
+                        Example: real estate, property
                       </p>
                     </div>
                     

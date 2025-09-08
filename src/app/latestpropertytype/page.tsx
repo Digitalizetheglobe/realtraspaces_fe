@@ -719,7 +719,7 @@ export default function PropertyCards() {
             </h1>
             
             <p className="text-xl md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Realtra Spaces is a forward-thinking real estate company specializing in luxury residential and commercial properties. We combine innovation with expertise to deliver exceptional real estate experiences.
+              Realtra Spaces is a forward-thinking real estate company specializing in commercial properties. We combine innovation with expertise to deliver exceptional real estate experiences.
             </p>
           </motion.div>
         )}

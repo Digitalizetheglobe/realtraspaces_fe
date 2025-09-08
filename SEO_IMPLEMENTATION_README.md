@@ -23,7 +23,7 @@ The API returns data in this format:
     "page": "home",
     "metaTitle": "",
     "metaDescription": "Description for home page",
-    "metaKeywords": "real estate, property, home",
+    "metaKeywords": "real estate, property",
     "canonicalUrl": "https://example.com",
     "createdAt": "2025-07-29T09:32:34.000Z",
     "updatedAt": "2025-07-29T09:32:34.000Z"

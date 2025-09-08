@@ -415,7 +415,7 @@ export default function RealtraSpacesAbout() {
             </h1>
             
             <p className="text-xl md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Realtra Spaces is a forward-thinking real estate company specializing in luxury residential and commercial properties. We combine innovation with expertise to deliver exceptional real estate experiences.
+              Realtra Spaces is a forward-thinking real estate company specializing in commercial properties. We combine innovation with expertise to deliver exceptional real estate experiences.
             </p>
             
             {/* <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -503,7 +503,7 @@ export default function RealtraSpacesAbout() {
                 Who We Are 
               </h2> 
               <p className="text-lg text-gray-600 leading-relaxed">
-                Realtra Spaces is a premier real estate company dedicated to providing exceptional service in residential and commercial properties. We specialize in luxury homes, modern apartments, commercial spaces, and investment opportunities across multiple cities.
+                Realtra Spaces is a premier real estate company dedicated to providing exceptional service in commercial properties. We specialize in commercial spaces, and investment opportunities across multiple cities.
               </p>
             </motion.div>
           </div>
