@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-
+import Link from 'next/link';
 interface Contact {
   id: number;
   name: string;
@@ -36,10 +36,11 @@ interface ApiResponse<T> {
 }
 
 const DashboardContactLeads: React.FC = () => {
-  const { isAuthenticated, adminData, isLoading } = useAuth();
+  const { isAuthenticated, adminData, isLoading, logout } = useAuth();
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [stats, setStats] = useState<ContactStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedContacts, setSelectedContacts] = useState<Set<number>>(new Set());
   const [filters, setFilters] = useState({
     search: '',
@@ -58,6 +59,21 @@ const DashboardContactLeads: React.FC = () => {
   const API_BASE = 'https://api.realtraspaces.com/api/contacts';
 
   // Fetch contact statistics
+  const modules = [
+    { name: "Dashboard", icon: "📊", href: "/dashboard" },
+    { name: "Career Management", icon: "💼", href: "/career-management" },
+    { name: "Blog", icon: "📝", href: "/blog" },
+    { name: "Manage Testimonials", icon: "⭐", href: "/manage-testimonials" },
+    {name :'All properties', icon:"🏠", href: '/PropertyListing'},
+    {name :'SEO Meta Manager',icon:"🌐", href: '/seometaManager'},
+    {name :'Team Management',icon:"👥", href: '/dashboardteam'},
+    {name :'Developer Management',icon:"🛠️", href: '/dashboarddeveloper'},
+    {name :'List Properties',icon:"💼", href: '/dashboardlistproperty'},
+    {name :'Cookie Policy',icon:"📝", href: '/dashboardcookies'},
+    {name :'Contact Leads',icon:"📝", href: '/dashboardcontactleads'},
+    {name :'Awards Management',icon:"🏆", href: '/awardmanagement'},
+
+  ];
   const fetchStats = async () => {
     try {
       const url = `${API_BASE}/stats`;
@@ -298,8 +314,60 @@ const DashboardContactLeads: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gray-50 flex">
+      {/* Sidebar */}
+      <div
+        className={`${
+          isSidebarOpen ? "w-64" : "w-20"
+        } bg-gray-200 shadow-lg transition-all duration-300 ease-in-out flex flex-col fixed h-screen`}
+      >
+        <div className="p-4 flex items-center gap-x-2">
+          {/* Toggle Button */}
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="text-gray-800 font-bold text-xl"
+          >
+            {isSidebarOpen ? "←" : "→"}
+          </button>
+
+          {/* Logo / Title */}
+          {isSidebarOpen && (
+            <h1 className="text-xl font-bold text-black whitespace-nowrap">
+              Realtraspace
+            </h1>
+          )}
+        </div>
+
+        {/* Navigation */}
+        <nav className="mt-4 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
+          {modules.map((module) => (
+            <Link
+              key={module.name}
+              href={module.href}
+              className="flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100"
+            >
+              <span className="text-xl">{module.icon}</span>
+              {isSidebarOpen && <span className="ml-3">{module.name}</span>}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Logout Button */}
+        <div className="p-4">
+          <button
+            onClick={logout}
+            className="flex items-center px-4 py-3 text-red-600 hover:bg-red-50 w-full rounded-lg transition-colors"
+          >
+            <span className="text-xl">🚪</span>
+            {isSidebarOpen && <span className="ml-3">Logout</span>}
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-20'} overflow-y-auto h-screen scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200`}>
+        <div className="p-6 min-h-full">
+          <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Contact Leads Management</h1>
@@ -560,17 +628,7 @@ const DashboardContactLeads: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
-                          <button
-                            onClick={() => {
-                              const notes = prompt('Add admin notes (optional):', contact.admin_notes || '');
-                              if (notes !== null) {
-                                updateContactStatus(contact.id, contact.status, notes);
-                              }
-                            }}
-                            className="text-blue-600 hover:text-blue-900"
-                          >
-                            Notes
-                          </button>
+                          
                           <button
                             onClick={() => deleteContact(contact.id)}
                             className="text-red-600 hover:text-red-900"
@@ -623,6 +681,8 @@ const DashboardContactLeads: React.FC = () => {
               </div>
             </div>
           )}
+        </div>
+          </div>
         </div>
       </div>
     </div>

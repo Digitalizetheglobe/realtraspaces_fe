@@ -75,6 +75,8 @@ const DashboardPage = () => {
     {name :'List Properties',icon:"💼", href: '/dashboardlistproperty'},
     {name :'Cookie Policy',icon:"📝", href: '/dashboardcookies'},
     {name :'Awards Management',icon:"🏆", href: '/awardmanagement'},
+    {name :'Contact Leads',icon:"📝", href: '/dashboardcontactleads'},
+    
     
   ];
 
@@ -107,7 +109,7 @@ const DashboardPage = () => {
         <div
           className={`${
             isSidebarOpen ? "w-64" : "w-20"
-          } bg-gray-200 shadow-lg transition-all duration-300 ease-in-out overflow-hidden flex flex-col`}
+          } bg-gray-200 shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
         >
           <div className="p-4 flex items-center gap-x-2">
             {/* Toggle Button */}
@@ -127,7 +129,7 @@ const DashboardPage = () => {
           </div>
 
           {/* Navigation */}
-          <nav className="mt-4 flex-1">
+          <nav className="mt-4 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
             {modules.map((module) => (
               <Link
                 key={module.name}

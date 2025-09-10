@@ -59,6 +59,8 @@ const TopDevelopers = () => {
   const [loading, setLoading] = useState(true);
   const [selectedDeveloper, setSelectedDeveloper] = useState<Developer | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   // Color scheme for modal
   const colors = {
@@ -188,6 +190,33 @@ const TopDevelopers = () => {
     document.body.style.overflow = 'unset'; // Restore scrolling
   };
 
+  // Lightbox handlers
+  const openLightbox = (imageUrl: string, index: number) => {
+    setLightboxImage(imageUrl);
+    setLightboxIndex(index);
+  };
+
+  const closeLightbox = () => {
+    setLightboxImage(null);
+    setLightboxIndex(0);
+  };
+
+  const nextLightboxImage = () => {
+    if (selectedDeveloper?.images) {
+      const nextIndex = (lightboxIndex + 1) % selectedDeveloper.images.length;
+      setLightboxIndex(nextIndex);
+      setLightboxImage(getDeveloperImageUrl(selectedDeveloper.images[nextIndex]));
+    }
+  };
+
+  const prevLightboxImage = () => {
+    if (selectedDeveloper?.images) {
+      const prevIndex = lightboxIndex === 0 ? selectedDeveloper.images.length - 1 : lightboxIndex - 1;
+      setLightboxIndex(prevIndex);
+      setLightboxImage(getDeveloperImageUrl(selectedDeveloper.images[prevIndex]));
+    }
+  };
+
   // Close modal on escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -199,6 +228,24 @@ const TopDevelopers = () => {
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isModalOpen]);
+
+  // Lightbox keyboard navigation
+  useEffect(() => {
+    const handleLightboxKey = (e: KeyboardEvent) => {
+      if (lightboxImage) {
+        if (e.key === 'Escape') {
+          closeLightbox();
+        } else if (e.key === 'ArrowLeft') {
+          prevLightboxImage();
+        } else if (e.key === 'ArrowRight') {
+          nextLightboxImage();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleLightboxKey);
+    return () => document.removeEventListener('keydown', handleLightboxKey);
+  }, [lightboxImage, lightboxIndex, selectedDeveloper]);
 
   if (loading) {
     return (
@@ -264,7 +311,7 @@ const TopDevelopers = () => {
                   }}
                   onClick={() => openModal(developer)}
                 >
-                  <div className="w-full h-42 shadow-2xl border border-gray-200 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:bg-gray-200 group-hover:shadow-lg overflow-hidden">
+                  <div className="w-full h-42 shadow-2xl border border-gray-200 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:bg-gray-200 group-hover:shadow-lg overflow-hidden bg-gray-100">
                     <Image
                       src={
                         developer.builder_logo && typeof developer.builder_logo === 'string' 
@@ -274,7 +321,7 @@ const TopDevelopers = () => {
                       alt={developer.buildername}
                       width={200}
                       height={128}
-                      className="w-full h-full object-cover  rounded-lg transform transition-all duration-500 group-hover:scale-110 group-hover:brightness-75"
+                      className="w-full h-full object-contain rounded-lg transform transition-all duration-500 group-hover:scale-110 group-hover:brightness-75"
                       onError={(e) => {
                         const img = e.currentTarget as HTMLImageElement;
                         img.src = '/assets/signin.jpeg';
@@ -315,7 +362,7 @@ const TopDevelopers = () => {
           {/* Modal Content */}
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scaleIn">
             {/* Modal Header */}
-            <div className="relative h-64">
+            <div className="relative h-64 bg-gray-100 flex items-center justify-center">
               <Image
                 src={
                   selectedDeveloper.builder_logo && typeof selectedDeveloper.builder_logo === 'string' 
@@ -325,7 +372,7 @@ const TopDevelopers = () => {
                 alt={selectedDeveloper.buildername}
                 width={800}
                 height={256}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
                 onError={(e) => {
                   const img = e.currentTarget as HTMLImageElement;
                   img.src = '/assets/signin.jpeg';
@@ -384,27 +431,43 @@ const TopDevelopers = () => {
                   <h3 className="text-xl font-semibold mb-4" style={{ color: colors.primary }}>
                     Gallery ({selectedDeveloper.images.length} images)
                   </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {selectedDeveloper.images.map((image, idx) => (
-                      <div key={idx} className="bg-white rounded-xl border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
-                        <div className="aspect-square overflow-hidden">
-                          <img
+                      <div 
+                        key={idx} 
+                        className="bg-white rounded-xl border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer"
+                        onClick={() => openLightbox(
+                          typeof image === 'string' ? getDeveloperImageUrl(image) : '/assets/signin.jpeg',
+                          idx
+                        )}
+                      >
+                        <div className="aspect-[4/3] overflow-hidden relative bg-gray-100 flex items-center justify-center">
+                          <Image
                             src={
                               typeof image === 'string' 
                                 ? getDeveloperImageUrl(image) 
                                 : '/assets/signin.jpeg'
                             }
                             alt={`${selectedDeveloper.buildername} gallery ${idx + 1}`}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            fill
+                            className="object-contain group-hover:scale-110 transition-transform duration-300"
                             onError={(e) => {
                               const img = e.currentTarget as HTMLImageElement;
                               img.src = '/assets/signin.jpeg';
                             }}
+                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                           />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <div className="bg-white bg-opacity-90 rounded-full p-2">
+                                <FiEye className="w-6 h-6 text-gray-700" />
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="p-3 bg-gradient-to-r from-gray-50 to-gray-100">
-                          <p className="text-xs text-gray-600 text-center font-medium">
-                            Image {idx + 1}
+                        <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100">
+                          <p className="text-sm text-gray-700 text-center font-medium">
+                            Gallery Image {idx + 1}
                           </p>
                         </div>
                       </div>
@@ -519,6 +582,65 @@ const TopDevelopers = () => {
       `}</style>
 
       <FeaturedProperties />
+
+      {/* Lightbox Modal */}
+      {lightboxImage && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-90 backdrop-blur-sm">
+          <div className="relative max-w-7xl max-h-[90vh] w-full h-full flex items-center justify-center p-4">
+            {/* Close Button */}
+            <button
+              onClick={closeLightbox}
+              className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-all z-10"
+            >
+              <FiX size={24} />
+            </button>
+
+            {/* Navigation Buttons */}
+            {selectedDeveloper?.images && selectedDeveloper.images.length > 1 && (
+              <>
+                <button
+                  onClick={prevLightboxImage}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-all z-10"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={nextLightboxImage}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/20 backdrop-blur-sm rounded-full text-white hover:bg-white/30 transition-all z-10"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </>
+            )}
+
+            {/* Image */}
+            <div className="relative max-w-full max-h-full flex items-center justify-center">
+              <Image
+                src={lightboxImage}
+                alt={`Gallery image ${lightboxIndex + 1}`}
+                width={1200}
+                height={800}
+                className="max-w-full max-h-full object-contain rounded-lg"
+                onError={(e) => {
+                  const img = e.currentTarget as HTMLImageElement;
+                  img.src = '/assets/signin.jpeg';
+                }}
+              />
+            </div>
+
+            {/* Image Counter */}
+            {selectedDeveloper?.images && selectedDeveloper.images.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm">
+                {lightboxIndex + 1} / {selectedDeveloper.images.length}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 };

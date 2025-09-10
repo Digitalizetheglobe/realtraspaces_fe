@@ -1373,14 +1373,12 @@ const handleCompareClick = async () => {
                               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             >
                               <option value="">Select Property Type</option>
-                              <option value="Apartment">Apartment</option>
-                              <option value="Villa">Villa</option>
-                           
-                              <option value="Plot">Plot</option>
                               <option value="Commercial">Commercial</option>
                               <option value="Office Space">Office Space</option>
                               <option value="Shop">Shop</option>
-                              {/* <option value="Warehouse">Warehouse</option> */}
+                              <option value="Warehouse">Warehouse</option>
+                              <option value="Industrial">Industrial</option>
+                              <option value="Retail">Retail</option>
                             </select>
                           </div>
                           <div>

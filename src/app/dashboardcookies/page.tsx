@@ -153,7 +153,7 @@ const DashboardCookies = () => {
       <div
         className={`${
           isSidebarOpen ? "w-64" : "w-20"
-        } bg-gray-200 shadow-lg transition-all duration-300 ease-in-out overflow-hidden flex flex-col`}
+        } bg-gray-200 shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
       >
         <div className="p-4 flex items-center gap-x-2">
           {/* Toggle Button */}
@@ -173,7 +173,7 @@ const DashboardCookies = () => {
         </div>
 
         {/* Navigation */}
-        <nav className="mt-4 flex-1">
+        <nav className="mt-4 flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200">
           {modules.map((module) => (
             <Link
               key={module.name}
