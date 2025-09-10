@@ -167,10 +167,18 @@ export default function Similarproperties() {
   const [allPropertyTypes, setAllPropertyTypes] = useState<string[]>([]);
 
   // Add these new states for the multi-component search
-  const [selectedCity, setSelectedCity] = useState<string>("");
-  const [selectedSubLocation, setSelectedSubLocation] = useState<string>("");
-  const [selectedPropertyType, setSelectedPropertyType] = useState<string>("");
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [selectedSubLocations, setSelectedSubLocations] = useState<string[]>([]);
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
+
+  // Debug effect to monitor selectedPropertyTypes changes
+  useEffect(() => {
+    console.log('selectedPropertyTypes changed:', selectedPropertyTypes);
+    console.log('selectedPropertyTypes length:', selectedPropertyTypes.length);
+  }, [selectedPropertyTypes]);
   const [selectedCarpetArea, setSelectedCarpetArea] = useState<string>("");
+  const [minCarpetArea, setMinCarpetArea] = useState<string>("");
+  const [maxCarpetArea, setMaxCarpetArea] = useState<string>("");
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [showSubLocationDropdown, setShowSubLocationDropdown] = useState(false);
   const [showPropertyTypeDropdown, setShowPropertyTypeDropdown] = useState(false);
@@ -201,10 +209,18 @@ export default function Similarproperties() {
     "Over 5000 sqft"
   ];
 
-  // Get available sub-locations for selected city
+  // Get available sub-locations for selected cities
   const getAvailableSubLocations = () => {
-    if (!selectedCity) return [];
-    return Array.from(allSublocalities[selectedCity] || []);
+    if (selectedCities.length === 0) return [];
+    
+    // Get all sub-locations from all selected cities
+    const allSubLocations = new Set<string>();
+    selectedCities.forEach(city => {
+      const citySubLocations = allSublocalities[city] || [];
+      citySubLocations.forEach(subLoc => allSubLocations.add(subLoc));
+    });
+    
+    return Array.from(allSubLocations);
   };
 
   // Get filtered and organized cities
@@ -237,9 +253,9 @@ export default function Similarproperties() {
 
   // Get filtered sub-locations
   const getFilteredSubLocations = () => {
-    if (!selectedCity) return [];
+    if (selectedCities.length === 0) return [];
     
-    let filteredSubLocations = Array.from(allSublocalities[selectedCity] || []);
+    let filteredSubLocations = getAvailableSubLocations();
     
     // Filter by search term if provided
     if (subLocationSearchTerm.trim()) {
@@ -263,7 +279,8 @@ export default function Similarproperties() {
         types.add(p.propertyType.childType.displayName);
       }
     });
-    return Array.from(types);
+    const result = Array.from(types).sort(); // Sort to ensure consistent order
+    return result;
   };
 
   const conditions = ["Furnished", "Semi-Furnished", "Unfurnished"];
@@ -274,10 +291,10 @@ export default function Similarproperties() {
     const searchSubLocation = sessionStorage.getItem('searchSubLocation');
     
     if (searchCity) {
-      setSelectedCity(searchCity);
+      setSelectedCities([searchCity]);
     }
     if (searchSubLocation) {
-      setSelectedSubLocation(searchSubLocation);
+      setSelectedSubLocations([searchSubLocation]);
     }
     
     // Clear sessionStorage after reading the values
@@ -495,53 +512,72 @@ const handleCompareClick = async () => {
       });
     }
 
-    // Filter by city
-    if (selectedCity) {
+    // Filter by cities
+    if (selectedCities.length > 0) {
       results = results.filter((property) => {
-        return property.address?.city === selectedCity;
+        return selectedCities.includes(property.address?.city || "");
       });
     }
 
-    // Filter by sub-location
-    if (selectedSubLocation) {
+    // Filter by sub-locations
+    if (selectedSubLocations.length > 0) {
       results = results.filter((property) => {
-        return property.address?.subLocality === selectedSubLocation;
+        return selectedSubLocations.includes(property.address?.subLocality || "");
       });
     }
 
     // Filter by property type
-    if (selectedPropertyType) {
+    if (selectedPropertyTypes.length > 0) {
       results = results.filter((property) => {
-        return (
-          property.propertyType?.displayName === selectedPropertyType ||
-          property.propertyType?.childType?.displayName === selectedPropertyType
+        return selectedPropertyTypes.some(propertyType => 
+          property.propertyType?.displayName === propertyType ||
+          property.propertyType?.childType?.displayName === propertyType
         );
       });
     }
 
     // Filter by carpet area
-    if (selectedCarpetArea) {
+    if (selectedCarpetArea || minCarpetArea || maxCarpetArea) {
       results = results.filter((property) => {
         const carpetArea = Number(property.dimension?.carpetArea) || 0;
         
-        switch (selectedCarpetArea) {
-          case "Under 500 sqft":
-            return carpetArea < 500;
-          case "500 - 1000 sqft":
-            return carpetArea >= 500 && carpetArea < 1000;
-          case "1000 - 1500 sqft":
-            return carpetArea >= 1000 && carpetArea < 1500;
-          case "1500 - 2000 sqft":
-            return carpetArea >= 1500 && carpetArea < 2000;
-          case "2000 - 3000 sqft":
-            return carpetArea >= 2000 && carpetArea < 3000;
-          case "3000 - 5000 sqft":
-            return carpetArea >= 3000 && carpetArea < 5000;
-          case "Over 5000 sqft":
-            return carpetArea >= 5000;
-          default:
-            return true;
+        // Handle predefined ranges
+        if (selectedCarpetArea) {
+          switch (selectedCarpetArea) {
+            case "Under 500 sqft":
+              return carpetArea < 500;
+            case "500 - 1000 sqft":
+              return carpetArea >= 500 && carpetArea < 1000;
+            case "1000 - 1500 sqft":
+              return carpetArea >= 1000 && carpetArea < 1500;
+            case "1500 - 2000 sqft":
+              return carpetArea >= 1500 && carpetArea < 2000;
+            case "2000 - 3000 sqft":
+              return carpetArea >= 2000 && carpetArea < 3000;
+            case "3000 - 5000 sqft":
+              return carpetArea >= 3000 && carpetArea < 5000;
+            case "Over 5000 sqft":
+              return carpetArea >= 5000;
+            default:
+              return true;
+          }
         }
+        
+        // Handle custom min/max range
+        if (minCarpetArea || maxCarpetArea) {
+          const minArea = minCarpetArea ? Number(minCarpetArea) : 0;
+          const maxArea = maxCarpetArea ? Number(maxCarpetArea) : Infinity;
+          
+          if (minCarpetArea && maxCarpetArea) {
+            return carpetArea >= minArea && carpetArea <= maxArea;
+          } else if (minCarpetArea) {
+            return carpetArea >= minArea;
+          } else if (maxCarpetArea) {
+            return carpetArea <= maxArea;
+          }
+        }
+        
+        return true;
       });
     }
 
@@ -623,19 +659,19 @@ const handleCompareClick = async () => {
     setFilteredProperties(results);
     
     // Show contact form if no properties found and user has selected specific filters
-    if (results.length === 0 && (selectedCity || selectedSubLocation || selectedPropertyType || selectedCarpetArea || searchTerm)) {
+    if (results.length === 0 && (selectedCities.length > 0 || selectedSubLocations.length > 0 || selectedPropertyTypes.length > 0 || selectedCarpetArea || minCarpetArea || maxCarpetArea || searchTerm)) {
       setShowContactForm(true);
       // Pre-fill the form with selected filters
       setContactFormData(prev => ({
         ...prev,
-        location: selectedCity || "",
-        propertyType: selectedPropertyType || "",
-        requirement: `${selectedCity ? `City: ${selectedCity}` : ""}${selectedSubLocation ? `, Sub-location: ${selectedSubLocation}` : ""}${selectedPropertyType ? `, Property Type: ${selectedPropertyType}` : ""}${selectedCarpetArea ? `, Area: ${selectedCarpetArea}` : ""}${searchTerm ? `, Search: ${searchTerm}` : ""}`.trim()
+        location: selectedCities.join(", ") || "",
+        propertyType: selectedPropertyTypes.join(", ") || "",
+        requirement: `${selectedCities.length > 0 ? `Cities: ${selectedCities.join(", ")}` : ""}${selectedSubLocations.length > 0 ? `, Sub-locations: ${selectedSubLocations.join(", ")}` : ""}${selectedPropertyTypes.length > 0 ? `, Property Types: ${selectedPropertyTypes.join(", ")}` : ""}${selectedCarpetArea ? `, Area: ${selectedCarpetArea}` : ""}${(minCarpetArea || maxCarpetArea) && !selectedCarpetArea ? `, Area: ${minCarpetArea || '0'} - ${maxCarpetArea || '∞'} sqft` : ""}${searchTerm ? `, Search: ${searchTerm}` : ""}`.trim()
       }));
     } else {
       setShowContactForm(false);
     }
-  }, [searchTerm, filters, properties, selectedLocations, selectedCity, selectedSubLocation, selectedPropertyType, selectedCarpetArea]);
+  }, [searchTerm, filters, properties, selectedLocations, selectedCities, selectedSubLocations, selectedPropertyTypes, selectedCarpetArea, minCarpetArea, maxCarpetArea]);
 
   // Helper function to get attribute value by ID
   const getAttributeValue = (property: Property, attributeId: string) => {
@@ -673,10 +709,12 @@ const handleCompareClick = async () => {
   const resetFilters = () => {
     setSearchTerm("");
     setSelectedLocations([]);
-    setSelectedCity("");
-    setSelectedSubLocation("");
-    setSelectedPropertyType("");
+    setSelectedCities([]);
+    setSelectedSubLocations([]);
+    setSelectedPropertyTypes([]);
     setSelectedCarpetArea("");
+    setMinCarpetArea("");
+    setMaxCarpetArea("");
     setShowCityDropdown(false);
     setShowSubLocationDropdown(false);
     setShowPropertyTypeDropdown(false);
@@ -737,17 +775,7 @@ const handleCompareClick = async () => {
     }
   };
 
-  // if (loading) {
-  //   return (
-  //     <div className={raleway.className}>
-  //       <section className="pb-10 lg:pb-20 bg-gray-100 dark:bg-dark relative overflow-hidden">
-  //         <div className="container mx-auto px-4">
-  //           <p>Loading properties...</p>
-  //         </div>
-  //       </section>
-  //     </div>
-  //   );
-  // }
+
 
   return (
     <>
@@ -833,7 +861,7 @@ const handleCompareClick = async () => {
                           setShowCarpetAreaDropdown(false);
                         }}
                       >
-                        {selectedCity || "Select City"}
+                        {selectedCities.length > 0 ? `${selectedCities.length} cities selected` : "Select Cities"}
                       </button>
                       <svg
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-black"
@@ -858,19 +886,19 @@ const handleCompareClick = async () => {
                             />
                           </div>
                           
-                          {/* All Cities Option */}
-                          {/* <div
-                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black border-b border-gray-100"
-                            onClick={() => {
-                              setSelectedCity("");
-                              setSelectedSubLocation("");
-                              setCitySearchTerm("");
-                              setShowCityDropdown(false);
-                            }}
-                          >
-                            All Cities
-                          </div>
-                           */}
+                          {/* Clear All Option */}
+                          {selectedCities.length > 0 && (
+                            <div
+                              className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-red-600 border-b border-gray-100 font-medium"
+                              onClick={() => {
+                                setSelectedCities([]);
+                                setSelectedSubLocations([]);
+                                setCitySearchTerm("");
+                              }}
+                            >
+                              Clear All Cities
+                            </div>
+                          )}
                           {/* Priority Cities Section */}
                           {getFilteredCities().filter(city => 
                             ["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
@@ -886,14 +914,23 @@ const handleCompareClick = async () => {
                                 .map((city) => (
                                   <div
                                     key={city}
-                                    className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                                    className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black flex items-center"
                                     onClick={() => {
-                                      setSelectedCity(city);
-                                      setSelectedSubLocation("");
-                                      setCitySearchTerm("");
-                                      setShowCityDropdown(false);
+                                      const isSelected = selectedCities.includes(city);
+                                      if (isSelected) {
+                                        setSelectedCities(selectedCities.filter(c => c !== city));
+                                      } else {
+                                        setSelectedCities([...selectedCities, city]);
+                                      }
+                                      setSelectedSubLocations([]);
                                     }}
                                   >
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedCities.includes(city)}
+                                      onChange={() => {}} // Handled by parent div onClick
+                                      className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                    />
                                     {city}
                                   </div>
                                 ))}
@@ -915,14 +952,23 @@ const handleCompareClick = async () => {
                                 .map((city) => (
                                   <div
                                     key={city}
-                                    className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                                    className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black flex items-center"
                                     onClick={() => {
-                                      setSelectedCity(city);
-                                      setSelectedSubLocation("");
-                                      setCitySearchTerm("");
-                                      setShowCityDropdown(false);
+                                      const isSelected = selectedCities.includes(city);
+                                      if (isSelected) {
+                                        setSelectedCities(selectedCities.filter(c => c !== city));
+                                      } else {
+                                        setSelectedCities([...selectedCities, city]);
+                                      }
+                                      setSelectedSubLocations([]);
                                     }}
                                   >
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedCities.includes(city)}
+                                      onChange={() => {}} // Handled by parent div onClick
+                                      className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                    />
                                     {city}
                                   </div>
                                 ))}
@@ -944,7 +990,7 @@ const handleCompareClick = async () => {
                       <button
                         type="button"
                         className="w-full text-left text-black text-sm p-3 pr-10 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
-                        disabled={!selectedCity}
+                        disabled={selectedCities.length === 0}
                         onClick={() => {
                           setShowSubLocationDropdown(!showSubLocationDropdown);
                           setShowCityDropdown(false);
@@ -952,7 +998,7 @@ const handleCompareClick = async () => {
                           setShowCarpetAreaDropdown(false);
                         }}
                       >
-                        {selectedSubLocation || (selectedCity ? "Select Sub-Location" : "Select City First")}
+                        {selectedSubLocations.length > 0 ? `${selectedSubLocations.length} sub-locations selected` : (selectedCities.length > 0 ? "Select Sub-Location" : "Select Cities First")}
                       </button>
                       <svg
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-black"
@@ -963,7 +1009,7 @@ const handleCompareClick = async () => {
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
-                      {showSubLocationDropdown && selectedCity && (
+                      {showSubLocationDropdown && selectedCities.length > 0 && (
                         <div className="search-dropdown absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
                           {/* Search Input */}
                           <div className="sticky top-0 bg-white border-b border-gray-200 p-2">
@@ -977,29 +1023,40 @@ const handleCompareClick = async () => {
                             />
                           </div>
                           
-                          {/* All Sub-Locations Option */}
-                          <div
-                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black border-b border-gray-100"
-                            onClick={() => {
-                              setSelectedSubLocation("");
-                              setSubLocationSearchTerm("");
-                              setShowSubLocationDropdown(false);
-                            }}
-                          >
-                            All Sub-Locations
-                          </div>
+                          {/* Clear All Option */}
+                          {selectedSubLocations.length > 0 && (
+                            <div
+                              className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-red-600 border-b border-gray-100 font-medium"
+                              onClick={() => {
+                                setSelectedSubLocations([]);
+                                setSubLocationSearchTerm("");
+                              }}
+                            >
+                              Clear All Sub-Locations
+                            </div>
+                          )}
                           
                           {/* Filtered Sub-Locations */}
                           {getFilteredSubLocations().map((subLocation) => (
                             <div
                               key={subLocation}
-                              className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                              className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black flex items-center"
                               onClick={() => {
-                                setSelectedSubLocation(subLocation);
+                                const isSelected = selectedSubLocations.includes(subLocation);
+                                if (isSelected) {
+                                  setSelectedSubLocations(selectedSubLocations.filter(sl => sl !== subLocation));
+                                } else {
+                                  setSelectedSubLocations([...selectedSubLocations, subLocation]);
+                                }
                                 setSubLocationSearchTerm("");
-                                setShowSubLocationDropdown(false);
                               }}
                             >
+                              <input
+                                type="checkbox"
+                                checked={selectedSubLocations.includes(subLocation)}
+                                onChange={() => {}} // Handled by parent div onClick
+                                className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                              />
                               {subLocation}
                             </div>
                           ))}
@@ -1026,7 +1083,11 @@ const handleCompareClick = async () => {
                           setShowCarpetAreaDropdown(false);
                         }}
                       >
-                        {selectedPropertyType || "Select Property Type"}
+                        {selectedPropertyTypes.length > 0 
+                          ? selectedPropertyTypes.length === 1 
+                            ? selectedPropertyTypes[0]
+                            : `${selectedPropertyTypes.length} Property Types Selected`
+                          : "Select Property Type"}
                       </button>
                       <svg
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-black"
@@ -1040,25 +1101,46 @@ const handleCompareClick = async () => {
                       {showPropertyTypeDropdown && (
                         <div className="search-dropdown absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
                           <div
-                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black flex items-center"
                             onClick={() => {
-                              setSelectedPropertyType("");
-                              setShowPropertyTypeDropdown(false);
+                              setSelectedPropertyTypes([]);
                             }}
                           >
+                            <input
+                              type="checkbox"
+                              checked={selectedPropertyTypes.length === 0}
+                              onChange={() => setSelectedPropertyTypes([])}
+                              className="mr-2"
+                            />
                             All Property Types
                           </div>
-                          {getAllPropertyTypes().map((propertyType) => (
-                            <div
-                              key={propertyType}
-                              className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
-                              onClick={() => {
-                                setSelectedPropertyType(propertyType);
-                                setShowPropertyTypeDropdown(false);
-                              }}
+                          {getAllPropertyTypes().map((propertyType, index) => (
+                            <label
+                              key={`${propertyType}-${index}`}
+                              className="px-4 py-2 hover:bg-gray-100 text-sm text-black flex items-center cursor-pointer"
                             >
+                              <input
+                                type="checkbox"
+                                checked={selectedPropertyTypes.includes(propertyType)}
+                                onChange={() => {
+                                  console.log('Checkbox onChange - Current selectedPropertyTypes:', selectedPropertyTypes);
+                                  console.log('Checkbox onChange - propertyType:', propertyType);
+                                  if (selectedPropertyTypes.includes(propertyType)) {
+                                    setSelectedPropertyTypes(prev => prev.filter(type => type !== propertyType));
+                                  } else {
+                                    setSelectedPropertyTypes(prev => {
+                                      // Use Set to ensure no duplicates
+                                      const newSet = new Set([...prev, propertyType]);
+                                      const newArray = Array.from(newSet);
+                                      console.log('Checkbox onChange - New array:', newArray);
+                                      return newArray;
+                                    });
+                                  }
+                                }}
+                                className="mr-2"
+                              />
                               {propertyType}
-                            </div>
+                            </label>
                           ))}
                         </div>
                       )}
@@ -1076,7 +1158,7 @@ const handleCompareClick = async () => {
                           setShowPropertyTypeDropdown(false);
                         }}
                       >
-                        {selectedCarpetArea || "Select Carpet Area"}
+                        {selectedCarpetArea || (minCarpetArea || maxCarpetArea ? `${minCarpetArea || '0'} - ${maxCarpetArea || '∞'} sqft` : "Select Carpet Area")}
                       </button>
                       <svg
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-black"
@@ -1088,22 +1170,64 @@ const handleCompareClick = async () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                       </svg>
                       {showCarpetAreaDropdown && (
-                        <div className="search-dropdown absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                        <div className="search-dropdown absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto">
                           <div
                             className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
                             onClick={() => {
                               setSelectedCarpetArea("");
+                              setMinCarpetArea("");
+                              setMaxCarpetArea("");
                               setShowCarpetAreaDropdown(false);
                             }}
                           >
                             All Areas
                           </div>
+                          
+                          {/* Min/Max Input Fields */}
+                          <div className="px-4 py-3 border-t border-gray-100">
+                            <div className="text-xs font-medium text-gray-600 mb-2">Custom Range (sqft)</div>
+                            <div className="flex gap-2">
+                              <input
+                                type="number"
+                                placeholder="Min"
+                                value={minCarpetArea}
+                                onChange={(e) => setMinCarpetArea(e.target.value)}
+                                className="w-20 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                min="0"
+                              />
+                              <input
+                                type="number"
+                                placeholder="Max"
+                                value={maxCarpetArea}
+                                onChange={(e) => setMaxCarpetArea(e.target.value)}
+                                className="w-20 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                                min="0"
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (minCarpetArea || maxCarpetArea) {
+                                  setSelectedCarpetArea("");
+                                  setShowCarpetAreaDropdown(false);
+                                }
+                              }}
+                              className="mt-2 px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                              disabled={!minCarpetArea && !maxCarpetArea}
+                            >
+                              Apply Range
+                            </button>
+                          </div>
+                          
+                          <div className="px-4 py-2 text-xs font-medium text-gray-600 border-t border-gray-100">Predefined Ranges</div>
                           {carpetAreaOptions.map((area) => (
                             <div
                               key={area}
                               className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
                               onClick={() => {
                                 setSelectedCarpetArea(area);
+                                setMinCarpetArea("");
+                                setMaxCarpetArea("");
                                 setShowCarpetAreaDropdown(false);
                               }}
                             >
@@ -1116,47 +1240,47 @@ const handleCompareClick = async () => {
                   </div>
 
                   {/* Selected Filters Display */}
-                  {(selectedCity || selectedSubLocation || selectedPropertyType || selectedCarpetArea) && (
+                  {(selectedCities.length > 0 || selectedSubLocations.length > 0 || selectedPropertyTypes.length > 0 || selectedCarpetArea || minCarpetArea || maxCarpetArea) && (
                     <div className="flex flex-wrap gap-2 mb-4">
-                      {selectedCity && (
-                        <div className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
-                          City: {selectedCity}
+                      {selectedCities.map((city) => (
+                        <div key={city} className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
+                          City: {city}
                           <button
                             type="button"
                             className="ml-1 text-white hover:text-gray-200 focus:outline-none"
                             onClick={() => {
-                              setSelectedCity("");
-                              setSelectedSubLocation("");
+                              setSelectedCities(selectedCities.filter(c => c !== city));
+                              setSelectedSubLocations([]);
                             }}
                           >
                             ×
                           </button>
                         </div>
-                      )}
-                      {selectedSubLocation && (
-                        <div className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
-                          Sub-Location: {selectedSubLocation}
+                      ))}
+                      {selectedSubLocations.map((subLocation) => (
+                        <div key={subLocation} className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
+                          Sub-Location: {subLocation}
                           <button
                             type="button"
                             className="ml-1 text-white hover:text-gray-200 focus:outline-none"
-                            onClick={() => setSelectedSubLocation("")}
+                            onClick={() => setSelectedSubLocations(selectedSubLocations.filter(sl => sl !== subLocation))}
                           >
                             ×
                           </button>
                         </div>
-                      )}
-                      {selectedPropertyType && (
-                        <div className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
-                          Type: {selectedPropertyType}
+                      ))}
+                      {selectedPropertyTypes.map((propertyType, index) => (
+                        <div key={`filter-${propertyType}-${index}`} className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
+                          Type: {propertyType}
                           <button
                             type="button"
                             className="ml-1 text-white hover:text-gray-200 focus:outline-none"
-                            onClick={() => setSelectedPropertyType("")}
+                            onClick={() => setSelectedPropertyTypes(prev => prev.filter(type => type !== propertyType))}
                           >
                             ×
                           </button>
                         </div>
-                      )}
+                      ))}
                       {selectedCarpetArea && (
                         <div className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
                           Area: {selectedCarpetArea}
@@ -1164,6 +1288,21 @@ const handleCompareClick = async () => {
                             type="button"
                             className="ml-1 text-white hover:text-gray-200 focus:outline-none"
                             onClick={() => setSelectedCarpetArea("")}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )}
+                      {(minCarpetArea || maxCarpetArea) && !selectedCarpetArea && (
+                        <div className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
+                          Area: {minCarpetArea || '0'} - {maxCarpetArea || '∞'} sqft
+                          <button
+                            type="button"
+                            className="ml-1 text-white hover:text-gray-200 focus:outline-none"
+                            onClick={() => {
+                              setMinCarpetArea("");
+                              setMaxCarpetArea("");
+                            }}
                           >
                             ×
                           </button>
@@ -1581,28 +1720,41 @@ const handleCompareClick = async () => {
                                 </svg>
                               </button>
                               {/* Share button */}
-                              <div className="relative">
-                                <button
-                                  className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
-                                  onClick={() => setOpenShareIndex(openShareIndex === index ? null : index)}
-                                  aria-label="Share"
-                                  type="button"
-                                >
-                                  <Image
-                                    src={share}
-                                    alt="Share"
-                                    width={20}
-                                    height={20}
-                                    className="object-contain transition-all duration-300 hover:scale-110"
-                                  />
-                                </button>
-                                <ShareModal
-                                  open={openShareIndex === index}
-                                  onClose={() => setOpenShareIndex(null)}
-                                  property={property}
-                                  getPropertyUrl={getPropertyUrl}
-                                />
-                              </div>
+                               {/* Share button */}
+                        <div className="relative">
+                          {/* <button
+                            className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
+                            onClick={() => setOpenShareIndex(openShareIndex === index ? null : index)}
+                            aria-label="Share"
+                            type="button"
+                          >
+                           
+                          </button> */}
+                                         <button
+                  type="button"
+                  className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
+                  onClick={() => {
+                    if (navigator.share) {
+                      navigator.share({
+                        title: property.title,
+                        text: `Check out this property: ${property.title}`,
+                        url: `https://realtraspaces.com/property-details/${property.title}`,
+                      });
+                    } else {
+                      alert("Share not supported on this browser.");
+                    }
+                  }}
+                  title="Share"
+                >
+                  <Image
+                    src={share}
+                    alt="Share"
+                    width={20}
+                    height={20}
+                    className="object-contain transition-all duration-300 hover:scale-110"
+                  />
+                </button>
+                        </div>
                               {/* WhatsApp button */}
                               <a
                                 href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(`${window.location.origin}/property-details/${encodeURIComponent(property.title || '')}`)}`}
