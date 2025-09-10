@@ -1163,7 +1163,7 @@ export default function PropertyCards() {
                   </div>
                   </Link>
                   {/* Property Details */}
-                  <div className="p-2 sm:p-3 flex-grow font-monotransition-all duration-300 hover:bg-gray-50/30">
+                  <div className="p-2 sm:p-3 flex-grow font-mono transition-all duration-300 hover:bg-gray-50/30">
                   <Link href={`/property-details/${property.title}`} key={property.title} className="block">
                     <div className="grid grid-cols-2 gap-1 text-xs">
                       <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Built up Area</div>

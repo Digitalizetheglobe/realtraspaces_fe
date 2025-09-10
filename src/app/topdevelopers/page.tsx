@@ -311,7 +311,7 @@ const TopDevelopers = () => {
                   }}
                   onClick={() => openModal(developer)}
                 >
-                  <div className="w-full h-42 shadow-2xl border border-gray-200 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:bg-gray-200 group-hover:shadow-lg overflow-hidden bg-gray-100">
+                  <div className="w-full h-42 shadow-2xl border border-gray-200 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:bg-gray-200 group-hover:shadow-lg overflow-hidden bg-white">
                     <Image
                       src={
                         developer.builder_logo && typeof developer.builder_logo === 'string' 

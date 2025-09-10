@@ -1114,11 +1114,30 @@ export default function PropertyDetails() {
                   Property Overview
                 </h2>
                 <div className="bg-gray-100 p-6 rounded-xl max-w-2xl">
-                  <p className="text-gray-700 leading-relaxed">
-                    {property.aboutProperty || 
-                      "This property offers excellent investment and living opportunities with prime location benefits. Featuring modern amenities and strategic connectivity, it's perfect for those seeking quality real estate in a well-connected area. Contact us for detailed information about this exceptional property."
-                    }
-                  </p>
+                  <div className="text-gray-700 leading-relaxed space-y-4">
+                    {property.aboutProperty ? (
+                      property.aboutProperty.split('\n').map((paragraph, index) => (
+                        paragraph.trim() && (
+                          <p key={index} className="text-gray-700 leading-relaxed">
+                            {paragraph.trim()}
+                          </p>
+                        )
+                      ))
+                    ) : (
+                      <>
+                        <p className="text-gray-700 leading-relaxed">
+                          This property offers excellent investment and living opportunities with prime location benefits. 
+                          Featuring modern amenities and strategic connectivity, it's perfect for those seeking quality 
+                          real estate in a well-connected area.
+                        </p>
+                        <p className="text-gray-700 leading-relaxed">
+                          The property is designed to meet contemporary living standards with thoughtful planning and 
+                          attention to detail. Contact us for detailed information about this exceptional property 
+                          and schedule a visit to experience it firsthand.
+                        </p>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1249,12 +1268,12 @@ export default function PropertyDetails() {
 
               </div>
 
-              <div className="mt-8  rounded-xl">
+              <div className="mt-8 rounded-xl">
                 <h2 className="text-xl font-semibold text-gray-800 p-4">
                   Property Highlights
                 </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 ">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4 p-4">
                   <div className="flex items-start gap-2 py-2 pl-2">
                     <Image
                       src={pin}
@@ -1522,11 +1541,11 @@ export default function PropertyDetails() {
                 </div>
               </div>
 
-              <div className="bg-gray-100 p-4 rounded-xl">
-                <h2 className="text-2xl font-bold  text-gray-800 mb-6 mt-12">
+              <div className="bg-gray-100 p-6 rounded-xl mt-8">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">
                   Features and Amenities
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {property.amenities?.length ? (
                     property.amenities.map((amenity, index) => (
                       <div key={index} className="flex items-center gap-3">
@@ -1747,10 +1766,12 @@ export default function PropertyDetails() {
         </div>
 
         <div className="mt-12 max-w-5xl mx-auto px-4">
-          <h1 className="text-black text-xl font-semibold mb-2">Location</h1>
-          <p className="text-gray-700 text-md">
-            {getFullAddress(property.address) || "Location not specified."}
-          </p>
+          <h1 className="text-black text-xl font-semibold mb-4">Location</h1>
+          <div className="bg-gray-50 p-4 rounded-lg mb-4">
+            <p className="text-gray-700 text-md leading-relaxed">
+              {getFullAddress(property.address) || "Location not specified."}
+            </p>
+          </div>
           <div className="py-4 mt-8">
             {getFullAddress(property.address) ? (
               <iframe

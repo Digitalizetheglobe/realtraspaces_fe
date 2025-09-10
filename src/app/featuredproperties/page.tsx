@@ -368,7 +368,7 @@ const FeaturedProperties = () => {
                     </h4>
 
                     {/* Property Details */}
-                    <div className="property-details flex flex-wrap space-x-4 md:space-x-12 border-t border-b border-gray-200 py-3 mb-3">
+                    <div className="property-details flex font-mono  flex-wrap space-x-4 md:space-x-12 border-t border-b border-gray-200 py-3 mb-3">
                       <div className="flex items-center space-x-2 mb-2">
                         <Image src={sqft} alt="Area" width={20} height={20} />
                         <div className="flex flex-col">
