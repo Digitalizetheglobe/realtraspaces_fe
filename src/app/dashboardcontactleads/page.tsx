@@ -315,31 +315,7 @@ const DashboardContactLeads: React.FC = () => {
             >
               Refresh Data
             </button>
-            <button
-              onClick={() => {
-                console.log('Current state:', { contacts, stats, loading, filters });
-              }}
-              className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
-            >
-              Log State
-            </button>
-            <button
-              onClick={async () => {
-                try {
-                  console.log('Testing API endpoint...');
-                  const response = await fetch(API_BASE);
-                  console.log('API Response status:', response.status);
-                  console.log('API Response headers:', response.headers);
-                  const text = await response.text();
-                  console.log('API Response text:', text);
-                } catch (error) {
-                  console.error('API Test Error:', error);
-                }
-              }}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-            >
-              Test API
-            </button>
+            
           </div>
         </div>
 
