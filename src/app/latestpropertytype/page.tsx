@@ -715,11 +715,11 @@ export default function PropertyCards() {
             className="text-center mb-8 justify-center"
           >
             <h1 className="text-3xl md:text-6xl  text-white font-bold mb-2 leading-tight">
-              We Only  <span className="text-gray-300"> Deals Into Commercial </span>  Properties
+              Realtra Spaces – <span className="text-gray-300">Redefining Commercial Real Estate</span>
             </h1>
             
             <p className="text-xl md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Realtra Spaces is a forward-thinking real estate company specializing in commercial properties. We combine innovation with expertise to deliver exceptional real estate experiences.
+              Real & Transparent. We make commercial real estate easy, transparent, and growth-focused—so you can focus on building your business while we take care of the space.
             </p>
           </motion.div>
         )}
@@ -1189,8 +1189,6 @@ export default function PropertyCards() {
                           </Link>
                     <div className="border-t border-gray-200 my-2 transition-all duration-300 hover:border-gray-300"></div>
 
-                    {/* Price and Actions */}
-                    {/* <Link href={`/property-details/${property.title}`} key={property.title} className="block"> */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
                     <Link href={`/property-details/${property.title}`} key={property.title} className="block">
                       <div className="transition-all duration-300 hover:scale-105">

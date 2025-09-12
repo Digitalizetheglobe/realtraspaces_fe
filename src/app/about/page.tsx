@@ -409,13 +409,20 @@ export default function RealtraSpacesAbout() {
               </p>
             </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold mb-4 leading-tight">
-              Transforming Real Estate
-              <span className="text-gray-300"> Dreams</span>
+            <h1 className="text-5xl md:text-5xl font-bold mb-4 leading-tight">
+              Realtra Spaces – Redefining Commercial Real Estate
             </h1>
             
-            <p className="text-xl md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Realtra Spaces is a forward-thinking real estate company specializing in commercial properties. We combine innovation with expertise to deliver exceptional real estate experiences.
+            <p className="text-xl md:text-xl text-gray-300 mb-4 max-w-3xl mx-auto leading-relaxed">
+              Real & Transparent
+            </p>
+            
+            <p className="text-lg md:text-lg text-gray-300 mb-4 max-w-4xl mx-auto leading-relaxed">
+              At Realtra Spaces, we are redefining the way businesses lease, buy, and invest in commercial real estate. With over a decade of industry expertise, we bring transparency, data-driven insights, and verified listings to help companies, startups, and investors make smarter property decisions.
+            </p>
+            
+            <p className="text-lg md:text-lg text-gray-300 mb-8 max-w-4xl mx-auto leading-relaxed">
+              Our mission is simple: to make commercial real estate easy, transparent, and growth-focused—so you can focus on building your business while we take care of the space.
             </p>
             
             {/* <div className="flex flex-col sm:flex-row gap-4 justify-center">
