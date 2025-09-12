@@ -111,6 +111,7 @@ const Blogs = () => {
 
   // FAQ accordion state
   const [openFaq, setOpenFaq] = useState(0); // 0: first open by default
+  const [showAllFaqs, setShowAllFaqs] = useState(false); // State for showing all FAQs
 
   return (
     <>
@@ -267,163 +268,194 @@ const Blogs = () => {
 
       {/* FAQ */}
       <section className="bg-white flex justify-center items-center min-h-screen">
-  <div className="w-full max-w-2xl p-4">
-    {/* Heading */}
-    <div className="text-center mb-8">
-      <div className="inline-flex items-center space-x-2">
-        <h2 className="text-3xl font-bold text-gray-900">FAQ</h2>
-        <h2 className="text-3xl font-bold text-gray-500">
-          Frequently Asked Questions
-        </h2>
-      </div>
-    </div>
+        <div className="w-full max-w-6xl px-4 py-10">
+          {/* Heading */}
+          <div className="text-center mb-8">
+            <div className=" items-center space-x-2">
+              <h2 className="text-3xl mb-2 font-bold text-gray-900">FAQ</h2>
+              <h2 className="text-3xl font-bold text-gray-500">
+                Frequently Asked Questions
+              </h2>
+            </div>
+          </div>
 
-    {/* FAQ 1 */}
-    <details
-      open={openFaq === 0}
-      className="group [&_summary::-webkit-details-marker]:hidden"
-      onClick={e => {
-        e.preventDefault();
-        setOpenFaq(openFaq === 0 ? -1 : 0);
-      }}
-    >
-      <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
-        <h2 className="text-lg font-medium cursor-pointer">
-          What is Realtraspaces?
-        </h2>
-        <svg
-          className="size-8 cursor-pointer shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          color="white"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </summary>
-      <p className="px-4 pt-4 text-gray-900">
-        Realtraspaces.com is a digital platform that helps users explore, compare, and connect with premium real estate projects across India.
-      </p>
-    </details>
+          {/* FAQ Data */}
+          {(() => {
+            const faqData = [
+              {
+                question: "What is RealtraSpaces.com and how does it help with Mumbai commercial real estate?",
+                answer: "RealtraSpaces.com is a digital platform specializing in Mumbai commercial real estate, helping clients lease, buy, and invest in prime office spaces, coworking hubs, and pre-leased properties with transparency."
+              },
+              {
+                question: "Why should I lease office space in Mumbai through RealtraSpaces?",
+                answer: "We provide verified listings, market insights, and past deal data, making it easier for businesses to lease office space in Mumbai's prime commercial hubs like Nariman Point, BKC, Lower Parel, and Andheri."
+              },
+              {
+                question: "Can I buy pre-leased commercial properties in Mumbai on RealtraSpaces?",
+                answer: "Yes, RealtraSpaces offers a wide selection of pre-leased commercial properties in Mumbai with stable tenants, providing investors steady rental income and long-term capital appreciation."
+              },
+              {
+                question: "How does RealtraSpaces ensure transparency in Mumbai commercial real estate transactions?",
+                answer: "We use real-time data, historical deals, and detailed analytics to ensure tenants, landlords, and investors in Mumbai make well-informed decisions."
+              },
+              {
+                question: "Does RealtraSpaces provide coworking office spaces in Mumbai?",
+                answer: "Absolutely. We list coworking spaces in Mumbai across prime locations like Powai, Andheri, BKC, and Navi Mumbai, catering to startups, freelancers, and corporates."
+              },
+              {
+                question: "Which types of Mumbai commercial properties are available on RealtraSpaces?",
+                answer: "We cover office spaces, coworking desks, retail outlets, pre-leased properties, and Grade A commercial assets across Mumbai, Navi Mumbai, and Thane."
+              },
+              {
+                question: "How can startups find affordable office space in Mumbai with RealtraSpaces?",
+                answer: "Startups can explore flexible coworking spaces and small private offices in Mumbai through RealtraSpaces, offering cost-effective options with scalable plans."
+              },
+              {
+                question: "Why is investing in Mumbai commercial real estate profitable?",
+                answer: "Mumbai's commercial real estate market offers high rental yields, consistent demand from corporates, and strong appreciation potential, making it a top choice for investors."
+              },
+              {
+                question: "Can NRIs invest in Mumbai commercial properties through RealtraSpaces?",
+                answer: "Yes, we help NRIs invest in Mumbai's pre-leased and fractional commercial properties while ensuring all RERA and legal compliances."
+              },
+              {
+                question: "What is fractional ownership in Mumbai commercial real estate?",
+                answer: "Fractional ownership allows multiple investors to co-own high-value Mumbai commercial assets, share rental income, and enjoy capital gains at lower investment entry points."
+              },
+              {
+                question: "How does RealtraSpaces support landlords in Mumbai?",
+                answer: "We assist landlords in Mumbai by listing their commercial properties, connecting them with quality tenants, negotiating deals, and ensuring faster closures."
+              },
+              {
+                question: "Which micro-markets of Mumbai are best for leasing office space?",
+                answer: "Emerging micro-markets like Andheri, Powai, Lower Parel, and Navi Mumbai are gaining traction, while traditional hubs like Nariman Point and BKC remain premium choices."
+              },
+              {
+                question: "Can RealtraSpaces help with retail shop leasing in Mumbai?",
+                answer: "Yes, we provide retail shops and showroom spaces for rent in Mumbai malls, high streets, and business districts with high footfall."
+              },
+              {
+                question: "What is the average rental yield for commercial properties in Mumbai?",
+                answer: "Rental yields in Mumbai commercial real estate typically range from 6–9%, depending on location, tenant profile, and property type."
+              },
+              {
+                question: "Does RealtraSpaces offer Grade A office spaces in Mumbai?",
+                answer: "Yes, we specialize in premium Grade A office spaces in iconic commercial towers across Mumbai's business hubs."
+              },
+              {
+                question: "How does RealtraSpaces help investors compare Mumbai commercial properties?",
+                answer: "We provide side-by-side comparisons of Mumbai office spaces based on rental rates, amenities, connectivity, and past transaction data."
+              },
+              {
+                question: "Can I invest in pre-leased IT parks in Navi Mumbai through RealtraSpaces?",
+                answer: "Yes, RealtraSpaces lists pre-leased IT parks and office spaces in Navi Mumbai, offering investors long-term stable returns."
+              },
+              {
+                question: "How quickly can RealtraSpaces help me lease an office in Mumbai?",
+                answer: "With verified listings and streamlined negotiations, businesses can finalize office leases in Mumbai within weeks."
+              },
+              {
+                question: "Does RealtraSpaces offer coworking spaces for corporates in Mumbai?",
+                answer: "Yes, corporates can find managed coworking solutions in Mumbai that provide flexibility, scalability, and cost savings."
+              },
+              {
+                question: "Can RealtraSpaces guide me on legal compliances in Mumbai real estate?",
+                answer: "Yes, we assist with RERA registrations, lease agreements, and due diligence for commercial real estate in Mumbai."
+              },
+              {
+                question: "How do I list my Mumbai commercial property on RealtraSpaces?",
+                answer: "Property owners can register on RealtraSpaces.com, submit details, and our team will verify and promote the property to potential tenants and investors."
+              },
+              {
+                question: "Why is Mumbai considered the top market for commercial real estate in India?",
+                answer: "Mumbai is India's financial hub, home to global corporations, strong infrastructure, and constant demand for Grade A office spaces, making it the most attractive commercial market."
+              },
+              {
+                question: "Does RealtraSpaces provide coworking options in Navi Mumbai and Thane?",
+                answer: "Yes, we cover coworking and serviced office spaces across Navi Mumbai and Thane for growing businesses and startups."
+              },
+              {
+                question: "What are the benefits of pre-leased commercial properties in Mumbai?",
+                answer: "Pre-leased properties in Mumbai offer assured rental income from day one, lower risk, and long-term tenant security."
+              },
+              {
+                question: "How can RealtraSpaces help SMEs expand office presence in Mumbai?",
+                answer: "We provide scalable office solutions and market insights, helping SMEs choose the right location and property for expansion."
+              },
+              {
+                question: "Which areas in Mumbai have affordable commercial property options?",
+                answer: "Areas like Navi Mumbai, Thane, and suburban micro-markets such as Kandivali and Malad offer affordable commercial property compared to South Mumbai and BKC."
+              },
+              {
+                question: "Does RealtraSpaces assist with investment in Mumbai coworking real estate?",
+                answer: "Yes, we connect investors to profitable coworking and flexible workspace assets in Mumbai."
+              },
+              {
+                question: "Can RealtraSpaces provide analytics for Mumbai commercial leasing trends?",
+                answer: "Yes, we share transactional data and market insights to highlight leasing demand across Mumbai's micro-markets."
+              },
+              {
+                question: "How does RealtraSpaces differentiate from traditional property brokers in Mumbai?",
+                answer: "Unlike brokers, we provide verified listings, data-backed insights, and complete transparency in Mumbai commercial real estate."
+              },
+              {
+                question: "Why choose RealtraSpaces for Mumbai office space leasing?",
+                answer: "With 30+ cumulative years of experience and access to 8,000+ commercial property owners in Mumbai, RealtraSpaces offers unmatched expertise, data, and convenience."
+              }
+            ];
 
-    {/* FAQ 2 */}
-    <details
-      open={openFaq === 1}
-      className="group [&_summary::-webkit-details-marker]:hidden mt-4"
-      onClick={e => {
-        e.preventDefault();
-        setOpenFaq(openFaq === 1 ? -1 : 1);
-      }}
-    >
-      <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
-        <h2 className="text-lg font-medium">
-          Are the properties listed on Realtraspaces verified?
-        </h2>
-        <svg
-          className="size-8 shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          color="white"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </summary>
-      <p className="px-4 pt-4 text-gray-900">
-        Yes, all listings are curated and verified in collaboration with trusted developers to ensure authenticity and transparency.
-      </p>
-    </details>
+            const visibleFaqs = showAllFaqs ? faqData : faqData.slice(0, 10);
 
-    {/* FAQ 3 */}
-    <details
-      open={openFaq === 2}
-      className="group [&_summary::-webkit-details-marker]:hidden mt-4"
-      onClick={e => {
-        e.preventDefault();
-        setOpenFaq(openFaq === 2 ? -1 : 2);
-      }}
-    >
-      <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
-        <h2 className="text-lg font-medium">
-          Can I compare different properties side by side?
-        </h2>
-        <svg
-          className="size-8 shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          color="white"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </summary>
-      <p className="px-4 pt-4 text-gray-900">
-        Yes, Realtraspaces allows you to compare project details, amenities, prices, and more using our "Compare Properties" feature.
-      </p>
-    </details>
+            return (
+              <>
+                {visibleFaqs.map((faq, index) => (
+                  <details
+                    key={index}
+                    open={openFaq === index}
+                    className="group [&_summary::-webkit-details-marker]:hidden"
+                    style={{ marginTop: index === 0 ? '0' : '1rem' }}
+                    onClick={e => {
+                      e.preventDefault();
+                      setOpenFaq(openFaq === index ? -1 : index);
+                    }}
+                  >
+                    <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
+                      <h2 className="text-lg font-medium cursor-pointer">
+                        {faq.question}
+                      </h2>
+                      <svg
+                        className="size-8 cursor-pointer shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        color="white"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </summary>
+                    <p className="px-4 pt-4 text-gray-900">
+                      {faq.answer}
+                    </p>
+                  </details>
+                ))}
 
-    {/* FAQ 4 */}
-    <details
-      open={openFaq === 3}
-      className="group [&_summary::-webkit-details-marker]:hidden mt-4"
-      onClick={e => {
-        e.preventDefault();
-        setOpenFaq(openFaq === 3 ? -1 : 3);
-      }}
-    >
-      <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
-        <h2 className="text-lg font-medium">
-          How do I enquire about a property I'm interested in?
-        </h2>
-        <svg
-          className="size-8 shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          color="white"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </summary>
-      <p className="px-4 pt-4 text-gray-900">
-        Just click on the “Enquire Now” button on the property page, submit your details, and our team will connect with you shortly.
-      </p>
-    </details>
-
-    {/* FAQ 5 */}
-    <details
-      open={openFaq === 4}
-      className="group [&_summary::-webkit-details-marker]:hidden mt-4"
-      onClick={e => {
-        e.preventDefault();
-        setOpenFaq(openFaq === 4 ? -1 : 4);
-      }}
-    >
-      <summary className="flex items-center justify-between gap-1.5 rounded-md border border-gray-100 bg-[#F1F1F4] p-4 text-gray-900 shadow-[#0000001A] shadow-md">
-        <h2 className="text-lg font-medium">
-          Do you charge users for property searches or enquiries?
-        </h2>
-        <svg
-          className="size-8 shrink-0 transition-transform duration-300 group-open:-rotate-180 bg-[#6E6E73B2] rounded-full border-2 border-gray-300"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          color="white"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-        </svg>
-      </summary>
-      <p className="px-4 pt-4 text-gray-900">
-        No, Realtraspaces is completely free for property seekers. There are no charges for browsing or enquiring.
-      </p>
-    </details>
-  </div>
-</section>
+                {/* See All Button */}
+                {faqData.length > 10 && (
+                  <div className="text-center mt-8">
+                    <button
+                      onClick={() => setShowAllFaqs(!showAllFaqs)}
+                      className="bg-black text-white hover:bg-white hover:text-black hover:border hover:border-black px-6 py-3 rounded-md text-sm font-medium transition-all duration-200"
+                    >
+                      {showAllFaqs ? 'Show Less' : `See All ${faqData.length} FAQs`}
+                    </button>
+                  </div>
+                )}
+              </>
+            );
+          })()}
+        </div>
+      </section>
 
 
       {/* CTA */}
