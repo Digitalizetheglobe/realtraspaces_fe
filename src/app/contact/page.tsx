@@ -14,14 +14,64 @@ export default function Home() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    number: "",
+    phone_number: "",
     subject: "",
     message: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: '' });
+
+    try {
+      const response = await fetch('https://api.realtraspaces.com/api/contacts/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setSubmitStatus({ 
+          type: 'success', 
+          message: 'Thank you for your message! We will get back to you soon.' 
+        });
+        setFormData({
+          name: "",
+          email: "",
+          phone_number: "",
+          subject: "",
+          message: "",
+        });
+      } else {
+        setSubmitStatus({ 
+          type: 'error', 
+          message: result.message || 'Failed to send message. Please try again.' 
+        });
+      }
+    } catch (error) {
+      setSubmitStatus({ 
+        type: 'error', 
+        message: 'Network error. Please check your connection and try again.' 
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -168,13 +218,14 @@ export default function Home() {
                 </ul>
               </div>
             </div>
-            <form className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
                 placeholder="Name"
+                required
                 className="w-full text-slate-900 rounded-md py-2.5 px-4 border text-sm outline-none focus:border-blue-500"
               />
               <input
@@ -183,6 +234,7 @@ export default function Home() {
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="Email"
+                required
                 className="w-full text-slate-900 rounded-md py-2.5 px-4 border text-sm outline-none focus:border-blue-500"
               />
               <div className="space-y-2">
@@ -190,9 +242,9 @@ export default function Home() {
                 <div className="relative">
                   <input
                     type="tel"
-                    id="number"
-                    name="number"
-                    value={formData.number}
+                    id="phone_number"
+                    name="phone_number"
+                    value={formData.phone_number}
                     onChange={(e) => {
                       const value = e.target.value;
                       // Allow only numbers and restrict to 10 digits
@@ -213,6 +265,7 @@ export default function Home() {
                 value={formData.subject}
                 onChange={handleInputChange}
                 placeholder="Subject"
+                required
                 className="w-full text-slate-900 rounded-md py-2.5 px-4 border text-sm outline-none focus:border-blue-500"
               />
               <textarea
@@ -221,13 +274,29 @@ export default function Home() {
                 onChange={handleInputChange}
                 placeholder="Message"
                 rows={6}
+                required
                 className="w-full text-slate-900 rounded-md px-4 border text-sm pt-2.5 outline-none focus:border-blue-500"
               />
+              
+              {/* Status Message */}
+              {submitStatus.type && (
+                <div className={`p-4 rounded-md ${
+                  submitStatus.type === 'success' 
+                    ? 'bg-green-50 border border-green-200 text-green-800' 
+                    : 'bg-red-50 border border-red-200 text-red-800'
+                }`}>
+                  {submitStatus.message}
+                </div>
+              )}
+
               <button
-                type="button"
-                className="text-white bg-black hover:bg-white hover:text-black border border-black rounded-full text-[15px] font-medium px-4 py-2 w-full !mt-6"
+                type="submit"
+                disabled={isSubmitting}
+                className={`text-white bg-black hover:bg-white hover:text-black border border-black rounded-full text-[15px] font-medium px-4 py-2 w-full !mt-6 transition-all duration-300 ${
+                  isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
               >
-                Send a Message
+                {isSubmitting ? 'Sending...' : 'Send a Message'}
               </button>
             </form>
           </div>

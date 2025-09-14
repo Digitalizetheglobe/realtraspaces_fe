@@ -425,15 +425,7 @@ export default function RealtraSpacesAbout() {
               Our mission is simple: to make commercial real estate easy, transparent, and growth-focused—so you can focus on building your business while we take care of the space.
             </p>
             
-            {/* <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-white text-black hover:bg-gray-300 px-8 py-4 rounded-full font-semibold flex items-center justify-center gap-2 transition-all duration-300 transform hover:scale-105">
-                Explore Properties
-                <ArrowRight size={20} />
-              </button>
-              <button className="border-2 border-white text-white hover:bg-white hover:text-black px-8 py-4 rounded-full font-semibold transition-all duration-300">
-                Book Consultation
-              </button>
-            </div> */}
+            
           </motion.div>
         </div>
       </section>
