@@ -689,7 +689,7 @@ export default function PropertyCards() {
 
   return (
     <div className={raleway.className}>
-       <section className="relative w-full h-[220px] sm:h-[320px] md:h-[400px]">
+       <section className="relative w-full h-[220px] sm:h-[400px] md:h-[400px]">
          <div className="absolute inset-0 z-0">
     <video
       autoPlay
@@ -704,21 +704,22 @@ export default function PropertyCards() {
     <div className="absolute inset-0 bg-black opacity-50"></div>
   </div>
  
-    <div className="absolute bottom-4 w-full flex justify-center px-4">
-      <div className="max-w-4xl mx-auto w-full">
+    <div className="absolute pt-10 bottom-4 w-full flex justify-center px-4">
+      <div className="max-w-4xl mx-auto w-full mt-10 ">
         {showHeading && (
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-8 justify-center"
+            className="text-center mb-6  justify-center px-4 "
           >
-            <h1 className="text-3xl md:text-6xl  text-white font-bold mb-2 leading-tight">
-              Realtra Spaces – <span className="text-gray-300">Redefining Commercial Real Estate</span>
+            <h1 className="text-2xl sm:text-2xl md:text-6xl  text-white font-bold mb-2 sm:mb-3 leading-tight">
+              <span className="block sm:inline">Realtra Spaces –</span> 
+              <span className="block sm:inline text-gray-300 mt-1 sm:mt-0">Redefining Commercial Real Estate</span>
             </h1>
             
-            <p className="text-xl md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-lg md:text-xl text-gray-300 mb-6 max-w-3xl mx-auto leading-relaxed px-2 sm:px-0">
               Real & Transparent. We make commercial real estate easy, transparent, and growth-focused—so you can focus on building your business while we take care of the space.
             </p>
           </motion.div>
@@ -726,12 +727,12 @@ export default function PropertyCards() {
 
         {/* Search Bar - Conditionally rendered */}
         {showSearchBar && (
-          <div className="py-40">
+          <div className="py-8 sm:py-20 md:py-40">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-3 px-4 py-3 rounded-2xl border border-gray-300 bg-white/60 backdrop-blur-md shadow-lg overflow-visible relative mx-auto "
+            className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-3 px-2 sm:px-4 py-3 rounded-2xl border border-gray-300 bg-white/60 backdrop-blur-md shadow-lg overflow-visible relative mx-auto "
           >
         {/* Suggestions Dropdown - now directly above the search bar */}
        
@@ -743,26 +744,28 @@ export default function PropertyCards() {
         >
           <button
             type="button"
-            className="appearance-none w-full sm:min-w-[200px] bg-black text-white text-sm font-medium pl-5 pr-10 py-3 rounded-2xl outline-none cursor-pointer flex justify-between items-center"
+            className="appearance-none w-full sm:min-w-[200px] bg-black text-white text-sm font-medium pl-3 sm:pl-5 pr-8 sm:pr-10 py-3 rounded-2xl outline-none cursor-pointer flex justify-between items-center"
             onClick={() => setDropdownOpen(true)}
           >
-            {selectedType
-              ? selectedType === "Rent"
-                ? "Rent"
-                : selectedType === "Investment"
-                ? "Investment"
-                : selectedType === ""
-                ? ""
-                : selectedType
-              : "Select Search Type"}
-            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-white text-xs">
+            <span className="truncate text-left">
+              {selectedType
+                ? selectedType === "Rent"
+                  ? "Rent"
+                  : selectedType === "Investment"
+                  ? "Investment"
+                  : selectedType === ""
+                  ? ""
+                  : selectedType
+                : "Select Search Type"}
+            </span>
+            <span className="pointer-events-none absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 text-white text-xs flex-shrink-0">
               ▼
             </span>
           </button>
           {dropdownOpen && (
-            <div className="absolute left-0 right-0  bg-black text-white rounded-lg shadow-lg z-50" style={{ zIndex: 9999 }}>
+            <div className="absolute left-0 right-0 sm:right-auto sm:min-w-full bg-black text-white rounded-lg shadow-lg z-50" style={{ zIndex: 9999 }}>
               <div
-                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-t-lg ${enquiredForFilter === "Rent" ? "bg-gray-700" : ""}`}
+                className={`px-3 sm:px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-t-lg ${enquiredForFilter === "Rent" ? "bg-gray-700" : ""}`}
                 onClick={() => { 
                   setSelectedType("Rent"); 
                   setEnquiredForFilter("Rent");
@@ -772,7 +775,7 @@ export default function PropertyCards() {
                 Rent
               </div>
               <div
-                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${enquiredForFilter === "Sale" ? "bg-gray-700" : ""}`}
+                className={`px-3 sm:px-5 py-3 cursor-pointer hover:bg-gray-800 ${enquiredForFilter === "Sale" ? "bg-gray-700" : ""}`}
                 onClick={() => { 
                   setSelectedType("Investment"); 
                   setEnquiredForFilter("Sale");
@@ -782,7 +785,7 @@ export default function PropertyCards() {
                 Investment
               </div>
               <div
-                className={`px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "" ? "bg-gray-700" : ""}`}
+                className={`px-3 sm:px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "" ? "bg-gray-700" : ""}`}
                 onClick={() => { 
                   setSelectedType("Research"); 
                   setEnquiredForFilter("");
@@ -804,30 +807,52 @@ export default function PropertyCards() {
         <div className="relative w-full">
           <input
             type="text"
-            placeholder="Search across both pages: property name, location, or type..."
-            className="w-full bg-white text-gray-900 px-5 py-3 text-sm rounded-2xl outline-none pr-44"
+            placeholder="Search property name, location, or type..."
+            className="w-full bg-white text-gray-900 px-3 sm:px-5 py-3 text-sm rounded-2xl outline-none pr-20 sm:pr-44"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={handleInputKeyDown}
             autoComplete="off"
           />
           {/* Chips overlay (right side, inside input) */}
-          <div className="absolute inset-y-0 right-3 flex items-center space-x-2 pointer-events-none" style={{ zIndex: 10 }}>
+          <div className="absolute inset-y-0 right-2 sm:right-3 flex items-center space-x-1 sm:space-x-2 pointer-events-none" style={{ zIndex: 10 }}>
             {selectedLocations.length > 0 && (
-              <div className="flex items-center space-x-2 pointer-events-auto">
-                {selectedLocations.map((loc) => (
-                  <div key={loc} className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium mr-1">
-                    {loc}
+              <div className="flex items-center space-x-1 sm:space-x-2 pointer-events-auto max-w-[60px] sm:max-w-none overflow-hidden">
+                {/* Mobile: Show only first chip + count */}
+                <div className="sm:hidden flex items-center space-x-1">
+                  <div className="bg-black text-white px-2 py-1 rounded-full flex items-center text-xs font-medium mr-1 flex-shrink-0">
+                    <span className="truncate max-w-[40px]">{selectedLocations[0]}</span>
                     <button
                       type="button"
-                      className="ml-1 text-white hover:text-gray-200 focus:outline-none"
+                      className="ml-1 text-white hover:text-gray-200 focus:outline-none flex-shrink-0"
                       style={{ pointerEvents: 'auto' }}
-                      onClick={() => removeLocation(loc)}
+                      onClick={() => removeLocation(selectedLocations[0])}
                     >
                       <span className="ml-1">×</span>
                     </button>
                   </div>
-                ))}
+                  {selectedLocations.length > 1 && (
+                    <div className="bg-gray-600 text-white px-2 py-1 rounded-full text-xs font-medium flex-shrink-0">
+                      +{selectedLocations.length - 1}
+                    </div>
+                  )}
+                </div>
+                {/* Desktop: Show all chips */}
+                <div className="hidden sm:flex items-center space-x-2">
+                  {selectedLocations.map((loc) => (
+                    <div key={loc} className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium mr-1 flex-shrink-0">
+                      <span className="truncate">{loc}</span>
+                      <button
+                        type="button"
+                        className="ml-1 text-white hover:text-gray-200 focus:outline-none flex-shrink-0"
+                        style={{ pointerEvents: 'auto' }}
+                        onClick={() => removeLocation(loc)}
+                      >
+                        <span className="ml-1">×</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -836,7 +861,7 @@ export default function PropertyCards() {
             <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto" style={{ zIndex: 9999 }}>
               {suggestions.map((s, idx) => (
                 <div
-                  className="px-5 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                  className="px-3 sm:px-5 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
                   onClick={() => handleSuggestionClick(s)}
                   key={s + idx}
                 >
