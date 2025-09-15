@@ -1008,6 +1008,17 @@ export default function RealtraSpacesAbout() {
                   <span>{(selectedDeveloper.project_name || []).length} Projects</span>
                 </div>
               </div>
+              <div className="absolute bottom-4 right-4 z-10">
+              <button
+                onClick={() => {
+                  // Navigate to contact page or open contact form
+                  window.open('/contact', '_blank');
+                }}
+                className="bg-gradient-to-r from-black to-black hover:from-black/80 hover:to-black/80 text-white px-6 py-3 rounded-full font-semibold text-sm shadow-lg hover:shadow-xl transform transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
+              >
+                Inquire Now
+              </button>
+            </div>
             </div>
 
             {/* Modal Body */}
