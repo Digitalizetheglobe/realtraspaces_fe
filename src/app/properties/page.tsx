@@ -185,7 +185,11 @@ export default function Similarproperties() {
   const [showCarpetAreaDropdown, setShowCarpetAreaDropdown] = useState(false);
   const [citySearchTerm, setCitySearchTerm] = useState<string>("");
   const [subLocationSearchTerm, setSubLocationSearchTerm] = useState<string>("");
-   const [allProperties, setAllProperties] = useState<Property[]>([]); // NEW: Combined properties from both pages
+  const [allProperties, setAllProperties] = useState<Property[]>([]); // NEW: Combined properties from both pages
+  
+  // Add missing state variables for search functionality
+  const [selectedType, setSelectedType] = useState<string>("");
+  const [enquiredForFilter, setEnquiredForFilter] = useState<string>("");
  
   // Add state for contact form
   const [showContactForm, setShowContactForm] = useState(false);
@@ -287,13 +291,48 @@ export default function Similarproperties() {
 
   // Handle search parameters from sessionStorage for auto-populating search fields
   useEffect(() => {
+    // Check for search data from latestpropertytype page
+    const searchData = sessionStorage.getItem('searchData');
+    
+    if (searchData) {
+      try {
+        const parsedData = JSON.parse(searchData);
+        
+        // Apply search data if it exists
+        if (parsedData.search) {
+          setSearchTerm(parsedData.search);
+        }
+        
+        if (parsedData.locations && parsedData.locations.length > 0) {
+          setSelectedLocations(parsedData.locations);
+          // Also set selected cities for the multi-component search
+          setSelectedCities(parsedData.locations);
+        }
+        
+        if (parsedData.type) {
+          setSelectedType(parsedData.type);
+        }
+        
+        if (parsedData.enquiredFor) {
+          setEnquiredForFilter(parsedData.enquiredFor);
+        }
+        
+        // Clear the search data after reading it
+        sessionStorage.removeItem('searchData');
+      } catch (error) {
+        console.error('Error parsing search data from sessionStorage:', error);
+        sessionStorage.removeItem('searchData');
+      }
+    }
+    
+    // Check sessionStorage for backward compatibility with other search methods
     const searchCity = sessionStorage.getItem('searchCity');
     const searchSubLocation = sessionStorage.getItem('searchSubLocation');
     
-    if (searchCity) {
+    if (searchCity && !searchData) {
       setSelectedCities([searchCity]);
     }
-    if (searchSubLocation) {
+    if (searchSubLocation && !searchData) {
       setSelectedSubLocations([searchSubLocation]);
     }
     
@@ -512,6 +551,35 @@ const handleCompareClick = async () => {
       });
     }
 
+    // Filter by enquiredFor (Rent/Investment) - similar to latestpropertytype page
+    if (enquiredForFilter) {
+      results = results.filter((property) => {
+        // Check based on forSale/forRent
+        if (enquiredForFilter === "Rent") {
+          return property.forRent === true;
+        } else if (enquiredForFilter === "Sale") {
+          return property.forSale === true;
+        }
+        
+        return false;
+      });
+    }
+
+    // Filter by search type (Rent/Investment/Research) - keep this for backward compatibility
+    if (selectedType && !enquiredForFilter) {
+      const typeLower = selectedType.toLowerCase().trim();
+      
+      // Filter by property type based on search type
+      if (typeLower === "rent") {
+        results = results.filter((property) => property.forRent);
+      } else if (typeLower === "investment") {
+        results = results.filter((property) => property.forSale);
+      } else if (typeLower === "research") {
+        // For research, show both sale and rent properties
+        results = results.filter((property) => property.forSale || property.forRent);
+      }
+    }
+
     // Filter by cities
     if (selectedCities.length > 0) {
       results = results.filter((property) => {
@@ -671,7 +739,7 @@ const handleCompareClick = async () => {
     } else {
       setShowContactForm(false);
     }
-  }, [searchTerm, filters, properties, selectedLocations, selectedCities, selectedSubLocations, selectedPropertyTypes, selectedCarpetArea, minCarpetArea, maxCarpetArea]);
+  }, [searchTerm, filters, properties, selectedLocations, selectedCities, selectedSubLocations, selectedPropertyTypes, selectedCarpetArea, minCarpetArea, maxCarpetArea, selectedType, enquiredForFilter]);
 
   // Helper function to get attribute value by ID
   const getAttributeValue = (property: Property, attributeId: string) => {
@@ -720,6 +788,8 @@ const handleCompareClick = async () => {
     setShowPropertyTypeDropdown(false);
     setShowCarpetAreaDropdown(false);
     setShowContactForm(false);
+    setSelectedType("");
+    setEnquiredForFilter("");
     setFilters({
       propertyType: "",
       priceRange: "",
@@ -1535,7 +1605,7 @@ const handleCompareClick = async () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                     {filteredProperties.map((property, index) => (
                       <div
-                        key={property.id}
+                        key={`${property.id}-${index}`}
                         className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col transform transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-gray-400/20 hover:-translate-y-2 hover:border-gray-300 animate-fade-in-up"
                         style={{ animationDelay: `${index * 150}ms` }}
                       >

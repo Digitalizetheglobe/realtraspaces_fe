@@ -281,12 +281,15 @@ export default function PropertyCards() {
         const propertiesPageData = Array.isArray(propertiesData2) ? propertiesData2 : propertiesData2.items || propertiesData2.data || [];
         console.log('Fetched properties page properties:', propertiesPageData);
         
-        // Combine both sets of properties
-        const combinedProperties = [...propertiesData, ...propertiesPageData];
-        console.log('Combined properties:', combinedProperties);
+        // Combine both sets of properties and remove duplicates based on ID
+        const allPropertiesArray = [...propertiesData, ...propertiesPageData];
+        const uniqueProperties = allPropertiesArray.filter((property, index, self) => 
+          index === self.findIndex(p => p.id === property.id)
+        );
+        console.log('Combined properties:', uniqueProperties);
         
         setProperties(propertiesData);
-        setAllProperties(combinedProperties);
+        setAllProperties(uniqueProperties);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching properties:", error);
@@ -897,7 +900,7 @@ export default function PropertyCards() {
       </section>
 
       {/* INQUIRE NOW Button - Fixed on right side */}
-      <div className="fixed right-2 top-1/3 transform -translate-y-1/2 z-40">
+      <div className="fixed right-6 top-1/3 transform -translate-y-1/2 z-40">
         <button
           onClick={() => setShowPopup(true)}
           className="bg-black hover:bg-gray-800 text-white px-6 py-2 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 font-bold text-lg uppercase tracking-wider"
@@ -924,17 +927,17 @@ export default function PropertyCards() {
               </h2>
               
                              {/* Results Counter */}
-               {(selectedType || enquiredForFilter || selectedLocations.length > 0 || search.trim()) && (
+               {/* {(selectedType || enquiredForFilter || selectedLocations.length > 0 || search.trim()) && (
                  <div className="mt-4 text-center">
                    <p className="text-sm text-gray-600">
-                     Showing {filteredProperties.length} of {allProperties.length} properties (searching across both pages)
+                     Showing of {allProperties.length} properties (searching across both pages)
                      {selectedType && ` • Type: ${selectedType}`}
                      {enquiredForFilter && ` • Enquired For: ${enquiredForFilter}`}
                      {selectedLocations.length > 0 && ` • Locations: ${selectedLocations.join(", ")}`}
                      {search.trim() && ` • Search: "${search}"`}
                    </p>
                  </div>
-               )}
+               )} */}
                
                {/* Debug Info */}
                {/* <div className="mt-4 text-center">
@@ -1010,44 +1013,64 @@ export default function PropertyCards() {
               <div></div>
             ) : (
               <div >
-                <div className="flex gap-4 mb-4">
-                {bookmarkedProperties.size > 0 && (
-                  <button
-                    className="block bg-black cursor-pointer text-white px-4 py-2 mb-4 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
-                    onClick={handleCompareClick} 
-                  >
-                    Compare Properties ({bookmarkedProperties.size})
-                  </button>
-                 
-                )}
-                                {bookmarkedProperties.size > 0 && (
-                  <button
-                    className="block bg-black cursor-pointer text-white px-4 py-2 mb-4 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
-                    onClick={() => {
-                      const selectedPropertyLinks = Array.from(bookmarkedProperties).map(propertyId => {
-                        const property = properties.find(p => p.id === propertyId);
-                        if (property) {
-                          const baseUrl = window.location.origin;
-                          return `${baseUrl}/property-details/${property.title}`;
-                        }
-                        return null;
-                      }).filter(Boolean).join('\n');
-                      
-                      const message = `I want to inquire about these properties:\n\n${selectedPropertyLinks}`;
-                      const whatsappUrl = `https://wa.me/918384848485?text=${encodeURIComponent(message)}`;
-                      window.open(whatsappUrl, '_blank');
-                    }}
-                  >
-                    Inquire this ({bookmarkedProperties.size}) properties
-                  </button>
-                )}
+                <div className="flex justify-between items-center mb-4">
+                  <div className="flex gap-4">
+                    {bookmarkedProperties.size > 0 && (
+                      <button
+                        className="block bg-black cursor-pointer text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                        onClick={handleCompareClick} 
+                      >
+                        Compare Properties ({bookmarkedProperties.size})
+                      </button>
+                   
+                    )}
+                    {bookmarkedProperties.size > 0 && (
+                      <button
+                        className="block bg-black cursor-pointer text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                        onClick={() => {
+                          const selectedPropertyLinks = Array.from(bookmarkedProperties).map(propertyId => {
+                            const property = properties.find(p => p.id === propertyId);
+                            if (property) {
+                              const baseUrl = window.location.origin;
+                              return `${baseUrl}/property-details/${property.title}`;
+                            }
+                            return null;
+                          }).filter(Boolean).join('\n');
+                          
+                          const message = `I want to inquire about these properties:\n\n${selectedPropertyLinks}`;
+                          const whatsappUrl = `https://wa.me/918384848485?text=${encodeURIComponent(message)}`;
+                          window.open(whatsappUrl, '_blank');
+                        }}
+                      >
+                        Inquire this ({bookmarkedProperties.size}) properties
+                      </button>
+                    )}
+                  </div>
+                 <Link href="/properties">
+                   <button 
+                     className="bg-black text-white px-4 py-1 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer tracking-wider"
+                     onClick={() => {
+                       // Store search data in sessionStorage before navigation
+                       sessionStorage.setItem('searchData', JSON.stringify({
+                         search: search,
+                         locations: selectedLocations,
+                         type: selectedType,
+                         enquiredFor: enquiredForFilter
+                       }));
+                     }}
+                   >
+                     Explore More 
+                   </button>
+                   {/* ({filteredProperties.length})  */}
+                 </Link>
                 </div>
+              
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               
               {filteredProperties.slice(0, 4).map((property, index) => (
                 
                 <div
-                  key={property.id}
+                  key={`${property.id}-${index}`}
                   className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col transform transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-gray-400/20 hover:-translate-y-2 hover:border-gray-300 animate-fade-in-up"
                   style={{ animationDelay: `${index * 150}ms` }}
                 >
