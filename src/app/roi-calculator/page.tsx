@@ -47,187 +47,188 @@ export default function ROICalculator() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen p-5">
-      <div className="max-w-4xl mx-auto bg-white rounded-none shadow-lg overflow-hidden">
-        <div className="flex flex-col md:flex-row min-h-[500px]">
-          {/* Left Panel - White Background */}
-          <div className="flex-1 p-8 bg-white">
-            <h1 className="text-2xl font-normal text-gray-800 mb-3">
-              ROI - Return on Investment Calculator
-            </h1>
-            <p className="text-gray-600 text-sm mb-8">
-              Figure out your loan amount and monthly repayments with our Calculator
-            </p>
+    <div className="max-w-6xl mx-auto my-20 p-8 bg-gray-50 min-h-screen">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          ROI - <span className="font-bold">Return on Investment Calculator</span>
+        </h1>
+        <p className="text-gray-600">
+          Figure out your loan amount and monthly repayments with our Calculator
+        </p>
+       
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Left Side */}
+        <div className="bg-white p-6 rounded-lg space-y-8">
             
-            {/* Property Price Input */}
-            <div className="mb-6">
-              <label className="block text-gray-800 font-normal mb-2 text-sm">
-                Property Price is
-              </label>
-              <input 
-                type="number" 
-                className="w-full px-3 py-2 border border-gray-400 rounded-none text-base bg-white focus:outline-none focus:border-gray-600"
+          {/* Property Price */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Property Price is</h2>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-lg font-semibold text-gray-600">₹</span>
+              <input
+                type="number"
                 value={propertyPrice}
-                onChange={(e) => setPropertyPrice(Number(e.target.value))}
+                onChange={(e) => setPropertyPrice(Number(e.target.value) || 0)}
+                className="w-full border-2 text-black border-gray-300 rounded-lg pl-8 pr-4 py-3 text-lg font-semibold focus:outline-none focus:border-blue-500"
+                placeholder="10000"
                 min="0"
               />
             </div>
+          </div>
             
-            {/* Rental Per Month Input */}
-            <div className="mb-6">
-              <label className="block text-gray-800 font-normal mb-2 text-sm">
-                Rental Per Month
-              </label>
-              <input 
-                type="number" 
-                className="w-full px-3 py-2 border border-gray-400 rounded-none text-base bg-white focus:outline-none focus:border-gray-600"
+          {/* Rental Per Month */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Rental Per Month</h2>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-lg font-semibold text-gray-600">₹</span>
+              <input
+                type="number"
                 value={rentalPerMonth}
-                onChange={(e) => setRentalPerMonth(Number(e.target.value))}
+                onChange={(e) => setRentalPerMonth(Number(e.target.value) || 0)}
+                className="w-full border-2 text-black border-gray-300 rounded-lg pl-8 pr-4 py-3 text-lg font-semibold focus:outline-none focus:border-blue-500"
+                placeholder="10000"
                 min="0"
               />
             </div>
+          </div>
             
-            {/* Lock-in Period Slider */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-800 font-normal text-sm">Lock-in Period</span>
-                <div className="flex items-center gap-2">
-                  <input 
-                    type="number" 
-                    className="w-12 px-2 py-1 bg-gray-100 border border-gray-300 rounded-none text-xs text-center"
-                    value={lockInPeriod}
-                    onChange={(e) => setLockInPeriod(Number(e.target.value))}
-                    min="1" 
-                    max="50"
-                  />
-                  <span className="text-gray-800 text-sm">years</span>
-                </div>
-              </div>
-              <div className="relative my-4">
-                <input 
-                  type="range" 
-                  className="w-full h-1 bg-gray-300 rounded-lg appearance-none cursor-pointer slider"
-                  min="1" 
-                  max="50" 
-                  value={lockInPeriod}
-                  onChange={(e) => setLockInPeriod(Number(e.target.value))}
-                />
-                <div className="flex justify-between text-xs text-gray-500 mt-2">
-                  <span>1year</span>
-                  <span>50year</span>
-                </div>
-              </div>
+          {/* Lock-in Period */}
+          <div>
+            <div className="flex items-center mb-6">
+              <span className="text-lg text-gray-700 mr-4">Lock-in Period</span>
+              <input
+                type="number"
+                value={lockInPeriod}
+                onChange={(e) => setLockInPeriod(Number(e.target.value) || 0)}
+                className="w-16 border-2 border-gray-300 rounded px-3 py-2 text-center font-semibold focus:outline-none focus:border-blue-500"
+                min="1"
+                max="50"
+              />
+              <span className="text-lg text-gray-700 ml-4">years</span>
             </div>
-            
-            {/* Agreement Tenure Slider */}
-            <div className="mb-6">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-800 font-normal text-sm">Agreement Tenure is</span>
-                <div className="flex items-center gap-2">
-                  <input 
-                    type="number" 
-                    className="w-12 px-2 py-1 bg-gray-100 border border-gray-300 rounded-none text-xs text-center"
-                    value={agreementTenure}
-                    onChange={(e) => setAgreementTenure(Number(e.target.value))}
-                    min="1" 
-                    max="50"
-                  />
-                  <span className="text-gray-800 text-sm">years</span>
-                </div>
-              </div>
-              <div className="relative my-4">
-                <input 
-                  type="range" 
-                  className="w-full h-1 bg-gray-300 rounded-lg appearance-none cursor-pointer slider"
-                  min="1" 
-                  max="50" 
-                  value={agreementTenure}
-                  onChange={(e) => setAgreementTenure(Number(e.target.value))}
-                />
-                <div className="flex justify-between text-xs text-gray-500 mt-2">
-                  <span>1year</span>
-                  <span>50year</span>
-                </div>
+
+            {/* Slider */}
+            <div className="relative">
+              <input
+                type="range"
+                min="1"
+                max="50"
+                value={lockInPeriod}
+                onChange={(e) => setLockInPeriod(parseInt(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                style={{
+                  background: `linear-gradient(to right, #000 0%, #000 ${((lockInPeriod - 1) / 49) * 100}%, #e5e7eb ${((lockInPeriod - 1) / 49) * 100}%, #e5e7eb 100%)`
+                }}
+              />
+              <div className="flex justify-between text-sm text-gray-600 mt-2">
+                <span>1year</span>
+                <span>50year</span>
               </div>
             </div>
           </div>
-          
-          {/* Right Panel - Black Background */}
-          <div className="flex-1 bg-black text-white p-8 flex flex-col justify-center items-center">
-            {/* ROI Display */}
-            <div className="text-center mb-12">
-              <div className="text-white text-lg mb-4 font-light">ROI</div>
-              <div className="text-7xl font-light mb-16 leading-none">
-                {calculations.roi.toFixed(1)}%
+            
+          {/* Agreement Tenure */}
+          <div>
+            <div className="flex items-center mb-6">
+              <span className="text-lg text-gray-700 mr-4">Agreement Tenure is</span>
+              <input
+                type="number"
+                value={agreementTenure}
+                onChange={(e) => setAgreementTenure(Number(e.target.value) || 0)}
+                className="w-16 border-2 border-gray-300 rounded px-3 py-2 text-center font-semibold focus:outline-none focus:border-blue-500"
+                min="1"
+                max="50"
+              />
+              <span className="text-lg text-gray-700 ml-4">years</span>
+            </div>
+
+            {/* Slider */}
+            <div className="relative">
+              <input
+                type="range"
+                min="1"
+                max="50"
+                value={agreementTenure}
+                onChange={(e) => setAgreementTenure(parseInt(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                style={{
+                  background: `linear-gradient(to right, #000 0%, #000 ${((agreementTenure - 1) / 49) * 100}%, #e5e7eb ${((agreementTenure - 1) / 49) * 100}%, #e5e7eb 100%)`
+                }}
+              />
+              <div className="flex justify-between text-sm text-gray-600 mt-2">
+                <span>1year</span>
+                <span>50year</span>
               </div>
             </div>
-            
-            {/* Total Returns */}
-            <div className="text-center mb-12">
-              <div className="text-white text-lg mb-4 font-light">Total Returns is</div>
-              <div className="text-6xl font-light leading-none">
-                {Math.round(calculations.totalReturns).toLocaleString()}
-              </div>
-            </div>
-            
-            {/* Monthly/Yearly Tabs */}
-           <div className="flex gap-4 mt-4">
-  {/* Monthly Tab */}
-  <button
-    onClick={() => setActiveTab('monthly')}
-    className={`px-6 py-3 rounded-lg border transition-colors duration-300 ${
-      activeTab === 'monthly'
-        ? 'bg-black text-white border-black'
-        : 'bg-white text-black border-gray-400 hover:bg-gray-100'
-    }`}
-  >
-    <div className="text-lg font-semibold">Monthly</div>
-    <div className="text-sm mt-1">
-      ₹ {calculations.monthlyReturn.toFixed(3)}
-    </div>
-  </button>
-
-  {/* Yearly Tab */}
-  <button
-    onClick={() => setActiveTab('yearly')}
-    className={`px-6 py-3 rounded-lg border transition-colors duration-300 ${
-      activeTab === 'yearly'
-        ? 'bg-black text-white border-black '
-        : 'bg-white text-black border-gray-400 hover:bg-gray-100'
-    }`}
-  >
-    <div className="text-lg font-semibold">Yearly</div>
-    <div className="text-sm mt-1">
-      ₹ {calculations.yearlyReturn.toFixed(3)}
-    </div>
-  </button>
-</div>
-
           </div>
         </div>
-        
-        {/* Custom Slider Styles */}
-        <style jsx>{`
-          .slider::-webkit-slider-thumb {
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            background: #333;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid #fff;
-          }
           
-          .slider::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
-            background: #333;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid #fff;
-          }
-        `}</style>
+        {/* Right Side */}
+        <div className="bg-black text-white p-8 rounded-lg">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-semibold mb-4">ROI is</h2>
+            <div className="text-4xl font-bold mb-4">{calculations.roi.toFixed(1)}%</div>
+            <div className="text-sm text-gray-400">
+              Total Returns: ₹{Math.round(calculations.totalReturns).toLocaleString()}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="bg-gray-800 p-4 rounded-lg text-center">
+              <h3 className="text-lg font-semibold mb-2">Monthly Return</h3>
+              <div className="text-xl font-bold">{calculations.monthlyReturn.toFixed(3)}%</div>
+            </div>
+            <div className="bg-gray-800 p-4 rounded-lg text-center">
+              <h3 className="text-lg font-semibold mb-2">Yearly Return</h3>
+              <div className="text-xl font-bold">{calculations.yearlyReturn.toFixed(3)}%</div>
+            </div>
+          </div>
+
+          {/* Summary */}
+          <div className="border-t border-gray-700 pt-4">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-gray-400">Property Price:</p>
+                <p className="font-semibold">₹{propertyPrice.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Monthly Rental:</p>
+                <p className="font-semibold">₹{rentalPerMonth.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Lock-in Period:</p>
+                <p className="font-semibold">{lockInPeriod} years</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Agreement Tenure:</p>
+                <p className="font-semibold">{agreementTenure} years</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          background: #000;
+          cursor: pointer;
+          border-radius: 50%;
+        }
+
+        .slider::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          background: #000;
+          cursor: pointer;
+          border-radius: 50%;
+          border: none;
+        }
+      `}</style>
     </div>
   );
 }

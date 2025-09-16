@@ -470,19 +470,19 @@ const TopDevelopers = () => {
                             }}
                             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                           />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                          {/* <div className="absolute inset-0  bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
                             <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                               <div className="bg-white bg-opacity-90 rounded-full p-2">
                                 <FiEye className="w-6 h-6 text-gray-700" />
                               </div>
                             </div>
-                          </div>
+                          </div> */}
                         </div>
-                        <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100">
+                        {/* <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100">
                           <p className="text-sm text-gray-700 text-center font-medium">
                             Gallery Image {idx + 1}
                           </p>
-                        </div>
+                        </div> */}
                             
                       </div>
                       

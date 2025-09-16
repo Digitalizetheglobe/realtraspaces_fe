@@ -102,151 +102,175 @@ export default function IRRCalculator() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-2 sm:p-5 flex items-center justify-center">
-      <div className="w-full max-w-2xl md:max-w-4xl bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="flex flex-col md:flex-row h-full">
-          {/* Left Panel */}
-          <div className="w-full md:w-1/2 p-4 sm:p-6 bg-white flex flex-col">
-            <h1 className="text-lg sm:text-xl font-normal text-gray-800 mb-2">
-              IRR - Internal Rate of Return Calculator
-            </h1>
-            <p className="text-gray-600 text-xs sm:text-sm mb-5">
-              Calculate the IRR for your investment project with irregular cash flows
-            </p>
+    <div className="max-w-6xl mx-auto my-20 p-8 bg-gray-50 min-h-screen">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          IRR - <span className="font-bold">Internal Rate of Return Calculator</span>
+        </h1>
+        <p className="text-gray-600">
+          Calculate the IRR for your investment project with irregular cash flows
+        </p>
+       
+      </div>
 
-            {/* Initial Investment */}
-            <div className="mb-4">
-              <label className="block text-gray-800 font-semibold mb-1 text-xs sm:text-sm">
-                Initial Investment (₹)
-              </label>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Left Side */}
+        <div className="bg-white p-6 rounded-lg space-y-8">
+
+          {/* Initial Investment */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4 text-gray-800">Initial Investment</h2>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-lg font-semibold text-gray-600">₹</span>
               <input
                 type="number"
                 value={initialInvestment}
                 onChange={(e) => setInitialInvestment(Number(e.target.value) || 0)}
-                className="w-full p-2 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none text-xs sm:text-sm"
+                className="w-full border-2 text-black border-gray-300 rounded-lg pl-8 pr-4 py-3 text-lg font-semibold focus:outline-none focus:border-blue-500"
+                placeholder="100000"
                 min="0"
-                placeholder="Enter initial investment"
               />
             </div>
+          </div>
 
-            {/* Cash Flows */}
-            <div className="mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <label className="block text-gray-800 font-semibold text-xs sm:text-sm">
-                  Annual Cash Flows (₹)
-                </label>
-                <button
-                  onClick={addCashFlow}
-                  className="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium"
-                  disabled={cashFlows.length >= 10}
-                >
-                  + Add Year
-                </button>
-              </div>
-              
-              <div className="max-h-48 overflow-y-auto space-y-2">
-                {cashFlows.map((flow, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <span className="text-xs sm:text-sm text-gray-600 w-12">
-                      Year {index + 1}:
-                    </span>
+          {/* Cash Flows */}
+          <div>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold text-gray-800">Annual Cash Flows</h2>
+              <button
+                onClick={addCashFlow}
+                className="text-blue-600 hover:text-blue-800 text-sm font-medium px-3 py-1 border border-blue-600 rounded-lg hover:bg-blue-50"
+                disabled={cashFlows.length >= 10}
+              >
+                + Add Year
+              </button>
+            </div>
+            
+            <div className="max-h-48 overflow-y-auto space-y-3">
+              {cashFlows.map((flow, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600 w-16 font-medium">
+                    Year {index + 1}:
+                  </span>
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-sm font-semibold text-gray-600">₹</span>
                     <input
                       type="number"
                       value={flow}
                       onChange={(e) => handleCashFlowChange(index, e.target.value)}
-                      className="flex-1 p-2 border-2 border-gray-300 rounded focus:border-blue-500 focus:outline-none text-xs sm:text-sm"
+                      className="w-full border-2 text-black border-gray-300 rounded-lg pl-8 pr-4 py-2 text-sm font-semibold focus:outline-none focus:border-blue-500"
                       placeholder="Enter cash flow"
                     />
-                    {cashFlows.length > 1 && (
-                      <button
-                        onClick={() => removeCashFlow(index)}
-                        className="text-red-600 hover:text-red-800 text-xs sm:text-sm font-medium px-2"
-                      >
-                        ×
-                      </button>
-                    )}
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Project Summary */}
-            <div className="mb-4 p-3 bg-gray-50 rounded">
-              <h3 className="text-xs sm:text-sm font-semibold text-gray-800 mb-2">
-                Project Summary
-              </h3>
-              <div className="text-xs text-gray-600 space-y-1">
-                <div>Project Duration: {cashFlows.length} years</div>
-                <div>Total Cash Inflows: ₹{results.totalCashFlow.toLocaleString()}</div>
-                <div>Simple ROI: {results.roi.toFixed(2)}%</div>
-              </div>
+                  {cashFlows.length > 1 && (
+                    <button
+                      onClick={() => removeCashFlow(index)}
+                      className="text-red-600 hover:text-red-800 text-sm font-medium px-2 py-1 border border-red-600 rounded-lg hover:bg-red-50"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Right Panel */}
-          <div className="w-full md:w-1/2 bg-gray-800 text-white p-4 sm:p-6 flex flex-col justify-center">
-            <div className="mb-6">
-              <h2 className="text-xs sm:text-sm font-normal mb-3">Internal Rate of Return (IRR)</h2>
-              <div className="text-3xl sm:text-4xl font-bold mb-2">
-                {(results.irr * 100).toFixed(2)}%
+          {/* Project Summary */}
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <h3 className="text-sm font-semibold text-gray-800 mb-3">
+              Project Summary
+            </h3>
+            <div className="text-sm text-gray-600 space-y-2">
+              <div className="flex justify-between">
+                <span>Project Duration:</span>
+                <span className="font-semibold">{cashFlows.length} years</span>
               </div>
-              <p className="text-xs text-gray-300">
-                {results.irr > 0.12 ? 'Potentially Good Investment' : 
-                 results.irr > 0.08 ? 'Moderate Investment' : 
-                 'Consider Alternatives'}
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-xs sm:text-sm font-normal mb-3">Additional Metrics</h3>
-              <div className="space-y-3">
-                <div className="border-2 border-gray-600 rounded p-3">
-                  <div className="text-xs mb-1">Net Present Value (NPV)</div>
-                  <div className="text-base font-bold">
-                    ₹{Math.abs(results.npv) < 1000 ? 
-                      results.npv.toFixed(2) : 
-                      results.npv.toLocaleString()}
-                  </div>
-                </div>
-                
-                <div className="border-2 border-gray-600 rounded p-3">
-                  <div className="text-xs mb-1">Total Cash Flows</div>
-                  <div className="text-base font-bold">
-                    ₹{results.totalCashFlow.toLocaleString()}
-                  </div>
-                </div>
-                
-                <div className="border-2 border-gray-600 rounded p-3">
-                  <div className="text-xs mb-1">Simple ROI</div>
-                  <div className="text-base font-bold">
-                    {results.roi.toFixed(2)}%
-                  </div>
-                </div>
+              <div className="flex justify-between">
+                <span>Total Cash Inflows:</span>
+                <span className="font-semibold">₹{results.totalCashFlow.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Simple ROI:</span>
+                <span className="font-semibold">{results.roi.toFixed(2)}%</span>
               </div>
             </div>
           </div>
         </div>
 
-        <style jsx>{`
-          .slider::-webkit-slider-thumb {
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #374151;
-            cursor: pointer;
-          }
+        {/* Right Side */}
+        <div className="bg-black text-white p-8 rounded-lg">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-semibold mb-4">IRR is</h2>
+            <div className="text-4xl font-bold mb-4">{(results.irr * 100).toFixed(2)}%</div>
+            <div className="text-sm text-gray-400">
+              {results.irr > 0.12 ? 'Potentially Good Investment' : 
+               results.irr > 0.08 ? 'Moderate Investment' : 
+               'Consider Alternatives'}
+            </div>
+          </div>
 
-          .slider::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #374151;
-            cursor: pointer;
-            border: none;
-          }
-        `}</style>
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="bg-gray-800 p-4 rounded-lg text-center">
+              <h3 className="text-lg font-semibold mb-2">NPV</h3>
+              <div className="text-xl font-bold">
+                ₹{Math.abs(results.npv) < 1000 ? 
+                  results.npv.toFixed(2) : 
+                  results.npv.toLocaleString()}
+              </div>
+            </div>
+            <div className="bg-gray-800 p-4 rounded-lg text-center">
+              <h3 className="text-lg font-semibold mb-2">Simple ROI</h3>
+              <div className="text-xl font-bold">{results.roi.toFixed(2)}%</div>
+            </div>
+          </div>
+
+          {/* Summary */}
+          <div className="border-t border-gray-700 pt-4">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="text-gray-400">Initial Investment:</p>
+                <p className="font-semibold">₹{initialInvestment.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Total Cash Flows:</p>
+                <p className="font-semibold">₹{results.totalCashFlow.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Project Duration:</p>
+                <p className="font-semibold">{cashFlows.length} years</p>
+              </div>
+              <div>
+                <p className="text-gray-400">Investment Status:</p>
+                <p className="font-semibold">
+                  {results.irr > 0.12 ? 'Good' : 
+                   results.irr > 0.08 ? 'Moderate' : 
+                   'Consider Alternatives'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          width: 20px;
+          height: 20px;
+          background: #000;
+          cursor: pointer;
+          border-radius: 50%;
+        }
+
+        .slider::-moz-range-thumb {
+          width: 20px;
+          height: 20px;
+          background: #000;
+          cursor: pointer;
+          border-radius: 50%;
+          border: none;
+        }
+      `}</style>
     </div>
   );
 }

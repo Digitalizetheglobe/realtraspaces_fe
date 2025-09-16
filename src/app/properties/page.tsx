@@ -1798,30 +1798,32 @@ const handleCompareClick = async () => {
                           >
                            
                           </button> */}
-                                         <button
-                  type="button"
-                  className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
-                  onClick={() => {
-                    if (navigator.share) {
-                      navigator.share({
-                        title: property.title,
-                        text: `Check out this property: ${property.title}`,
-                        url: `https://realtraspaces.com/property-details/${property.title}`,
-                      });
-                    } else {
-                      alert("Share not supported on this browser.");
-                    }
-                  }}
-                  title="Share"
-                >
-                  <Image
-                    src={share}
-                    alt="Share"
-                    width={20}
-                    height={20}
-                    className="object-contain transition-all duration-300 hover:scale-110"
-                  />
-                </button>
+                                         {isLoggedIn && (
+                  <button
+                    type="button"
+                    className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
+                    onClick={() => {
+                      if (navigator.share) {
+                        navigator.share({
+                          title: property.title,
+                          text: `Check out this property: ${property.title}`,
+                          url: `https://realtraspaces.com/property-details/${property.title}`,
+                        });
+                      } else {
+                        alert("Share not supported on this browser.");
+                      }
+                    }}
+                    title="Share"
+                  >
+                    <Image
+                      src={share}
+                      alt="Share"
+                      width={20}
+                      height={20}
+                      className="object-contain transition-all duration-300 hover:scale-110"
+                    />
+                  </button>
+                )}
                         </div>
                               {/* WhatsApp button */}
                               <a

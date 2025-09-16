@@ -161,7 +161,7 @@ const SignUpPage = () => {
               <div className="flex items-center space-x-3">
                 <Building className="h-8 w-8 text-white" />
                 <span className="text-2xl font-bold text-white">
-                  Realtraspace
+                  Realtraspaces
                 </span>
               </div>
 
@@ -197,7 +197,7 @@ const SignUpPage = () => {
               </div>
 
               <div className="text-white/80 text-sm">
-                © 2023 Realtraspace. All rights reserved.
+                © 2023 Realtraspaces. All rights reserved.
               </div>
             </div>
           </div>
@@ -212,7 +212,7 @@ const SignUpPage = () => {
                 Create Account
               </h2>
               <p className="text-[#6E6E73]">
-                Join Realtraspace to find your perfect property
+                Join Realtraspaces to find your perfect property
               </p>
             </div>
 

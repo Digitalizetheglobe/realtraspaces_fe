@@ -116,7 +116,7 @@ export default function PrivacyPolicy() {
                 Contact Information
               </h2>
               <p className="text-gray-700">
-                For questions, contact <a href="mailto:info@realtraspaces.com" className="text-blue-600 hover:text-blue-800 hover:underline">info@realtraspaces.com</a> or call +91 9730156575.
+                For questions, contact <a href="mailto:info@realtraspaces.com" className="text-blue-600 hover:text-blue-800 hover:underline">info@realtraspaces.com</a> or call <a href="tel:+919730156575" className="text-blue-600 hover:text-blue-800 hover:underline">+91 9730156575</a>.
               </p>
             </div>
           </div>

@@ -285,74 +285,69 @@ const DevelopersPage = () => {
               {filteredDevelopers.map((developer, index) => (
                 <div
                   key={developer.id}
-                  className="group relative bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer"
+                  className="group bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-pointer"
                   style={{
                     animationDelay: `${index * 100}ms`,
                     animation: 'fadeInUp 0.6s ease-out forwards'
                   }}
                   onClick={() => openModal(developer)}
                 >
-                  {/* Card Content */}
+                  {/* Image Section */}
                   <div className="relative h-80 overflow-hidden">
-                    {/* Background Image/Logo */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200">
-                      <Image
-                        src={developer.builder_logo ? getDeveloperImageUrl(developer.builder_logo) : '/assets/signin.jpeg'}
-                        alt={developer.buildername}
-                        width={400}
-                        height={320}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                        onError={(e) => {
-                          const img = e.currentTarget as HTMLImageElement;
-                          img.src = '/assets/signin.jpeg';
-                        }}
-                      />
-                    </div>
-
+                    <Image
+                      src={developer.builder_logo ? getDeveloperImageUrl(developer.builder_logo) : '/assets/signin.jpeg'}
+                      alt={developer.buildername}
+                      width={400}
+                      height={320}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      onError={(e) => {
+                        const img = e.currentTarget as HTMLImageElement;
+                        img.src = '/assets/signin.jpeg';
+                      }}
+                    />
+                    
                     {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-
-                    {/* Status Badge */}
-                    <div className="absolute top-4 right-4">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          developer.status
-                            ? "bg-green-500 text-white"
-                            : "bg-gray-500 text-white"
-                        }`}
-                      >
-                        {developer.status ? "Active" : "Inactive"}
-                      </span>
-                    </div>
-
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
+                    
                     {/* View Details Icon */}
-                    <div className="absolute top-4 left-4">
+                    <div className="absolute top-4 right-4">
                       <div className="bg-white/20 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
                         <FiEye className="text-white text-lg" />
                       </div>
                     </div>
+                  </div>
 
-                    {/* Developer Info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <h3 className="text-2xl font-bold mb-2 group-hover:text-yellow-300 transition-colors">
-                        {developer.buildername}
-                      </h3>
-                      <p className="text-sm text-white/80 line-clamp-2 mb-3">
-                        {developer.descriptions || 'No description available'}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center text-sm text-white/70">
-                          <FiHome className="mr-1" />
-                          <span>{(developer.project_name || []).length} Projects</span>
-                        </div>
-                        <div className="text-sm text-white/70">
-                          Click to view details
-                        </div>
+                  {/* White Background Details Section */}
+                  <div className="bg-white p-6">
+                    <h3 className="text-2xl font-bold mb-3 text-gray-800 group-hover:text-blue-600 transition-colors">
+                      {developer.buildername}
+                    </h3>
+                    
+                    <p className="text-gray-600 text-sm line-clamp-3 mb-4 leading-relaxed">
+                      {developer.descriptions || 'No description available'}
+                    </p>
+                    
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center text-sm text-gray-500">
+                        <FiHome className="mr-2 text-blue-500" />
+                        <span className="font-medium">{(developer.project_name || []).length} Projects</span>
+                      </div>
+                      <div className="flex items-center">
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          developer.status 
+                            ? "bg-green-100 text-green-700" 
+                            : "bg-gray-100 text-gray-700"
+                        }`}>
+                          {developer.status ? "Active" : "Inactive"}
+                        </span>
                       </div>
                     </div>
-
-                    {/* Hover Overlay */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300"></div>
+                    
+                    <div className="text-center">
+                      <span className="text-sm text-gray-400 group-hover:text-blue-500 transition-colors">
+                        Click to view details
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -463,11 +458,7 @@ const DevelopersPage = () => {
                             }}
                           />
                         </div>
-                        <div className="p-3 bg-gradient-to-r from-gray-50 to-gray-100">
-                          <p className="text-xs text-gray-600 text-center font-medium">
-                            Image {idx + 1}
-                          </p>
-                        </div>
+                      
                       </div>
                     ))}
                   </div>

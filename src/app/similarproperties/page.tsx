@@ -331,41 +331,35 @@ export default function Similarproperties() {
                                                   />
                                                 </svg>
                                               </button>
-                                                {/* Share button */}
-                        <div className="relative">
-                          {/* <button
-                            className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
-                            onClick={() => setOpenShareIndex(openShareIndex === index ? null : index)}
-                            aria-label="Share"
-                            type="button"
-                          >
-                           
-                          </button> */}
-                                         <button
-                  type="button"
-                  className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
-                  onClick={() => {
-                    if (navigator.share) {
-                      navigator.share({
-                        title: property.title,
-                        text: `Check out this property: ${property.title}`,
-                        url: `https://realtraspaces.com/property-details/${property.title}`,
-                      });
-                    } else {
-                      alert("Share not supported on this browser.");
-                    }
-                  }}
-                  title="Share"
-                >
-                  <Image
-                    src={share}
-                    alt="Share"
-                    width={20}
-                    height={20}
-                    className="object-contain transition-all duration-300 hover:scale-110"
-                  />
-                </button>
-                        </div>
+                                                {/* Share button - only show if user is logged in */}
+                        {isLoggedIn && (
+                          <div className="relative">
+                            <button
+                              type="button"
+                              className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
+                              onClick={() => {
+                                if (navigator.share) {
+                                  navigator.share({
+                                    title: property.title,
+                                    text: `Check out this property: ${property.title}`,
+                                    url: `https://realtraspaces.com/property-details/${property.title}`,
+                                  });
+                                } else {
+                                  alert("Share not supported on this browser.");
+                                }
+                              }}
+                              title="Share"
+                            >
+                              <Image
+                                src={share}
+                                alt="Share"
+                                width={20}
+                                height={20}
+                                className="object-contain transition-all duration-300 hover:scale-110"
+                              />
+                            </button>
+                          </div>
+                        )}
                                               {/* WhatsApp button */}
                                               <a
                                                 href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}

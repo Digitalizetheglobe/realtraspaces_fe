@@ -121,7 +121,7 @@ export default function EmiCalculator() {
   const maxDownPayment = Math.max(0, loanAmount * 0.8); // Max 80% of loan amount
 
   return (
-    <div className="max-w-6xl mx-auto p-8 bg-gray-50 min-h-screen">
+    <div className="max-w-6xl mx-auto p-8 my-20 bg-gray-50 min-h-screen">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">
           Loan Against Rental Receivables - <span className="font-bold">EMI Calculator</span>
@@ -129,6 +129,7 @@ export default function EmiCalculator() {
         <p className="text-gray-600">
           Figure out your loan amount and monthly repayments with our Calculator
         </p>
+        
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
