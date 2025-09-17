@@ -293,13 +293,13 @@ const DevelopersPage = () => {
                   onClick={() => openModal(developer)}
                 >
                   {/* Image Section */}
-                  <div className="relative h-80 overflow-hidden">
+                  <div className="relative h-80 overflow-hidden bg-gray-100">
                     <Image
                       src={developer.builder_logo ? getDeveloperImageUrl(developer.builder_logo) : '/assets/signin.jpeg'}
                       alt={developer.buildername}
                       width={400}
                       height={320}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      className="w-full h-full object-contain transition-transform duration-300 group-hover:scale-105"
                       onError={(e) => {
                         const img = e.currentTarget as HTMLImageElement;
                         img.src = '/assets/signin.jpeg';
