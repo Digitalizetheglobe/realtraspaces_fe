@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Listing API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .endpoint {
+            background: #e8f4fd;
+            padding: 15px;
+            border-left: 4px solid #007acc;
+            margin-bottom: 15px;
+        }
+        .method {
+            font-weight: bold;
+            color: #007acc;
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            font-family: monospace;
+            font-size: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #005a9e;
+        }
+        .response {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            border-left: 4px solid #28a745;
+            background: #d4edda;
+        }
+        .error {
+            border-left: 4px solid #dc3545;
+            background: #f8d7da;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .json-examples {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .integration-info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Property Listing API Test Suite</h1>
+    
+    <div class="integration-info">
+        <h3>🚀 Integration Complete!</h3>
+        <p><strong>Your Next.js form is now ready at:</strong> <code>/list-property</code></p>
+        <p>This test page allows you to test the same API endpoints that your Next.js form uses.</p>
+        <ul>
+            <li>✅ Comprehensive property listing form with all fields</li>
+            <li>✅ Image upload with drag & drop functionality</li>
+            <li>✅ Form validation and error handling</li>
+            <li>✅ API integration with property listing service</li>
+            <li>✅ Responsive design with modern UI</li>
+            <li>✅ Toast notifications for user feedback</li>
+        </ul>
+    </div>
+    
+    <div class="container">
+        <h2>Base Configuration</h2>
+        <div class="form-group">
+            <label>API Base URL:</label>
+            <input type="text" id="baseUrl" value="http://localhost:8000/api/property-listings">
+        </div>
+    </div>
+
+    <!-- CREATE PROPERTY LISTING -->
+    <div class="container">
+        <div class="endpoint">
+            <span class="method">POST</span> /api/property-listings/create
+        </div>
+        
+        <div class="json-examples">
+            <h4>📝 Load Test Data:</h4>
+            <button onclick="loadCreateExample(1)">Office Space</button>
+            <button onclick="loadCreateExample(2)">Retail Shop</button>
+            <button onclick="loadCreateExample(3)">Coworking</button>
+            <button onclick="clearCreateForm()">Clear Form</button>
+        </div>
+
+        <h4>Property Details (JSON Payload):</h4>
+        <textarea id="createBody">{
+  "propertyName": "Tech Tower Business Center",
+  "location": "Sector 18, Gurgaon",
+  "propertyType": "Office",
+  "transactionType": "Lease",
+  "areaCarpet": "3200 sq ft",
+  "areaBuiltup": "4000 sq ft",
+  "rent": 180000.00,
+  "price": null,
+  "contactName": "Rahul Mehta",
+  "contactNumber": "+91-9988776655",
+  "emailAddress": "rahul.mehta@techproperties.com",
+  "description": "Premium office space with sea view, fully furnished with modern amenities including high-speed internet, conference rooms, and dedicated parking.",
+  "images": [
+    "property-test-001-exterior.jpg",
+    "property-test-002-lobby.jpg",
+    "property-test-003-office-floor.jpg"
+  ]
+}</textarea>
+        <br>
+        <button onclick="testCreate()">🚀 Test Create</button>
+        <div id="createResponse" class="response"></div>
+    </div>
+
+    <!-- GET ALL PROPERTY LISTINGS -->
+    <div class="container">
+        <div class="endpoint">
+            <span class="method">GET</span> /api/property-listings/all
+        </div>
+        
+        <div class="form-group">
+            <label>Query Parameters (optional):</label>
+            <input type="text" id="getAllParams" placeholder="page=1&limit=10&status=approved&propertyType=Office">
+        </div>
+        
+        <button onclick="testGetAll()">📋 Test Get All</button>
+        <div id="getAllResponse" class="response"></div>
+    </div>
+
+    <!-- GET PROPERTY BY ID -->
+    <div class="container">
+        <div class="endpoint">
+            <span class="method">GET</span> /api/property-listings/:id
+        </div>
+        
+        <div class="form-group">
+            <label>Property ID:</label>
+            <input type="number" id="getById" placeholder="1">
+        </div>
+        
+        <button onclick="testGetById()">🔍 Test Get By ID</button>
+        <div id="getByIdResponse" class="response"></div>
+    </div>
+
+    <!-- UPDATE PROPERTY LISTING -->
+    <div class="container">
+        <div class="endpoint">
+            <span class="method">PUT</span> /api/property-listings/:id
+        </div>
+        
+        <div class="form-group">
+            <label>Property ID to Update:</label>
+            <input type="number" id="updateId" placeholder="1">
+        </div>
+
+        <h4>Update Data:</h4>
+        <textarea id="updateBody">{
+  "rent": 200000.00,
+  "description": "Updated: Premium office space with additional amenities and parking",
+  "images": [
+    "property-test-001-exterior-updated.jpg",
+    "property-test-002-lobby-renovated.jpg"
+  ]
+}</textarea>
+        <br>
+        <button onclick="testUpdate()">✏️ Test Update</button>
+        <div id="updateResponse" class="response"></div>
+    </div>
+
+    <!-- UPDATE STATUS -->
+    <div class="container">
+        <div class="endpoint">
+            <span class="method">PATCH</span> /api/property-listings/:id/status
+        </div>
+        
+        <div class="form-group">
+            <label>Property ID:</label>
+            <input type="number" id="statusId" placeholder="1">
+        </div>
+        
+        <div class="form-group">
+            <label>New Status:</label>
+            <select id="newStatus">
+                <option value="pending">pending</option>
+                <option value="approved">approved</option>
+                <option value="rejected">rejected</option>
+                <option value="active">active</option>
+                <option value="inactive">inactive</option>
+            </select>
+        </div>
+        
+        <button onclick="testUpdateStatus()">🔄 Test Update Status</button>
+        <div id="statusResponse" class="response"></div>
+    </div>
+
+    <script>
+        const baseUrlInput = document.getElementById('baseUrl');
+
+        // Create property examples
+        const createExamples = {
+            1: {
+                "propertyName": "Tech Tower Business Center",
+                "location": "Sector 18, Gurgaon",
+                "propertyType": "Office",
+                "transactionType": "Lease",
+                "areaCarpet": "3200 sq ft",
+                "areaBuiltup": "4000 sq ft",
+                "rent": 180000.00,
+                "price": null,
+                "contactName": "Rahul Mehta",
+                "contactNumber": "+91-9988776655",
+                "emailAddress": "rahul.mehta@techproperties.com",
+                "description": "Premium office space with sea view, fully furnished with modern amenities including high-speed internet, conference rooms, and dedicated parking.",
+                "images": [
+                    "property-test-001-exterior.jpg",
+                    "property-test-002-lobby.jpg",
+                    "property-test-003-office-floor.jpg"
+                ]
+            },
+            2: {
+                "propertyName": "Street Side Retail Shop",
+                "location": "Khan Market, New Delhi",
+                "propertyType": "Retail",
+                "transactionType": "Sale",
+                "areaCarpet": "600 sq ft",
+                "areaBuiltup": "750 sq ft",
+                "rent": null,
+                "price": 4500000.00,
+                "contactName": "Sunita Kapoor",
+                "contactNumber": "+91-8877665544",
+                "emailAddress": "sunita.kapoor@retailspaces.in",
+                "description": "Prime retail location with high foot traffic, perfect for boutique or electronics store.",
+                "images": [
+                    "property-test-006-storefront.jpg",
+                    "property-test-007-interior.jpg"
+                ]
+            },
+            3: {
+                "propertyName": "Creative Workspace Hub",
+                "location": "Koramangala, Bangalore",
+                "propertyType": "Coworking",
+                "transactionType": "BOTH",
+                "areaCarpet": "8000 sq ft",
+                "areaBuiltup": "10000 sq ft",
+                "rent": 350000.00,
+                "price": 15000000.00,
+                "contactName": "Arjun Reddy",
+                "contactNumber": "+91-7766554433",
+                "emailAddress": "arjun.reddy@creativespaces.com",
+                "description": "State-of-the-art coworking facility with 200+ desks, multiple meeting rooms, event space, rooftop cafe, and wellness area.",
+                "images": [
+                    "property-test-008-main-workspace.jpg",
+                    "property-test-009-meeting-room-1.jpg",
+                    "property-test-010-meeting-room-2.jpg"
+                ]
+            }
+        };
+
+        function loadCreateExample(num) {
+            const example = createExamples[num];
+            document.getElementById('createBody').value = JSON.stringify(example, null, 2);
+        }
+
+        function clearCreateForm() {
+            document.getElementById('createBody').value = '';
+        }
+
+        async function makeRequest(method, endpoint, body = null) {
+            const url = baseUrlInput.value + endpoint;
+            const options = {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            };
+
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+
+            try {
+                const response = await fetch(url, options);
+                const data = await response.json();
+                return {
+                    status: response.status,
+                    data: data,
+                    success: response.ok
+                };
+            } catch (error) {
+                return {
+                    status: 0,
+                    data: { error: error.message },
+                    success: false
+                };
+            }
+        }
+
+        function displayResponse(elementId, response) {
+            const element = document.getElementById(elementId);
+            element.className = 'response ' + (response.success ? 'success' : 'error');
+            element.textContent = `Status: ${response.status}\n\n${JSON.stringify(response.data, null, 2)}`;
+        }
+
+        async function testCreate() {
+            try {
+                const body = JSON.parse(document.getElementById('createBody').value);
+                const response = await makeRequest('POST', '/create', body);
+                displayResponse('createResponse', response);
+            } catch (error) {
+                displayResponse('createResponse', {
+                    success: false,
+                    status: 0,
+                    data: { error: 'Invalid JSON: ' + error.message }
+                });
+            }
+        }
+
+        async function testGetAll() {
+            const params = document.getElementById('getAllParams').value;
+            const endpoint = params ? `/all?${params}` : '/all';
+            const response = await makeRequest('GET', endpoint);
+            displayResponse('getAllResponse', response);
+        }
+
+        async function testGetById() {
+            const id = document.getElementById('getById').value;
+            if (!id) {
+                alert('Please enter a Property ID');
+                return;
+            }
+            const response = await makeRequest('GET', `/${id}`);
+            displayResponse('getByIdResponse', response);
+        }
+
+        async function testUpdate() {
+            const id = document.getElementById('updateId').value;
+            if (!id) {
+                alert('Please enter a Property ID');
+                return;
+            }
+            try {
+                const body = JSON.parse(document.getElementById('updateBody').value);
+                const response = await makeRequest('PUT', `/${id}`, body);
+                displayResponse('updateResponse', response);
+            } catch (error) {
+                displayResponse('updateResponse', {
+                    success: false,
+                    status: 0,
+                    data: { error: 'Invalid JSON: ' + error.message }
+                });
+            }
+        }
+
+        async function testUpdateStatus() {
+            const id = document.getElementById('statusId').value;
+            const status = document.getElementById('newStatus').value;
+            if (!id) {
+                alert('Please enter a Property ID');
+                return;
+            }
+            const response = await makeRequest('PATCH', `/${id}/status`, { status });
+            displayResponse('statusResponse', response);
+        }
+
+        // Load first example on page load
+        window.addEventListener('load', function() {
+            loadCreateExample(1);
+        });
+    </script>
+</body>
+</html>
