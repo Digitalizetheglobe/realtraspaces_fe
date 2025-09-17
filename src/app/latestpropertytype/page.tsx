@@ -692,7 +692,7 @@ export default function PropertyCards() {
 
   return (
     <div className={raleway.className}>
-       <section className="relative w-full h-[220px] sm:h-[400px] md:h-[400px]">
+       <section className="relative w-full h-[400px] sm:h-[400px] md:h-[400px]">
          <div className="absolute inset-0 z-0">
     <video
       autoPlay
@@ -715,9 +715,9 @@ export default function PropertyCards() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -50 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-6  justify-center px-4 "
+            className="text-center mb-6  justify-center px-4"
           >
-            <h1 className="text-2xl sm:text-2xl md:text-6xl  text-white font-bold mb-2 sm:mb-3 leading-tight">
+            <h1 className="text-2xl sm:text-2xl md:text-6xl text-white font-bold mb-2 sm:mb-3 leading-tight">
               <span className="block sm:inline">Realtra Spaces –</span> 
               <span className="block sm:inline text-gray-300 mt-1 sm:mt-0">Redefining Commercial Real Estate</span>
             </h1>
@@ -900,10 +900,10 @@ export default function PropertyCards() {
       </section>
 
       {/* INQUIRE NOW Button - Fixed on right side */}
-      <div className="fixed right-6 top-1/3 transform -translate-y-1/2 z-40">
+      <div className="fixed right-4 top-1/4 md:right-6 md:top-1/3 transform -translate-y-1/2 z-40">
         <button
           onClick={() => setShowPopup(true)}
-          className="bg-black hover:bg-gray-800 text-white px-6 py-2 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 font-bold text-lg uppercase tracking-wider"
+          className="bg-black hover:bg-gray-800 text-white px-6 py-2 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 font-bold text-sm uppercase tracking-wider"
           style={{
             writingMode: 'vertical-rl',
             textOrientation: 'mixed'
