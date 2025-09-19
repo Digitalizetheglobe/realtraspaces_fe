@@ -111,12 +111,12 @@ export default function PropertyCards() {
   useEffect(() => {
     const hideHeadingTimer = setTimeout(() => {
       setShowHeading(false);
-    }, 7000);
+    }, 4000);
 
     const showSearchBarTimer = setTimeout(() => {
       setShowSearchBar(true);
       setInitialDelayComplete(true);
-    }, 7500); // Show search bar 1 second after heading hides
+    }, 4500); // Show search bar 1 second after heading hides
 
     return () => {
       clearTimeout(hideHeadingTimer);
