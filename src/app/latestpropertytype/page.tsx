@@ -1236,7 +1236,7 @@ export default function PropertyCards() {
                           ? "For Sale2"
                           : property.forRent
                           ? "For Rent"
-                          : `For ${property.enquiredFor}`}
+: `For ${property.enquiredFor}`}
                       </span>
                       <span className="mx-1 transition-all duration-300 group-hover:scale-110">•</span>
                       <span className="ml-1 transition-all duration-300 group-hover:font-medium">
