@@ -253,7 +253,7 @@ export default function PropertyCards() {
       try {
         // Fetch properties from latestpropertytype page
         const response = await fetch(
-          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=20",
+          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=1000",
           {
             method: "GET",
             headers: {
@@ -268,7 +268,7 @@ export default function PropertyCards() {
         
         // Fetch properties from properties page
         const propertiesResponse = await fetch(
-          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=100",
+          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=1000",
           {
             method: "GET",
             headers: {
@@ -288,8 +288,9 @@ export default function PropertyCards() {
         );
         console.log('Combined properties:', uniqueProperties);
         
-        setProperties(propertiesData);
+        setProperties(uniqueProperties);
         setAllProperties(uniqueProperties);
+        console.log('Total unique properties loaded:', uniqueProperties.length);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching properties:", error);
@@ -874,9 +875,40 @@ export default function PropertyCards() {
             </div>
           )}
         </div>
+        <div>
+          <button
+            type="button"
+            className="bg-black hover:bg-gray-800 text-white px-2 py-3 rounded-2xl text-sm font-medium transition-all duration-200 hover:scale-105 flex items-center justify-center"
+            onClick={() => {
+              // Store search data in sessionStorage before navigation
+              sessionStorage.setItem('searchData', JSON.stringify({
+                search: search,
+                locations: selectedLocations,
+                type: selectedType,
+                enquiredFor: enquiredForFilter
+              }));
+            }}
+          >
+            <svg
+              className="w-5 h-5 "
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+            
+          </button>
+        </div>
         
         {/* Clear Filters Button */}
-        {/* {(selectedType || enquiredForFilter || selectedLocations.length > 0 || search.trim()) && (
+        {(selectedType || enquiredForFilter || selectedLocations.length > 0 || search.trim()) && (
           <button
             onClick={() => {
               setSelectedType("");
@@ -889,7 +921,7 @@ export default function PropertyCards() {
           >
             Clear
           </button>
-        )} */}
+        )}
           </motion.div>
           </div>
         )}
@@ -951,12 +983,14 @@ export default function PropertyCards() {
                  </p>
                </div> */}
             </div>
+{/* Debug Info */}
+            
 
             {/* Property Cards */}
             {loading ? (
-              // Loading state - show 4 skeleton cards
+              // Loading state - show 8 skeleton cards
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                {[...Array(4)].map((_, index) => (
+                {[...Array(8)].map((_, index) => (
                   <div
                     key={index}
                     className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col animate-pulse"
@@ -1061,13 +1095,13 @@ export default function PropertyCards() {
                    >
                      Explore More 
                    </button>
-                   {/* ({filteredProperties.length})  */}
+                   ({filteredProperties.length}) 
                  </Link>
                 </div>
               
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               
-              {filteredProperties.slice(0, 4).map((property, index) => (
+              {filteredProperties.slice(0, 8).map((property, index) => (
                 
                 <div
                   key={`${property.id}-${index}`}
@@ -1194,7 +1228,11 @@ export default function PropertyCards() {
                     {/* <Link href={`/property-details/${property.title}`} key={property.title} className="block"> */}
                     <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
                       <span className="mr-2 transition-all duration-300 group-hover:font-medium">
-                        {property.forSale
+                        {enquiredForFilter === "Rent"
+                          ? "For Rent"
+                          : enquiredForFilter === "Sale"
+                          ? "For Sale"
+                          : property.forSale
                           ? "For Sale"
                           : property.forRent
                           ? "For Rent"
