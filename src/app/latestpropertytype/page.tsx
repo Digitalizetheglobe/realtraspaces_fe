@@ -1231,12 +1231,12 @@ export default function PropertyCards() {
                         {enquiredForFilter === "Rent"
                           ? "For Rent"
                           : enquiredForFilter === "Sale"
-                          ? "For Sale"
+                          ? "For Sale3"
                           : property.forSale
-                          ? "For Sale"
+                          ? "For Sale2"
                           : property.forRent
                           ? "For Rent"
-                          : "For Sale"}
+                          : `For ${property.enquiredFor}`}
                       </span>
                       <span className="mx-1 transition-all duration-300 group-hover:scale-110">•</span>
                       <span className="ml-1 transition-all duration-300 group-hover:font-medium">
