@@ -122,12 +122,12 @@ export default function Home() {
                     <div className="bg-[#e6e6e6cf] h-6 w-6 rounded-full flex items-center justify-center shrink-0">
                       <Image src={email} alt="email" />
                     </div>
-                    <a href="javascript:void(0)" className="text-sm ml-4">
+                    <a href="mailto:info@realtraspaces.com" className="text-sm ml-4">
                       <small className="block text-xl text-black">
                         Write to Us
                       </small>
                       <span className="text-gray-500 text-md font-medium">
-                        contact@realtraspaces.com
+                        info@realtraspaces.com
                       </span>
                     </a>
                   </li>
