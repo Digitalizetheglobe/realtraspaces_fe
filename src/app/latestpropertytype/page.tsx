@@ -875,10 +875,10 @@ export default function PropertyCards() {
             </div>
           )}
         </div>
-        <div>
+        <Link href="/properties">
           <button
             type="button"
-            className="bg-black hover:bg-gray-800 text-white px-2 py-3 rounded-2xl text-sm font-medium transition-all duration-200 hover:scale-105 flex items-center justify-center"
+            className="bg-black cursor-pointer hover:bg-gray-800 text-white px-2 py-3 rounded-2xl text-sm font-medium transition-all duration-200 hover:scale-105 flex items-center justify-center"
             onClick={() => {
               // Store search data in sessionStorage before navigation
               sessionStorage.setItem('searchData', JSON.stringify({
@@ -905,7 +905,7 @@ export default function PropertyCards() {
             </svg>
             
           </button>
-        </div>
+        </Link>
         
         {/* Clear Filters Button */}
         {(selectedType || enquiredForFilter || selectedLocations.length > 0 || search.trim()) && (
