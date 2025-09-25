@@ -253,7 +253,7 @@ export default function PropertyCards() {
       try {
         // Fetch properties from latestpropertytype page
         const response = await fetch(
-          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=1000",
+          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=500",
           {
             method: "GET",
             headers: {
@@ -268,7 +268,7 @@ export default function PropertyCards() {
         
         // Fetch properties from properties page
         const propertiesResponse = await fetch(
-          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=1000",
+          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=500",
           {
             method: "GET",
             headers: {
@@ -1095,7 +1095,7 @@ export default function PropertyCards() {
                    >
                      Explore More 
                    </button>
-                   ({filteredProperties.length}) 
+                   {/* ({filteredProperties.length})  */}
                  </Link>
                 </div>
               
