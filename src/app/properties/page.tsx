@@ -275,7 +275,7 @@ export default function Similarproperties() {
   // Get available property types (including child types)
   const getAllPropertyTypes = () => {
     const types = new Set<string>();
-    properties.forEach(p => {
+    allProperties.forEach(p => {
       if (p.propertyType?.displayName) {
         types.add(p.propertyType.displayName);
       }
@@ -447,6 +447,7 @@ const handleCompareClick = async () => {
           ? data
           : data.items || data.data || [];
         setProperties(propertiesArray);
+        setAllProperties(propertiesArray);
         setFilteredProperties(propertiesArray);
         setLoading(false);
       } catch (error) {
@@ -460,19 +461,19 @@ const handleCompareClick = async () => {
 
   // After fetching properties, preprocess unique values
   useEffect(() => {
-    if (properties.length === 0) return;
+    if (allProperties.length === 0) return;
     // Unique cities
-    const cities = Array.from(new Set(properties.map(p => p.address?.city).filter((c): c is string => Boolean(c))));
+    const cities = Array.from(new Set(allProperties.map(p => p.address?.city).filter((c): c is string => Boolean(c))));
     // Unique sublocalities grouped by city
     const sublocalities: { [city: string]: Set<string> } = {};
-    properties.forEach(p => {
+    allProperties.forEach(p => {
       if (p.address?.city && p.address?.subLocality) {
         if (!sublocalities[p.address.city]) sublocalities[p.address.city] = new Set();
         sublocalities[p.address.city].add(p.address.subLocality);
       }
     });
     // Unique property types
-    const propertyTypes = Array.from(new Set(properties.map(p => p.propertyType?.displayName).filter((t): t is string => Boolean(t))));
+    const propertyTypes = Array.from(new Set(allProperties.map(p => p.propertyType?.displayName).filter((t): t is string => Boolean(t))));
     
     // Add pre-fed popular cities that might not have properties yet
     const popularCities = [
@@ -537,11 +538,16 @@ const handleCompareClick = async () => {
     setAllCities(allCitiesCombined);
     setAllSublocalities(sublocalities);
     setAllPropertyTypes(propertyTypes);
-  }, [properties]);
+  }, [allProperties]);
 
   // Update filtering logic to use new search components
   useEffect(() => {
-    let results = properties;
+    if (allProperties.length === 0) {
+      setFilteredProperties([]);
+      return;
+    }
+    
+    let results = allProperties;
 
     // Search by property name
     if (searchTerm) {
@@ -739,7 +745,7 @@ const handleCompareClick = async () => {
     } else {
       setShowContactForm(false);
     }
-  }, [searchTerm, filters, properties, selectedLocations, selectedCities, selectedSubLocations, selectedPropertyTypes, selectedCarpetArea, minCarpetArea, maxCarpetArea, selectedType, enquiredForFilter]);
+  }, [searchTerm, filters, allProperties, selectedLocations, selectedCities, selectedSubLocations, selectedPropertyTypes, selectedCarpetArea, minCarpetArea, maxCarpetArea, selectedType, enquiredForFilter]);
 
   // Helper function to get attribute value by ID
   const getAttributeValue = (property: Property, attributeId: string) => {
@@ -923,7 +929,7 @@ const handleCompareClick = async () => {
                     <div className="relative">
                       <button
                         type="button"
-                        className="w-full text-left text-black text-sm p-3 pr-10 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full text-left text-black text-sm p-3 cursor-pointer pr-10 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                         onClick={() => {
                           setShowCityDropdown(!showCityDropdown);
                           setShowSubLocationDropdown(false);
@@ -945,7 +951,7 @@ const handleCompareClick = async () => {
                       {showCityDropdown && (
                         <div className="search-dropdown absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
                           {/* Search Input */}
-                          <div className="sticky top-0 bg-white border-b border-gray-200 p-2">
+                          <div className="sticky top-0 cursor-pointer bg-white border-b border-gray-200 p-2">
                             <input
                               type="text"
                               placeholder="Search cities..."
@@ -1059,7 +1065,7 @@ const handleCompareClick = async () => {
                     <div className="relative">
                       <button
                         type="button"
-                        className="w-full text-left text-black text-sm p-3 pr-10 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        className="w-full text-left cursor-pointer text-black text-sm p-3 pr-10 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
                         disabled={selectedCities.length === 0}
                         onClick={() => {
                           setShowSubLocationDropdown(!showSubLocationDropdown);
@@ -1145,7 +1151,7 @@ const handleCompareClick = async () => {
                     <div className="relative">
                       <button
                         type="button"
-                        className="w-full text-left text-black text-sm p-3 pr-10 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full text-left cursor-pointer text-black text-sm p-3 pr-10 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                         onClick={() => {
                           setShowPropertyTypeDropdown(!showPropertyTypeDropdown);
                           setShowCityDropdown(false);
@@ -1220,7 +1226,7 @@ const handleCompareClick = async () => {
                     <div className="relative">
                       <button
                         type="button"
-                        className="w-full text-left text-black text-sm p-3 pr-10 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        className="w-full text-left cursor-pointer text-black text-sm p-3 pr-10 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                         onClick={() => {
                           setShowCarpetAreaDropdown(!showCarpetAreaDropdown);
                           setShowCityDropdown(false);
