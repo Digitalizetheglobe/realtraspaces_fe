@@ -178,10 +178,17 @@ const Blogs = () => {
 
               {/* Slider container */}
               <div className="overflow-hidden">
-                <div className="flex gap-8 transition-transform duration-500 ease-in-out">
+                <div 
+                  className="flex gap-8 transition-transform duration-500 ease-in-out"
+                  style={{
+                    transform: `translateX(-${currentSlide * 100}%)`
+                  }}
+                >
                   {blogs.length > 0 ? (
-                    getCurrentSlideBlogs().map((blog, index) => (
-                      <div key={blog.slug} className="flex-shrink-0 w-full md:w-1/3">
+                    Array.from({ length: Math.ceil(blogs.length / 3) }, (_, slideIndex) => (
+                      <div key={slideIndex} className="flex gap-8 w-full flex-shrink-0">
+                        {blogs.slice(slideIndex * 3, slideIndex * 3 + 3).map((blog, index) => (
+                          <div key={blog.slug} className="flex-shrink-0 w-full md:w-1/3">
                         <Link href={`/blogs/${blog.slug}`} className="block group">
                           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                             <div className="relative overflow-hidden rounded-lg">
@@ -234,7 +241,9 @@ const Blogs = () => {
                               </div>
                             </div>
                           </div>
-                        </Link>
+                            </Link>
+                          </div>
+                        ))}
                       </div>
                     ))
                   ) : (

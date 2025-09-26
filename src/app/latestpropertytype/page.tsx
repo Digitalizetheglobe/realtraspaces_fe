@@ -77,9 +77,15 @@ export default function PropertyCards() {
   const [formData, setFormData] = useState({
     email: "",
     name: "",
-    number: "",
+    phone_number: "",
+    subject: "",
     message: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
   const [openShareIndex, setOpenShareIndex] = useState<number | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<string>("");
@@ -452,6 +458,16 @@ export default function PropertyCards() {
     setShowPopup(false);
     setPopupDismissed(true);
     localStorage.setItem('popupDismissedAt', Date.now().toString());
+    // Reset form state
+    setFormData({
+      name: "",
+      email: "",
+      phone_number: "",
+      subject: "",
+      message: ""
+    });
+    setSubmitStatus({ type: null, message: '' });
+    setIsSubmitting(false);
   };
 
   // Handle form input changes
@@ -464,12 +480,55 @@ export default function PropertyCards() {
   };
 
   // Handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    // Here you can add your form submission logic
-    handleClosePopup();
-    setFormData({ email: "", name: "", number: "", message: "" });
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: '' });
+
+    try {
+      const response = await fetch('https://api.realtraspaces.com/api/contacts/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setSubmitStatus({ 
+          type: 'success', 
+          message: 'Thank you for your message! We will get back to you soon.' 
+        });
+        setFormData({
+          name: "",
+          email: "",
+          phone_number: "",
+          subject: "",
+          message: ""
+        });
+        toast.success('Message sent successfully!');
+        // Close popup after a short delay to show success message
+        setTimeout(() => {
+          handleClosePopup();
+        }, 2000);
+      } else {
+        setSubmitStatus({ 
+          type: 'error', 
+          message: result.message || 'Failed to send message. Please try again.' 
+        });
+        toast.error(result.message || 'Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      setSubmitStatus({ 
+        type: 'error', 
+        message: 'Network error. Please check your connection and try again.' 
+      });
+      toast.error('Network error. Please check your connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Helper function to get attribute value by ID
@@ -1433,10 +1492,10 @@ export default function PropertyCards() {
 
       {/* Popup Modal */}
       {showPopup && (
-  <div className="fixed inset-0 bg-gray-500 bg-opacity-60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-    <div className="bg-white  rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 opacity-100">
+  <div className="fixed inset-0 bg-gray-500 bg-opacity-60 flex items-center justify-center z-50 py-4 px-2 backdrop-blur-sm">
+    <div className="bg-white  rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] transform transition-all duration-300 scale-100 opacity-100">
       {/* Header with gradient background */}
-      <div className="bg-black text-white p-6 rounded-t-2xl">
+      <div className="bg-black text-white px-6 py-4 rounded-t-2xl">
         <div className="flex justify-between items-center">
           <div>
             <h3 className="text-2xl font-bold">Get in Touch</h3>
@@ -1452,80 +1511,177 @@ export default function PropertyCards() {
       </div>
 
       {/* Form */}
-      <div className="p-6 space-y-6 bg-[#F1F1F4]">
-        {/* Name Field */}
+      <div className="px-6 py-4 space-y-4 bg-[#F1F1F4]">
+            {/* Name and Email Row */}
+        <div className="flex gap-4">
+          {/* Name Field */}
+          <div className="flex-1 space-y-2">
+            <label htmlFor="name" className="block text-sm font-semibold text-black">
+              Full Name *
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+                className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
+                placeholder="Enter your full name"
+              />
+            </div>
+          </div>
+
+          {/* Email Field */}
+          <div className="flex-1 space-y-2">
+            <label htmlFor="email" className="block text-sm font-semibold text-black">
+              Email Address *
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
+                placeholder="Enter your email address"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Phone and Subject Row */}
+        <div className="flex gap-4">
+          {/* Phone Field */}
+          <div className="flex-1 space-y-2">
+            <label htmlFor="phone_number" className="block text-sm font-semibold text-black">
+              Phone Number *
+            </label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
+              <input
+                type="tel"
+                id="phone_number"
+                name="phone_number"
+                value={formData.phone_number}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  // Allow only numbers and restrict to 10 digits
+                  if (/^\d{0,10}$/.test(value)) {
+                    handleInputChange(e);
+                  }
+                }}
+                required
+                maxLength={10}
+                className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
+                placeholder="Enter your phone number"
+              />
+            </div>
+          </div>
+
+          {/* Subject Field */}
+          <div className="flex-1 space-y-2">
+            <label htmlFor="subject" className="block text-sm font-semibold text-black">
+              Subject *
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                id="subject"
+                name="subject"
+                value={formData.subject}
+                onChange={handleInputChange}
+                required
+                className="w-full pl-4 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
+                placeholder="Enter subject"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Message Field */}
         <div className="space-y-2">
-          <label htmlFor="name" className="block text-sm font-semibold text-black">
-            Full Name *
+          <label htmlFor="message" className="block text-sm font-semibold text-black">
+            Message *
           </label>
           <div className="relative">
-            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
+            <MessageSquare className="absolute left-3 top-3 text-black w-5 h-5" />
+            <textarea
+              id="message"
+              name="message"
+              value={formData.message}
               onChange={handleInputChange}
               required
-              className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
-              placeholder="Enter your full name"
+              rows={2}
+              className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black resize-none"
+              placeholder="Enter your message"
             />
           </div>
         </div>
 
-        {/* Email Field */}
-        <div className="space-y-2">
-          <label htmlFor="email" className="block text-sm font-semibold text-black">
-            Email Address *
-          </label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-              className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
-              placeholder="Enter your email address"
-            />
-          </div>
+        {/* Contact Information */}
+        <div className="text-black space-y-1">
+          <p>
+            <span className="font-semibold ">Contact No:</span>{' '}
+            <a href="tel:+919730156575" className="text-black hover:text-blue-800 font-mono hover:underline">
+              +91 9730156575
+            </a>
+          </p>
+          <p>
+            <span className="font-semibold">Email:</span>{' '}
+            <a href="mailto:info@realtraspaces.com" className="text-black hover:text-blue-800 hover:underline">
+              info@realtraspaces.com
+            </a>
+          </p>
+          <p>
+            <span className="font-semibold">Address:</span> Mumbai, Maharashtra, India
+          </p>
         </div>
 
-        {/* Phone Field */}
-        <div className="text-black space-y-2">
-  <p>
-    <span className="font-semibold ">Contact No:</span>{' '}
-    <a href="tel:+919730156575" className="text-black hover:text-blue-800 font-mono hover:underline">
-      +91 9730156575
-    </a>
-  </p>
-  <p>
-    <span className="font-semibold">Email:</span>{' '}
-    <a href="mailto:info@realtraspaces.com" className="text-black hover:text-blue-800 hover:underline">
-      info@realtraspaces.com
-    </a>
-  </p>
-  <p>
-    <span className="font-semibold">Address:</span> Mumbai, Maharashtra, India
-  </p>
-</div>
+        {/* Status Messages */}
+        {submitStatus.type && (
+          <div className={`p-3 rounded-lg ${
+            submitStatus.type === 'success' 
+              ? 'bg-green-100 text-green-800 border border-green-200' 
+              : 'bg-red-100 text-red-800 border border-red-200'
+          }`}>
+            {submitStatus.message}
+          </div>
+        )}
 
 
         {/* Action Buttons */}
         <div className="flex gap-3 pt-2">
           <button
             onClick={handleSubmit}
-            className="flex-1 bg-black text-white py-3 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center gap-2"
+            disabled={isSubmitting}
+            className={`flex-1 py-3 px-6 rounded-xl cursor-pointer transition-all duration-200 font-semibold shadow-lg transform flex items-center justify-center gap-2 ${
+              isSubmitting 
+                ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
+                : 'bg-black text-white hover:from-blue-700 hover:to-purple-700 hover:shadow-xl hover:scale-[1.02]'
+            }`}
           >
-            <Send className="w-5 h-5" />
-            Send Message
+            {isSubmitting ? (
+              <>
+                <div className="w-5 h-5 border-2 cursor-pointer border-white border-t-transparent rounded-full animate-spin"></div>
+                Sending...
+              </>
+            ) : (
+              <>
+                <Send className="w-5 h-5 cursor-pointer" />
+                Send Message
+              </>
+            )}
           </button>
           <button
             type="button"
             onClick={handleClosePopup}
-            className="flex-1 bg-white text-black border border-black  py-3 px-6 rounded-xl hover:bg-[#F1F1F4] transition-all duration-200 font-semibold  hover:border-gray-400"
+            className="flex-1 bg-white cursor-pointer text-black border border-black  py-3 px-6 rounded-xl hover:bg-[#F1F1F4] transition-all duration-200 font-semibold  hover:border-gray-400"
           >
             Cancel
           </button>

@@ -205,6 +205,31 @@ const Header = () => {
             {/* Menu content with blur effect */}
             {/* <div className="w-full sm:w-80  sm:h-auto"> */}
               <div className="py-4 bg-[#FEFEFE4D] backdrop-blur-md shadow-lg">
+                {/* Mobile-only menu items */}
+                <div className="sm:hidden">
+                  <Link href="/" className="block" onClick={() => setIsMenuOpen(false)}>
+                    <span className="text-black hover:bg-gray-100 block px-6 py-3 text-sm font-bold w-full text-left cursor-pointer">
+                      Home
+                    </span>
+                  </Link>
+                  <Link href="/about" className="block" onClick={() => setIsMenuOpen(false)}>
+                    <span className="text-black hover:bg-gray-100 block px-6 py-3 text-sm font-bold w-full text-left cursor-pointer">
+                      About
+                    </span>
+                  </Link>
+                  <Link href="/properties" className="block" onClick={() => setIsMenuOpen(false)}>
+                    <span className="text-black hover:bg-gray-100 block px-6 py-3 text-sm font-bold w-full text-left cursor-pointer">
+                      Properties
+                    </span>
+                  </Link>
+                  <Link href="/list-property" className="block" onClick={() => setIsMenuOpen(false)}>
+                    <span className="text-black hover:bg-gray-100 block px-6 py-3 text-sm font-bold w-full text-left cursor-pointer">
+                      List Your Property
+                    </span>
+                  </Link>
+                  <hr className="border-gray-200 mx-6 my-2" />
+                </div>
+                
                 {menuItems.map((item, index) => (
                   <div key={item.name}>
                     <Link href={item.href} className="block" onClick={() => setIsMenuOpen(false)}>

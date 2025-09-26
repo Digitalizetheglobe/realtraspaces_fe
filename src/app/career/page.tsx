@@ -61,6 +61,7 @@ const BenefitsSection = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState({ success: false, message: '' });
   const [fileName, setFileName] = useState('');
+  const [fileError, setFileError] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.target;
@@ -69,8 +70,27 @@ const BenefitsSection = () => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     if (e.target.files && e.target.files[0]) {
-      setFormData((prev: typeof formData) => ({ ...prev, resume: e.target.files![0] }));
-      setFileName(e.target.files[0].name);
+      const file = e.target.files[0];
+      const allowedTypes = [
+        'application/pdf',
+        'image/jpeg',
+        'image/jpg', 
+        'image/png',
+        'image/gif',
+        'image/webp'
+      ];
+      
+      if (allowedTypes.includes(file.type)) {
+        setFormData((prev: typeof formData) => ({ ...prev, resume: file }));
+        setFileName(file.name);
+        setFileError('');
+      } else {
+        setFileError('Only PDF, JPEG, PNG, JPG, GIF, and WebP files are allowed.');
+        setFormData((prev: typeof formData) => ({ ...prev, resume: null }));
+        setFileName('');
+        // Clear the file input
+        e.target.value = '';
+      }
     }
   };
 
@@ -487,18 +507,25 @@ const BenefitsSection = () => {
                       <span className="text-black font-medium">
                         {fileName || 'Upload Your Resume'}
                       </span>
-                      <p className="text-sm mt-1" style={{ color: '#6E6E73' }}>PDF, DOC, or DOCX format</p>
+                      <p className="text-sm mt-1" style={{ color: '#6E6E73' }}>PDF, JPEG, PNG, JPG, GIF, or WebP format</p>
                     </div>
                     <input 
                       type="file" 
                       id="resume" 
                       name="resume"
-                      accept=".pdf,.doc,.docx" 
+                      accept=".pdf,.jpeg,.jpg,.png,.gif,.webp" 
                       onChange={handleFileChange}
                       className="hidden" 
                     />
                   </label>
                 </div>
+                
+                {/* File Error Message */}
+                {fileError && (
+                  <div className="mb-4 p-3 bg-red-50 border-2 border-red-200 rounded-lg">
+                    <p className="text-red-600 text-sm font-medium">{fileError}</p>
+                  </div>
+                )}
                 
                 {/* Form Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
