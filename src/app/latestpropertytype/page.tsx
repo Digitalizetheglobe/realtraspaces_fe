@@ -1231,9 +1231,9 @@ export default function PropertyCards() {
                         {enquiredForFilter === "Rent"
                           ? "For Rent"
                           : enquiredForFilter === "Sale"
-                          ? "For Sale3"
+                          ? "For Sale"
                           : property.forSale
-                          ? "For Sale2"
+                          ? "For Sale"
                           : property.forRent
                           ? "For Rent"
 : `For ${property.enquiredFor}`}
