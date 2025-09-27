@@ -146,7 +146,7 @@ export type { ApiResponse, ApiError };
 // SEO Metadata API function
 export async function fetchSeoMetaData(page: string): Promise<SeoMetaData | null> {
   try {
-    const response = await fetch(`https://api.realtraspaces.com/api/seo/${page}`);
+    const response = await fetch(`https://api.realtraspaces.com/api/seo/meta-tags/`);
     
     if (!response.ok) {
       // If the endpoint doesn't exist or returns an error, return null
@@ -155,7 +155,21 @@ export async function fetchSeoMetaData(page: string): Promise<SeoMetaData | null
     }
 
     const data = await response.json();
-    return data;
+    
+    // Find the SEO data for the specific page
+    if (data.status === 'success' && data.data && Array.isArray(data.data)) {
+      const pageData = data.data.find((item: any) => item.page === page);
+      if (pageData) {
+        return {
+          metaTitle: pageData.metaTitle,
+          metaDescription: pageData.metaDescription,
+          metaKeywords: pageData.metaKeywords,
+          canonicalUrl: pageData.canonicalUrl
+        };
+      }
+    }
+    
+    return null;
   } catch (error) {
     // Return null on error - this is expected behavior
     console.warn(`Failed to fetch SEO data for page ${page}:`, error);

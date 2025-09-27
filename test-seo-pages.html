@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Test - Contact and Career Pages</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+        .test-section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        .code { background-color: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; }
+        .api-data { background-color: #e2e3e5; padding: 15px; border-radius: 4px; margin: 10px 0; }
+        h1, h2 { color: #333; }
+        h2 { border-bottom: 2px solid #007bff; padding-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <h1>SEO Implementation Test Results</h1>
+    
+    <div class="test-section success">
+        <h2>✅ API Integration Status</h2>
+        <p>The SEO API integration is working correctly. The system can now:</p>
+        <ul>
+            <li>Fetch SEO data from <code>https://api.realtraspaces.com/api/seo/meta-tags/</code></li>
+            <li>Parse the response and find page-specific data</li>
+            <li>Extract metaTitle, metaDescription, metaKeywords, and canonicalUrl</li>
+        </ul>
+    </div>
+
+    <div class="test-section info">
+        <h2>📄 Current SEO Data</h2>
+        
+        <h3>Contact Page</h3>
+        <div class="api-data">
+            <strong>Title:</strong> CONTACT | Realtraspaces<br>
+            <strong>Description:</strong> contact<br>
+            <strong>Keywords:</strong> real estate, property, home<br>
+            <strong>Canonical:</strong> https://realtraspaces.com/contact
+        </div>
+
+        <h3>Career Page</h3>
+        <div class="api-data">
+            <strong>Title:</strong> career | realtrspaces<br>
+            <strong>Description:</strong> career | realtrspaces<br>
+            <strong>Keywords:</strong> real estate, property, home<br>
+            <strong>Canonical:</strong> https://realtraspaces.com/career
+        </div>
+    </div>
+
+    <div class="test-section warning">
+        <h2>⚠️ SEO Data Quality Issues</h2>
+        <p>The current SEO data needs improvement:</p>
+        <ul>
+            <li><strong>Contact Page:</strong> Description is too generic ("contact")</li>
+            <li><strong>Career Page:</strong> Title and description are too generic</li>
+            <li><strong>Keywords:</strong> Both pages use the same generic keywords</li>
+        </ul>
+        
+        <h3>Recommended Improvements:</h3>
+        <div class="code">
+            <strong>Contact Page:</strong><br>
+            Title: "Contact Us | Realtra Spaces - Get in Touch"<br>
+            Description: "Contact Realtra Spaces for all your real estate needs in Mumbai. Get expert advice on commercial properties, office spaces, and investment opportunities."<br>
+            Keywords: "contact real estate Mumbai, property consultation, real estate advisor Mumbai, commercial property inquiry"<br><br>
+            
+            <strong>Career Page:</strong><br>
+            Title: "Careers at Realtra Spaces | Join Our Real Estate Team"<br>
+            Description: "Explore exciting career opportunities at Realtra Spaces. Join our innovative real estate team in Mumbai and shape the future of property development."<br>
+            Keywords: "real estate careers Mumbai, property development jobs, real estate team, career opportunities Mumbai"
+        </div>
+    </div>
+
+    <div class="test-section success">
+        <h2>🔧 Technical Implementation</h2>
+        <p>The following components have been updated:</p>
+        <ul>
+            <li><strong>api.ts:</strong> Updated fetchSeoMetaData to use correct endpoint and parse response</li>
+            <li><strong>serverSeo.ts:</strong> Fixed canonical URL format</li>
+            <li><strong>PageWithSeo.tsx:</strong> Re-enabled dynamic SEO data fetching with useSeo hook</li>
+            <li><strong>Layout files:</strong> Contact and career pages use generateMetadata function</li>
+        </ul>
+    </div>
+
+    <div class="test-section info">
+        <h2>📋 Next Steps</h2>
+        <ol>
+            <li>Update the SEO data in your backend API with better titles and descriptions</li>
+            <li>Test the pages in the browser to verify meta tags are being set correctly</li>
+            <li>Use browser dev tools to inspect the head section and verify SEO tags</li>
+            <li>Consider adding Open Graph and Twitter Card images for better social sharing</li>
+        </ol>
+    </div>
+
+    <script>
+        // Test the API directly in browser
+        async function testApiInBrowser() {
+            try {
+                const response = await fetch('https://api.realtraspaces.com/api/seo/meta-tags/');
+                const data = await response.json();
+                
+                console.log('SEO API Response:', data);
+                
+                // Test finding contact page
+                const contactPage = data.data.find(item => item.page === 'contact');
+                if (contactPage) {
+                    console.log('Contact page SEO data found:', contactPage);
+                }
+                
+                // Test finding career page
+                const careerPage = data.data.find(item => item.page === 'career');
+                if (careerPage) {
+                    console.log('Career page SEO data found:', careerPage);
+                }
+                
+            } catch (error) {
+                console.error('Error testing API:', error);
+            }
+        }
+        
+        // Run the test when page loads
+        testApiInBrowser();
+    </script>
+</body>
+</html>

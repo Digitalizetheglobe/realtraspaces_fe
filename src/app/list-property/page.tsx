@@ -25,7 +25,7 @@ export default function ListPropertyPage() {
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<any>({});
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     propertyName: "",
@@ -40,7 +40,7 @@ export default function ListPropertyPage() {
     contactNumber: "",
     emailAddress: "",
     description: "",
-    image: null as File | null,
+    images: [] as File[],
     termsAccepted: false,
   });
 
@@ -74,12 +74,25 @@ export default function ListPropertyPage() {
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     const { name, value, files, type, checked } = e.target as any;
-    if (name === "image" && files && files[0]) {
-      const file = files[0];
-      setForm(prev => ({ ...prev, [name]: file }));
-      const reader = new FileReader();
-      reader.onload = (e) => setImagePreview(e.target?.result as string);
-      reader.readAsDataURL(file);
+    if (name === "images" && files && files.length > 0) {
+      const fileArray = Array.from(files) as File[];
+      setForm(prev => ({ ...prev, [name]: fileArray }));
+      
+      // Create previews for all selected images
+      const previews: string[] = [];
+      fileArray.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result;
+          if (typeof result === 'string') {
+            previews.push(result);
+            if (previews.length === fileArray.length) {
+              setImagePreviews(previews);
+            }
+          }
+        };
+        reader.readAsDataURL(file);
+      });
     } else if (type === "checkbox") {
       setForm(prev => ({ ...prev, [name]: checked }));
     } else {
@@ -110,7 +123,7 @@ export default function ListPropertyPage() {
         contactNumber: form.contactNumber,
         emailAddress: form.emailAddress,
         description: form.description,
-        imageUrl: null, // You can implement image upload separately
+        images: form.images.map(file => file.name), // Send image filenames as array
         termsAccepted: form.termsAccepted,
       };
 
@@ -157,7 +170,7 @@ export default function ListPropertyPage() {
             </ul>
           </div>
           <button 
-            onClick={() => {setSubmitted(false); setForm({propertyName: "", location: "", propertyType: "", transactionType: "", areaCarpet: "", areaBuiltup: "", rent: "", price: "", contactName: "", contactNumber: "", emailAddress: "", description: "", image: null, termsAccepted: false}); setImagePreview(null);}}
+            onClick={() => {setSubmitted(false); setForm({propertyName: "", location: "", propertyType: "", transactionType: "", areaCarpet: "", areaBuiltup: "", rent: "", price: "", contactName: "", contactNumber: "", emailAddress: "", description: "", images: [], termsAccepted: false}); setImagePreviews([]);}}
             className="w-full bg-[#FFB400] text-black font-semibold py-3 rounded-lg hover:bg-[#E6A200] transition-all duration-200 transform hover:scale-105"
           >
             List Another Property
@@ -377,30 +390,43 @@ export default function ListPropertyPage() {
               
               {/* Image Upload */}
               <div className="md:col-span-2">
-                <label className="block font-semibold mb-2 text-gray-900">Image Upload</label>
+                <label className="block font-semibold mb-2 text-gray-900">Property Images</label>
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#FFB400] transition-colors relative">
-                  {imagePreview ? (
-                    <div className="relative">
-                      <img src={imagePreview} alt="Preview" className="max-h-48 mx-auto rounded-lg" />
-                      <button 
-                        type="button" 
-                        onClick={() => {setImagePreview(null); setForm(prev => ({...prev, image: null}));}}
-                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors"
-                      >
-                        ×
-                      </button>
+                  {imagePreviews.length > 0 ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {imagePreviews.map((preview, index) => (
+                          <div key={index} className="relative">
+                            <img src={preview} alt={`Preview ${index + 1}`} className="w-full h-32 object-cover rounded-lg" />
+                            <button 
+                              type="button" 
+                              onClick={() => {
+                                const newPreviews = imagePreviews.filter((_, i) => i !== index);
+                                const newImages = form.images.filter((_, i) => i !== index);
+                                setImagePreviews(newPreviews);
+                                setForm(prev => ({...prev, images: newImages}));
+                              }}
+                              className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-sm text-gray-500">Selected {imagePreviews.length} image(s)</p>
                     </div>
                   ) : (
                     <>
                       <Upload className="w-12 h-12 text-gray-400 mx-auto mb-2" />
                       <p className="text-gray-600 mb-2">Click to upload or drag and drop</p>
-                      <p className="text-sm text-gray-500">PNG, JPG up to 10MB</p>
+                      <p className="text-sm text-gray-500">PNG, JPG up to 10MB each (Multiple files allowed)</p>
                     </>
                   )}
                   <input 
-                    name="image" 
+                    name="images" 
                     type="file" 
                     accept="image/*" 
+                    multiple
                     onChange={handleChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   />

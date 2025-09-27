@@ -54,17 +54,17 @@ export async function generateMetadata(page: string, fallbackConfig?: MetadataCo
 
   // Return fallback metadata if API fails or no data
   return {
-    title: fallbackConfig?.title || "Realtra Spaces | Premium Real Estate in Mumbai",
-    description: fallbackConfig?.description || "Discover the best real estate opportunities in Mumbai with Realtra Spaces. Explore properties, connect with developers, and invest smartly.",
-    keywords: fallbackConfig?.keywords || "Real estate Mumbai, buy property Mumbai, real estate investment, residential plots, commercial properties",
+    title: fallbackConfig?.title || "Buy Commercial Property In Mumbai | Realtra Spaces",
+    description: fallbackConfig?.description || "Buy commercial property in Mumbai's top business hubs. From compact offices to spacious workspaces, find the right place to build your future.",
+    keywords: fallbackConfig?.keywords || "commercial property in mumbai for sale,commercial property in mumbai on rent,commercial buildings in Mumbai, Coworking spaces in Mumbai,commercial property price in mumbai, Office Spaces in Mumbai, office space in mumbai for rent, office space in mumbai for sale, shop on rent in mumbai",
     alternates: {
-      canonical: fallbackConfig?.canonical || "https://Realtraspaces.com/",
+      canonical: fallbackConfig?.canonical || "https://realtraspaces.com/",
     },
     robots: fallbackConfig?.robots || 'index, follow',
     openGraph: {
       title: fallbackConfig?.openGraph?.title || fallbackConfig?.title || "Realtra Spaces | Premium Real Estate in Mumbai",
       description: fallbackConfig?.openGraph?.description || fallbackConfig?.description || "Discover the best real estate opportunities in Mumbai with Realtra Spaces. Explore properties, connect with developers, and invest smartly.",
-      url: fallbackConfig?.openGraph?.url || fallbackConfig?.canonical || "https://Realtraspaces.com/",
+      url: fallbackConfig?.openGraph?.url || fallbackConfig?.canonical || "https://realtraspaces.com/",
       type: fallbackConfig?.openGraph?.type || 'website',
       image: fallbackConfig?.openGraph?.image,
     },
