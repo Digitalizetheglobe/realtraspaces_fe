@@ -107,7 +107,7 @@ const DevelopersPage = () => {
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         if (errorMessage.includes("Failed to fetch")) {
-          setError("Cannot connect to server. Please check if the backend server is running on http://localhost:8000");
+          setError("Cannot connect to server. Please check if the backend server is running on https://api.realtraspaces.com");
         } else {
           setError(`Failed to load developers: ${errorMessage}`);
         }
@@ -401,7 +401,7 @@ const DevelopersPage = () => {
               <div className="text-xs text-red-600 mb-4">
                 <p className="mb-1">Troubleshooting tips:</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Make sure the backend server is running on http://localhost:8000</li>
+                  <li>Make sure the backend server is running on https://api.realtraspaces.com</li>
                   <li>Check if the API endpoint is accessible</li>
                   <li>Verify your internet connection</li>
                   <li>Try refreshing the page</li>
