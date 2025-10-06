@@ -2,24 +2,7 @@
 import { useState } from "react";
 import { Camera, MapPin, DollarSign, Home, Phone, Mail, Upload, Check, AlertCircle, Building2, FileText } from "lucide-react";
 import Link from "next/link";
-// API utility function
-const callAPI = async (endpoint: string, data: any) => {
-  const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-  
-  const response = await fetch(`${baseURL}${endpoint}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data)
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  return await response.json();
-};
+// Note: We now use FormData directly for file uploads instead of this utility function
 
 export default function ListPropertyPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -109,26 +92,40 @@ export default function ListPropertyPage() {
     setIsSubmitting(true);
     
     try {
-      // Prepare the data for API
-      const formData = {
-        propertyName: form.propertyName,
-        location: form.location,
-        propertyType: form.propertyType,
-        transactionType: form.transactionType,
-        areaCarpet: form.areaCarpet,
-        areaBuiltup: form.areaBuiltup,
-        rent: form.rent ? parseFloat(form.rent) : null,
-        price: form.price ? parseFloat(form.price) : null,
-        contactName: form.contactName,
-        contactNumber: form.contactNumber,
-        emailAddress: form.emailAddress,
-        description: form.description,
-        images: form.images.map(file => file.name), // Send image filenames as array
-        termsAccepted: form.termsAccepted,
-      };
+      // Create FormData for file upload
+      const formData = new FormData();
+      
+      // Add all form fields to FormData
+      formData.append('propertyName', form.propertyName);
+      formData.append('location', form.location);
+      formData.append('propertyType', form.propertyType);
+      formData.append('transactionType', form.transactionType);
+      formData.append('areaCarpet', form.areaCarpet);
+      formData.append('areaBuiltup', form.areaBuiltup);
+      if (form.rent) formData.append('rent', form.rent);
+      if (form.price) formData.append('price', form.price);
+      formData.append('contactName', form.contactName);
+      formData.append('contactNumber', form.contactNumber);
+      formData.append('emailAddress', form.emailAddress);
+      formData.append('description', form.description);
+      
+      // Add image files to FormData
+      form.images.forEach((file) => {
+        formData.append('images', file);
+      });
 
-      // Call the API using utility function
-      const result = await callAPI('/api/property-listings/create', formData);
+      // Call the API with FormData
+      const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${baseURL}/api/property-listings/create`, {
+        method: 'POST',
+        body: formData, // Send FormData instead of JSON
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
 
       if (result.success) {
         setSubmitted(true);
