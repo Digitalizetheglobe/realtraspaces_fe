@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 
 // API utility functions
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.realtraspaces.com';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 const apiCall = async (endpoint: string, options: RequestInit = {}) => {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -56,6 +56,12 @@ const apiCall = async (endpoint: string, options: RequestInit = {}) => {
   return await response.json();
 };
 
+// Utility function to get the correct image URL
+const getImageUrl = (imageFilename: string): string => {
+  // Based on the backend configuration, property images are served from /propertyImages path
+  return `${API_BASE_URL}/propertyImages/${imageFilename}`;
+};
+
 interface PropertyListing {
   id: number;
   propertyName: string;
@@ -70,7 +76,7 @@ interface PropertyListing {
   contactNumber: string;
   emailAddress: string;
   description: string;
-  imageUrl: string | null;
+  images: string[];
   status: 'pending' | 'approved' | 'rejected' | 'active' | 'inactive';
   isActive: boolean;
   createdAt: string;
@@ -79,7 +85,7 @@ interface PropertyListing {
 
 interface PropertyImages {
   id: number;
-  imageUrl: string;
+  images: string[];
   propertyId: number;
   createdAt: string;
 }
@@ -239,15 +245,31 @@ export default function DashboardListProperty() {
     setShowDetailsModal(true);
     setCurrentImageIndex(0);
     
-    // Fetch property images
+    // Use images from property listing response
     setIsLoadingImages(true);
     try {
-      const response = await apiCall(`/api/properties/${property.id}/images`);
-      if (response.success) {
-        setPropertyImages(response.data || []);
+      // Convert property images array to the expected format
+      const images = property.images || [];
+      console.log('Property images from API:', images);
+      
+      if (images.length > 0) {
+        const formattedImages = images.map((imageUrl, index) => {
+          console.log(`Processing image ${index}:`, imageUrl);
+          return {
+            id: index + 1,
+            images: [imageUrl],
+            propertyId: property.id,
+            createdAt: property.createdAt
+          };
+        });
+        console.log('Formatted images for display:', formattedImages);
+        setPropertyImages(formattedImages);
+      } else {
+        console.log('No images found in property data');
+        setPropertyImages([]);
       }
     } catch (error) {
-      console.error('Error fetching images:', error);
+      console.error('Error processing images:', error);
       setPropertyImages([]);
     } finally {
       setIsLoadingImages(false);
@@ -275,7 +297,33 @@ export default function DashboardListProperty() {
 
   const downloadImage = async (imageUrl: string, imageName: string) => {
     try {
-      const response = await fetch(imageUrl);
+      // Try multiple possible paths for the image, starting with the most likely
+      const possiblePaths = [
+        `${API_BASE_URL}/propertyImages/${imageUrl}`,  // From propertyImages directory (most likely)
+        `${API_BASE_URL}/${imageUrl}`,  // Direct from root
+        `${API_BASE_URL}/public/${imageUrl}`,  // From public directory
+      ];
+      
+      let fullImageUrl = possiblePaths[0];
+      let response;
+      
+      // Try each path until one works
+      for (const path of possiblePaths) {
+        try {
+          response = await fetch(path);
+          if (response.ok) {
+            fullImageUrl = path;
+            break;
+          }
+        } catch (e) {
+          continue;
+        }
+      }
+      
+      if (!response || !response.ok) {
+        throw new Error('Image not found at any expected path');
+      }
+      
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -292,7 +340,7 @@ export default function DashboardListProperty() {
 
   const downloadAllImages = async () => {
     for (let i = 0; i < propertyImages.length; i++) {
-      await downloadImage(propertyImages[i].imageUrl, `image_${i + 1}`);
+      await downloadImage(propertyImages[i].images[0], `image_${i + 1}`);
       // Add delay between downloads
       await new Promise(resolve => setTimeout(resolve, 500));
     }
@@ -347,7 +395,7 @@ export default function DashboardListProperty() {
           <h3 style="color: #374151; margin-bottom: 10px;">Property Images</h3>
           ${propertyImages.length > 0 ? 
             propertyImages.map((img, index) => 
-              `<p style="color: #6b7280; margin: 5px 0;">Image ${index + 1}: ${img.imageUrl}</p>`
+              `<p style="color: #6b7280; margin: 5px 0;">Image ${index + 1}: ${getImageUrl(img.images[0])}</p>`
             ).join('') : 
             '<p style="color: #6b7280;">No images available</p>'
           }
@@ -992,9 +1040,21 @@ export default function DashboardListProperty() {
                   <div className="relative">
                     <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
                       <img
-                        src={propertyImages[currentImageIndex]?.imageUrl}
+                        src={getImageUrl(propertyImages[currentImageIndex]?.images[0])}
                         alt={`Property image ${currentImageIndex + 1}`}
                         className="w-full h-full object-cover"
+                        onLoad={() => {
+                          console.log('Image loaded successfully:', getImageUrl(propertyImages[currentImageIndex]?.images[0]));
+                          console.log('Image filename:', propertyImages[currentImageIndex]?.images[0]);
+                        }}
+                        onError={(e) => {
+                          console.error('Image load error for URL:', getImageUrl(propertyImages[currentImageIndex]?.images[0]));
+                          console.log('Image filename:', propertyImages[currentImageIndex]?.images[0]);
+                          console.log('This image file does not exist on the server. Showing placeholder.');
+                          
+                          // Show placeholder immediately since the image doesn't exist
+                          e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBGb3VuZDwvdGV4dD48L3N2Zz4=';
+                        }}
                       />
                     </div>
                     
@@ -1029,13 +1089,21 @@ export default function DashboardListProperty() {
                             }`}
                           >
                             <img
-                              src={image.imageUrl}
+                              src={getImageUrl(image.images[0])}
                               alt={`Thumbnail ${index + 1}`}
                               className="w-full h-full object-cover"
+                              onError={(e) => {
+                                console.error('Thumbnail load error for URL:', getImageUrl(image.images[0]));
+                                console.log('Thumbnail filename:', image.images[0]);
+                                console.log('This image file does not exist on the server. Showing placeholder.');
+                                
+                                // Show placeholder immediately since the image doesn't exist
+                                e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM2YjcyODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
+                              }}
                             />
                           </button>
                           <button
-                            onClick={() => downloadImage(image.imageUrl, `image_${index + 1}`)}
+                            onClick={() => downloadImage(image.images[0], `image_${index + 1}`)}
                             className="w-full mt-1 px-2 py-1 bg-gray-100 hover:bg-gray-200 rounded text-xs flex items-center justify-center"
                           >
                             <Download className="w-3 h-3 mr-1" />
@@ -1049,7 +1117,14 @@ export default function DashboardListProperty() {
                   <div className="flex items-center justify-center h-64 bg-gray-100 rounded-lg">
                     <div className="text-center">
                       <ImageIcon className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                      <p className="text-gray-500">No images available</p>
+                      <p className="text-gray-500">No images available for this property</p>
+                      <p className="text-gray-400 text-sm mt-1">Images will appear here when uploaded</p>
+                      <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-red-800 text-xs">
+                          <strong>Issue:</strong> The property listing contains image filenames but the actual image files are missing from the server. 
+                          This indicates that the image upload functionality is not properly implemented in the backend.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}

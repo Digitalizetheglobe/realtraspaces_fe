@@ -41,13 +41,11 @@ ChartJS.register(
 interface Property {
   id: string;
   title?: string;
-  imageUrls?: {
-    Images?: Array<{
-      imageFilePath: string;
-      isCoverImage: boolean;
-      orderRank?: number | null;
-    }>;
-  };
+  images?: Array<{
+    imageFilePath: string;
+    isCoverImage: boolean;
+    orderRank?: number | null;
+  }>;
   propertyType?: {
     displayName?: string;
     childType?: {

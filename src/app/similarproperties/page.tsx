@@ -46,13 +46,11 @@ type Property = {
   }>;
   forSale?: boolean;
   forRent?: boolean;
-  imageUrls?: {
-    Images?: Array<{
-      imageFilePath: string;
-      isCoverImage: boolean;
-      orderRank: number | null;
-    }>;
-  };
+  images?: Array<{
+    imageFilePath: string;
+    isCoverImage: boolean;
+    orderRank: number | null;
+  }>;
 };
 
 export default function Similarproperties() {
@@ -122,18 +120,18 @@ export default function Similarproperties() {
 
   // Helper function to get the best available image for a property
   const getPropertyImage = (property: Property) => {
-    if (!property.imageUrls?.Images || property.imageUrls.Images.length === 0) {
+    if (!property.images || property.images.length === 0) {
       return defaultPropertyImage;
     }
     
     // First try to find a cover image
-    const coverImage = property.imageUrls.Images.find(img => img.isCoverImage);
+    const coverImage = property.images.find(img => img.isCoverImage);
     if (coverImage) {
       return coverImage.imageFilePath;
     }
     
     // If no cover image, return the first available image
-    return property.imageUrls.Images[0].imageFilePath;
+    return property.images[0].imageFilePath;
   };
 
   // Format price in Indian currency format (e.g., ₹ 45,00,000)

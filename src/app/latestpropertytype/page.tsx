@@ -25,13 +25,11 @@ const raleway = Raleway({
 type Property = {
   id: string;
   title?: string;
-  imageUrls?: {
-    Images?: Array<{
-      imageFilePath: string;
-      isCoverImage: boolean;
-      orderRank?: number | null;
-    }>;
-  };
+  images?: Array<{
+    imageFilePath: string;
+    isCoverImage: boolean;
+    orderRank?: number | null;
+  }>;
   propertyType?: {
     displayName?: string;
     childType?: {
@@ -541,14 +539,14 @@ export default function PropertyCards() {
 
   // Helper function to get the best image for a property
   const getPropertyImage = (property: Property): string => {
-    if (property.imageUrls?.Images && property.imageUrls.Images.length > 0) {
+    if (property.images && property.images.length > 0) {
       // First try to find a cover image
-      const coverImage = property.imageUrls.Images.find(img => img.isCoverImage);
+      const coverImage = property.images.find(img => img.isCoverImage);
       if (coverImage && !failedImages.has(coverImage.imageFilePath)) {
         return coverImage.imageFilePath;
       }
       // If no cover image or cover image failed, return the first non-failed image
-      const firstImage = property.imageUrls.Images.find(img => !failedImages.has(img.imageFilePath));
+      const firstImage = property.images.find(img => !failedImages.has(img.imageFilePath));
       if (firstImage) {
         return firstImage.imageFilePath;
       }

@@ -4,7 +4,7 @@ import { Camera, MapPin, DollarSign, Home, Phone, Mail, Upload, Check, AlertCirc
 import Link from "next/link";
 // API utility function
 const callAPI = async (endpoint: string, data: any) => {
-  const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://api.realtraspaces.com';
+  const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
   
   const response = await fetch(`${baseURL}${endpoint}`, {
     method: 'POST',
