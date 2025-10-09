@@ -59,6 +59,7 @@ type Property = {
   }>;
   forSale?: boolean;
   forRent?: boolean;
+  enquiredFor?: string;
 };
 
 export default function Similarproperties() {
@@ -122,6 +123,7 @@ export default function Similarproperties() {
         setShowCityDropdown(false);
         setShowSubLocationDropdown(false);
         setShowPropertyTypeDropdown(false);
+        setShowTransactionTypeDropdown(false);
         setShowCarpetAreaDropdown(false);
         // Clear search terms when dropdowns are closed
         setCitySearchTerm("");
@@ -179,6 +181,7 @@ export default function Similarproperties() {
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [showSubLocationDropdown, setShowSubLocationDropdown] = useState(false);
   const [showPropertyTypeDropdown, setShowPropertyTypeDropdown] = useState(false);
+  const [showTransactionTypeDropdown, setShowTransactionTypeDropdown] = useState(false);
   const [showCarpetAreaDropdown, setShowCarpetAreaDropdown] = useState(false);
   const [citySearchTerm, setCitySearchTerm] = useState<string>("");
   const [subLocationSearchTerm, setSubLocationSearchTerm] = useState<string>("");
@@ -661,6 +664,7 @@ const handleCompareClick = async () => {
         const propertiesArray = Array.isArray(data)
           ? data
           : data.items || data.data || [];
+        
         setProperties(propertiesArray);
         setAllProperties(propertiesArray);
         setFilteredProperties(propertiesArray);
@@ -762,6 +766,7 @@ const handleCompareClick = async () => {
       return;
     }
     
+    
     let results = allProperties;
 
     // Enhanced search by property name, city, and sub-location
@@ -782,7 +787,12 @@ const handleCompareClick = async () => {
     // Filter by enquiredFor (Rent/Investment) - similar to latestpropertytype page
     if (enquiredForFilter) {
       results = results.filter((property) => {
-        // Check based on forSale/forRent
+        // Check based on enquiredFor field first (like latestpropertytype page)
+        if (property.enquiredFor) {
+          return property.enquiredFor === enquiredForFilter;
+        }
+        
+        // Otherwise, check based on forSale/forRent
         if (enquiredForFilter === "Rent") {
           return property.forRent === true;
         } else if (enquiredForFilter === "Sale") {
@@ -1152,7 +1162,7 @@ const handleCompareClick = async () => {
                 {/* Search and Filter Section */}
                 <div className="mb-8 px-4 sm:px-0">
                   {/* Multi-Component Search */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
                     {/* Enhanced Search Input with Suggestions */}
                     <div className="relative">
                       <input
@@ -1589,6 +1599,66 @@ const handleCompareClick = async () => {
                       )}
                     </div>
 
+                    {/* Transaction Type Dropdown */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        className="w-full text-left cursor-pointer text-black text-sm p-3 pr-10 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        onClick={() => {
+                          setShowTransactionTypeDropdown(!showTransactionTypeDropdown);
+                          setShowCityDropdown(false);
+                          setShowSubLocationDropdown(false);
+                          setShowPropertyTypeDropdown(false);
+                          setShowCarpetAreaDropdown(false);
+                        }}
+                      >
+                        {enquiredForFilter || "Transaction Type"}
+                      </button>
+                      <svg
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-black"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                      {showTransactionTypeDropdown && (
+                        <div className="search-dropdown absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                          <div
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                            onClick={() => {
+                              setEnquiredForFilter("");
+                              setSelectedType("");
+                              setShowTransactionTypeDropdown(false);
+                            }}
+                          >
+                            All Types
+                          </div>
+                          <div
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                            onClick={() => {
+                              setEnquiredForFilter("Rent");
+                              setSelectedType("Rent");
+                              setShowTransactionTypeDropdown(false);
+                            }}
+                          >
+                            Rent
+                          </div>
+                          <div
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                            onClick={() => {
+                              setEnquiredForFilter("Sale");
+                              setSelectedType("Investment");
+                              setShowTransactionTypeDropdown(false);
+                            }}
+                          >
+                            Sale
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
                     {/* Carpet Area Dropdown */}
                     <div className="relative">
                       <button
@@ -1599,6 +1669,7 @@ const handleCompareClick = async () => {
                           setShowCityDropdown(false);
                           setShowSubLocationDropdown(false);
                           setShowPropertyTypeDropdown(false);
+                          setShowTransactionTypeDropdown(false);
                         }}
                       >
                         {selectedCarpetArea || (minCarpetArea || maxCarpetArea ? `${minCarpetArea || '0'} - ${maxCarpetArea || '∞'} sqft` : "Select Carpet Area")}
@@ -1683,7 +1754,7 @@ const handleCompareClick = async () => {
                   </div>
 
                   {/* Selected Filters Display */}
-                  {(selectedCities.length > 0 || selectedSubLocations.length > 0 || selectedPropertyTypes.length > 0 || selectedCarpetArea || minCarpetArea || maxCarpetArea) && (
+                  {(selectedCities.length > 0 || selectedSubLocations.length > 0 || selectedPropertyTypes.length > 0 || selectedCarpetArea || minCarpetArea || maxCarpetArea || enquiredForFilter) && (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {selectedCities.map((city) => (
                         <div key={city} className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
@@ -1724,6 +1795,21 @@ const handleCompareClick = async () => {
                           </button>
                         </div>
                       ))}
+                      {enquiredForFilter && (
+                        <div className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
+                          Transaction: {enquiredForFilter}
+                          <button
+                            type="button"
+                            className="ml-1 text-white hover:text-gray-200 focus:outline-none"
+                            onClick={() => {
+                              setEnquiredForFilter("");
+                              setSelectedType("");
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )}
                       {selectedCarpetArea && (
                         <div className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
                           Area: {selectedCarpetArea}
@@ -2076,7 +2162,11 @@ const handleCompareClick = async () => {
                             {/* For Sale/Rent / Property Type overlay */}
                             <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
                               <span className="mr-2 transition-all duration-300 group-hover:font-medium">
-                                {property.forSale
+                                {(property as any).enquiredFor === "Sale"
+                                  ? "For Sale"
+                                  : (property as any).enquiredFor === "Rent"
+                                  ? "For Rent"
+                                  : property.forSale
                                   ? "For Sale"
                                   : property.forRent
                                   ? "For Rent"
