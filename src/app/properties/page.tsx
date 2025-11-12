@@ -59,6 +59,7 @@ type Property = {
   }>;
   forSale?: boolean;
   forRent?: boolean;
+  enquiredFor?: string;
 };
 
 export default function Similarproperties() {
@@ -122,6 +123,7 @@ export default function Similarproperties() {
         setShowCityDropdown(false);
         setShowSubLocationDropdown(false);
         setShowPropertyTypeDropdown(false);
+        setShowTransactionTypeDropdown(false);
         setShowCarpetAreaDropdown(false);
         // Clear search terms when dropdowns are closed
         setCitySearchTerm("");
@@ -135,7 +137,7 @@ export default function Similarproperties() {
   // Debug: log when dropdown is rendered
   useEffect(() => {
     if (openShareIndex !== null) {
-      console.log('Dropdown rendered for index:', openShareIndex);
+      // Dropdown rendered
     }
   }, [openShareIndex]);
 
@@ -171,8 +173,7 @@ export default function Similarproperties() {
 
   // Debug effect to monitor selectedPropertyTypes changes
   useEffect(() => {
-    console.log('selectedPropertyTypes changed:', selectedPropertyTypes);
-    console.log('selectedPropertyTypes length:', selectedPropertyTypes.length);
+    // selectedPropertyTypes changed
   }, [selectedPropertyTypes]);
   const [selectedCarpetArea, setSelectedCarpetArea] = useState<string>("");
   const [minCarpetArea, setMinCarpetArea] = useState<string>("");
@@ -180,6 +181,7 @@ export default function Similarproperties() {
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [showSubLocationDropdown, setShowSubLocationDropdown] = useState(false);
   const [showPropertyTypeDropdown, setShowPropertyTypeDropdown] = useState(false);
+  const [showTransactionTypeDropdown, setShowTransactionTypeDropdown] = useState(false);
   const [showCarpetAreaDropdown, setShowCarpetAreaDropdown] = useState(false);
   const [citySearchTerm, setCitySearchTerm] = useState<string>("");
   const [subLocationSearchTerm, setSubLocationSearchTerm] = useState<string>("");
@@ -199,6 +201,14 @@ export default function Similarproperties() {
     transactionType: "",
     inquiry: ""
   });
+
+  // Enhanced search states
+  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
+  const [searchSuggestions, setSearchSuggestions] = useState<{
+    cities: string[];
+    subLocations: string[];
+    propertyNames: string[];
+  }>({ cities: [], subLocations: [], propertyNames: [] });
 
   // Carpet area options
   const carpetAreaOptions = [
@@ -285,7 +295,197 @@ export default function Similarproperties() {
     return result;
   };
 
+  // Simple detection for cities, sub-locations, and property types
+  const detectLocationType = (searchTerm: string) => {
+    const searchLower = searchTerm.toLowerCase().trim();
+    
+    // Fixed list of major cities - EXACT MATCH ONLY
+    const majorCities = [
+      'mumbai', 'pune', 'thane', 'new mumbai', 'bangalore', 'chennai'
+    ];
+
+    // Fixed list of property types - EXACT MATCH ONLY
+    const propertyTypes = [
+      'commercial', 'industrial space', 'office space', 'shop', 'showroom',
+      'warehouse', 'retail', 'residential', 'apartment', 'villa',
+      'plot', 'land', 'industrial', 'office', 'commercial space'
+    ];
+
+    // Sub-location keywords - if input contains ANY of these, it's a sub-location
+    const subLocationKeywords = [
+      'east', 'west', 'north', 'south', 'central', 'road', 'nagar',
+      'colony', 'sector', 'phase', 'andheri', 'kurla', 'vile',
+      'parle', 'nariman', 'point', 'station', 'junction', 'chowk',
+      'market', 'bazaar', 'naka', 'chowki', 'gate', 'gateway',
+      'park', 'garden', 'society', 'complex', 'tower', 'plaza',
+      'mall', 'center', 'centre', 'square', 'circle', 'cross',
+      'corner', 'lane', 'street', 'avenue', 'boulevard', 'drive',
+      'way', 'path', 'highway', 'expressway', 'bypass',
+      'ring', 'outer', 'inner', 'main', 'old', 'upper',
+      'lower', 'middle', 'top', 'bottom', 'side', 'end', 'start',
+      'terminal', 'depot', 'yard', 'ground', 'field',
+      'area', 'zone', 'district', 'ward', 'block',
+      'pocket', 'plot', 'scheme', 'layout', 'township',
+      'town', 'village', 'gaon', 'pura', 'pur',
+      'abad', 'garh', 'bandra', 'powai', 'goregaon', 'malad',
+      'kandivali', 'borivali', 'dahisar', 'mira', 'bhayandar',
+      'kalyan', 'dombivli'
+    ];
+
+    // STEP 1: Check if it EXACTLY matches a property type
+    const isExactPropertyType = propertyTypes.includes(searchLower);
+    
+    if (isExactPropertyType) {
+      return 'propertyType';
+    }
+
+    // STEP 2: Check if it contains ANY sub-location keyword
+    const hasSubLocationKeyword = subLocationKeywords.some(keyword => 
+      searchLower.includes(keyword)
+    );
+
+    if (hasSubLocationKeyword) {
+      return 'subLocation';
+    }
+
+    // STEP 3: Check if it EXACTLY matches a major city
+    const isExactCity = majorCities.includes(searchLower);
+    
+    if (isExactCity) {
+      return 'city';
+    }
+
+    // STEP 4: Check if it's in property data as sub-location
+    const allSubLocations = new Set<string>();
+    allProperties.forEach(p => {
+      if (p.address?.subLocality) {
+        allSubLocations.add(p.address.subLocality.toLowerCase());
+      }
+    });
+    
+    if (allSubLocations.has(searchLower)) {
+      return 'subLocation';
+    }
+
+    // STEP 5: Check if it's in property data as property type
+    const allPropertyTypes = new Set<string>();
+    allProperties.forEach(p => {
+      if (p.propertyType?.displayName) {
+        allPropertyTypes.add(p.propertyType.displayName.toLowerCase());
+      }
+      if (p.propertyType?.childType?.displayName) {
+        allPropertyTypes.add(p.propertyType.childType.displayName.toLowerCase());
+      }
+    });
+    
+    if (allPropertyTypes.has(searchLower)) {
+      return 'propertyType';
+    }
+    return 'unknown';
+  };
+
+  // Enhanced search suggestions function with smart detection
+  const generateSearchSuggestions = (searchTerm: string) => {
+    if (!searchTerm.trim() || allProperties.length === 0) {
+      setSearchSuggestions({ cities: [], subLocations: [], propertyNames: [] });
+      return;
+    }
+
+    const searchLower = searchTerm.toLowerCase();
+    const suggestions = {
+      cities: [] as string[],
+      subLocations: [] as string[],
+      propertyNames: [] as string[]
+    };
+
+    // Get all sub-locations from properties
+    const allSubLocations = new Set<string>();
+    allProperties.forEach(p => {
+      if (p.address?.subLocality) {
+        allSubLocations.add(p.address.subLocality);
+      }
+    });
+    const allSubLocationsArray = Array.from(allSubLocations);
+
+    // Get all property types from properties
+    const allPropertyTypes = new Set<string>();
+    allProperties.forEach(p => {
+      if (p.propertyType?.displayName) {
+        allPropertyTypes.add(p.propertyType.displayName);
+      }
+      if (p.propertyType?.childType?.displayName) {
+        allPropertyTypes.add(p.propertyType.childType.displayName);
+      }
+    });
+    const allPropertyTypesArray = Array.from(allPropertyTypes);
+
+    // Detect what type of location this is
+    const locationType = detectLocationType(searchTerm);
+
+    // Generate suggestions based on detection
+    if (locationType === 'city') {
+      // Show cities that match
+      const matchingCities = allCities.filter(city => 
+        city.toLowerCase().includes(searchLower)
+      ).slice(0, 5);
+      suggestions.cities = matchingCities;
+    } else if (locationType === 'subLocation') {
+      // Show sub-locations that match
+      const matchingSubLocations = allSubLocationsArray.filter(subLoc => 
+        subLoc.toLowerCase().includes(searchLower)
+      ).slice(0, 5);
+      suggestions.subLocations = matchingSubLocations;
+    } else if (locationType === 'propertyType') {
+      // Show property types that match
+      const matchingPropertyTypes = allPropertyTypesArray.filter(propertyType => 
+        propertyType.toLowerCase().includes(searchLower)
+      ).slice(0, 5);
+      // For now, add property types to property names section
+      suggestions.propertyNames = matchingPropertyTypes;
+    } else {
+      // Show all categories
+      const matchingCities = allCities.filter(city => 
+        city.toLowerCase().includes(searchLower)
+      ).slice(0, 2);
+      
+      const matchingSubLocations = allSubLocationsArray.filter(subLoc => 
+        subLoc.toLowerCase().includes(searchLower)
+      ).slice(0, 2);
+      
+      const matchingPropertyTypes = allPropertyTypesArray.filter(propertyType => 
+        propertyType.toLowerCase().includes(searchLower)
+      ).slice(0, 2);
+      
+      suggestions.cities = matchingCities;
+      suggestions.subLocations = matchingSubLocations;
+      suggestions.propertyNames = matchingPropertyTypes;
+    }
+
+    // Always search in property names (if not already filled with property types)
+    if (suggestions.propertyNames.length === 0) {
+      const matchingPropertyNames = allProperties
+        .filter(p => p.title?.toLowerCase().includes(searchLower))
+        .map(p => p.title)
+        .filter(Boolean)
+        .slice(0, 5) as string[];
+      suggestions.propertyNames = matchingPropertyNames;
+    }
+
+    setSearchSuggestions(suggestions);
+  };
+
   const conditions = ["Furnished", "Semi-Furnished", "Unfurnished"];
+
+  // Handle search term changes and generate suggestions
+  useEffect(() => {
+    if (searchTerm.trim()) {
+      generateSearchSuggestions(searchTerm);
+      setShowSearchSuggestions(true);
+    } else {
+      setShowSearchSuggestions(false);
+      setSearchSuggestions({ cities: [], subLocations: [], propertyNames: [] });
+    }
+  }, [searchTerm, allProperties, allCities]);
 
   // Handle search parameters from sessionStorage for auto-populating search fields
   useEffect(() => {
@@ -303,8 +503,28 @@ export default function Similarproperties() {
         
         if (parsedData.locations && parsedData.locations.length > 0) {
           setSelectedLocations(parsedData.locations);
-          // Also set selected cities for the multi-component search
-          setSelectedCities(parsedData.locations);
+          
+          // Categorize each location properly using our detection logic
+          const categorizedCities: string[] = [];
+          const categorizedSubLocations: string[] = [];
+          const categorizedPropertyTypes: string[] = [];
+          
+          parsedData.locations.forEach((location: string) => {
+            const detectedType = detectLocationType(location);
+            
+            if (detectedType === 'city') {
+              categorizedCities.push(location);
+            } else if (detectedType === 'subLocation') {
+              categorizedSubLocations.push(location);
+            } else if (detectedType === 'propertyType') {
+              categorizedPropertyTypes.push(location);
+            }
+            // If unknown, don't add to any category
+          });
+          
+          setSelectedCities(categorizedCities);
+          setSelectedSubLocations(categorizedSubLocations);
+          setSelectedPropertyTypes(categorizedPropertyTypes);
         }
         
         if (parsedData.type) {
@@ -444,6 +664,7 @@ const handleCompareClick = async () => {
         const propertiesArray = Array.isArray(data)
           ? data
           : data.items || data.data || [];
+        
         setProperties(propertiesArray);
         setAllProperties(propertiesArray);
         setFilteredProperties(propertiesArray);
@@ -545,20 +766,33 @@ const handleCompareClick = async () => {
       return;
     }
     
+    
     let results = allProperties;
 
-    // Search by property name
+    // Enhanced search by property name, city, and sub-location
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       results = results.filter((property) => {
-        return property.title?.toLowerCase().includes(searchLower);
+        return (
+          property.title?.toLowerCase().includes(searchLower) ||
+          property.address?.city?.toLowerCase().includes(searchLower) ||
+          property.address?.subLocality?.toLowerCase().includes(searchLower) ||
+          property.address?.state?.toLowerCase().includes(searchLower) ||
+          property.propertyType?.displayName?.toLowerCase().includes(searchLower) ||
+          property.propertyType?.childType?.displayName?.toLowerCase().includes(searchLower)
+        );
       });
     }
 
     // Filter by enquiredFor (Rent/Investment) - similar to latestpropertytype page
     if (enquiredForFilter) {
       results = results.filter((property) => {
-        // Check based on forSale/forRent
+        // Check based on enquiredFor field first (like latestpropertytype page)
+        if (property.enquiredFor) {
+          return property.enquiredFor === enquiredForFilter;
+        }
+        
+        // Otherwise, check based on forSale/forRent
         if (enquiredForFilter === "Rent") {
           return property.forRent === true;
         } else if (enquiredForFilter === "Sale") {
@@ -794,6 +1028,8 @@ const handleCompareClick = async () => {
     setShowContactForm(false);
     setSelectedType("");
     setEnquiredForFilter("");
+    setShowSearchSuggestions(false);
+    setSearchSuggestions({ cities: [], subLocations: [], propertyNames: [] });
     setFilters({
       propertyType: "",
       priceRange: "",
@@ -849,6 +1085,36 @@ const handleCompareClick = async () => {
     }
   };
 
+  // Handle suggestion clicks with smart detection
+  const handleSuggestionClick = (suggestion: string, type: 'city' | 'subLocation' | 'propertyName') => {
+    // Use smart detection to determine the correct category - prioritize detection over manual type
+    const detectedType = detectLocationType(suggestion);
+    
+    // Use detected type if available, otherwise use manual type
+    const finalType = detectedType !== 'unknown' ? detectedType : type;
+    
+    if (finalType === 'city') {
+      if (!selectedCities.includes(suggestion)) {
+        setSelectedCities([...selectedCities, suggestion]);
+      }
+      setSearchTerm("");
+    } else if (finalType === 'subLocation') {
+      if (!selectedSubLocations.includes(suggestion)) {
+        setSelectedSubLocations([...selectedSubLocations, suggestion]);
+      }
+      setSearchTerm("");
+    } else if (finalType === 'propertyType') {
+      if (!selectedPropertyTypes.includes(suggestion)) {
+        setSelectedPropertyTypes([...selectedPropertyTypes, suggestion]);
+      }
+      setSearchTerm("");
+    } else if (type === 'propertyName') {
+      // For property names, keep the search term as is for filtering
+      setSearchTerm(suggestion);
+    }
+    setShowSearchSuggestions(false);
+  };
+
 
 
   return (
@@ -896,15 +1162,54 @@ const handleCompareClick = async () => {
                 {/* Search and Filter Section */}
                 <div className="mb-8 px-4 sm:px-0">
                   {/* Multi-Component Search */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-                    {/* Search Input */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-6">
+                    {/* Enhanced Search Input with Suggestions */}
                     <div className="relative">
                       <input
                         type="text"
-                        placeholder="Search by property name..."
+                        placeholder="Type city (Mumbai, Pune) or area (Andheri East, Kurla West)..."
                         className="w-full text-black text-sm p-3 pl-10 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
+                        onFocus={() => {
+                          if (searchTerm.trim()) {
+                            setShowSearchSuggestions(true);
+                          }
+                        }}
+                        onBlur={() => {
+                          // Auto-detect and add if user typed something and didn't click a suggestion
+                          if (searchTerm.trim() && !showSearchSuggestions) {
+                            const detectedType = detectLocationType(searchTerm);
+                            if (detectedType === 'city' && !selectedCities.includes(searchTerm)) {
+                              setSelectedCities([...selectedCities, searchTerm]);
+                              setSearchTerm("");
+                            } else if (detectedType === 'subLocation' && !selectedSubLocations.includes(searchTerm)) {
+                              setSelectedSubLocations([...selectedSubLocations, searchTerm]);
+                              setSearchTerm("");
+                            } else if (detectedType === 'propertyType' && !selectedPropertyTypes.includes(searchTerm)) {
+                              setSelectedPropertyTypes([...selectedPropertyTypes, searchTerm]);
+                              setSearchTerm("");
+                            }
+                          }
+                          // Delay hiding suggestions to allow clicks
+                          setTimeout(() => setShowSearchSuggestions(false), 200);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && searchTerm.trim()) {
+                            const detectedType = detectLocationType(searchTerm);
+                            if (detectedType === 'city' && !selectedCities.includes(searchTerm)) {
+                              setSelectedCities([...selectedCities, searchTerm]);
+                              setSearchTerm("");
+                            } else if (detectedType === 'subLocation' && !selectedSubLocations.includes(searchTerm)) {
+                              setSelectedSubLocations([...selectedSubLocations, searchTerm]);
+                              setSearchTerm("");
+                            } else if (detectedType === 'propertyType' && !selectedPropertyTypes.includes(searchTerm)) {
+                              setSelectedPropertyTypes([...selectedPropertyTypes, searchTerm]);
+                              setSearchTerm("");
+                            }
+                            setShowSearchSuggestions(false);
+                          }
+                        }}
                         autoComplete="off"
                       />
                       <svg
@@ -921,6 +1226,84 @@ const handleCompareClick = async () => {
                           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                         />
                       </svg>
+                      
+                      {/* Search Suggestions Dropdown */}
+                      {showSearchSuggestions && (searchSuggestions.cities.length > 0 || searchSuggestions.subLocations.length > 0 || searchSuggestions.propertyNames.length > 0) && (
+                        <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                          {/* Detection indicator */}
+                          {searchTerm.trim() && (
+                            <div className="px-4 py-2 text-xs font-medium text-blue-600 bg-blue-50 border-b border-blue-100">
+                              {detectLocationType(searchTerm) === 'city' && "🏙️ Detected as City"}
+                              {detectLocationType(searchTerm) === 'subLocation' && "📍 Detected as Area/Location"}
+                              {detectLocationType(searchTerm) === 'unknown' && "🔍 Searching all categories"}
+                            </div>
+                          )}
+                          
+                          {/* Sub-locations Section - Show first if available */}
+                          {searchSuggestions.subLocations.length > 0 && (
+                            <>
+                              <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
+                                📍 Areas & Locations
+                              </div>
+                              {searchSuggestions.subLocations.map((subLocation, index) => (
+                                <div
+                                  key={`sub-${index}`}
+                                  className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black flex items-center"
+                                  onClick={() => handleSuggestionClick(subLocation, 'subLocation')}
+                                >
+                                  <svg className="w-4 h-4 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                  </svg>
+                                  {subLocation}
+                                </div>
+                              ))}
+                            </>
+                          )}
+                          
+                          {/* Cities Section - Show after sub-locations */}
+                          {searchSuggestions.cities.length > 0 && (
+                            <>
+                              <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
+                                🏙️ Cities
+                              </div>
+                              {searchSuggestions.cities.map((city, index) => (
+                                <div
+                                  key={`city-${index}`}
+                                  className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black flex items-center"
+                                  onClick={() => handleSuggestionClick(city, 'city')}
+                                >
+                                  <svg className="w-4 h-4 mr-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  </svg>
+                                  {city}
+                                </div>
+                              ))}
+                            </>
+                          )}
+                          
+                          {/* Property Names Section */}
+                          {searchSuggestions.propertyNames.length > 0 && (
+                            <>
+                              <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
+                                🏢 Properties
+                              </div>
+                              {searchSuggestions.propertyNames.map((propertyName, index) => (
+                                <div
+                                  key={`prop-${index}`}
+                                  className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black flex items-center"
+                                  onClick={() => handleSuggestionClick(propertyName, 'propertyName')}
+                                >
+                                  <svg className="w-4 h-4 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                  </svg>
+                                  {propertyName}
+                                </div>
+                              ))}
+                            </>
+                          )}
+                        </div>
+                      )}
                     </div>
 
                     {/* City Dropdown */}
@@ -1058,7 +1441,6 @@ const handleCompareClick = async () => {
                         </div>
                       )}
                     </div>
-
                     {/* Sub-Location Dropdown */}
                     <div className="relative">
                       <button
@@ -1197,8 +1579,6 @@ const handleCompareClick = async () => {
                                 type="checkbox"
                                 checked={selectedPropertyTypes.includes(propertyType)}
                                 onChange={() => {
-                                  console.log('Checkbox onChange - Current selectedPropertyTypes:', selectedPropertyTypes);
-                                  console.log('Checkbox onChange - propertyType:', propertyType);
                                   if (selectedPropertyTypes.includes(propertyType)) {
                                     setSelectedPropertyTypes(prev => prev.filter(type => type !== propertyType));
                                   } else {
@@ -1206,7 +1586,6 @@ const handleCompareClick = async () => {
                                       // Use Set to ensure no duplicates
                                       const newSet = new Set([...prev, propertyType]);
                                       const newArray = Array.from(newSet);
-                                      console.log('Checkbox onChange - New array:', newArray);
                                       return newArray;
                                     });
                                   }
@@ -1216,6 +1595,66 @@ const handleCompareClick = async () => {
                               {propertyType}
                             </label>
                           ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Transaction Type Dropdown */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        className="w-full text-left cursor-pointer text-black text-sm p-3 pr-10 rounded-lg border border-black focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                        onClick={() => {
+                          setShowTransactionTypeDropdown(!showTransactionTypeDropdown);
+                          setShowCityDropdown(false);
+                          setShowSubLocationDropdown(false);
+                          setShowPropertyTypeDropdown(false);
+                          setShowCarpetAreaDropdown(false);
+                        }}
+                      >
+                        {enquiredForFilter || "Transaction Type"}
+                      </button>
+                      <svg
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-black"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                      {showTransactionTypeDropdown && (
+                        <div className="search-dropdown absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                          <div
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                            onClick={() => {
+                              setEnquiredForFilter("");
+                              setSelectedType("");
+                              setShowTransactionTypeDropdown(false);
+                            }}
+                          >
+                            All Types
+                          </div>
+                          <div
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                            onClick={() => {
+                              setEnquiredForFilter("Rent");
+                              setSelectedType("Rent");
+                              setShowTransactionTypeDropdown(false);
+                            }}
+                          >
+                            Rent
+                          </div>
+                          <div
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                            onClick={() => {
+                              setEnquiredForFilter("Sale");
+                              setSelectedType("Investment");
+                              setShowTransactionTypeDropdown(false);
+                            }}
+                          >
+                            Sale
+                          </div>
                         </div>
                       )}
                     </div>
@@ -1230,6 +1669,7 @@ const handleCompareClick = async () => {
                           setShowCityDropdown(false);
                           setShowSubLocationDropdown(false);
                           setShowPropertyTypeDropdown(false);
+                          setShowTransactionTypeDropdown(false);
                         }}
                       >
                         {selectedCarpetArea || (minCarpetArea || maxCarpetArea ? `${minCarpetArea || '0'} - ${maxCarpetArea || '∞'} sqft` : "Select Carpet Area")}
@@ -1314,7 +1754,7 @@ const handleCompareClick = async () => {
                   </div>
 
                   {/* Selected Filters Display */}
-                  {(selectedCities.length > 0 || selectedSubLocations.length > 0 || selectedPropertyTypes.length > 0 || selectedCarpetArea || minCarpetArea || maxCarpetArea) && (
+                  {(selectedCities.length > 0 || selectedSubLocations.length > 0 || selectedPropertyTypes.length > 0 || selectedCarpetArea || minCarpetArea || maxCarpetArea || enquiredForFilter) && (
                     <div className="flex flex-wrap gap-2 mb-4">
                       {selectedCities.map((city) => (
                         <div key={city} className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
@@ -1355,6 +1795,21 @@ const handleCompareClick = async () => {
                           </button>
                         </div>
                       ))}
+                      {enquiredForFilter && (
+                        <div className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
+                          Transaction: {enquiredForFilter}
+                          <button
+                            type="button"
+                            className="ml-1 text-white hover:text-gray-200 focus:outline-none"
+                            onClick={() => {
+                              setEnquiredForFilter("");
+                              setSelectedType("");
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      )}
                       {selectedCarpetArea && (
                         <div className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
                           Area: {selectedCarpetArea}
@@ -1707,7 +2162,11 @@ const handleCompareClick = async () => {
                             {/* For Sale/Rent / Property Type overlay */}
                             <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
                               <span className="mr-2 transition-all duration-300 group-hover:font-medium">
-                                {property.forSale
+                                {(property as any).enquiredFor === "Sale"
+                                  ? "For Sale"
+                                  : (property as any).enquiredFor === "Rent"
+                                  ? "For Rent"
+                                  : property.forSale
                                   ? "For Sale"
                                   : property.forRent
                                   ? "For Rent"
