@@ -1,0 +1,61 @@
+# robots.txt for realtraspaces.com
+
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Disallow admin and dashboard routes
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /dashboard/*
+Disallow: /dashboardallwebusers
+Disallow: /dashboardallwebusers/
+Disallow: /dashboardcontactleads
+Disallow: /dashboardcontactleads/
+Disallow: /dashboardcookies
+Disallow: /dashboardcookies/
+Disallow: /dashboarddeveloper
+Disallow: /dashboarddeveloper/
+Disallow: /dashboardlistproperty
+Disallow: /dashboardlistproperty/
+Disallow: /dashboardteam
+Disallow: /dashboardteam/
+Disallow: /awardmanagement
+Disallow: /awardmanagement/
+Disallow: /career-management
+Disallow: /career-management/
+Disallow: /blog
+Disallow: /blog/
+Disallow: /manage-testimonials
+Disallow: /manage-testimonials/
+Disallow: /seometaManager
+Disallow: /seometaManager/
+Disallow: /PropertyListing
+Disallow: /PropertyListing/
+
+# Disallow API routes
+Disallow: /api/
+
+# Disallow private user pages
+Disallow: /profile-page
+Disallow: /profile-page/
+Disallow: /SavedProperties
+Disallow: /SavedProperties/
+
+# Allow important public pages
+Allow: /properties
+Allow: /property-details/
+Allow: /blogs
+Allow: /blogs/
+Allow: /career
+Allow: /developers
+Allow: /about
+Allow: /contact
+Allow: /research
+
+# Sitemap location
+Sitemap: https://realtraspaces.com/sitemap.xml
+
+# Crawl-delay (optional, adjust as needed)
+Crawl-delay: 1
+

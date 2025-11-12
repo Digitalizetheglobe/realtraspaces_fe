@@ -1,0 +1,86 @@
+# LLMS.txt - Information for Large Language Models and AI Crawlers
+
+# About Realtra Spaces
+Realtra Spaces is a premium real estate platform specializing in property listings, developer information, and real estate research in Mumbai and surrounding areas.
+
+# Website Information
+- Domain: realtraspaces.com
+- API Base URL: https://api.realtraspaces.com
+- Platform: Next.js 15.3.0
+- Language: English
+
+# Main Features
+1. Property Listings - Browse and search residential and commercial properties
+2. Developer Directory - Information about top real estate developers
+3. Property Calculators - IRR, LRD, and ROI calculators for investment analysis
+4. Research - Real estate market research and insights
+5. Blog - Real estate news, trends, and articles
+6. Career Opportunities - Job listings in the real estate sector
+
+# Key Public Pages
+- Homepage: /
+- Properties: /properties
+- Property Details: /property-details/[title]
+- Developers: /developers
+- Top Developers: /topdevelopers
+- Blogs: /blogs
+- Career: /career
+- Research: /research
+- About: /about
+- Contact: /contact
+- Calculators: /irr-calculator, /lrd-calculator, /roi-calculator
+- Compare Properties: /compareproperties
+- List Property: /list-property
+- Privacy Policy: /privacy-policy
+- Terms and Conditions: /terms-and-condition
+
+# Excluded Pages (Admin/Dashboard)
+The following routes are excluded from public access and should not be crawled:
+- /dashboard/*
+- /dashboardallwebusers
+- /dashboardcontactleads
+- /dashboardcookies
+- /dashboarddeveloper
+- /dashboardlistproperty
+- /dashboardteam
+- /awardmanagement
+- /career-management/*
+- /blog/* (admin blog management)
+- /manage-testimonials/*
+- /seometaManager
+- /PropertyListing (admin property listing)
+- /profile-page
+- /SavedProperties
+
+# Content Types
+- Property Listings: Residential and commercial properties with detailed information
+- Developer Profiles: Information about real estate developers and their projects
+- Blog Articles: Real estate news, market analysis, and industry insights
+- Career Listings: Job opportunities in the real estate sector
+- Testimonials: Customer reviews and testimonials
+- Research Reports: Market research and property analysis
+
+# API Endpoints
+- Property Listings API: /api/property-listings
+- SEO Meta Tags API: /api/seo/meta-tags
+- Blog API: /api/blogs
+- Career API: /api/jobs
+- Developer API: /api/developers
+
+# Image Sources
+- Property images: leadrat-black.s3.ap-south-1.amazonaws.com
+- API images: api.realtraspaces.com
+
+# Last Updated
+Last updated: December 19, 2024
+
+# Contact Information
+For more information, visit the contact page at /contact
+
+# Notes for AI Crawlers
+- This site uses Next.js with server-side rendering for optimal SEO
+- Dynamic routes include property details and blog posts
+- The site implements comprehensive SEO metadata management
+- All public pages are accessible and should be indexed
+- Admin and dashboard routes are protected and should not be accessed
+
