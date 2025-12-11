@@ -127,6 +127,10 @@ export default function PropertyDetails() {
   const [isComparing, setIsComparing] = useState(false);
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set()); // Track failed image URLs
   const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set()); // Track loading image URLs
+  const [enquiryTermsAccepted, setEnquiryTermsAccepted] = useState(false);
+  const [scheduleTermsAccepted, setScheduleTermsAccepted] = useState(false);
+  const [enquiryTermsError, setEnquiryTermsError] = useState<string | null>(null);
+  const [scheduleTermsError, setScheduleTermsError] = useState<string | null>(null);
 
   // Helper function to get the best image URL for a property
   const getPropertyImage = (property: Property | null): string => {
@@ -402,24 +406,34 @@ export default function PropertyDetails() {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would typically send the form data to your backend
-    console.log("Form submitted:", formData);
-    // Close the popup after submission
-    setShowEnquirePopup(false);
-    // Reset form
-    setFormData({
-      name: "",
-      mobile: "",
-      message: "",
-      propertySlug: propertyTitle || "",
-      visitDate: "",
-      visitTime: "",
-    });
-    // Show success message
-    toast.success("Thank you for your enquiry! We'll get back to you soon.");
-  };
+  const handleSubmit =
+    (type: "enquiry" | "schedule") => (e: React.FormEvent) => {
+      e.preventDefault();
+      if (type === "enquiry" && !enquiryTermsAccepted) {
+        setEnquiryTermsError("You must accept the terms to continue");
+        return;
+      }
+      if (type === "schedule" && !scheduleTermsAccepted) {
+        setScheduleTermsError("You must accept the terms to continue");
+        return;
+      }
+      console.log("Form submitted:", formData);
+      setShowEnquirePopup(false);
+      setShowSchedulePopup(false);
+      setEnquiryTermsAccepted(false);
+      setScheduleTermsAccepted(false);
+      setEnquiryTermsError(null);
+      setScheduleTermsError(null);
+      setFormData({
+        name: "",
+        mobile: "",
+        message: "",
+        propertySlug: propertyTitle || "",
+        visitDate: "",
+        visitTime: "",
+      });
+      toast.success("Thank you for your enquiry! We'll get back to you soon.");
+    };
 
   const handleSaveProperty = async () => {
     // Check if user is logged in
@@ -679,7 +693,7 @@ export default function PropertyDetails() {
               Please fill out the form below and we'll get back to you soon.
             </p>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit("enquiry")}>
               <div className="mb-4">
                 <label
                   htmlFor="name"
@@ -737,10 +751,44 @@ export default function PropertyDetails() {
               </div>
 
               <div className="text-sm text-gray-700">
-  Enquiring for - <span className="font-medium text-black">{property?.title}</span>
-</div>
+                Enquiring for -{" "}
+                <span className="font-medium text-black">{property?.title}</span>
+              </div>
 
-                
+              <div className="mt-4">
+                <label className="block text-gray-700 text-sm font-medium mb-2">
+                  Terms & Conditions *
+                </label>
+                <div className="flex items-start space-x-2">
+                  <input
+                    type="checkbox"
+                    id="enquiryTerms"
+                    checked={enquiryTermsAccepted}
+                    onChange={(e) => {
+                      setEnquiryTermsAccepted(e.target.checked);
+                      if (enquiryTermsError) {
+                        setEnquiryTermsError(null);
+                      }
+                    }}
+                    className="w-4 h-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <p className="text-sm text-gray-600">
+                    I agree to the{" "}
+                    <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </p>
+                </div>
+                {enquiryTermsError && (
+                  <p className="text-red-500 text-sm mt-1">{enquiryTermsError}</p>
+                )}
+              </div>
+
               <div className="mt-6">
                 <button
                   type="submit"
@@ -785,7 +833,7 @@ export default function PropertyDetails() {
               Please fill out the form below and we'll get back to you soon.
             </p>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit("schedule")}>
               <div className="mb-4">
                 {/* <label
                   htmlFor="name"
@@ -860,6 +908,40 @@ export default function PropertyDetails() {
                   required
                   className="w-full px-3 py-2 border text-black border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-medium mb-2">
+                  Terms & Conditions *
+                </label>
+                <div className="flex items-start space-x-2">
+                  <input
+                    type="checkbox"
+                    id="scheduleTerms"
+                    checked={scheduleTermsAccepted}
+                    onChange={(e) => {
+                      setScheduleTermsAccepted(e.target.checked);
+                      if (scheduleTermsError) {
+                        setScheduleTermsError(null);
+                      }
+                    }}
+                    className="w-4 h-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <p className="text-sm text-gray-600">
+                    I agree to the{" "}
+                    <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </p>
+                </div>
+                {scheduleTermsError && (
+                  <p className="text-red-500 text-sm mt-1">{scheduleTermsError}</p>
+                )}
               </div>
 
               <div className="mb-4">

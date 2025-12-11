@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
 import { Building, Phone, ArrowRight, Shield, Mail, Lock } from "lucide-react";
 import { toast } from "react-hot-toast";
 import PageWithSeo from "../../components/PageWithSeo";
@@ -33,6 +34,8 @@ const SignInPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [sendOtpTermsAccepted, setSendOtpTermsAccepted] = useState(false);
+  const [verifyOtpTermsAccepted, setVerifyOtpTermsAccepted] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -68,6 +71,9 @@ const SignInPage = () => {
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Email is invalid";
     }
+    if (!sendOtpTermsAccepted) {
+      newErrors.sendOtpTerms = "You must accept the terms to continue";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -80,6 +86,9 @@ const SignInPage = () => {
       newErrors.otpCode = "OTP is required";
     } else if (!/^\d{6}$/.test(otpData.otpCode)) {
       newErrors.otpCode = "OTP must be 6 digits";
+    }
+    if (!verifyOtpTermsAccepted) {
+      newErrors.verifyOtpTerms = "You must accept the terms to continue";
     }
 
     setErrors(newErrors);
@@ -309,6 +318,40 @@ const SignInPage = () => {
                       </div>
                     </div>
 
+                    <div>
+                      <label className="block text-sm font-medium mb-1" style={{ color: "#6E6E73" }}>
+                        Terms & Conditions *
+                      </label>
+                      <div className="flex items-start space-x-2">
+                        <input
+                          type="checkbox"
+                          id="signinTerms"
+                          checked={sendOtpTermsAccepted}
+                          onChange={(e) => {
+                            setSendOtpTermsAccepted(e.target.checked);
+                            if (errors.sendOtpTerms) {
+                              setErrors((prev) => ({ ...prev, sendOtpTerms: "" }));
+                            }
+                          }}
+                          className="w-4 h-4 mt-1 text-blue-600 border-[#E5E5E7] rounded focus:ring-blue-500"
+                        />
+                        <p className="text-sm" style={{ color: "#6E6E73" }}>
+                          I agree to the{" "}
+                          <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                            Terms of Service
+                          </Link>{" "}
+                          and{" "}
+                          <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                            Privacy Policy
+                          </Link>
+                          .
+                        </p>
+                      </div>
+                      {errors.sendOtpTerms && (
+                        <p className="text-red-500 text-sm mt-1">{errors.sendOtpTerms}</p>
+                      )}
+                    </div>
+
                     {/* Submit Button */}
                     <button
                       type="submit"
@@ -378,6 +421,40 @@ const SignInPage = () => {
                       <p className="text-sm text-[#6E6E73] mt-2">
                         We've sent a 6-digit OTP to {otpData.email}
                       </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-1" style={{ color: "#6E6E73" }}>
+                        Terms & Conditions *
+                      </label>
+                      <div className="flex items-start space-x-2">
+                        <input
+                          type="checkbox"
+                          id="verifyOtpTerms"
+                          checked={verifyOtpTermsAccepted}
+                          onChange={(e) => {
+                            setVerifyOtpTermsAccepted(e.target.checked);
+                            if (errors.verifyOtpTerms) {
+                              setErrors((prev) => ({ ...prev, verifyOtpTerms: "" }));
+                            }
+                          }}
+                          className="w-4 h-4 mt-1 text-blue-600 border-[#E5E5E7] rounded focus:ring-blue-500"
+                        />
+                        <p className="text-sm" style={{ color: "#6E6E73" }}>
+                          I agree to the{" "}
+                          <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                            Terms of Service
+                          </Link>{" "}
+                          and{" "}
+                          <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                            Privacy Policy
+                          </Link>
+                          .
+                        </p>
+                      </div>
+                      {errors.verifyOtpTerms && (
+                        <p className="text-red-500 text-sm mt-1">{errors.verifyOtpTerms}</p>
+                      )}
                     </div>
 
                     {/* Submit Button */}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import Link from 'next/link';
 import { FiPlus, FiEdit2, FiX, FiCheck, FiArrowLeft, FiTrash2 } from 'react-icons/fi';
 
 const SEOMetaManager = () => {
@@ -368,7 +369,31 @@ const SEOMetaManager = () => {
                       />
                     </div>
                   </div>
-                  
+
+                  <div className="mt-6">
+                    <label className="block text-sm font-medium mb-2" style={{ color: colors.dark }}>
+                      Terms & Conditions *
+                    </label>
+                    <div className="flex items-start space-x-2">
+                      <input
+                        type="checkbox"
+                        required
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+                      />
+                      <p className="text-sm text-gray-600">
+                        I agree to the{" "}
+                        <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                          Terms of Service
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                          Privacy Policy
+                        </Link>
+                        .
+                      </p>
+                    </div>
+                  </div>
+
                   <div className="mt-8 flex justify-end space-x-3">
                     {isEditing && (
                       <button

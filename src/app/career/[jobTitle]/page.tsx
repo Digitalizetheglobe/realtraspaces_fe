@@ -4,6 +4,7 @@ import { useState, FormEvent, ChangeEvent, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useEffect } from 'react';
+import Link from 'next/link';
 
 export default function JobTitle() {
   return (
@@ -573,6 +574,30 @@ function JobTitleContent() {
             <p className="mt-1 text-xs text-gray-500">
               You can select multiple files. Accepted file formats: PDF, DOC, DOCX, JPG, JPEG, PNG
             </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Terms & Conditions *
+            </label>
+            <div className="flex items-start space-x-2">
+              <input
+                type="checkbox"
+                required
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+              />
+              <p className="text-sm text-gray-600">
+                I agree to the{" "}
+                <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
+                <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                  Privacy Policy
+                </Link>
+                .
+              </p>
+            </div>
           </div>
           
           {/* Submit button */}

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   Building,
   Phone,
@@ -60,6 +61,8 @@ const SignUpPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [registrationTermsAccepted, setRegistrationTermsAccepted] = useState(false);
+  const [verifyTermsAccepted, setVerifyTermsAccepted] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -100,6 +103,9 @@ const SignUpPage = () => {
       newErrors.mobileNumber = "Mobile number must be 10 digits";
     if (!formData.location.trim()) newErrors.location = "Location is required";
     if (!formData.company.trim()) newErrors.company = "Company is required";
+    if (!registrationTermsAccepted) {
+      newErrors.registrationTerms = "You must accept the terms to continue";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -111,6 +117,9 @@ const SignUpPage = () => {
     if (!otpData.otpCode.trim()) newErrors.otpCode = "OTP is required";
     else if (!/^\d{6}$/.test(otpData.otpCode))
       newErrors.otpCode = "OTP must be 6 digits";
+    if (!verifyTermsAccepted) {
+      newErrors.verifyTerms = "You must accept the terms to continue";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -455,6 +464,40 @@ const SignUpPage = () => {
                       </label>
                     </div>
 
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Terms & Conditions *
+                      </label>
+                      <div className="flex items-start space-x-2">
+                        <input
+                          type="checkbox"
+                          id="signupTerms"
+                          checked={registrationTermsAccepted}
+                          onChange={(e) => {
+                            setRegistrationTermsAccepted(e.target.checked);
+                            if (errors.registrationTerms) {
+                              setErrors((prev) => ({ ...prev, registrationTerms: "" }));
+                            }
+                          }}
+                          className="w-4 h-4 mt-1 text-blue-600 border-[#E5E5E7] rounded focus:ring-blue-500"
+                        />
+                        <p className="text-sm" style={{ color: "#6E6E73" }}>
+                          I agree to the{" "}
+                          <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                            Terms of Service
+                          </Link>{" "}
+                          and{" "}
+                          <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                            Privacy Policy
+                          </Link>
+                          .
+                        </p>
+                      </div>
+                      {errors.registrationTerms && (
+                        <p className="text-red-500 text-sm mt-1">{errors.registrationTerms}</p>
+                      )}
+                    </div>
+
                     {/* Submit Button */}
                     <button
                       type="submit"
@@ -524,6 +567,40 @@ const SignUpPage = () => {
                       <p className="text-sm text-[#6E6E73] mt-2">
                         We've sent a 6-digit OTP to {otpData.email}
                       </p>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Terms & Conditions *
+                      </label>
+                      <div className="flex items-start space-x-2">
+                        <input
+                          type="checkbox"
+                          id="verifySignupTerms"
+                          checked={verifyTermsAccepted}
+                          onChange={(e) => {
+                            setVerifyTermsAccepted(e.target.checked);
+                            if (errors.verifyTerms) {
+                              setErrors((prev) => ({ ...prev, verifyTerms: "" }));
+                            }
+                          }}
+                          className="w-4 h-4 mt-1 text-blue-600 border-[#E5E5E7] rounded focus:ring-blue-500"
+                        />
+                        <p className="text-sm" style={{ color: "#6E6E73" }}>
+                          I agree to the{" "}
+                          <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                            Terms of Service
+                          </Link>{" "}
+                          and{" "}
+                          <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                            Privacy Policy
+                          </Link>
+                          .
+                        </p>
+                      </div>
+                      {errors.verifyTerms && (
+                        <p className="text-red-500 text-sm mt-1">{errors.verifyTerms}</p>
+                      )}
                     </div>
 
                     {/* Submit Button */}

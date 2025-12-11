@@ -11,6 +11,7 @@ import {
 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Link from "next/link";
 import { getTeamImageUrl } from "@/utils/imageUtils";
 
 interface TeamMember {
@@ -487,6 +488,31 @@ const TeamPage = () => {
                   className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
               </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Terms & Conditions *
+                </label>
+                <div className="flex items-start space-x-2">
+                  <input
+                    type="checkbox"
+                    required
+                    className="w-4 h-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  />
+                  <p className="text-sm text-gray-600">
+                    I agree to the{" "}
+                    <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </p>
+                </div>
+              </div>
+
               <div className="flex justify-end gap-3">
                 <button
                   type="button"

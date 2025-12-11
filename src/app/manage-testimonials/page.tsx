@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { FiEdit2, FiTrash2, FiStar, FiPlus, FiCheck, FiX } from 'react-icons/fi';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface Testimonial {
@@ -248,6 +249,31 @@ const ManageTestimonialsPage = () => {
                     <label htmlFor="isActive" className="ml-2 block text-sm text-gray-700">
                       Active
                     </label>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: colors.dark }}>
+                      Terms & Conditions *
+                    </label>
+                    <div className="flex items-start space-x-2">
+                      <input
+                        type="checkbox"
+                        required
+                        className="h-4 w-4 rounded border-gray-300 focus:ring-blue-500"
+                        style={{ borderColor: colors.secondary }}
+                      />
+                      <p className="text-sm text-gray-600">
+                        I agree to the{" "}
+                        <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                          Terms of Service
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                          Privacy Policy
+                        </Link>
+                        .
+                      </p>
+                    </div>
                   </div>
 
                   <div className="flex justify-end space-x-4">

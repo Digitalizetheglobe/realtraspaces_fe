@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { FiPlus, FiArrowLeft, FiSave, FiUpload, FiX } from 'react-icons/fi';
 
@@ -354,6 +355,30 @@ const CreateBlogContent = () => {
                     placeholder="blog-post-title"
                   />
                 </div>
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2" style={{ color: colors.dark }}>
+                Terms & Conditions *
+              </label>
+              <div className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  required
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+                />
+                <p className="text-sm text-gray-600">
+                  I agree to the{" "}
+                  <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                    Privacy Policy
+                  </Link>
+                  .
+                </p>
               </div>
             </div>
 

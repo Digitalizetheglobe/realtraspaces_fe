@@ -201,6 +201,8 @@ export default function Similarproperties() {
     transactionType: "",
     inquiry: ""
   });
+  const [contactFormTermsAccepted, setContactFormTermsAccepted] = useState(false);
+  const [contactFormError, setContactFormError] = useState<string | null>(null);
 
   // Enhanced search states
   const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
@@ -1042,6 +1044,11 @@ const handleCompareClick = async () => {
   // Handle contact form submission
   const handleContactFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+      if (!contactFormTermsAccepted) {
+        setContactFormError("You must accept the terms to continue");
+        return;
+      }
     
     // Here you would typically send the form data to your backend
     // For now, we'll just show an alert
@@ -1056,6 +1063,8 @@ const handleCompareClick = async () => {
       transactionType: "",
       inquiry: ""
     });
+    setContactFormTermsAccepted(false);
+    setContactFormError(null);
     setShowContactForm(false);
   };
 
@@ -1935,6 +1944,40 @@ const handleCompareClick = async () => {
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Tell us about your inquiry or specific requirements..."
                           />
+                        </div>
+
+                        <div className="mb-4 text-left">
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Terms & Conditions *
+                          </label>
+                          <div className="flex items-start space-x-2 text-left">
+                            <input
+                              type="checkbox"
+                              id="contactFormTerms"
+                              checked={contactFormTermsAccepted}
+                              onChange={(e) => {
+                                setContactFormTermsAccepted(e.target.checked);
+                                if (contactFormError) {
+                                  setContactFormError(null);
+                                }
+                              }}
+                              className="w-4 h-4 mt-1 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                            />
+                            <p className="text-sm text-gray-600">
+                              I agree to the{" "}
+                              <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                                Terms of Service
+                              </Link>{" "}
+                              and{" "}
+                              <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                                Privacy Policy
+                              </Link>
+                              .
+                            </p>
+                          </div>
+                          {contactFormError && (
+                            <p className="text-red-500 text-sm mt-1 flex items-center">{contactFormError}</p>
+                          )}
                         </div>
                         
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">

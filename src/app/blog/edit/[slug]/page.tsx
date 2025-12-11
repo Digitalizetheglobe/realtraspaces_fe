@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import Link from 'next/link';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { FiArrowLeft, FiSave, FiUpload, FiX } from 'react-icons/fi';
 import { Blog, BlogFormData } from '@/types/blog';
@@ -363,6 +364,30 @@ const EditBlogContent = () => {
                   </div>
                 </div>
               )}
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Terms & Conditions *
+              </label>
+              <div className="flex items-start space-x-2">
+                <input
+                  type="checkbox"
+                  required
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+                />
+                <p className="text-sm text-gray-600">
+                  I agree to the{" "}
+                  <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                    Privacy Policy
+                  </Link>
+                  .
+                </p>
+              </div>
             </div>
 
             {/* Submit Button */}

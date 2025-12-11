@@ -600,6 +600,30 @@ const BenefitsSection = () => {
                     style={{ color: '#6E6E73' }}
                   ></textarea>
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-black mb-2">
+                    Terms & Conditions *
+                  </label>
+                  <div className="flex items-start space-x-2 text-left">
+                    <input
+                      type="checkbox"
+                      required
+                      className="w-4 h-4 mt-1 text-black border-2 border-black rounded focus:ring-black"
+                    />
+                    <p className="text-sm" style={{ color: '#6E6E73' }}>
+                      I agree to the{' '}
+                      <Link href="/terms-and-condition" className="text-black underline">
+                        Terms of Service
+                      </Link>{' '}
+                      and{' '}
+                      <Link href="/privacy-policy" className="text-black underline">
+                        Privacy Policy
+                      </Link>
+                      .
+                    </p>
+                  </div>
+                </div>
                 
                 <div className="text-center pt-6">
                   <button 
