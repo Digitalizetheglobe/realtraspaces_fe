@@ -210,6 +210,16 @@ const AdminLoginPage = () => {
               )}
             </div>
 
+            {/* Forgot Password Link */}
+            <div className="flex items-center justify-end">
+              <Link
+                href="/dashboard/adminforgotpass"
+                className="text-sm text-blue-600 hover:text-blue-500 transition-colors"
+              >
+                Forgot Password?
+              </Link>
+            </div>
+
             {/* API Error */}
             {apiError && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
