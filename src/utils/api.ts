@@ -145,6 +145,11 @@ export type { ApiResponse, ApiError };
 
 // SEO Metadata API function
 export async function fetchSeoMetaData(page: string): Promise<SeoMetaData | null> {
+  // In local development, skip remote SEO API calls to avoid timeouts during page load
+  if (process.env.NODE_ENV === "development") {
+    return null;
+  }
+
   try {
     const response = await fetch(`https://api.realtraspaces.com/api/seo/meta-tags/`);
     
@@ -170,9 +175,8 @@ export async function fetchSeoMetaData(page: string): Promise<SeoMetaData | null
     }
     
     return null;
-  } catch (error) {
-    // Return null on error - this is expected behavior
-    console.warn(`Failed to fetch SEO data for page ${page}:`, error);
+  } catch {
+    // Silently fall back when SEO service is unreachable
     return null;
   }
 } 

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.realtraspaces.com";
+
 interface RegisterFormData {
   fullName: string;
   mobileNumber: string;
@@ -109,7 +111,7 @@ const AdminRegisterPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://api.realtraspaces.com/api/admins/register", {
+      const response = await fetch(`${API_BASE_URL}/api/admins/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

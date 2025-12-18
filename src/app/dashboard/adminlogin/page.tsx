@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../../../hooks/useAuth";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.realtraspaces.com";
+
 interface LoginFormData {
   mobileNumber: string;
   password: string;
@@ -94,7 +96,7 @@ const AdminLoginPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://api.realtraspaces.com/api/admins/login", {
+      const response = await fetch(`${API_BASE_URL}/api/admins/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

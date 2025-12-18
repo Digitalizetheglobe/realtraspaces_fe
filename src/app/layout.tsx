@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Qwitcher_Grypen } from "next/font/google";
+import { Inter, Roboto_Mono, Qwitcher_Grypen } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import LayoutWithConditionalHeader from "../components/LayoutWithConditionalHeader";
 
-const geistSans = Geist({
+const geistSans = Inter({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
+const geistMono = Roboto_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });

@@ -4,12 +4,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-interface ForgotPasswordFormData {
-  mobileNumber: string;
-}
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.realtraspaces.com";
 
 interface ResetPasswordFormData {
-  mobileNumber: string;
   otpCode: string;
   newPassword: string;
   confirmPassword: string;
@@ -23,35 +21,20 @@ interface ApiResponse {
 
 const AdminForgetPasswordPage = () => {
   const router = useRouter();
+  const ADMIN_EMAIL = "Rahulsonar@credefine.com";
   const [step, setStep] = useState<"request" | "verify" | "reset">("request");
-  const [forgotFormData, setForgotFormData] = useState<ForgotPasswordFormData>({
-    mobileNumber: "",
-  });
   const [resetFormData, setResetFormData] = useState<ResetPasswordFormData>({
-    mobileNumber: "",
     otpCode: "",
     newPassword: "",
     confirmPassword: "",
   });
-  const [errors, setErrors] = useState<Partial<ForgotPasswordFormData & ResetPasswordFormData>>({});
+  const [errors, setErrors] = useState<Partial<ResetPasswordFormData>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string>("");
   const [apiSuccess, setApiSuccess] = useState<string>("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const validateRequestForm = (): boolean => {
-    const newErrors: Partial<ForgotPasswordFormData> = {};
-
-    if (!forgotFormData.mobileNumber.trim()) {
-      newErrors.mobileNumber = "Mobile number is required";
-    } else if (!/^[0-9]{10}$/.test(forgotFormData.mobileNumber.trim())) {
-      newErrors.mobileNumber = "Please enter a valid 10-digit mobile number";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const validateResetForm = (): boolean => {
     const newErrors: Partial<ResetPasswordFormData> = {};
@@ -78,20 +61,6 @@ const AdminForgetPasswordPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleRequestInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForgotFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    if (errors[name as keyof ForgotPasswordFormData]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: ""
-      }));
-    }
-  };
 
   const handleResetInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -113,20 +82,16 @@ const AdminForgetPasswordPage = () => {
     setApiError("");
     setApiSuccess("");
 
-    if (!validateRequestForm()) {
-      return;
-    }
-
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://api.realtraspaces.com/api/admins/forgot-password", {
+      const response = await fetch(`${API_BASE_URL}/api/admins/forgot-password/request-otp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          mobileNumber: forgotFormData.mobileNumber.trim(),
+          email: ADMIN_EMAIL,
         }),
       });
 
@@ -138,11 +103,7 @@ const AdminForgetPasswordPage = () => {
       }
 
       if (response.ok && data.success) {
-        setApiSuccess(data.message || "OTP sent to your mobile number");
-        setResetFormData(prev => ({
-          ...prev,
-          mobileNumber: forgotFormData.mobileNumber.trim(),
-        }));
+        setApiSuccess(data.message || `OTP sent to ${ADMIN_EMAIL}`);
         setStep("verify");
       } else {
         const errorMessage = data.message || `Failed to send OTP. Please try again.`;
@@ -170,13 +131,13 @@ const AdminForgetPasswordPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://api.realtraspaces.com/api/admins/verify-otp", {
+      const response = await fetch(`${API_BASE_URL}/api/admins/verify-otp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          mobileNumber: resetFormData.mobileNumber,
+          email: ADMIN_EMAIL,
           otpCode: resetFormData.otpCode.trim(),
         }),
       });
@@ -216,13 +177,13 @@ const AdminForgetPasswordPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("https://api.realtraspaces.com/api/admins/reset-password", {
+      const response = await fetch(`${API_BASE_URL}/api/admins/reset-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          mobileNumber: resetFormData.mobileNumber,
+          email: ADMIN_EMAIL,
           otpCode: resetFormData.otpCode.trim(),
           newPassword: resetFormData.newPassword,
         }),
@@ -263,8 +224,8 @@ const AdminForgetPasswordPage = () => {
             {step === "reset" && "Reset Password"}
           </h2>
           <p className="text-gray-600">
-            {step === "request" && "Enter your mobile number to receive OTP"}
-            {step === "verify" && "Enter the OTP sent to your mobile number"}
+            {step === "request" && "OTP will be sent to the admin email"}
+            {step === "verify" && "Enter the OTP sent to your email"}
             {step === "reset" && "Enter your new password"}
           </p>
         </div>
@@ -275,26 +236,20 @@ const AdminForgetPasswordPage = () => {
           {/* Request OTP Form */}
           {step === "request" && (
             <form className="space-y-6" onSubmit={handleRequestOtp}>
-              <div>
-                <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                  Mobile Number
-                </label>
-                <input
-                  id="mobileNumber"
-                  name="mobileNumber"
-                  type="tel"
-                  required
-                  value={forgotFormData.mobileNumber}
-                  onChange={handleRequestInputChange}
-                  className={`w-full px-3 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                    errors.mobileNumber ? "border-red-300" : "border-gray-300"
-                  }`}
-                  placeholder="Enter your mobile number"
-                  maxLength={10}
-                />
-                {errors.mobileNumber && (
-                  <p className="mt-1 text-sm text-red-600">{errors.mobileNumber}</p>
-                )}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-blue-700">
+                      OTP will be sent to: <span className="font-semibold">{ADMIN_EMAIL}</span>
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {apiError && (
@@ -373,7 +328,7 @@ const AdminForgetPasswordPage = () => {
                   <p className="mt-1 text-sm text-red-600">{errors.otpCode}</p>
                 )}
                 <p className="mt-2 text-sm text-gray-600">
-                  OTP sent to {resetFormData.mobileNumber}
+                  OTP sent to <span className="font-semibold">{ADMIN_EMAIL}</span>
                 </p>
               </div>
 
