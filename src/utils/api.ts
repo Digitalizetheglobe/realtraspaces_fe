@@ -145,13 +145,22 @@ export type { ApiResponse, ApiError };
 
 // SEO Metadata API function
 export async function fetchSeoMetaData(page: string): Promise<SeoMetaData | null> {
-  // In local development, skip remote SEO API calls to avoid timeouts during page load
-  if (process.env.NODE_ENV === "development") {
+  // In local development or during build, skip remote SEO API calls to avoid timeouts
+  if (process.env.NODE_ENV === "development" || process.env.NEXT_PHASE === "phase-production-build") {
     return null;
   }
 
   try {
-    const response = await fetch(`https://api.realtraspaces.com/api/seo/meta-tags/`);
+    // Add timeout to prevent hanging during build
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+    const response = await fetch(`https://api.realtraspaces.com/api/seo/meta-tags/`, {
+      signal: controller.signal,
+      next: { revalidate: 3600 } // Cache for 1 hour
+    });
+    
+    clearTimeout(timeoutId);
     
     if (!response.ok) {
       // If the endpoint doesn't exist or returns an error, return null
@@ -175,8 +184,11 @@ export async function fetchSeoMetaData(page: string): Promise<SeoMetaData | null
     }
     
     return null;
-  } catch {
-    // Silently fall back when SEO service is unreachable
+  } catch (error) {
+    // Silently fall back when SEO service is unreachable or times out
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.warn('SEO metadata fetch timed out, using fallback');
+    }
     return null;
   }
 } 
