@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../../../hooks/useAuth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.realtraspaces.com";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 interface LoginFormData {
   mobileNumber: string;
@@ -285,7 +285,7 @@ const AdminLoginPage = () => {
           </form>
 
           {/* Registration Link */}
-          <div className="mt-6 text-center">
+          {/* <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don't have an admin account?{" "}
               <Link
@@ -295,7 +295,7 @@ const AdminLoginPage = () => {
                 Register here
               </Link>
             </p>
-          </div>
+          </div> */}
 
           {/* Back to Dashboard */}
           <div className="mt-4 text-center">

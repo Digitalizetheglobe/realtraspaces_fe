@@ -40,7 +40,7 @@ const SEOMetaManager = () => {
   const fetchAllMetaTags = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('https://api.realtraspaces.com/api/seo/meta-tags/');
+      const response = await axios.get('http://localhost:8000/api/seo/meta-tags/');
       setMetaTags(response.data.data);
     } catch (err) {
       showNotification('Failed to fetch meta tags', 'error');
@@ -53,7 +53,7 @@ const SEOMetaManager = () => {
   const fetchPageMeta = async (page) => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://api.realtraspaces.com/api/seo/meta-tags/${page}`);
+      const response = await axios.get(`http://localhost:8000/api/seo/meta-tags/${page}`);
       setCurrentPage(response.data.data);
       setFormData(response.data.data);
     } catch (err) {
@@ -69,7 +69,7 @@ const SEOMetaManager = () => {
     
     setLoading(true);
     try {
-      await axios.delete(`https://api.realtraspaces.com/api/seo/meta-tags/${page}`);
+      await axios.delete(`http://localhost:8000/api/seo/meta-tags/${page}`);
       showNotification('Meta tags deleted successfully!', 'success');
       setCurrentPage(null);
       fetchAllMetaTags();
@@ -92,10 +92,10 @@ const SEOMetaManager = () => {
     setLoading(true);
     try {
       if (isEditing) {
-        await axios.put(`https://api.realtraspaces.com/api/seo/meta-tags/${formData.page}`, formData);
+        await axios.put(`http://localhost:8000/api/seo/meta-tags/${formData.page}`, formData);
         showNotification('Meta tags updated successfully!', 'success');
       } else {
-        await axios.post('https://api.realtraspaces.com/api/seo/meta-tags/', formData);
+        await axios.post('http://localhost:8000/api/seo/meta-tags/', formData);
         showNotification('Meta tags created successfully!', 'success');
       }
       fetchAllMetaTags();

@@ -30,6 +30,15 @@ type Property = {
     isCoverImage: boolean;
     orderRank?: number | null;
   }>;
+  imageUrls?: {
+    images?: Array<{
+      imageFilePath: string;
+      isCoverImage?: boolean;
+      orderRank?: number | null;
+      height?: number | null;
+      width?: number | null;
+    }>;
+  };
   propertyType?: {
     displayName?: string;
     childType?: {
@@ -169,7 +178,7 @@ export default function PropertyCards() {
       // Add each selected property to comparison
       for (const property of selectedProperties) {
         try {
-          const response = await fetch("https://api.realtraspaces.com/api/webusers/compare/add", {
+          const response = await fetch("http://localhost:8000/api/webusers/compare/add", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -484,7 +493,7 @@ export default function PropertyCards() {
     setSubmitStatus({ type: null, message: '' });
 
     try {
-      const response = await fetch('https://api.realtraspaces.com/api/contacts/submit', {
+      const response = await fetch('http://localhost:8000/api/contacts/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -539,6 +548,23 @@ export default function PropertyCards() {
 
   // Helper function to get the best image for a property
   const getPropertyImage = (property: Property): string => {
+    // First check imageUrls.images (new structure)
+    if (property.imageUrls?.images && property.imageUrls.images.length > 0) {
+      // First try to find a cover image
+      const coverImage = property.imageUrls.images.find(img => img.isCoverImage);
+      if (coverImage && coverImage.imageFilePath && !failedImages.has(coverImage.imageFilePath)) {
+        return coverImage.imageFilePath;
+      }
+      // If no cover image or cover image failed, return the first non-failed image
+      const firstImage = property.imageUrls.images.find(
+        img => img.imageFilePath && !failedImages.has(img.imageFilePath)
+      );
+      if (firstImage && firstImage.imageFilePath) {
+        return firstImage.imageFilePath;
+      }
+    }
+    
+    // Fallback to property.images (old structure for backward compatibility)
     if (property.images && property.images.length > 0) {
       // First try to find a cover image
       const coverImage = property.images.find(img => img.isCoverImage);
@@ -551,6 +577,8 @@ export default function PropertyCards() {
         return firstImage.imageFilePath;
       }
     }
+    
+    // Return default image if no images found
     return defaultPropertyImage.src;
   };
 

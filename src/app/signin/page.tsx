@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Building, Phone, ArrowRight, Shield, Mail, Lock } from "lucide-react";
 import { toast } from "react-hot-toast";
 import PageWithSeo from "../../components/PageWithSeo";
@@ -21,6 +22,7 @@ type FormErrors = {
 };
 
 const SignInPage = () => {
+  const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     email: "",
   });
@@ -104,7 +106,7 @@ const SignInPage = () => {
 
     try {
       const response = await fetch(
-        "https://api.realtraspaces.com/api/webusers/send-login-otp",
+        "http://localhost:8000/api/webusers/send-login-otp",
         {
           method: "POST",
           headers: {
@@ -144,7 +146,7 @@ const SignInPage = () => {
 
     try {
       const response = await fetch(
-        "https://api.realtraspaces.com/api/webusers/verify-login-otp",
+        "http://localhost:8000/api/webusers/verify-login-otp",
         {
           //add changes
           method: "POST",
@@ -164,7 +166,7 @@ const SignInPage = () => {
       if (result.status === "success" && result.data?.token) {
         localStorage.setItem("authToken", result.data.token);
         toast.success("Login successful!");
-        window.location.href = "/";
+        router.push("/dashboard");
       } else {
         throw new Error("No authentication token received");
       }

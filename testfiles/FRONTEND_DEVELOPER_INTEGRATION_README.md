@@ -124,7 +124,7 @@ setDevelopers((prev) =>
     "id": 1,
     "buildername": "Test Developer",
     "builder_logo": "developer-1234567890.jpg",
-    "builder_logo_url": "https://api.realtraspaces.com/developers/developer-1234567890.jpg",
+    "builder_logo_url": "http://localhost:8000/developers/developer-1234567890.jpg",
     "descriptions": "Test description",
     "project_name": ["Project 1", "Project 2"],
     "images": [
@@ -132,8 +132,8 @@ setDevelopers((prev) =>
       "developer-1234567892.jpg"
     ],
     "image_urls": [
-      "https://api.realtraspaces.com/developers/developer-1234567891.jpg",
-      "https://api.realtraspaces.com/developers/developer-1234567892.jpg"
+      "http://localhost:8000/developers/developer-1234567891.jpg",
+      "http://localhost:8000/developers/developer-1234567892.jpg"
     ],
     "status": true,
     "created_at": "2024-01-01T00:00:00.000Z",

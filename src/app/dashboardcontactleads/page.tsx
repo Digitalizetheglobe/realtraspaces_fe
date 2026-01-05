@@ -56,7 +56,7 @@ const DashboardContactLeads: React.FC = () => {
     totalItems: 0
   });
 
-  const API_BASE = 'https://api.realtraspaces.com/api/contacts';
+  const API_BASE = 'http://localhost:8000/api/contacts';
 
   // Fetch contact statistics
   const modules = [

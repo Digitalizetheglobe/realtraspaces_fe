@@ -11,8 +11,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, isLoading, requireAuth } = useAuth();
 
   useEffect(() => {
-    requireAuth();
-  }, [isAuthenticated, isLoading]);
+    // Only redirect if we're sure the user is not authenticated
+    // Don't redirect while loading or if already authenticated
+    if (!isLoading && !isAuthenticated) {
+      requireAuth();
+    }
+  }, [isAuthenticated, isLoading, requireAuth]);
 
   // Show loading spinner while checking authentication
   if (isLoading) {
@@ -25,7 +29,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  // If not authenticated, don't render children (will redirect to login)
+  // If not authenticated, show nothing (redirect will happen via requireAuth)
   if (!isAuthenticated) {
     return null;
   }

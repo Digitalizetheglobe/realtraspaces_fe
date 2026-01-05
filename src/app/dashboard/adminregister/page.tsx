@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAuth } from "../../../hooks/useAuth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.realtraspaces.com";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 interface RegisterFormData {
   fullName: string;
@@ -33,6 +34,7 @@ interface ApiResponse {
 
 const AdminRegisterPage = () => {
   const router = useRouter();
+  const { login } = useAuth();
   const [formData, setFormData] = useState<RegisterFormData>({
     fullName: "",
     mobileNumber: "",
@@ -127,9 +129,8 @@ const AdminRegisterPage = () => {
       const data: ApiResponse = await response.json();
 
       if (response.ok && data.success) {
-        // Store token in localStorage
-        localStorage.setItem("adminToken", data.token);
-        localStorage.setItem("adminData", JSON.stringify(data.data.admin));
+        // Use the login function from useAuth hook (same as adminlogin)
+        login(data.token, data.data.admin);
         
         // Redirect to dashboard
         router.push("/dashboard");

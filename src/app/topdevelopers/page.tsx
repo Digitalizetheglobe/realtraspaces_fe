@@ -78,7 +78,7 @@ const TopDevelopers = () => {
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
-        const response = await fetch('https://api.realtraspaces.com/api/developers');
+        const response = await fetch('http://localhost:8000/api/developers');
         const data = await response.json();
         
         if (data.success && data.data) {

@@ -1,6 +1,6 @@
 # Dynamic SEO Implementation Guide
 
-This implementation provides a comprehensive solution for handling dynamic SEO metadata from the API at `https://api.realtraspaces.com/api/seo/meta-tags/{page}`.
+This implementation provides a comprehensive solution for handling dynamic SEO metadata from the API at `http://localhost:8000/api/seo/meta-tags/{page}`.
 
 ## Overview
 
@@ -190,7 +190,7 @@ The system automatically generates and updates:
 ### API Base URL
 Update the API base URL in `src/utils/api.ts`:
 ```typescript
-const API_BASE_URL = 'https://api.realtraspaces.com/api';
+const API_BASE_URL = 'http://localhost:8000/api';
 ```
 
 ### Default Fallback Values

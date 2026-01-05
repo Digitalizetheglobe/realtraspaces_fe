@@ -38,6 +38,15 @@ type Property = {
     isCoverImage: boolean;
     orderRank?: number | null;
   }>;
+  imageUrls?: {
+    images?: Array<{
+      imageFilePath: string;
+      isCoverImage?: boolean;
+      orderRank?: number | null;
+      height?: number | null;
+      width?: number | null;
+    }>;
+  };
   propertyType?: {
     displayName?: string;
     childType?: {
@@ -136,6 +145,23 @@ export default function PropertyDetails() {
   const getPropertyImage = (property: Property | null): string => {
     if (!property) return propertydetails.src;
     
+    // First check imageUrls.images (new structure)
+    if (property.imageUrls?.images && property.imageUrls.images.length > 0) {
+      // First try to find a cover image
+      const coverImage = property.imageUrls.images.find(img => img.isCoverImage);
+      if (coverImage && coverImage.imageFilePath && !failedImages.has(coverImage.imageFilePath)) {
+        return coverImage.imageFilePath;
+      }
+      // If no cover image or cover image failed, return the first non-failed image
+      const firstImage = property.imageUrls.images.find(
+        img => img.imageFilePath && !failedImages.has(img.imageFilePath)
+      );
+      if (firstImage && firstImage.imageFilePath) {
+        return firstImage.imageFilePath;
+      }
+    }
+    
+    // Fallback to property.images (old structure for backward compatibility)
     if (property.images && property.images.length > 0) {
       // First try to find a cover image
       const coverImage = property.images.find(img => img.isCoverImage);
@@ -236,11 +262,31 @@ export default function PropertyDetails() {
           setLoadingImages(new Set());
 
           // Set image URLs from API if available, otherwise use default images
+          // Check imageUrls.images (new structure) first, then fallback to old structures
           if (
-            properties[0].imageUrls?.Images &&
-            properties[0].imageUrls.Images.length > 0
+            properties[0].imageUrls?.images &&
+            properties[0].imageUrls.images.length > 0
           ) {
-            const urls = properties[0].imageUrls.Images.map((img: { imageFilePath: string; isCoverImage: boolean; orderRank?: number | null }) => img.imageFilePath);
+            const urls = properties[0].imageUrls.images
+              .filter((img: { imageFilePath?: string }) => img.imageFilePath)
+              .map((img: { imageFilePath: string }) => img.imageFilePath);
+            setImageUrls(urls);
+            // Use the helper function to get the best image
+            const bestImage = getPropertyImage(properties[0]);
+            setMainImage(bestImage);
+          } else if (
+            (properties[0].imageUrls as any)?.Images &&
+            (properties[0].imageUrls as any).Images.length > 0
+          ) {
+            // Fallback for old structure with capital I
+            const urls = (properties[0].imageUrls as any).Images.map((img: { imageFilePath: string; isCoverImage: boolean; orderRank?: number | null }) => img.imageFilePath);
+            setImageUrls(urls);
+            // Use the helper function to get the best image
+            const bestImage = getPropertyImage(properties[0]);
+            setMainImage(bestImage);
+          } else if (properties[0].images && properties[0].images.length > 0) {
+            // Fallback to direct images array
+            const urls = properties[0].images.map((img: { imageFilePath: string }) => img.imageFilePath);
             setImageUrls(urls);
             // Use the helper function to get the best image
             const bestImage = getPropertyImage(properties[0]);
@@ -251,7 +297,10 @@ export default function PropertyDetails() {
               setLoadingImages(prev => new Set(prev).add(bestImage));
             }
           } else {
-            setMainImage(propertydetails); // Ensure mainImage is set to a default image
+            // No images found, use default
+            const bestImage = getPropertyImage(properties[0]);
+            setMainImage(bestImage);
+            setImageUrls([]);
           }
         } else {
           console.warn("No property found with this title:", decodedTitle);
@@ -455,7 +504,7 @@ export default function PropertyDetails() {
       setIsSaving(true);
 
       const response = await fetch(
-        "https://api.realtraspaces.com/api/webusers/save-property",
+        "http://localhost:8000/api/webusers/save-property",
         {
           method: "POST",
           headers: {
@@ -532,7 +581,7 @@ export default function PropertyDetails() {
     try {
       setIsComparing(true);
       
-      const response = await fetch("https://api.realtraspaces.com/api/webusers/compare/add", {
+      const response = await fetch("http://localhost:8000/api/webusers/compare/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
