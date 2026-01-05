@@ -5,7 +5,7 @@ Realtra Spaces is a premium real estate platform specializing in property listin
 
 # Website Information
 - Domain: realtraspaces.com
-- API Base URL: http://localhost:8000
+- API Base URL: https://api.realtraspaces.com
 - Platform: Next.js 15.3.0
 - Language: English
 

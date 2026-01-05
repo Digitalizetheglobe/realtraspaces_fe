@@ -106,7 +106,7 @@ const SignInPage = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/api/webusers/send-login-otp",
+        "https://api.realtraspaces.com/api/webusers/send-login-otp",
         {
           method: "POST",
           headers: {
@@ -146,7 +146,7 @@ const SignInPage = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/api/webusers/verify-login-otp",
+        "https://api.realtraspaces.com/api/webusers/verify-login-otp",
         {
           //add changes
           method: "POST",

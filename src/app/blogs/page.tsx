@@ -49,8 +49,8 @@ const Blogs = () => {
     const fetchBlogs = async () => {
       try {
         setLoading(true);
-        //http://localhost:8000
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/blogs/`);
+        //https://api.realtraspaces.com
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/blogs/`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

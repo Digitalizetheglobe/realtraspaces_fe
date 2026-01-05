@@ -65,7 +65,7 @@ const SavedProperties = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `http://localhost:8000/api/webusers/saved-properties?page=${page}&limit=10`,
+        `https://api.realtraspaces.com/api/webusers/saved-properties?page=${page}&limit=10`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -100,7 +100,7 @@ const SavedProperties = () => {
     try {
       setIsRemoving(propertyId);
       const response = await fetch(
-        `http://localhost:8000/api/webusers/saved-properties/${propertyId}`,
+        `https://api.realtraspaces.com/api/webusers/saved-properties/${propertyId}`,
         {
           method: "DELETE",
           headers: {

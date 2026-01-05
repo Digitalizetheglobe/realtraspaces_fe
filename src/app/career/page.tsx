@@ -109,7 +109,7 @@ const BenefitsSection = () => {
         submissionData.append('cv_file', formData.resume);
       }
 
-      const response = await fetch('http://localhost:8000/api/cv-submissions/submit', {
+      const response = await fetch('https://api.realtraspaces.com/api/cv-submissions/submit', {
         method: 'POST',
         body: submissionData,
       });
@@ -158,7 +158,7 @@ const BenefitsSection = () => {
     const fetchJobs = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/jobs`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/jobs`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.status}`);

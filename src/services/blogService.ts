@@ -1,6 +1,6 @@
 import { Blog, CreateBlogRequest, UpdateBlogRequest, BlogApiResponse, BlogFilters } from '@/types/blog';
 
-const API_BASE_URL = 'http://localhost:8000/api/blogs';
+const API_BASE_URL = 'https://api.realtraspaces.com/api/blogs';
 
 class BlogService {
   // Get all blogs

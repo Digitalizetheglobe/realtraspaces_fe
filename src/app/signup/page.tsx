@@ -134,7 +134,7 @@ const SignUpPage = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/api/webusers/send-registration-otp",
+        "https://api.realtraspaces.com/api/webusers/send-registration-otp",
         {
           method: "POST",
           headers: {
@@ -174,7 +174,7 @@ const SignUpPage = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/api/webusers/verify-registration-otp",
+        "https://api.realtraspaces.com/api/webusers/verify-registration-otp",
         {
           method: "POST",
           headers: {

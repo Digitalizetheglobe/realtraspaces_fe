@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../../../hooks/useAuth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.realtraspaces.com";
 
 interface RegisterFormData {
   fullName: string;
@@ -130,7 +130,12 @@ const AdminRegisterPage = () => {
 
       if (response.ok && data.success) {
         // Use the login function from useAuth hook (same as adminlogin)
-        login(data.token, data.data.admin);
+        // Provide default lastLogin for newly registered admins (not present in registration response)
+        const adminData = {
+          ...data.data.admin,
+          lastLogin: new Date().toISOString(), // New admins don't have lastLogin, use current time
+        };
+        login(data.token, adminData);
         
         // Redirect to dashboard
         router.push("/dashboard");

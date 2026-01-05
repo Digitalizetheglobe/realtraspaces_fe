@@ -36,7 +36,7 @@ const ProfilePage = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/api/webusers/saved-properties?page=1&limit=1`,
+        `https://api.realtraspaces.com/api/webusers/saved-properties?page=1&limit=1`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -59,7 +59,7 @@ const ProfilePage = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/api/webusers/compare/list",
+        "https://api.realtraspaces.com/api/webusers/compare/list",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -86,7 +86,7 @@ const ProfilePage = () => {
     let page = 1;
     let hasMore = true;
     while (hasMore) {
-      const response = await fetch(`http://localhost:8000/api/webusers/saved-properties?page=${page}&limit=50`, {
+      const response = await fetch(`https://api.realtraspaces.com/api/webusers/saved-properties?page=${page}&limit=50`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!response.ok) break;
@@ -110,7 +110,7 @@ const ProfilePage = () => {
     }
     try {
       // 1. Clear compared properties
-      await fetch('http://localhost:8000/api/webusers/compare/clear', {
+      await fetch('https://api.realtraspaces.com/api/webusers/compare/clear', {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -118,7 +118,7 @@ const ProfilePage = () => {
       const ids = await fetchAllSavedPropertyIds();
       await Promise.all(
         ids.map(id =>
-          fetch(`http://localhost:8000/api/webusers/saved-properties/${id}`, {
+          fetch(`https://api.realtraspaces.com/api/webusers/saved-properties/${id}`, {
             method: 'DELETE',
             headers: { Authorization: `Bearer ${token}` },
           })
@@ -156,7 +156,7 @@ const ProfilePage = () => {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch('http://localhost:8000/api/webusers/profile', {
+        const response = await fetch('https://api.realtraspaces.com/api/webusers/profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,

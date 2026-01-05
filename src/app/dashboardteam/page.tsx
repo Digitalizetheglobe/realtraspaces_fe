@@ -62,7 +62,7 @@ const TeamPage = () => {
   useEffect(() => {
     const fetchTeamMembers = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/team/`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/team/`);
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
@@ -137,8 +137,8 @@ const TeamPage = () => {
       }
 
       const url = currentMember
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/team/${currentMember.id}`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/team/`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/team/${currentMember.id}`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/team/`;
 
       const method = currentMember ? "PUT" : "POST";
 
@@ -182,7 +182,7 @@ const TeamPage = () => {
 
     setIsDeleting(id);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/team/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/team/${id}`, {
         method: "DELETE",
       });
 

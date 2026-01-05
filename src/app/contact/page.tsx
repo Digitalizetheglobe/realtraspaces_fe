@@ -36,7 +36,7 @@ export default function Home() {
     setSubmitStatus({ type: null, message: '' });
 
     try {
-      const response = await fetch('http://localhost:8000/api/contacts/submit', {
+      const response = await fetch('https://api.realtraspaces.com/api/contacts/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

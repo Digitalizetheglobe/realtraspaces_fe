@@ -8,7 +8,7 @@ interface AdminData {
   mobileNumber: string;
   role: string;
   isActive: boolean;
-  lastLogin: string;
+  lastLogin?: string; // Optional - not present for newly registered admins
   createdAt: string;
   updatedAt: string;
 }

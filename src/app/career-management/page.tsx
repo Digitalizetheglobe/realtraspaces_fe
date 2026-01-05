@@ -57,7 +57,7 @@ const CareerManagementPage = () => {
   // CV Submissions API Functions
   const fetchCVStats = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/cv-submissions/stats');
+      const response = await fetch('https://api.realtraspaces.com/api/cv-submissions/stats');
       const result = await response.json();
       
       if (response.ok && result.success) {
@@ -79,7 +79,7 @@ const CareerManagementPage = () => {
       params.append('page', pageNumber.toString());
       params.append('limit', pageLimit.toString());
       
-      const url = `http://localhost:8000/api/cv-submissions?${params.toString()}`;
+      const url = `https://api.realtraspaces.com/api/cv-submissions?${params.toString()}`;
       const response = await fetch(url);
       const result = await response.json();
       
@@ -97,7 +97,7 @@ const CareerManagementPage = () => {
 
   const updateSubmissionStatus = async (id: number, status: string, notes?: string) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/cv-submissions/${id}/status`, {
+      const response = await fetch(`https://api.realtraspaces.com/api/cv-submissions/${id}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -131,7 +131,7 @@ const CareerManagementPage = () => {
     }
     
     try {
-      const response = await fetch(`http://localhost:8000/api/cv-submissions/${id}`, {
+      const response = await fetch(`https://api.realtraspaces.com/api/cv-submissions/${id}`, {
         method: 'DELETE'
       });
       
@@ -149,7 +149,7 @@ const CareerManagementPage = () => {
   };
 
   const downloadCV = (filename: string) => {
-    const downloadUrl = `http://localhost:8000/api/cv-submissions/download/${filename}`;
+    const downloadUrl = `https://api.realtraspaces.com/api/cv-submissions/download/${filename}`;
     window.open(downloadUrl, '_blank');
   };
 
