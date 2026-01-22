@@ -1,6 +1,6 @@
 // Utility functions for handling blog images
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.realtraspaces.com';
 
 /**
  * Get the full URL for a blog image

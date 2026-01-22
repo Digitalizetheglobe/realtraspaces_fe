@@ -614,7 +614,7 @@ export default function Similarproperties() {
       // Add each selected property to comparison
       for (const property of selectedProperties) {
         try {
-          const response = await fetch("http://localhost:8000/api/webusers/compare/add", {
+          const response = await fetch("https://api.realtraspaces.com/api/webusers/compare/add", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

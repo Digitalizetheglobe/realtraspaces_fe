@@ -89,7 +89,7 @@ const CreateBlogContent = () => {
         formDataToSend.append('images', image.file);
       });
 
-      const response = await fetch(`http://localhost:8000/api/blogs/`, {
+      const response = await fetch(`https://api.realtraspaces.com/api/blogs/`, {
         method: 'POST',
         body: formDataToSend, // Don't set Content-Type header, let browser set it with boundary
       });

@@ -30,7 +30,7 @@ const EditTestimonialPage = ({ params }: PageProps) => {
   useEffect(() => {
     const fetchTestimonial = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/testimonials/${id}`);
+        const response = await fetch(`https://api.realtraspaces.com/api/testimonials/${id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch testimonial');
         }
@@ -53,7 +53,7 @@ const EditTestimonialPage = ({ params }: PageProps) => {
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:8000/api/testimonials/${id}`, {
+      const response = await fetch(`https://api.realtraspaces.com/api/testimonials/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

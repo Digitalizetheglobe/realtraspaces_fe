@@ -2,22 +2,19 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Building, Phone, ArrowRight, Shield, Mail, Lock } from "lucide-react";
+import { Building, ArrowRight, Shield, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { toast } from "react-hot-toast";
 import PageWithSeo from "../../components/PageWithSeo";
 
 type FormData = {
   email: string;
-};
-
-type OtpData = {
-  email: string;
-  otpCode: string;
+  password: string;
 };
 
 type FormErrors = {
   email?: string;
-  otpCode?: string;
+  password?: string;
+  terms?: string;
   [key: string]: string | undefined;
 };
 
@@ -25,36 +22,17 @@ const SignInPage = () => {
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
     email: "",
-  });
-
-  const [otpData, setOtpData] = useState<OtpData>({
-    email: "",
-    otpCode: "",
+    password: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
-  const [sendOtpTermsAccepted, setSendOtpTermsAccepted] = useState(false);
-  const [verifyOtpTermsAccepted, setVerifyOtpTermsAccepted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev: FormData) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev: FormErrors) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const handleOtpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setOtpData((prev: OtpData) => ({
       ...prev,
       [name]: value,
     }));
@@ -73,31 +51,20 @@ const SignInPage = () => {
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Email is invalid";
     }
-    if (!sendOtpTermsAccepted) {
-      newErrors.sendOtpTerms = "You must accept the terms to continue";
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    }
+
+    if (!termsAccepted) {
+      newErrors.terms = "You must accept the terms to continue";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const validateOtp = () => {
-    const newErrors: FormErrors = {};
-
-    if (!otpData.otpCode.trim()) {
-      newErrors.otpCode = "OTP is required";
-    } else if (!/^\d{6}$/.test(otpData.otpCode)) {
-      newErrors.otpCode = "OTP must be 6 digits";
-    }
-    if (!verifyOtpTermsAccepted) {
-      newErrors.verifyOtpTerms = "You must accept the terms to continue";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSendOtp = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) return;
@@ -106,7 +73,7 @@ const SignInPage = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/api/webusers/send-login-otp",
+        "https://api.realtraspaces.com/api/webusers/login",
         {
           method: "POST",
           headers: {
@@ -119,48 +86,7 @@ const SignInPage = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || "Failed to send OTP");
-      }
-
-      if (result.status === "success") {
-        setOtpData({ ...otpData, email: formData.email });
-        setOtpSent(true);
-        toast.success("OTP sent to your email!");
-      } else {
-        throw new Error(result.message || "Failed to send OTP");
-      }
-    } catch (error: any) {
-      toast.error(error.message || "An error occurred while sending OTP");
-      console.error("Send OTP error:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateOtp()) return;
-
-    setIsVerifyingOtp(true);
-
-    try {
-      const response = await fetch(
-        "http://localhost:8000/api/webusers/verify-login-otp",
-        {
-          //add changes
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(otpData),
-        }
-      );
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "OTP verification failed");
+        throw new Error(result.message || "Login failed");
       }
 
       if (result.status === "success" && result.data?.token) {
@@ -168,13 +94,13 @@ const SignInPage = () => {
         toast.success("Login successful!");
         router.push("/dashboard");
       } else {
-        throw new Error("No authentication token received");
+        throw new Error(result.message || "Login failed");
       }
     } catch (error: any) {
-      toast.error(error.message || "An error occurred during OTP verification");
-      console.error("Verify OTP error:", error);
+      toast.error(error.message || "An error occurred during login");
+      console.error("Login error:", error);
     } finally {
-      setIsVerifyingOtp(false);
+      setIsLoading(false);
     }
   };
 
@@ -263,252 +189,171 @@ const SignInPage = () => {
                     className="text-3xl font-bold mb-2"
                     style={{ color: "#1A1A1A" }}
                   >
-                    {otpSent ? "Verify Your Email" : "Sign In"}
+                    Sign In
                   </h2>
                   <p className="text-[#6E6E73]">
-                    {otpSent
-                      ? "Enter the OTP sent to your email to complete login"
-                      : "Access your account with email"
-                    }
+                    Access your account
                   </p>
                 </div>
 
-                {!otpSent ? (
-                  <form onSubmit={handleSendOtp} className="space-y-6">
-                    {/* Email Address */}
-                    <div>
-                      <label
-                        className="block text-sm font-medium mb-1"
-                        style={{ color: "#6E6E73" }}
-                      >
-                        Email Address *
-                      </label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#6E6E73]" />
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border border-[#E5E5E7] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.email ? "border-red-500" : ""
-                            }`}
-                          placeholder="Enter your email"
-                          style={{ color: "#1A1A1A" }}
-                        />
-                      </div>
-                      {errors.email && (
-                        <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                      )}
-                    </div>
-
-                    {/* Remember Me */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id="rememberMe"
-                          className="w-4 h-4 text-blue-600 border-[#E5E5E7] rounded focus:ring-blue-500"
-                        />
-                        <label
-                          htmlFor="rememberMe"
-                          className="text-sm"
-                          style={{ color: "#6E6E73" }}
-                        >
-                          Remember me
-                        </label>
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: "#6E6E73" }}>
-                        Terms & Conditions *
-                      </label>
-                      <div className="flex items-start space-x-2">
-                        <input
-                          type="checkbox"
-                          id="signinTerms"
-                          checked={sendOtpTermsAccepted}
-                          onChange={(e) => {
-                            setSendOtpTermsAccepted(e.target.checked);
-                            if (errors.sendOtpTerms) {
-                              setErrors((prev) => ({ ...prev, sendOtpTerms: "" }));
-                            }
-                          }}
-                          className="w-4 h-4 mt-1 text-blue-600 border-[#E5E5E7] rounded focus:ring-blue-500"
-                        />
-                        <p className="text-sm" style={{ color: "#6E6E73" }}>
-                          I agree to the{" "}
-                          <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
-                            Terms of Service
-                          </Link>{" "}
-                          and{" "}
-                          <Link href="/privacy-policy" className="text-blue-600 hover:underline">
-                            Privacy Policy
-                          </Link>
-                          .
-                        </p>
-                      </div>
-                      {errors.sendOtpTerms && (
-                        <p className="text-red-500 text-sm mt-1">{errors.sendOtpTerms}</p>
-                      )}
-                    </div>
-
-                    {/* Submit Button */}
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center space-x-2"
+                <form onSubmit={handleLogin} className="space-y-6">
+                  {/* Email Address */}
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#6E6E73" }}
                     >
-                      {isLoading ? (
-                        <>
-                          <svg
-                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
-                          <span>Sending OTP...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Send OTP</span>
-                          <ArrowRight className="h-5 w-5" />
-                        </>
-                      )}
-                    </button>
-                  </form>
-                ) : (
-                  <form onSubmit={handleVerifyOtp} className="space-y-6">
-                    {/* OTP Input */}
-                    <div>
+                      Email Address *
+                    </label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#6E6E73]" />
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border border-[#E5E5E7] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.email ? "border-red-500" : ""
+                          }`}
+                        placeholder="Enter your email"
+                        style={{ color: "#1A1A1A" }}
+                      />
+                    </div>
+                    {errors.email && (
+                      <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                    )}
+                  </div>
+
+                  {/* Password */}
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: "#6E6E73" }}
+                    >
+                      Password *
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#6E6E73]" />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        className={`w-full pl-10 pr-12 py-3 bg-[#F1F1F4] border border-[#E5E5E7] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.password ? "border-red-500" : ""
+                          }`}
+                        placeholder="Enter your password"
+                        style={{ color: "#1A1A1A" }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6E6E73] hover:text-[#1A1A1A]"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5" />
+                        ) : (
+                          <Eye className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                    {errors.password && (
+                      <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                    )}
+                  </div>
+
+                  {/* Remember Me */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="rememberMe"
+                        className="w-4 h-4 text-blue-600 border-[#E5E5E7] rounded focus:ring-blue-500"
+                      />
                       <label
-                        className="block text-sm font-medium mb-1"
+                        htmlFor="rememberMe"
+                        className="text-sm"
                         style={{ color: "#6E6E73" }}
                       >
-                        Enter OTP *
+                        Remember me
                       </label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#6E6E73]" />
-                        <input
-                          type="text"
-                          name="otpCode"
-                          value={otpData.otpCode}
-                          onChange={handleOtpChange}
-                          className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border border-[#E5E5E7] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.otpCode ? "border-red-500" : ""
-                            }`}
-                          placeholder="Enter 6-digit OTP"
-                          style={{ color: "#1A1A1A" }}
-                          maxLength={6}
-                        />
-                      </div>
-                      {errors.otpCode && (
-                        <p className="text-red-500 text-sm mt-1">{errors.otpCode}</p>
-                      )}
-                      <p className="text-sm text-[#6E6E73] mt-2">
-                        We've sent a 6-digit OTP to {otpData.email}
+                    </div>
+                    {/* Optional Forgot Password Link */}
+                    {/* <Link href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+                      Forgot Password?
+                    </Link> */}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1" style={{ color: "#6E6E73" }}>
+                      Terms & Conditions *
+                    </label>
+                    <div className="flex items-start space-x-2">
+                      <input
+                        type="checkbox"
+                        id="terms"
+                        checked={termsAccepted}
+                        onChange={(e) => {
+                          setTermsAccepted(e.target.checked);
+                          if (errors.terms) {
+                            setErrors((prev) => ({ ...prev, terms: "" }));
+                          }
+                        }}
+                        className="w-4 h-4 mt-1 text-blue-600 border-[#E5E5E7] rounded focus:ring-blue-500"
+                      />
+                      <p className="text-sm" style={{ color: "#6E6E73" }}>
+                        I agree to the{" "}
+                        <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                          Terms of Service
+                        </Link>{" "}
+                        and{" "}
+                        <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                          Privacy Policy
+                        </Link>
+                        .
                       </p>
                     </div>
+                    {errors.terms && (
+                      <p className="text-red-500 text-sm mt-1">{errors.terms}</p>
+                    )}
+                  </div>
 
-                    <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: "#6E6E73" }}>
-                        Terms & Conditions *
-                      </label>
-                      <div className="flex items-start space-x-2">
-                        <input
-                          type="checkbox"
-                          id="verifyOtpTerms"
-                          checked={verifyOtpTermsAccepted}
-                          onChange={(e) => {
-                            setVerifyOtpTermsAccepted(e.target.checked);
-                            if (errors.verifyOtpTerms) {
-                              setErrors((prev) => ({ ...prev, verifyOtpTerms: "" }));
-                            }
-                          }}
-                          className="w-4 h-4 mt-1 text-blue-600 border-[#E5E5E7] rounded focus:ring-blue-500"
-                        />
-                        <p className="text-sm" style={{ color: "#6E6E73" }}>
-                          I agree to the{" "}
-                          <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
-                            Terms of Service
-                          </Link>{" "}
-                          and{" "}
-                          <Link href="/privacy-policy" className="text-blue-600 hover:underline">
-                            Privacy Policy
-                          </Link>
-                          .
-                        </p>
-                      </div>
-                      {errors.verifyOtpTerms && (
-                        <p className="text-red-500 text-sm mt-1">{errors.verifyOtpTerms}</p>
-                      )}
-                    </div>
-
-                    {/* Submit Button */}
-                    <button
-                      type="submit"
-                      disabled={isVerifyingOtp}
-                      className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center space-x-2"
-                    >
-                      {isVerifyingOtp ? (
-                        <>
-                          <svg
-                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                          >
-                            <circle
-                              className="opacity-25"
-                              cx="12"
-                              cy="12"
-                              r="10"
-                              stroke="currentColor"
-                              strokeWidth="4"
-                            ></circle>
-                            <path
-                              className="opacity-75"
-                              fill="currentColor"
-                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                          </svg>
-                          <span>Verifying OTP...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Verify OTP</span>
-                          <ArrowRight className="h-5 w-5" />
-                        </>
-                      )}
-                    </button>
-
-                    {/* Back Button */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOtpSent(false);
-                        setOtpData({ email: "", otpCode: "" });
-                        setErrors({});
-                      }}
-                      className="w-full bg-gray-500 text-white py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors duration-200"
-                    >
-                      ← Back to Email
-                    </button>
-                  </form>
-                )}
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center space-x-2"
+                  >
+                    {isLoading ? (
+                      <>
+                        <svg
+                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        <span>Signing In...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Sign In</span>
+                        <ArrowRight className="h-5 w-5" />
+                      </>
+                    )}
+                  </button>
+                </form>
 
                 {/* Sign Up Link */}
                 <div className="pt-6 border-t border-[#E5E5E7]">
