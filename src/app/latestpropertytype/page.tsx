@@ -154,7 +154,7 @@ export default function PropertyCards() {
   const handleCompareClick = async () => {
     // Check if user is logged in
     const token = localStorage.getItem("authToken");
-    
+
     if (!token) {
       toast.error("Please log in to compare properties");
       router.push("/signin");
@@ -166,19 +166,19 @@ export default function PropertyCards() {
       toast.error("Please select at least one property to compare");
       return;
     }
-    
+
     try {
       setIsComparing(true);
-      
+
       // Get selected properties
       const selectedProperties = allProperties.filter(prop => bookmarkedProperties.has(prop.id));
       let addedCount = 0;
       let alreadyInListCount = 0;
-      
+
       // Add each selected property to comparison
       for (const property of selectedProperties) {
         try {
-          const response = await fetch("https://api.realtraspaces.com/api/webusers/compare/add", {
+          const response = await fetch("http://localhost:8000/api/webusers/compare/add", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -189,35 +189,35 @@ export default function PropertyCards() {
               propertyData: property
             })
           });
-      
+
           if (response.status === 401 || response.status === 403) {
             toast.error("You Are Not Login");
             router.push("/signin");
             return;
           }
-      
+
           if (!response.ok) {
             const errorData = await response.json();
             const errorMessage = errorData.message || "Failed to add property to comparison";
-            
+
             // Check if property is already in comparison list
-            if (errorMessage.toLowerCase().includes("already in comparison") || 
-                errorMessage.toLowerCase().includes("already exists")) {
+            if (errorMessage.toLowerCase().includes("already in comparison") ||
+              errorMessage.toLowerCase().includes("already exists")) {
               alreadyInListCount++;
               continue; // Skip this property and continue with others
             }
-            
+
             throw new Error(errorMessage);
           }
-          
+
           addedCount++;
-          
+
         } catch (propertyError) {
           console.error(`Error adding property ${property.id}:`, propertyError);
           // Continue with other properties even if one fails
         }
       }
-  
+
       // Show appropriate success message
       if (addedCount > 0 && alreadyInListCount > 0) {
         toast.success(`${addedCount} properties added to comparison. ${alreadyInListCount} were already in your list.`);
@@ -226,12 +226,12 @@ export default function PropertyCards() {
       } else if (alreadyInListCount > 0) {
         toast.success(`All ${alreadyInListCount} selected properties are already in your comparison list`);
       }
-      
+
       // Navigate to compare page if any properties were added
       if (addedCount > 0) {
         router.push("/compareproperties");
       }
-      
+
     } catch (error) {
       console.error("Error adding to compare:", error);
       toast.error(error instanceof Error ? error.message : "Failed to add to comparison");
@@ -278,7 +278,7 @@ export default function PropertyCards() {
         const data = await response.json();
         const propertiesData = Array.isArray(data) ? data : data.items || data.data || [];
         console.log('Fetched latestpropertytype properties:', propertiesData);
-        
+
         // Fetch properties from properties page
         const propertiesResponse = await fetch(
           "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=500",
@@ -293,14 +293,14 @@ export default function PropertyCards() {
         const propertiesData2 = await propertiesResponse.json();
         const propertiesPageData = Array.isArray(propertiesData2) ? propertiesData2 : propertiesData2.items || propertiesData2.data || [];
         console.log('Fetched properties page properties:', propertiesPageData);
-        
+
         // Combine both sets of properties and remove duplicates based on ID
         const allPropertiesArray = [...propertiesData, ...propertiesPageData];
-        const uniqueProperties = allPropertiesArray.filter((property, index, self) => 
+        const uniqueProperties = allPropertiesArray.filter((property, index, self) =>
           index === self.findIndex(p => p.id === property.id)
         );
         console.log('Combined properties:', uniqueProperties);
-        
+
         setProperties(uniqueProperties);
         setAllProperties(uniqueProperties);
         console.log('Total unique properties loaded:', uniqueProperties.length);
@@ -493,7 +493,7 @@ export default function PropertyCards() {
     setSubmitStatus({ type: null, message: '' });
 
     try {
-      const response = await fetch('https://api.realtraspaces.com/api/contacts/submit', {
+      const response = await fetch('http://localhost:8000/api/contacts/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -504,9 +504,9 @@ export default function PropertyCards() {
       const result = await response.json();
 
       if (response.ok && result.success) {
-        setSubmitStatus({ 
-          type: 'success', 
-          message: 'Thank you for your message! We will get back to you soon.' 
+        setSubmitStatus({
+          type: 'success',
+          message: 'Thank you for your message! We will get back to you soon.'
         });
         setFormData({
           name: "",
@@ -521,16 +521,16 @@ export default function PropertyCards() {
           handleClosePopup();
         }, 2000);
       } else {
-        setSubmitStatus({ 
-          type: 'error', 
-          message: result.message || 'Failed to send message. Please try again.' 
+        setSubmitStatus({
+          type: 'error',
+          message: result.message || 'Failed to send message. Please try again.'
         });
         toast.error(result.message || 'Failed to send message. Please try again.');
       }
     } catch (error) {
-      setSubmitStatus({ 
-        type: 'error', 
-        message: 'Network error. Please check your connection and try again.' 
+      setSubmitStatus({
+        type: 'error',
+        message: 'Network error. Please check your connection and try again.'
       });
       toast.error('Network error. Please check your connection and try again.');
     } finally {
@@ -563,7 +563,7 @@ export default function PropertyCards() {
         return firstImage.imageFilePath;
       }
     }
-    
+
     // Fallback to property.images (old structure for backward compatibility)
     if (property.images && property.images.length > 0) {
       // First try to find a cover image
@@ -577,7 +577,7 @@ export default function PropertyCards() {
         return firstImage.imageFilePath;
       }
     }
-    
+
     // Return default image if no images found
     return defaultPropertyImage.src;
   };
@@ -627,14 +627,14 @@ export default function PropertyCards() {
     if (property.enquiredFor) {
       return property.enquiredFor === filter;
     }
-    
+
     // Otherwise, check based on forSale/forRent
     if (filter === "Rent") {
       return property.forRent === true;
     } else if (filter === "Sale") {
       return property.forSale === true;
     }
-    
+
     return false;
   };
 
@@ -646,11 +646,11 @@ export default function PropertyCards() {
         return false;
       }
     }
-    
+
     // Filter by search type (Rent/Investment/Research) - keep this for backward compatibility
     if (selectedType && !enquiredForFilter) {
       const typeLower = selectedType.toLowerCase().trim();
-      
+
       // Filter by property type based on search type
       if (typeLower === "rent") {
         if (!property.forRent) return false;
@@ -730,7 +730,7 @@ export default function PropertyCards() {
     if (property.enquiredFor) {
       return property.enquiredFor;
     }
-    
+
     // Otherwise, derive from forSale/forRent
     if (property.forRent && !property.forSale) {
       return "Rent";
@@ -740,7 +740,7 @@ export default function PropertyCards() {
       // If both are true, we can't determine - return null
       return null;
     }
-    
+
     return null;
   };
 
@@ -778,240 +778,240 @@ export default function PropertyCards() {
 
   return (
     <div className={raleway.className}>
-       <section className="relative w-full h-[400px] sm:h-[400px] md:h-[400px]">
-         <div className="absolute inset-0 z-0">
-    <video
-      autoPlay
-      muted
-      loop
-      playsInline
-      className="w-full h-full object-cover"
-    >
-      <source src="/assets/main_vedio.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video>
-    <div className="absolute inset-0 bg-black opacity-50"></div>
-  </div>
- 
-    <div className="absolute pt-10 bottom-4 w-full flex justify-center px-4">
-      <div className="max-w-4xl mx-auto w-full mt-10 ">
-        {showHeading && (
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-6  justify-center px-4"
+      <section className="relative w-full h-[400px] sm:h-[400px] md:h-[400px]">
+        <div className="absolute inset-0 z-0">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover"
           >
-            <h1 className="text-2xl sm:text-2xl md:text-6xl text-white font-bold mb-2 sm:mb-3 leading-tight">
-              <span className="block sm:inline">Realtra Spaces –</span> 
-              <span className="block sm:inline text-gray-300 mt-1 sm:mt-0">Redefining Commercial Real Estate</span>
-            </h1>
-            
-            <p className="text-sm sm:text-lg md:text-xl text-gray-300 mb-6 max-w-3xl mx-auto leading-relaxed px-2 sm:px-0">
-              Real & Transparent. We make commercial real estate easy, transparent, and growth-focused—so you can focus on building your business while we take care of the space.
-            </p>
-          </motion.div>
-        )}
-
-        {/* Search Bar - Conditionally rendered */}
-        {showSearchBar && (
-          <div className="py-8 sm:py-20 md:py-40">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-3 px-2 sm:px-4 py-3 rounded-2xl border border-gray-300 bg-white/60 backdrop-blur-md shadow-lg overflow-visible relative mx-auto "
-          >
-        {/* Suggestions Dropdown - now directly above the search bar */}
-       
-        {/* Dropdown */}
-        <div
-          className="relative w-full sm:w-auto"
-          onMouseEnter={() => setDropdownOpen(true)}
-          onMouseLeave={() => setDropdownOpen(false)}
-        >
-          <button
-            type="button"
-            className="appearance-none w-full sm:min-w-[200px] bg-black text-white text-sm font-medium pl-3 sm:pl-5 pr-8 sm:pr-10 py-3 rounded-2xl outline-none cursor-pointer flex justify-between items-center"
-            onClick={() => setDropdownOpen(true)}
-          >
-            <span className="truncate text-left">
-              {selectedType
-                ? selectedType === "Rent"
-                  ? "Rent"
-                  : selectedType === "Investment"
-                  ? "Investment"
-                  : selectedType === ""
-                  ? ""
-                  : selectedType
-                : "Select Search Type"}
-            </span>
-            <span className="pointer-events-none absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 text-white text-xs flex-shrink-0">
-              ▼
-            </span>
-          </button>
-          {dropdownOpen && (
-            <div className="absolute left-0 right-0 sm:right-auto sm:min-w-full bg-black text-white rounded-lg shadow-lg z-50" style={{ zIndex: 9999 }}>
-              <div
-                className={`px-3 sm:px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-t-lg ${enquiredForFilter === "Rent" ? "bg-gray-700" : ""}`}
-                onClick={() => { 
-                  setSelectedType("Rent"); 
-                  setEnquiredForFilter("Rent");
-                  setDropdownOpen(false); 
-                }}
-              >
-                Rent
-              </div>
-              <div
-                className={`px-3 sm:px-5 py-3 cursor-pointer hover:bg-gray-800 ${enquiredForFilter === "Sale" ? "bg-gray-700" : ""}`}
-                onClick={() => { 
-                  setSelectedType("Investment"); 
-                  setEnquiredForFilter("Sale");
-                  setDropdownOpen(false); 
-                }}
-              >
-                Investment
-              </div>
-              <div
-                className={`px-3 sm:px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "" ? "bg-gray-700" : ""}`}
-                onClick={() => { 
-                  setSelectedType("Research"); 
-                  setEnquiredForFilter("");
-                  setDropdownOpen(false); 
-                  router.push('/research');
-                }}
-              >
-                Research
-              </div>
-            </div>
-          )}
+            <source src="/assets/main_vedio.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+          <div className="absolute inset-0 bg-black opacity-50"></div>
         </div>
-        {/* Multi-location chips UI inside input area, right-aligned */}
-        {/* <div className="mb-2 text-center">
+
+        <div className="absolute pt-10 bottom-4 w-full flex justify-center px-4">
+          <div className="max-w-4xl mx-auto w-full mt-10 ">
+            {showHeading && (
+              <motion.div
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+                transition={{ duration: 0.8 }}
+                className="text-center mb-6  justify-center px-4"
+              >
+                <h1 className="text-2xl sm:text-2xl md:text-6xl text-white font-bold mb-2 sm:mb-3 leading-tight">
+                  <span className="block sm:inline">Realtra Spaces –</span>
+                  <span className="block sm:inline text-gray-300 mt-1 sm:mt-0">Redefining Commercial Real Estate</span>
+                </h1>
+
+                <p className="text-sm sm:text-lg md:text-xl text-gray-300 mb-6 max-w-3xl mx-auto leading-relaxed px-2 sm:px-0">
+                  Real & Transparent. We make commercial real estate easy, transparent, and growth-focused—so you can focus on building your business while we take care of the space.
+                </p>
+              </motion.div>
+            )}
+
+            {/* Search Bar - Conditionally rendered */}
+            {showSearchBar && (
+              <div className="py-8 sm:py-20 md:py-40">
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                  className="flex flex-col sm:flex-row w-full sm:w-[90%] md:w-[750px] max-w-[98%] items-stretch sm:items-center gap-3 px-2 sm:px-4 py-3 rounded-2xl border border-gray-300 bg-white/60 backdrop-blur-md shadow-lg overflow-visible relative mx-auto "
+                >
+                  {/* Suggestions Dropdown - now directly above the search bar */}
+
+                  {/* Dropdown */}
+                  <div
+                    className="relative w-full sm:w-auto"
+                    onMouseEnter={() => setDropdownOpen(true)}
+                    onMouseLeave={() => setDropdownOpen(false)}
+                  >
+                    <button
+                      type="button"
+                      className="appearance-none w-full sm:min-w-[200px] bg-black text-white text-sm font-medium pl-3 sm:pl-5 pr-8 sm:pr-10 py-3 rounded-2xl outline-none cursor-pointer flex justify-between items-center"
+                      onClick={() => setDropdownOpen(true)}
+                    >
+                      <span className="truncate text-left">
+                        {selectedType
+                          ? selectedType === "Rent"
+                            ? "Rent"
+                            : selectedType === "Investment"
+                              ? "Investment"
+                              : selectedType === ""
+                                ? ""
+                                : selectedType
+                          : "Select Search Type"}
+                      </span>
+                      <span className="pointer-events-none absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 text-white text-xs flex-shrink-0">
+                        ▼
+                      </span>
+                    </button>
+                    {dropdownOpen && (
+                      <div className="absolute left-0 right-0 sm:right-auto sm:min-w-full bg-black text-white rounded-lg shadow-lg z-50" style={{ zIndex: 9999 }}>
+                        <div
+                          className={`px-3 sm:px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-t-lg ${enquiredForFilter === "Rent" ? "bg-gray-700" : ""}`}
+                          onClick={() => {
+                            setSelectedType("Rent");
+                            setEnquiredForFilter("Rent");
+                            setDropdownOpen(false);
+                          }}
+                        >
+                          Rent
+                        </div>
+                        <div
+                          className={`px-3 sm:px-5 py-3 cursor-pointer hover:bg-gray-800 ${enquiredForFilter === "Sale" ? "bg-gray-700" : ""}`}
+                          onClick={() => {
+                            setSelectedType("Investment");
+                            setEnquiredForFilter("Sale");
+                            setDropdownOpen(false);
+                          }}
+                        >
+                          Investment
+                        </div>
+                        <div
+                          className={`px-3 sm:px-5 py-3 cursor-pointer hover:bg-gray-800 rounded-b-lg ${selectedType === "" ? "bg-gray-700" : ""}`}
+                          onClick={() => {
+                            setSelectedType("Research");
+                            setEnquiredForFilter("");
+                            setDropdownOpen(false);
+                            router.push('/research');
+                          }}
+                        >
+                          Research
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  {/* Multi-location chips UI inside input area, right-aligned */}
+                  {/* <div className="mb-2 text-center">
           <p className="text-xs text-gray-600">
             🔍 Searching across both Latest Properties and All Properties pages
           </p>
         </div> */}
-        <div className="relative w-full">
-          <input
-            type="text"
-            placeholder="Search property name, location, or type..."
-            className="w-full bg-white text-gray-900 px-3 sm:px-5 py-3 text-sm rounded-2xl outline-none pr-20 sm:pr-44"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={handleInputKeyDown}
-            autoComplete="off"
-          />
-          {/* Chips overlay (right side, inside input) */}
-          <div className="absolute inset-y-0 right-2 sm:right-3 flex items-center space-x-1 sm:space-x-2 pointer-events-none" style={{ zIndex: 10 }}>
-            {selectedLocations.length > 0 && (
-              <div className="flex items-center space-x-1 sm:space-x-2 pointer-events-auto max-w-[60px] sm:max-w-none overflow-hidden">
-                {/* Mobile: Show only first chip + count */}
-                <div className="sm:hidden flex items-center space-x-1">
-                  <div className="bg-black text-white px-2 py-1 rounded-full flex items-center text-xs font-medium mr-1 flex-shrink-0">
-                    <span className="truncate max-w-[40px]">{selectedLocations[0]}</span>
+                  <div className="relative w-full">
+                    <input
+                      type="text"
+                      placeholder="Search property name, location, or type..."
+                      className="w-full bg-white text-gray-900 px-3 sm:px-5 py-3 text-sm rounded-2xl outline-none pr-20 sm:pr-44"
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      onKeyDown={handleInputKeyDown}
+                      autoComplete="off"
+                    />
+                    {/* Chips overlay (right side, inside input) */}
+                    <div className="absolute inset-y-0 right-2 sm:right-3 flex items-center space-x-1 sm:space-x-2 pointer-events-none" style={{ zIndex: 10 }}>
+                      {selectedLocations.length > 0 && (
+                        <div className="flex items-center space-x-1 sm:space-x-2 pointer-events-auto max-w-[60px] sm:max-w-none overflow-hidden">
+                          {/* Mobile: Show only first chip + count */}
+                          <div className="sm:hidden flex items-center space-x-1">
+                            <div className="bg-black text-white px-2 py-1 rounded-full flex items-center text-xs font-medium mr-1 flex-shrink-0">
+                              <span className="truncate max-w-[40px]">{selectedLocations[0]}</span>
+                              <button
+                                type="button"
+                                className="ml-1 text-white hover:text-gray-200 focus:outline-none flex-shrink-0"
+                                style={{ pointerEvents: 'auto' }}
+                                onClick={() => removeLocation(selectedLocations[0])}
+                              >
+                                <span className="ml-1">×</span>
+                              </button>
+                            </div>
+                            {selectedLocations.length > 1 && (
+                              <div className="bg-gray-600 text-white px-2 py-1 rounded-full text-xs font-medium flex-shrink-0">
+                                +{selectedLocations.length - 1}
+                              </div>
+                            )}
+                          </div>
+                          {/* Desktop: Show all chips */}
+                          <div className="hidden sm:flex items-center space-x-2">
+                            {selectedLocations.map((loc) => (
+                              <div key={loc} className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium mr-1 flex-shrink-0">
+                                <span className="truncate">{loc}</span>
+                                <button
+                                  type="button"
+                                  className="ml-1 text-white hover:text-gray-200 focus:outline-none flex-shrink-0"
+                                  style={{ pointerEvents: 'auto' }}
+                                  onClick={() => removeLocation(loc)}
+                                >
+                                  <span className="ml-1">×</span>
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {/* Suggestions dropdown */}
+                    {suggestions.length > 0 && (
+                      <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto" style={{ zIndex: 9999 }}>
+                        {suggestions.map((s, idx) => (
+                          <div
+                            className="px-3 sm:px-5 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
+                            onClick={() => handleSuggestionClick(s)}
+                            key={s + idx}
+                          >
+                            {s}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <Link href="/properties">
                     <button
                       type="button"
-                      className="ml-1 text-white hover:text-gray-200 focus:outline-none flex-shrink-0"
-                      style={{ pointerEvents: 'auto' }}
-                      onClick={() => removeLocation(selectedLocations[0])}
+                      className="bg-black cursor-pointer hover:bg-gray-800 text-white px-2 py-3 rounded-2xl text-sm font-medium transition-all duration-200 hover:scale-105 flex items-center justify-center"
+                      onClick={() => {
+                        // Store search data in sessionStorage before navigation
+                        sessionStorage.setItem('searchData', JSON.stringify({
+                          search: search,
+                          locations: selectedLocations,
+                          type: selectedType,
+                          enquiredFor: enquiredForFilter
+                        }));
+                      }}
                     >
-                      <span className="ml-1">×</span>
-                    </button>
-                  </div>
-                  {selectedLocations.length > 1 && (
-                    <div className="bg-gray-600 text-white px-2 py-1 rounded-full text-xs font-medium flex-shrink-0">
-                      +{selectedLocations.length - 1}
-                    </div>
-                  )}
-                </div>
-                {/* Desktop: Show all chips */}
-                <div className="hidden sm:flex items-center space-x-2">
-                  {selectedLocations.map((loc) => (
-                    <div key={loc} className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium mr-1 flex-shrink-0">
-                      <span className="truncate">{loc}</span>
-                      <button
-                        type="button"
-                        className="ml-1 text-white hover:text-gray-200 focus:outline-none flex-shrink-0"
-                        style={{ pointerEvents: 'auto' }}
-                        onClick={() => removeLocation(loc)}
+                      <svg
+                        className="w-5 h-5 "
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
                       >
-                        <span className="ml-1">×</span>
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+
+                    </button>
+                  </Link>
+
+                  {/* Clear Filters Button */}
+                  {(selectedType || enquiredForFilter || selectedLocations.length > 0 || search.trim()) && (
+                    <button
+                      onClick={() => {
+                        setSelectedType("");
+                        setEnquiredForFilter("");
+                        setSelectedLocations([]);
+                        setSearch("");
+                        setSuggestions([]);
+                      }}
+                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200 hover:scale-105"
+                    >
+                      Clear
+                    </button>
+                  )}
+                </motion.div>
               </div>
             )}
           </div>
-          {/* Suggestions dropdown */}
-          {suggestions.length > 0 && (
-            <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto" style={{ zIndex: 9999 }}>
-              {suggestions.map((s, idx) => (
-                <div
-                  className="px-3 sm:px-5 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black"
-                  onClick={() => handleSuggestionClick(s)}
-                  key={s + idx}
-                >
-                  {s}
-                </div>
-              ))}
-            </div>
-          )}
         </div>
-        <Link href="/properties">
-          <button
-            type="button"
-            className="bg-black cursor-pointer hover:bg-gray-800 text-white px-2 py-3 rounded-2xl text-sm font-medium transition-all duration-200 hover:scale-105 flex items-center justify-center"
-            onClick={() => {
-              // Store search data in sessionStorage before navigation
-              sessionStorage.setItem('searchData', JSON.stringify({
-                search: search,
-                locations: selectedLocations,
-                type: selectedType,
-                enquiredFor: enquiredForFilter
-              }));
-            }}
-          >
-            <svg
-              className="w-5 h-5 "
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            
-          </button>
-        </Link>
-        
-        {/* Clear Filters Button */}
-        {(selectedType || enquiredForFilter || selectedLocations.length > 0 || search.trim()) && (
-          <button
-            onClick={() => {
-              setSelectedType("");
-              setEnquiredForFilter("");
-              setSelectedLocations([]);
-              setSearch("");
-              setSuggestions([]);
-            }}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-3 rounded-2xl text-sm font-medium transition-all duration-200 hover:scale-105"
-          >
-            Clear
-          </button>
-        )}
-          </motion.div>
-          </div>
-        )}
-      </div>
-    </div>
 
 
       </section>
@@ -1030,7 +1030,7 @@ export default function PropertyCards() {
         </button>
       </div>
 
-   <section className="pb-8 sm:pb-10 lg:pb-20 bg-white dark:bg-dark relative overflow-hidden">
+      <section className="pb-8 sm:pb-10 lg:pb-20 bg-white dark:bg-dark relative overflow-hidden">
         <div className="container mx-auto px-2 sm:px-4">
           <div className="w-full">
             {/* Heading */}
@@ -1040,11 +1040,11 @@ export default function PropertyCards() {
                 <span className="text-[#6E6E73]">
                   Take a look at whats new right now.
                 </span>
-               
+
               </h2>
-              
-                             {/* Results Counter */}
-               {/* {(selectedType || enquiredForFilter || selectedLocations.length > 0 || search.trim()) && (
+
+              {/* Results Counter */}
+              {/* {(selectedType || enquiredForFilter || selectedLocations.length > 0 || search.trim()) && (
                  <div className="mt-4 text-center">
                    <p className="text-sm text-gray-600">
                      Showing of {allProperties.length} properties (searching across both pages)
@@ -1055,9 +1055,9 @@ export default function PropertyCards() {
                    </p>
                  </div>
                )} */}
-               
-               {/* Debug Info */}
-               {/* <div className="mt-4 text-center">
+
+              {/* Debug Info */}
+              {/* <div className="mt-4 text-center">
                  <p className="text-xs text-gray-500">
                    Debug: Properties with enquiredFor="Rent": {properties.filter(p => p.enquiredFor === "Rent").length} | 
                    Properties with enquiredFor="Sale": {properties.filter(p => p.enquiredFor === "Sale").length} |
@@ -1068,8 +1068,8 @@ export default function PropertyCards() {
                  </p>
                </div> */}
             </div>
-{/* Debug Info */}
-            
+            {/* Debug Info */}
+
 
             {/* Property Cards */}
             {loading ? (
@@ -1109,9 +1109,9 @@ export default function PropertyCards() {
                         <div className="h-3 bg-gray-300 rounded w-20"></div>
                         <div className="h-3 bg-gray-300 rounded w-16 ml-auto"></div>
                       </div>
-                      
+
                       <div className="border-t border-gray-200 my-2"></div>
-                      
+
                       <div className="flex justify-between items-center mt-1">
                         <div>
                           <div className="h-4 bg-gray-300 rounded w-24 mb-1"></div>
@@ -1137,11 +1137,11 @@ export default function PropertyCards() {
                     {bookmarkedProperties.size > 0 && (
                       <button
                         className="block bg-black cursor-pointer text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
-                        onClick={handleCompareClick} 
+                        onClick={handleCompareClick}
                       >
                         Compare Properties ({bookmarkedProperties.size})
                       </button>
-                   
+
                     )}
                     {bookmarkedProperties.size > 0 && (
                       <button
@@ -1155,7 +1155,7 @@ export default function PropertyCards() {
                             }
                             return null;
                           }).filter(Boolean).join('\n');
-                          
+
                           const message = `I want to inquire about these properties:\n\n${selectedPropertyLinks}`;
                           const whatsappUrl = `https://wa.me/918384848485?text=${encodeURIComponent(message)}`;
                           window.open(whatsappUrl, '_blank');
@@ -1165,69 +1165,69 @@ export default function PropertyCards() {
                       </button>
                     )}
                   </div>
-                 <Link href="/properties">
-                   <button 
-                     className="bg-black text-white px-4 py-1 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer tracking-wider"
-                     onClick={() => {
-                       // Store search data in sessionStorage before navigation
-                       sessionStorage.setItem('searchData', JSON.stringify({
-                         search: search,
-                         locations: selectedLocations,
-                         type: selectedType,
-                         enquiredFor: enquiredForFilter
-                       }));
-                     }}
-                   >
-                     Explore More 
-                   </button>
-                   {/* ({filteredProperties.length})  */}
-                 </Link>
+                  <Link href="/properties">
+                    <button
+                      className="bg-black text-white px-4 py-1 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors cursor-pointer tracking-wider"
+                      onClick={() => {
+                        // Store search data in sessionStorage before navigation
+                        sessionStorage.setItem('searchData', JSON.stringify({
+                          search: search,
+                          locations: selectedLocations,
+                          type: selectedType,
+                          enquiredFor: enquiredForFilter
+                        }));
+                      }}
+                    >
+                      Explore More
+                    </button>
+                    {/* ({filteredProperties.length})  */}
+                  </Link>
                 </div>
-              
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-              
-              {filteredProperties.slice(0, 8).map((property, index) => (
-                
-                <div
-                  key={`${property.id}-${index}`}
-                  className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col transform transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-gray-400/20 hover:-translate-y-2 hover:border-gray-300 animate-fade-in-up"
-                  style={{ animationDelay: `${index * 150}ms` }}
-                >
-                  {/* Header with title and checkbox */}
-                  <div className="p-2 sm:p-3 flex justify-between items-center transition-all duration-300 hover:bg-gray-50/50">
-                  <Link href={`/property-details/${property.title}`} key={property.title} className="block">
-                    <div className="h-14">
-                      <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
-                        {isLoggedIn ? (property.title || "Prime Business Hub") : "Property Details"}
-                      </h3>
-                      <div className="flex items-center text-gray-700 text-xs transition-all duration-300 hover:text-gray-900">
-                        <svg
-                          className="w-4 h-4 mr-1 transition-all duration-300 hover:scale-110"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                          />
-                        </svg>
-                        {[property.address?.subLocality, property.address?.city]
-  .filter(Boolean)
-  .join(", ") || "Location Name"}
-                      </div>
-                    </div>
-                    </Link>
-                    {/* <div className="w-5 h-5 border border-gray-600 rounded flex items-center justify-center transition-all duration-300 hover:border-gray-800 hover:bg-gray-100 hover:scale-110">
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+
+                  {filteredProperties.slice(0, 8).map((property, index) => (
+
+                    <div
+                      key={`${property.id}-${index}`}
+                      className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col transform transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-gray-400/20 hover:-translate-y-2 hover:border-gray-300 animate-fade-in-up"
+                      style={{ animationDelay: `${index * 150}ms` }}
+                    >
+                      {/* Header with title and checkbox */}
+                      <div className="p-2 sm:p-3 flex justify-between items-center transition-all duration-300 hover:bg-gray-50/50">
+                        <Link href={`/property-details/${property.title}`} key={property.title} className="block">
+                          <div className="h-14">
+                            <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
+                              {isLoggedIn ? (property.title || "Prime Business Hub") : "Property Details"}
+                            </h3>
+                            <div className="flex items-center text-gray-700 text-xs transition-all duration-300 hover:text-gray-900">
+                              <svg
+                                className="w-4 h-4 mr-1 transition-all duration-300 hover:scale-110"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                />
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                />
+                              </svg>
+                              {[property.address?.subLocality, property.address?.city]
+                                .filter(Boolean)
+                                .join(", ") || "Location Name"}
+                            </div>
+                          </div>
+                        </Link>
+                        {/* <div className="w-5 h-5 border border-gray-600 rounded flex items-center justify-center transition-all duration-300 hover:border-gray-800 hover:bg-gray-100 hover:scale-110">
                       <svg
                         className="w-3 h-3 text-black transition-all duration-300 hover:scale-110"
                         fill="none"
@@ -1243,13 +1243,12 @@ export default function PropertyCards() {
                         />
                       </svg>
                     </div> */}
-                      <button
+                        <button
                           onClick={() => handleCheckboxClick(property.id)}
-                          className={`w-5 h-5 border rounded flex items-center justify-center cursor-pointer ${
-                            bookmarkedProperties.has(property.id)
-                              ? "border-green-500 bg-green-500"
-                              : "border-gray-400"
-                          }`}
+                          className={`w-5 h-5 border rounded flex items-center justify-center cursor-pointer ${bookmarkedProperties.has(property.id)
+                            ? "border-green-500 bg-green-500"
+                            : "border-gray-400"
+                            }`}
                         >
                           {bookmarkedProperties.has(property.id) && (
                             <svg
@@ -1268,219 +1267,219 @@ export default function PropertyCards() {
                             </svg>
                           )}
                         </button>
-                  </div>
-
-                  {/* Property Image */}
-                  <Link href={`/property-details/${property.title}`} key={property.title} className="block">
-                  <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
-                    <Image
-                      src={getPropertyImage(property)}
-                      alt={isLoggedIn ? (property.title || "Property") : "Property Details"}
-                      className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
-                      width={340}
-                      height={180}
-                      onLoad={() => {
-                        // Remove from loading state when image loads successfully
-                        const imageUrl = getPropertyImage(property);
-                        if (imageUrl !== defaultPropertyImage.src) {
-                          setLoadingImages(prev => {
-                            const newSet = new Set(prev);
-                            newSet.delete(imageUrl);
-                            return newSet;
-                          });
-                        }
-                      }}
-                      onError={(e) => {
-                        // Add failed image URL to state and fallback to default image
-                        const target = e.target as HTMLImageElement;
-                        const failedUrl = target.src;
-                        setFailedImages(prev => new Set(prev).add(failedUrl));
-                        setLoadingImages(prev => {
-                          const newSet = new Set(prev);
-                          newSet.delete(failedUrl);
-                          return newSet;
-                        });
-                        target.src = defaultPropertyImage.src;
-                      }}
-                    />
-                    {/* Loading overlay */}
-                    {loadingImages.has(getPropertyImage(property)) && (
-                      <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600"></div>
-                      </div>
-                    )}
-                    {/* For Sale/Rent / Property Type overlay */}
-                    {/* <Link href={`/property-details/${property.title}`} key={property.title} className="block"> */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
-                      <span className="mr-2 transition-all duration-300 group-hover:font-medium">
-                        {enquiredForFilter === "Rent"
-                          ? "For Rent"
-                          : enquiredForFilter === "Sale"
-                          ? "For Sale"
-                          : property.forSale
-                          ? "For Sale"
-                          : property.forRent
-                          ? "For Rent"
-: `For ${property.enquiredFor}`}
-                      </span>
-                      <span className="mx-1 transition-all duration-300 group-hover:scale-110">•</span>
-                      <span className="ml-1 transition-all duration-300 group-hover:font-medium">
-                        {
-                          property.propertyType?.childType?.type ||
-                          "Office space"}
-                      </span>
-                    </div>
-                    {/* </Link> */}
-                  </div>
-                  </Link>
-                  {/* Property Details */}
-                  <div className="p-2 sm:p-3 flex-grow font-mono transition-all duration-300 hover:bg-gray-50/30">
-                  <Link href={`/property-details/${property.title}`} key={property.title} className="block">
-                    <div className="grid grid-cols-2 gap-1 text-xs">
-                      <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Built up Area</div>
-                      <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                        {property.dimension?.area || "5490"} sqft
                       </div>
 
-                      <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Carpet Area</div>
-                      <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                      {property.dimension?.carpetArea ? `${property.dimension.carpetArea} sqft` : "N/A"}
-                      </div>
-
-                      <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Parking</div>
-                      <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                      {property.dimension?.parking || "N/A"}
-                      </div>
-
-                      <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">No of Cabin</div>
-                      <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                      {property.furnishStatus || "N/A"}
-                      </div>
-                    </div>
-                          </Link>
-                    <div className="border-t border-gray-200 my-2 transition-all duration-300 hover:border-gray-300"></div>
-
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
-                    <Link href={`/property-details/${property.title}`} key={property.title} className="block">
-                      <div className="transition-all duration-300 hover:scale-105">
-                        <div className="text-base text-black font-mono font-semibold transition-all duration-300 hover:text-gray-800">
-                          {property.forRent
-                            ? `₹ ${property.monetaryInfo?.expectedRent || 4500}`
-                            : formatPrice(property.monetaryInfo?.expectedPrice)}
+                      {/* Property Image */}
+                      <Link href={`/property-details/${property.title}`} key={property.title} className="block">
+                        <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
+                          <Image
+                            src={getPropertyImage(property)}
+                            alt={isLoggedIn ? (property.title || "Property") : "Property Details"}
+                            className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
+                            width={340}
+                            height={180}
+                            onLoad={() => {
+                              // Remove from loading state when image loads successfully
+                              const imageUrl = getPropertyImage(property);
+                              if (imageUrl !== defaultPropertyImage.src) {
+                                setLoadingImages(prev => {
+                                  const newSet = new Set(prev);
+                                  newSet.delete(imageUrl);
+                                  return newSet;
+                                });
+                              }
+                            }}
+                            onError={(e) => {
+                              // Add failed image URL to state and fallback to default image
+                              const target = e.target as HTMLImageElement;
+                              const failedUrl = target.src;
+                              setFailedImages(prev => new Set(prev).add(failedUrl));
+                              setLoadingImages(prev => {
+                                const newSet = new Set(prev);
+                                newSet.delete(failedUrl);
+                                return newSet;
+                              });
+                              target.src = defaultPropertyImage.src;
+                            }}
+                          />
+                          {/* Loading overlay */}
+                          {loadingImages.has(getPropertyImage(property)) && (
+                            <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
+                              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600"></div>
+                            </div>
+                          )}
+                          {/* For Sale/Rent / Property Type overlay */}
+                          {/* <Link href={`/property-details/${property.title}`} key={property.title} className="block"> */}
+                          <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
+                            <span className="mr-2 transition-all duration-300 group-hover:font-medium">
+                              {enquiredForFilter === "Rent"
+                                ? "For Rent"
+                                : enquiredForFilter === "Sale"
+                                  ? "For Sale"
+                                  : property.forSale
+                                    ? "For Sale"
+                                    : property.forRent
+                                      ? "For Rent"
+                                      : `For ${property.enquiredFor}`}
+                            </span>
+                            <span className="mx-1 transition-all duration-300 group-hover:scale-110">•</span>
+                            <span className="ml-1 transition-all duration-300 group-hover:font-medium">
+                              {
+                                property.propertyType?.childType?.type ||
+                                "Office space"}
+                            </span>
+                          </div>
+                          {/* </Link> */}
                         </div>
-                        <div className="text-gray-500 text-xs transition-all duration-300 hover:text-gray-600">
-                          {property.forRent ? "rent/month" : ""}
-                        </div>
-                      </div>
                       </Link>
-                      <div className="flex space-x-1 relative">
-                       
-                        <button
-                          className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-red-200 hover:scale-110 hover:shadow-md active:scale-95"
-                          aria-label="View on Map"
-                          onClick={() => {
-                            const address = [
-                              property.address?.subLocality,
-                              property.address?.city,
-                              property.address?.state
-                            ].filter(Boolean).join(", ");
-                            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-                            window.open(mapUrl, '_blank');
-                          }}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={1.5}
-                            stroke="currentColor"
-                            className="w-5 h-5 text-red-500"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M12 21c-4.418 0-8-5.373-8-10A8 8 0 0112 3a8 8 0 018 8c0 4.627-3.582 10-8 10zm0-7a3 3 0 100-6 3 3 0 000 6z"
-                            />
-                          </svg>
-                        </button>
-                        {/* Share button - only show if user is logged in */}
-                        {isLoggedIn && (
-                          <div className="relative">
+                      {/* Property Details */}
+                      <div className="p-2 sm:p-3 flex-grow font-mono transition-all duration-300 hover:bg-gray-50/30">
+                        <Link href={`/property-details/${property.title}`} key={property.title} className="block">
+                          <div className="grid grid-cols-2 gap-1 text-xs">
+                            <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Built up Area</div>
+                            <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
+                              {property.dimension?.area || "5490"} sqft
+                            </div>
+
+                            <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Carpet Area</div>
+                            <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
+                              {property.dimension?.carpetArea ? `${property.dimension.carpetArea} sqft` : "N/A"}
+                            </div>
+
+                            <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Parking</div>
+                            <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
+                              {property.dimension?.parking || "N/A"}
+                            </div>
+
+                            <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">No of Cabin</div>
+                            <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
+                              {property.furnishStatus || "N/A"}
+                            </div>
+                          </div>
+                        </Link>
+                        <div className="border-t border-gray-200 my-2 transition-all duration-300 hover:border-gray-300"></div>
+
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
+                          <Link href={`/property-details/${property.title}`} key={property.title} className="block">
+                            <div className="transition-all duration-300 hover:scale-105">
+                              <div className="text-base text-black font-mono font-semibold transition-all duration-300 hover:text-gray-800">
+                                {property.forRent
+                                  ? `₹ ${property.monetaryInfo?.expectedRent || 4500}`
+                                  : formatPrice(property.monetaryInfo?.expectedPrice)}
+                              </div>
+                              <div className="text-gray-500 text-xs transition-all duration-300 hover:text-gray-600">
+                                {property.forRent ? "rent/month" : ""}
+                              </div>
+                            </div>
+                          </Link>
+                          <div className="flex space-x-1 relative">
+
                             <button
-                              type="button"
-                              className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
+                              className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-red-200 hover:scale-110 hover:shadow-md active:scale-95"
+                              aria-label="View on Map"
                               onClick={() => {
-                                if (navigator.share) {
-                                  navigator.share({
-                                    title: property.title,
-                                    text: `Check out this property: ${property.title}`,
-                                    url: `https://realtraspaces.com/property-details/${property.title}`,
-                                  });
-                                } else {
-                                  alert("Share not supported on this browser.");
-                                }
+                                const address = [
+                                  property.address?.subLocality,
+                                  property.address?.city,
+                                  property.address?.state
+                                ].filter(Boolean).join(", ");
+                                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+                                window.open(mapUrl, '_blank');
                               }}
-                              title="Share"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="w-5 h-5 text-red-500"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M12 21c-4.418 0-8-5.373-8-10A8 8 0 0112 3a8 8 0 018 8c0 4.627-3.582 10-8 10zm0-7a3 3 0 100-6 3 3 0 000 6z"
+                                />
+                              </svg>
+                            </button>
+                            {/* Share button - only show if user is logged in */}
+                            {isLoggedIn && (
+                              <div className="relative">
+                                <button
+                                  type="button"
+                                  className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
+                                  onClick={() => {
+                                    if (navigator.share) {
+                                      navigator.share({
+                                        title: property.title,
+                                        text: `Check out this property: ${property.title}`,
+                                        url: `https://realtraspaces.com/property-details/${property.title}`,
+                                      });
+                                    } else {
+                                      alert("Share not supported on this browser.");
+                                    }
+                                  }}
+                                  title="Share"
+                                >
+                                  <Image
+                                    src={share}
+                                    alt="Share"
+                                    width={20}
+                                    height={20}
+                                    className="object-contain transition-all duration-300 hover:scale-110"
+                                  />
+                                </button>
+                              </div>
+                            )}
+                            {/* WhatsApp button */}
+                            <a
+                              href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
+                              aria-label="WhatsApp"
                             >
                               <Image
-                                src={share}
-                                alt="Share"
+                                src={whatsapp}
+                                alt="WhatsApp"
                                 width={20}
                                 height={20}
                                 className="object-contain transition-all duration-300 hover:scale-110"
                               />
-                            </button>
+                            </a>
+                            {/* Inquiry button */}
+                            <Link href="/contact">
+                              <button
+                                className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-purple-200 hover:scale-110 hover:shadow-md active:scale-95"
+                                aria-label="Inquire"
+                                title="Inquire about this property"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={1.5}
+                                  stroke="currentColor"
+                                  className="w-5 h-5 text-purple-600"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
+                                  />
+                                </svg>
+                              </button>
+                            </Link>
                           </div>
-                        )}
-                        {/* WhatsApp button */}
-                        <a
-                          href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
-                          aria-label="WhatsApp"
-                        >
-                          <Image
-                            src={whatsapp}
-                            alt="WhatsApp"
-                            width={20}
-                            height={20}
-                            className="object-contain transition-all duration-300 hover:scale-110"
-                          />
-                        </a>
-                        {/* Inquiry button */}
-                        <Link href="/contact">
-                          <button
-                            className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-purple-200 hover:scale-110 hover:shadow-md active:scale-95"
-                            aria-label="Inquire"
-                            title="Inquire about this property"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                              className="w-5 h-5 text-purple-600"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
-                              />
-                            </svg>
-                          </button>
-                        </Link>
-                      </div>
 
+                        </div>
+
+                      </div>
                     </div>
-                    
-                  </div>
+
+                  ))}
                 </div>
-               
-              ))}
-            </div>
-            </div>
+              </div>
             )}
           </div>
         </div>
@@ -1503,9 +1502,9 @@ export default function PropertyCards() {
           }
         `}</style>
       </section>
-      
+
       <TopDevelopers />
-      
+
       {/* Share Modal - moved outside cards for proper positioning */}
       {openShareIndex !== null && properties[openShareIndex] && (
         <ShareModal
@@ -1518,204 +1517,202 @@ export default function PropertyCards() {
 
       {/* Popup Modal */}
       {showPopup && (
-  <div className="fixed inset-0 bg-gray-500 bg-opacity-60 flex items-center justify-center z-50 py-4 px-2 backdrop-blur-sm">
-    <div className="bg-white  rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] transform transition-all duration-300 scale-100 opacity-100">
-      {/* Header with gradient background */}
-      <div className="bg-black text-white px-6 py-4 rounded-t-2xl">
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="text-2xl font-bold">Get in Touch</h3>
-            <p className="text-[#F1F1F4] mt-1">We'd love to hear from you!</p>
-          </div>
-          <button
-            onClick={handleClosePopup}
-            className="text-white hover:text-[#F1F1F4] transition-colors duration-200 p-2 hover:bg-white hover:bg-opacity-20 rounded-full"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-      </div>
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-60 flex items-center justify-center z-50 py-4 px-2 backdrop-blur-sm">
+          <div className="bg-white  rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] transform transition-all duration-300 scale-100 opacity-100">
+            {/* Header with gradient background */}
+            <div className="bg-black text-white px-6 py-4 rounded-t-2xl">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-2xl font-bold">Get in Touch</h3>
+                  <p className="text-[#F1F1F4] mt-1">We'd love to hear from you!</p>
+                </div>
+                <button
+                  onClick={handleClosePopup}
+                  className="text-white hover:text-[#F1F1F4] transition-colors duration-200 p-2 hover:bg-white hover:bg-opacity-20 rounded-full"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+            </div>
 
-      {/* Form */}
-      <div className="px-6 py-4 space-y-4 bg-[#F1F1F4]">
-            {/* Name and Email Row */}
-        <div className="flex gap-4">
-          {/* Name Field */}
-          <div className="flex-1 space-y-2">
-            <label htmlFor="name" className="block text-sm font-semibold text-black">
-              Full Name *
-            </label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                required
-                className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
-                placeholder="Enter your full name"
-              />
+            {/* Form */}
+            <div className="px-6 py-4 space-y-4 bg-[#F1F1F4]">
+              {/* Name and Email Row */}
+              <div className="flex gap-4">
+                {/* Name Field */}
+                <div className="flex-1 space-y-2">
+                  <label htmlFor="name" className="block text-sm font-semibold text-black">
+                    Full Name *
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
+                    <input
+                      type="text"
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
+                      placeholder="Enter your full name"
+                    />
+                  </div>
+                </div>
+
+                {/* Email Field */}
+                <div className="flex-1 space-y-2">
+                  <label htmlFor="email" className="block text-sm font-semibold text-black">
+                    Email Address *
+                  </label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
+                      placeholder="Enter your email address"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Phone and Subject Row */}
+              <div className="flex gap-4">
+                {/* Phone Field */}
+                <div className="flex-1 space-y-2">
+                  <label htmlFor="phone_number" className="block text-sm font-semibold text-black">
+                    Phone Number *
+                  </label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
+                    <input
+                      type="tel"
+                      id="phone_number"
+                      name="phone_number"
+                      value={formData.phone_number}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Allow only numbers and restrict to 10 digits
+                        if (/^\d{0,10}$/.test(value)) {
+                          handleInputChange(e);
+                        }
+                      }}
+                      required
+                      maxLength={10}
+                      className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+                </div>
+
+                {/* Subject Field */}
+                <div className="flex-1 space-y-2">
+                  <label htmlFor="subject" className="block text-sm font-semibold text-black">
+                    Subject *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full pl-4 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
+                      placeholder="Enter subject"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Message Field */}
+              <div className="space-y-2">
+                <label htmlFor="message" className="block text-sm font-semibold text-black">
+                  Message *
+                </label>
+                <div className="relative">
+                  <MessageSquare className="absolute left-3 top-3 text-black w-5 h-5" />
+                  <textarea
+                    id="message"
+                    name="message"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
+                    rows={2}
+                    className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black resize-none"
+                    placeholder="Enter your message"
+                  />
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div className="text-black space-y-1">
+                <p>
+                  <span className="font-semibold ">Contact No:</span>{' '}
+                  <a href="tel:+919730156575" className="text-black hover:text-blue-800 font-mono hover:underline">
+                    +91 9730156575
+                  </a>
+                </p>
+                <p>
+                  <span className="font-semibold">Email:</span>{' '}
+                  <a href="mailto:info@realtraspaces.com" className="text-black hover:text-blue-800 hover:underline">
+                    info@realtraspaces.com
+                  </a>
+                </p>
+                <p>
+                  <span className="font-semibold">Address:</span> Mumbai, Maharashtra, India
+                </p>
+              </div>
+
+              {/* Status Messages */}
+              {submitStatus.type && (
+                <div className={`p-3 rounded-lg ${submitStatus.type === 'success'
+                  ? 'bg-green-100 text-green-800 border border-green-200'
+                  : 'bg-red-100 text-red-800 border border-red-200'
+                  }`}>
+                  {submitStatus.message}
+                </div>
+              )}
+
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  className={`flex-1 py-3 px-6 rounded-xl cursor-pointer transition-all duration-200 font-semibold shadow-lg transform flex items-center justify-center gap-2 ${isSubmitting
+                    ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                    : 'bg-black text-white hover:from-blue-700 hover:to-purple-700 hover:shadow-xl hover:scale-[1.02]'
+                    }`}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 cursor-pointer border-white border-t-transparent rounded-full animate-spin"></div>
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-5 h-5 cursor-pointer" />
+                      Send Message
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleClosePopup}
+                  className="flex-1 bg-white cursor-pointer text-black border border-black  py-3 px-6 rounded-xl hover:bg-[#F1F1F4] transition-all duration-200 font-semibold  hover:border-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
-
-          {/* Email Field */}
-          <div className="flex-1 space-y-2">
-            <label htmlFor="email" className="block text-sm font-semibold text-black">
-              Email Address *
-            </label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
-                placeholder="Enter your email address"
-              />
-            </div>
-          </div>
         </div>
-
-        {/* Phone and Subject Row */}
-        <div className="flex gap-4">
-          {/* Phone Field */}
-          <div className="flex-1 space-y-2">
-            <label htmlFor="phone_number" className="block text-sm font-semibold text-black">
-              Phone Number *
-            </label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-black w-5 h-5" />
-              <input
-                type="tel"
-                id="phone_number"
-                name="phone_number"
-                value={formData.phone_number}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  // Allow only numbers and restrict to 10 digits
-                  if (/^\d{0,10}$/.test(value)) {
-                    handleInputChange(e);
-                  }
-                }}
-                required
-                maxLength={10}
-                className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
-                placeholder="Enter your phone number"
-              />
-            </div>
-          </div>
-
-          {/* Subject Field */}
-          <div className="flex-1 space-y-2">
-            <label htmlFor="subject" className="block text-sm font-semibold text-black">
-              Subject *
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                id="subject"
-                name="subject"
-                value={formData.subject}
-                onChange={handleInputChange}
-                required
-                className="w-full pl-4 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black"
-                placeholder="Enter subject"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Message Field */}
-        <div className="space-y-2">
-          <label htmlFor="message" className="block text-sm font-semibold text-black">
-            Message *
-          </label>
-          <div className="relative">
-            <MessageSquare className="absolute left-3 top-3 text-black w-5 h-5" />
-            <textarea
-              id="message"
-              name="message"
-              value={formData.message}
-              onChange={handleInputChange}
-              required
-              rows={2}
-              className="w-full pl-10 pr-4 py-3 border border-black rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 bg-white text-black resize-none"
-              placeholder="Enter your message"
-            />
-          </div>
-        </div>
-
-        {/* Contact Information */}
-        <div className="text-black space-y-1">
-          <p>
-            <span className="font-semibold ">Contact No:</span>{' '}
-            <a href="tel:+919730156575" className="text-black hover:text-blue-800 font-mono hover:underline">
-              +91 9730156575
-            </a>
-          </p>
-          <p>
-            <span className="font-semibold">Email:</span>{' '}
-            <a href="mailto:info@realtraspaces.com" className="text-black hover:text-blue-800 hover:underline">
-              info@realtraspaces.com
-            </a>
-          </p>
-          <p>
-            <span className="font-semibold">Address:</span> Mumbai, Maharashtra, India
-          </p>
-        </div>
-
-        {/* Status Messages */}
-        {submitStatus.type && (
-          <div className={`p-3 rounded-lg ${
-            submitStatus.type === 'success' 
-              ? 'bg-green-100 text-green-800 border border-green-200' 
-              : 'bg-red-100 text-red-800 border border-red-200'
-          }`}>
-            {submitStatus.message}
-          </div>
-        )}
-
-
-        {/* Action Buttons */}
-        <div className="flex gap-3 pt-2">
-          <button
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className={`flex-1 py-3 px-6 rounded-xl cursor-pointer transition-all duration-200 font-semibold shadow-lg transform flex items-center justify-center gap-2 ${
-              isSubmitting 
-                ? 'bg-gray-400 text-gray-200 cursor-not-allowed' 
-                : 'bg-black text-white hover:from-blue-700 hover:to-purple-700 hover:shadow-xl hover:scale-[1.02]'
-            }`}
-          >
-            {isSubmitting ? (
-              <>
-                <div className="w-5 h-5 border-2 cursor-pointer border-white border-t-transparent rounded-full animate-spin"></div>
-                Sending...
-              </>
-            ) : (
-              <>
-                <Send className="w-5 h-5 cursor-pointer" />
-                Send Message
-              </>
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={handleClosePopup}
-            className="flex-1 bg-white cursor-pointer text-black border border-black  py-3 px-6 rounded-xl hover:bg-[#F1F1F4] transition-all duration-200 font-semibold  hover:border-gray-400"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+      )}
 
     </div>
   );

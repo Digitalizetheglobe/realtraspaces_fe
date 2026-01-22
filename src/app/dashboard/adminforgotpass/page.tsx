@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.realtraspaces.com";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 interface ResetPasswordFormData {
   otpCode: string;
@@ -318,9 +318,8 @@ const AdminForgetPasswordPage = () => {
                   required
                   value={resetFormData.otpCode}
                   onChange={handleResetInputChange}
-                  className={`w-full px-3 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                    errors.otpCode ? "border-red-300" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.otpCode ? "border-red-300" : "border-gray-300"
+                    }`}
                   placeholder="Enter 6-digit OTP"
                   maxLength={6}
                 />
@@ -409,9 +408,8 @@ const AdminForgetPasswordPage = () => {
                     required
                     value={resetFormData.newPassword}
                     onChange={handleResetInputChange}
-                    className={`w-full px-3 py-3 pr-10 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.newPassword ? "border-red-300" : "border-gray-300"
-                    }`}
+                    className={`w-full px-3 py-3 pr-10 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.newPassword ? "border-red-300" : "border-gray-300"
+                      }`}
                     placeholder="Enter new password"
                   />
                   <button
@@ -448,9 +446,8 @@ const AdminForgetPasswordPage = () => {
                     required
                     value={resetFormData.confirmPassword}
                     onChange={handleResetInputChange}
-                    className={`w-full px-3 py-3 pr-10 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                      errors.confirmPassword ? "border-red-300" : "border-gray-300"
-                    }`}
+                    className={`w-full px-3 py-3 pr-10 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.confirmPassword ? "border-red-300" : "border-gray-300"
+                      }`}
                     placeholder="Confirm new password"
                   />
                   <button

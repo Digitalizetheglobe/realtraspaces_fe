@@ -46,7 +46,7 @@ const ManageTestimonialsPage = () => {
   const fetchTestimonials = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://api.realtraspaces.com/api/testimonials');
+      const response = await fetch('http://localhost:8000/api/testimonials');
       if (!response.ok) throw new Error('Failed to fetch testimonials');
       const { data } = await response.json();
       setTestimonials(data || []);
@@ -60,7 +60,7 @@ const ManageTestimonialsPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://api.realtraspaces.com/api/testimonials', {
+      const response = await fetch('http://localhost:8000/api/testimonials', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ const ManageTestimonialsPage = () => {
     if (!confirm('Are you sure you want to delete this testimonial?')) return;
 
     try {
-      const response = await fetch(`https://api.realtraspaces.com/api/testimonials/${id}`, {
+      const response = await fetch(`http://localhost:8000/api/testimonials/${id}`, {
         method: 'DELETE',
       });
 
@@ -102,7 +102,7 @@ const ManageTestimonialsPage = () => {
 
   const handleStatusChange = async (id: number, isActive: boolean) => {
     try {
-      const response = await fetch(`https://api.realtraspaces.com/api/testimonials/${id}`, {
+      const response = await fetch(`http://localhost:8000/api/testimonials/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ const ManageTestimonialsPage = () => {
 
       if (!response.ok) throw new Error('Failed to update status');
 
-      setTestimonials(testimonials.map(t => 
+      setTestimonials(testimonials.map(t =>
         t.id === id ? { ...t, isActive } : t
       ));
     } catch (error) {
@@ -128,9 +128,8 @@ const ManageTestimonialsPage = () => {
             key={star}
             type={interactive ? "button" : undefined}
             onClick={interactive ? () => onChange?.(star) : undefined}
-            className={`text-2xl ${star <= rating ? 'text-yellow-400' : 'text-gray-300'} ${
-              interactive ? 'hover:scale-110 transition-transform' : ''
-            }`}
+            className={`text-2xl ${star <= rating ? 'text-yellow-400' : 'text-gray-300'} ${interactive ? 'hover:scale-110 transition-transform' : ''
+              }`}
           >
             <FiStar />
           </button>
@@ -142,7 +141,7 @@ const ManageTestimonialsPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div 
+        <div
           className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
           style={{ borderColor: colors.primary }}
         ></div>
@@ -167,7 +166,7 @@ const ManageTestimonialsPage = () => {
             <button
               onClick={() => setShowForm(true)}
               className="flex items-center px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all"
-              style={{ 
+              style={{
                 backgroundColor: colors.primary,
                 color: 'white'
               }}
@@ -185,14 +184,14 @@ const ManageTestimonialsPage = () => {
                   <h2 className="text-xl font-semibold" style={{ color: colors.dark }}>
                     Add New Testimonial
                   </h2>
-                  <button 
+                  <button
                     onClick={() => setShowForm(false)}
                     className="p-2 rounded-full hover:bg-gray-100"
                   >
                     <FiX />
                   </button>
                 </div>
-                
+
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium mb-2" style={{ color: colors.dark }}>
@@ -201,9 +200,9 @@ const ManageTestimonialsPage = () => {
                     <input
                       type="text"
                       value={newTestimonial.name}
-                      onChange={(e) => setNewTestimonial({...newTestimonial, name: e.target.value})}
+                      onChange={(e) => setNewTestimonial({ ...newTestimonial, name: e.target.value })}
                       className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                      style={{ 
+                      style={{
                         borderColor: colors.secondary,
                       }}
                       required
@@ -216,10 +215,10 @@ const ManageTestimonialsPage = () => {
                     </label>
                     <textarea
                       value={newTestimonial.testimonial}
-                      onChange={(e) => setNewTestimonial({...newTestimonial, testimonial: e.target.value})}
+                      onChange={(e) => setNewTestimonial({ ...newTestimonial, testimonial: e.target.value })}
                       rows={4}
                       className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                      style={{ 
+                      style={{
                         borderColor: colors.secondary,
                       }}
                       required
@@ -230,8 +229,8 @@ const ManageTestimonialsPage = () => {
                     <label className="block text-sm font-medium mb-2" style={{ color: colors.dark }}>
                       Rating
                     </label>
-                    {renderStars(newTestimonial.rating, true, (rating) => 
-                      setNewTestimonial({...newTestimonial, rating})
+                    {renderStars(newTestimonial.rating, true, (rating) =>
+                      setNewTestimonial({ ...newTestimonial, rating })
                     )}
                   </div>
 
@@ -240,9 +239,9 @@ const ManageTestimonialsPage = () => {
                       type="checkbox"
                       id="isActive"
                       checked={newTestimonial.isActive}
-                      onChange={(e) => setNewTestimonial({...newTestimonial, isActive: e.target.checked})}
+                      onChange={(e) => setNewTestimonial({ ...newTestimonial, isActive: e.target.checked })}
                       className="h-4 w-4 rounded border-gray-300 focus:ring-blue-500"
-                      style={{ 
+                      style={{
                         borderColor: colors.secondary,
                       }}
                     />
@@ -287,7 +286,7 @@ const ManageTestimonialsPage = () => {
                     <button
                       type="submit"
                       className="px-6 py-2 rounded-md text-white hover:shadow-md transition-all flex items-center"
-                      style={{ 
+                      style={{
                         backgroundColor: colors.primary
                       }}
                     >
@@ -317,11 +316,10 @@ const ManageTestimonialsPage = () => {
                       <h3 className="text-xl font-semibold" style={{ color: colors.dark }}>
                         {testimonial.name}
                       </h3>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        testimonial.isActive 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${testimonial.isActive
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                        }`}>
                         {testimonial.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
@@ -347,11 +345,10 @@ const ManageTestimonialsPage = () => {
                         </button>
                         <button
                           onClick={() => handleStatusChange(testimonial.id, !testimonial.isActive)}
-                          className={`p-2 rounded-full transition-colors ${
-                            testimonial.isActive
-                              ? 'text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50'
-                              : 'text-green-600 hover:text-green-800 hover:bg-green-50'
-                          }`}
+                          className={`p-2 rounded-full transition-colors ${testimonial.isActive
+                            ? 'text-yellow-600 hover:text-yellow-800 hover:bg-yellow-50'
+                            : 'text-green-600 hover:text-green-800 hover:bg-green-50'
+                            }`}
                           title={testimonial.isActive ? 'Deactivate' : 'Activate'}
                         >
                           {testimonial.isActive ? (

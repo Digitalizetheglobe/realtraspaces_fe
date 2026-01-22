@@ -106,7 +106,7 @@ const SignInPage = () => {
 
     try {
       const response = await fetch(
-        "https://api.realtraspaces.com/api/webusers/send-login-otp",
+        "http://localhost:8000/api/webusers/send-login-otp",
         {
           method: "POST",
           headers: {
@@ -146,7 +146,7 @@ const SignInPage = () => {
 
     try {
       const response = await fetch(
-        "https://api.realtraspaces.com/api/webusers/verify-login-otp",
+        "http://localhost:8000/api/webusers/verify-login-otp",
         {
           //add changes
           method: "POST",
@@ -266,7 +266,7 @@ const SignInPage = () => {
                     {otpSent ? "Verify Your Email" : "Sign In"}
                   </h2>
                   <p className="text-[#6E6E73]">
-                    {otpSent 
+                    {otpSent
                       ? "Enter the OTP sent to your email to complete login"
                       : "Access your account with email"
                     }
@@ -290,9 +290,8 @@ const SignInPage = () => {
                           name="email"
                           value={formData.email}
                           onChange={handleInputChange}
-                          className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border border-[#E5E5E7] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                            errors.email ? "border-red-500" : ""
-                          }`}
+                          className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border border-[#E5E5E7] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.email ? "border-red-500" : ""
+                            }`}
                           placeholder="Enter your email"
                           style={{ color: "#1A1A1A" }}
                         />
@@ -409,9 +408,8 @@ const SignInPage = () => {
                           name="otpCode"
                           value={otpData.otpCode}
                           onChange={handleOtpChange}
-                          className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border border-[#E5E5E7] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                            errors.otpCode ? "border-red-500" : ""
-                          }`}
+                          className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border border-[#E5E5E7] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.otpCode ? "border-red-500" : ""
+                            }`}
                           placeholder="Enter 6-digit OTP"
                           style={{ color: "#1A1A1A" }}
                           maxLength={6}

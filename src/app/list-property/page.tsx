@@ -36,7 +36,7 @@ export default function ListPropertyPage() {
     if (!form.transactionType) newErrors.transactionType = "Transaction type is required";
     if (!form.areaCarpet.trim()) newErrors.areaCarpet = "Area Carpet is required";
     if (!form.areaBuiltup.trim()) newErrors.areaBuiltup = "Area Builtup is required";
-    
+
     // Conditional validation for Rent and Price
     if (form.transactionType === "Lease" || form.transactionType === "BOTH") {
       if (!form.rent.trim()) newErrors.rent = "Rent is required for Lease/BOTH";
@@ -44,7 +44,7 @@ export default function ListPropertyPage() {
     if (form.transactionType === "Sale" || form.transactionType === "Preleased" || form.transactionType === "BOTH") {
       if (!form.price.trim()) newErrors.price = "Price is required for Sale/Preleased/BOTH";
     }
-    
+
     if (!form.contactName.trim()) newErrors.contactName = "Contact name is required";
     if (!form.contactNumber.trim()) newErrors.contactNumber = "Contact number is required";
     if (!form.emailAddress.trim() || !/\S+@\S+\.\S+/.test(form.emailAddress)) {
@@ -60,7 +60,7 @@ export default function ListPropertyPage() {
     if (name === "images" && files && files.length > 0) {
       const fileArray = Array.from(files) as File[];
       setForm(prev => ({ ...prev, [name]: fileArray }));
-      
+
       // Create previews for all selected images
       const previews: string[] = [];
       fileArray.forEach((file) => {
@@ -90,11 +90,11 @@ export default function ListPropertyPage() {
     e.preventDefault();
     if (!validateForm()) return;
     setIsSubmitting(true);
-    
+
     try {
       // Create FormData for file upload
       const formData = new FormData();
-      
+
       // Add all form fields to FormData
       formData.append('propertyName', form.propertyName);
       formData.append('location', form.location);
@@ -108,14 +108,14 @@ export default function ListPropertyPage() {
       formData.append('contactNumber', form.contactNumber);
       formData.append('emailAddress', form.emailAddress);
       formData.append('description', form.description);
-      
+
       // Add image files to FormData
       form.images.forEach((file) => {
         formData.append('images', file);
       });
 
       // Call the API with FormData
-      const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://api.realtraspaces.com';
+      const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const response = await fetch(`${baseURL}/api/property-listings/create`, {
         method: 'POST',
         body: formData, // Send FormData instead of JSON
@@ -149,7 +149,7 @@ export default function ListPropertyPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4" style={{fontFamily: '"Inter", "Segoe UI", "Roboto", sans-serif'}}>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4" style={{ fontFamily: '"Inter", "Segoe UI", "Roboto", sans-serif' }}>
         <div className="max-w-md mx-auto p-8 bg-white rounded-xl shadow-lg text-center border border-gray-200">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Check className="w-8 h-8 text-green-600" />
@@ -166,8 +166,8 @@ export default function ListPropertyPage() {
               <li>• Listing activation</li>
             </ul>
           </div>
-          <button 
-            onClick={() => {setSubmitted(false); setForm({propertyName: "", location: "", propertyType: "", transactionType: "", areaCarpet: "", areaBuiltup: "", rent: "", price: "", contactName: "", contactNumber: "", emailAddress: "", description: "", images: [], termsAccepted: false}); setImagePreviews([]);}}
+          <button
+            onClick={() => { setSubmitted(false); setForm({ propertyName: "", location: "", propertyType: "", transactionType: "", areaCarpet: "", areaBuiltup: "", rent: "", price: "", contactName: "", contactNumber: "", emailAddress: "", description: "", images: [], termsAccepted: false }); setImagePreviews([]); }}
             className="w-full bg-[#FFB400] text-black font-semibold py-3 rounded-lg hover:bg-[#E6A200] transition-all duration-200 transform hover:scale-105"
           >
             List Another Property
@@ -178,7 +178,7 @@ export default function ListPropertyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8" style={{fontFamily: '"Inter", "Segoe UI", "Roboto", sans-serif'}}>
+    <div className="min-h-screen bg-gray-50 py-8" style={{ fontFamily: '"Inter", "Segoe UI", "Roboto", sans-serif' }}>
       <div className="max-w-4xl mx-auto p-6">
         {/* Header */}
         <div className="text-center mb-8">
@@ -199,37 +199,37 @@ export default function ListPropertyPage() {
                 <label className="block font-semibold mb-2 text-gray-900">Property Name</label>
                 <div className="relative">
                   <Home className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                  <input 
-                    name="propertyName" 
-                    value={form.propertyName} 
-                    onChange={handleChange} 
+                  <input
+                    name="propertyName"
+                    value={form.propertyName}
+                    onChange={handleChange}
                     placeholder="e.g., Premium Office Space"
                     className="w-full border border-gray-300 rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900"
                   />
                 </div>
               </div>
-              
+
               {/* Location */}
               <div className="md:col-span-2">
                 <label className="block font-semibold mb-2 text-gray-900">Location</label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                  <input 
-                    name="location" 
-                    value={form.location} 
+                  <input
+                    name="location"
+                    value={form.location}
                     onChange={handleChange}
                     placeholder="e.g., BKC, Mumbai"
                     className="w-full border border-gray-300 rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900"
                   />
                 </div>
               </div>
-              
+
               {/* Property Type */}
               <div>
                 <label className="block font-semibold mb-2 text-gray-900">Property Type *</label>
-                <select 
-                  name="propertyType" 
-                  value={form.propertyType} 
+                <select
+                  name="propertyType"
+                  value={form.propertyType}
                   onChange={handleChange}
                   className={`w-full border rounded-lg px-3 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 bg-white ${errors.propertyType ? 'border-red-500' : 'border-gray-300'}`}
                 >
@@ -240,13 +240,13 @@ export default function ListPropertyPage() {
                 </select>
                 {errors.propertyType && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.propertyType}</p>}
               </div>
-              
+
               {/* Transaction Type */}
               <div>
                 <label className="block font-semibold mb-2 text-gray-900">Transaction Type *</label>
-                <select 
-                  name="transactionType" 
-                  value={form.transactionType} 
+                <select
+                  name="transactionType"
+                  value={form.transactionType}
                   onChange={handleChange}
                   className={`w-full border rounded-lg px-3 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 bg-white ${errors.transactionType ? 'border-red-500' : 'border-gray-300'}`}
                 >
@@ -257,13 +257,13 @@ export default function ListPropertyPage() {
                 </select>
                 {errors.transactionType && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.transactionType}</p>}
               </div>
-              
+
               {/* Area Carpet */}
               <div>
                 <label className="block font-semibold mb-2 text-gray-900">Area Carpet *</label>
-                <input 
-                  name="areaCarpet" 
-                  value={form.areaCarpet} 
+                <input
+                  name="areaCarpet"
+                  value={form.areaCarpet}
                   onChange={handleChange}
                   type="text"
                   placeholder="e.g., 2000 sq ft"
@@ -271,13 +271,13 @@ export default function ListPropertyPage() {
                 />
                 {errors.areaCarpet && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.areaCarpet}</p>}
               </div>
-              
+
               {/* Area Builtup */}
               <div>
                 <label className="block font-semibold mb-2 text-gray-900">Area Builtup *</label>
-                <input 
-                  name="areaBuiltup" 
-                  value={form.areaBuiltup} 
+                <input
+                  name="areaBuiltup"
+                  value={form.areaBuiltup}
                   onChange={handleChange}
                   type="text"
                   placeholder="e.g., 2500 sq ft"
@@ -285,18 +285,18 @@ export default function ListPropertyPage() {
                 />
                 {errors.areaBuiltup && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.areaBuiltup}</p>}
               </div>
-              
+
               {/* Rent - Conditional */}
               {(form.transactionType === "Lease" || form.transactionType === "BOTH") && (
                 <div>
                   <label className="block font-semibold mb-2 text-gray-900">Rent (₹) *</label>
                   <div className="relative">
                     <span className="absolute left-3 top-3 text-gray-400 font-semibold">₹</span>
-                    <input 
-                      name="rent" 
-                      value={form.rent} 
+                    <input
+                      name="rent"
+                      value={form.rent}
                       onChange={handleChange}
-                      type="number" 
+                      type="number"
                       min="0"
                       placeholder="50000"
                       className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.rent ? 'border-red-500' : 'border-gray-300'}`}
@@ -305,18 +305,18 @@ export default function ListPropertyPage() {
                   {errors.rent && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.rent}</p>}
                 </div>
               )}
-              
+
               {/* Price - Conditional */}
               {(form.transactionType === "Sale" || form.transactionType === "Preleased" || form.transactionType === "BOTH") && (
                 <div>
                   <label className="block font-semibold mb-2 text-gray-900">Price (₹) *</label>
                   <div className="relative">
                     <span className="absolute left-3 top-3 text-gray-400 font-semibold">₹</span>
-                    <input 
-                      name="price" 
-                      value={form.price} 
+                    <input
+                      name="price"
+                      value={form.price}
                       onChange={handleChange}
-                      type="number" 
+                      type="number"
                       min="0"
                       placeholder="5000000"
                       className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.price ? 'border-red-500' : 'border-gray-300'}`}
@@ -325,28 +325,28 @@ export default function ListPropertyPage() {
                   {errors.price && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.price}</p>}
                 </div>
               )}
-              
+
               {/* Contact Name */}
               <div>
                 <label className="block font-semibold mb-2 text-gray-900">Contact Name *</label>
-                <input 
-                  name="contactName" 
-                  value={form.contactName} 
+                <input
+                  name="contactName"
+                  value={form.contactName}
                   onChange={handleChange}
                   placeholder="Your Name"
                   className={`w-full border rounded-lg px-3 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.contactName ? 'border-red-500' : 'border-gray-300'}`}
                 />
                 {errors.contactName && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.contactName}</p>}
               </div>
-              
+
               {/* Contact Number */}
               <div>
                 <label className="block font-semibold mb-2 text-gray-900">Contact Number *</label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                  <input 
-                    name="contactNumber" 
-                    value={form.contactNumber} 
+                  <input
+                    name="contactNumber"
+                    value={form.contactNumber}
                     onChange={handleChange}
                     placeholder="+41 123 456 7890"
                     className={`w-full border rounded-lg px-10 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 ${errors.contactNumber ? 'border-red-500' : 'border-gray-300'}`}
@@ -354,15 +354,15 @@ export default function ListPropertyPage() {
                 </div>
                 {errors.contactNumber && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.contactNumber}</p>}
               </div>
-              
+
               {/* Email Address */}
               <div className="md:col-span-2">
                 <label className="block font-semibold mb-2 text-gray-900">Email Address *</label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                  <input 
-                    name="emailAddress" 
-                    value={form.emailAddress} 
+                  <input
+                    name="emailAddress"
+                    value={form.emailAddress}
                     onChange={handleChange}
                     type="email"
                     placeholder="your@email.com"
@@ -371,20 +371,20 @@ export default function ListPropertyPage() {
                 </div>
                 {errors.emailAddress && <p className="text-red-500 text-sm mt-1 flex items-center"><AlertCircle className="w-4 h-4 mr-1" />{errors.emailAddress}</p>}
               </div>
-              
+
               {/* Description */}
               <div className="md:col-span-2">
                 <label className="block font-semibold mb-2 text-gray-900">Description</label>
-                <textarea 
-                  name="description" 
-                  value={form.description} 
+                <textarea
+                  name="description"
+                  value={form.description}
                   onChange={handleChange}
                   rows={4}
                   placeholder="Describe your property in detail..."
                   className="w-full border border-gray-300 rounded-lg px-3 py-3 focus:ring-2 focus:ring-[#FFB400] focus:border-[#FFB400] transition-colors text-gray-900 resize-none"
                 />
               </div>
-              
+
               {/* Image Upload */}
               <div className="md:col-span-2">
                 <label className="block font-semibold mb-2 text-gray-900">Property Images</label>
@@ -395,13 +395,13 @@ export default function ListPropertyPage() {
                         {imagePreviews.map((preview, index) => (
                           <div key={index} className="relative">
                             <img src={preview} alt={`Preview ${index + 1}`} className="w-full h-32 object-cover rounded-lg" />
-                            <button 
-                              type="button" 
+                            <button
+                              type="button"
                               onClick={() => {
                                 const newPreviews = imagePreviews.filter((_, i) => i !== index);
                                 const newImages = form.images.filter((_, i) => i !== index);
                                 setImagePreviews(newPreviews);
-                                setForm(prev => ({...prev, images: newImages}));
+                                setForm(prev => ({ ...prev, images: newImages }));
                               }}
                               className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-600 transition-colors"
                             >
@@ -419,10 +419,10 @@ export default function ListPropertyPage() {
                       <p className="text-sm text-gray-500">PNG, JPG up to 10MB each (Multiple files allowed)</p>
                     </>
                   )}
-                  <input 
-                    name="images" 
-                    type="file" 
-                    accept="image/*" 
+                  <input
+                    name="images"
+                    type="file"
+                    accept="image/*"
                     multiple
                     onChange={handleChange}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -434,10 +434,10 @@ export default function ListPropertyPage() {
               <div className="md:col-span-2">
                 <label className="block font-semibold mb-2 text-gray-900">Terms and Conditions *</label>
                 <div className="flex items-center">
-                  <input 
-                    type="checkbox" 
-                    name="termsAccepted" 
-                    checked={form.termsAccepted} 
+                  <input
+                    type="checkbox"
+                    name="termsAccepted"
+                    checked={form.termsAccepted}
                     onChange={handleChange}
                     className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   />
@@ -462,8 +462,8 @@ export default function ListPropertyPage() {
                   Submitting your property listing...
                 </div>
               )}
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={isSubmitting}
                 className="bg-[#FFB400] text-black font-bold py-4 px-8 rounded-lg hover:bg-[#E6A200] transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center mx-auto"
               >

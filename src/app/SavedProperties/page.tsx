@@ -5,8 +5,8 @@ import { Building, Trash2, Heart, ArrowRight, MapPin, Star, Ruler, Bed } from "l
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
-import { 
-  User, Home, Search, LogOut, GitCompare, 
+import {
+  User, Home, Search, LogOut, GitCompare,
 } from 'lucide-react';
 
 type Property = {
@@ -65,7 +65,7 @@ const SavedProperties = () => {
     try {
       setLoading(true);
       const response = await fetch(
-        `https://api.realtraspaces.com/api/webusers/saved-properties?page=${page}&limit=10`,
+        `http://localhost:8000/api/webusers/saved-properties?page=${page}&limit=10`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -79,7 +79,7 @@ const SavedProperties = () => {
 
       const data = await response.json();
       const properties = data.data || [];
-      
+
       setSavedProperties(prev => page === 1 ? properties : [...prev, ...properties]);
       setHasMore(data.pagination?.total > page * 10);
     } catch (error) {
@@ -100,7 +100,7 @@ const SavedProperties = () => {
     try {
       setIsRemoving(propertyId);
       const response = await fetch(
-        `https://api.realtraspaces.com/api/webusers/saved-properties/${propertyId}`,
+        `http://localhost:8000/api/webusers/saved-properties/${propertyId}`,
         {
           method: "DELETE",
           headers: {
@@ -133,9 +133,9 @@ const SavedProperties = () => {
 
   if (loading && savedProperties.length === 0) {
     return (
-      <div 
+      <div
         className="flex justify-center items-center h-64"
-        style={{ 
+        style={{
           backgroundColor: '#F1F1F4',
           fontFamily: 'Raleway, sans-serif'
         }}
@@ -146,9 +146,9 @@ const SavedProperties = () => {
   }
 
   return (
-    <div 
+    <div
       className="min-h-screen flex"
-      style={{ 
+      style={{
         backgroundColor: '#F1F1F4',
         fontFamily: 'Raleway, sans-serif'
       }}
@@ -161,7 +161,7 @@ const SavedProperties = () => {
             <span className="text-xl font-bold">Realtraspace</span>
           </div>
         </div>
-        
+
         <nav className="p-4 space-y-2">
           <button
             onClick={() => router.push('/compareproperties')}
@@ -170,7 +170,7 @@ const SavedProperties = () => {
             <Home className="h-5 w-5" />
             <span className="text-black">Compare Properties</span>
           </button>
-          
+
           <button
             onClick={() => router.push('/properties')}
             className="cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-[#F1F1F4] transition-colors"
@@ -178,7 +178,7 @@ const SavedProperties = () => {
             <Search className="h-5 w-5" />
             <span className="text-black">Explore More</span>
           </button>
-          
+
           <button
             onClick={() => router.push('/profile-page')}
             className="cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg hover:bg-[#F1F1F4] transition-colors"
@@ -186,7 +186,7 @@ const SavedProperties = () => {
             <User className="h-5 w-5" />
             <span className="text-black">Profile</span>
           </button>
-          
+
           <button
             onClick={() => router.push('/saved-properties')}
             className="cursor-pointer w-full flex items-center space-x-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600"
@@ -194,7 +194,7 @@ const SavedProperties = () => {
             <Heart className="h-5 w-5" />
             <span className="text-black">Saved Properties</span>
           </button>
-          
+
           <button
             onClick={() => {
               localStorage.removeItem('authToken');
@@ -207,7 +207,7 @@ const SavedProperties = () => {
           </button>
         </nav>
       </div>
-      
+
       {/* Main Content */}
       <div className="flex-1 p-6 md:p-8">
         <div className="max-w-7xl mx-auto">
@@ -283,14 +283,14 @@ const SavedProperties = () => {
                           {property.propertyData.propertyType?.childType?.displayName || 'Property'}
                         </span>
                       </div>
-                      
+
                       <div className="flex items-center text-[#6E6E73] mb-4">
                         <MapPin className="h-4 w-4 mr-1" />
                         <span className="text-sm">
                           {property.propertyData.address?.subLocality}, {property.propertyData.address?.city}
                         </span>
                       </div>
-                      
+
                       <div className="grid grid-cols-3 gap-2 mb-4">
                         <div className="flex items-center">
                           <Ruler className="h-4 w-4 mr-1 text-[#6E6E73]" />
@@ -310,7 +310,7 @@ const SavedProperties = () => {
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className="flex justify-between items-center pt-4 border-t border-[#E5E5E7]">
                         <div>
                           <span className="text-xs" style={{ color: '#6E6E73' }}>Price</span>

@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
 // Get API base URL from environment or default to localhost
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.realtraspaces.com";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface CookieStatistics {
   status: string;
@@ -151,9 +151,8 @@ const DashboardCookies = () => {
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <div
-        className={`${
-          isSidebarOpen ? "w-64" : "w-20"
-        } bg-gray-200 shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
+        className={`${isSidebarOpen ? "w-64" : "w-20"
+          } bg-gray-200 shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
       >
         <div className="p-4 flex items-center gap-x-2">
           {/* Toggle Button */}
@@ -352,11 +351,10 @@ const DashboardCookies = () => {
                             {record.policyVersion}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              record.accepted
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
-                            }`}>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${record.accepted
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                              }`}>
                               {record.accepted ? 'Accepted' : 'Declined'}
                             </span>
                           </td>

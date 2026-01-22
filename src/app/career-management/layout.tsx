@@ -12,9 +12,9 @@ const CareerManagementLayout = ({
 
   const modules = [
     { name: 'Dashboard', icon: '📊', href: '/dashboard' },
-    { name: 'Career Management', icon: '💼', href: '/career-management' , active: true },
-    { name: 'Blog', icon: '📝', href: '/blog'  },
-    { name: 'Manage Testimonials', icon: '⭐', href: '/manage-testimonials'},
+    { name: 'Career Management', icon: '💼', href: '/career-management', active: true },
+    { name: 'Blog', icon: '📝', href: '/blog' },
+    { name: 'Manage Testimonials', icon: '⭐', href: '/manage-testimonials' },
     { name: 'SEO Meta Manager', icon: '🌐', href: '/seometaManager' },
     { name: 'Team Management', icon: '👥', href: '/dashboardteam' },
     { name: 'Developer Management', icon: '🛠️', href: '/dashboarddeveloper' },
@@ -24,9 +24,8 @@ const CareerManagementLayout = ({
     <div className="flex h-screen bg-gray-50">
       {/* Sidebar */}
       <aside
-        className={`${
-           isSidebarOpen ? "w-70" : "w-30"
-        } bg-white shadow-xl transition-all duration-300 ease-in-out flex flex-col border-r border-gray-200`}
+        className={`${isSidebarOpen ? "w-70" : "w-30"
+          } bg-white shadow-xl transition-all duration-300 ease-in-out flex flex-col border-r border-gray-200`}
       >
         {/* Sidebar Header */}
         <div className="p-4 border-b border-gray-200 flex items-center justify-between">
@@ -61,11 +60,10 @@ const CareerManagementLayout = ({
               <li key={module.name}>
                 <Link
                   href={module.href}
-                  className={`flex items-center px-4 py-3 rounded-lg mx-2 transition-all duration-200 ${
-                    module.active
-                      ? 'bg-indigo-50 text-indigo-700 font-medium'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
+                  className={`flex items-center px-4 py-3 rounded-lg mx-2 transition-all duration-200 ${module.active
+                    ? 'bg-indigo-50 text-indigo-700 font-medium'
+                    : 'text-gray-600 hover:bg-gray-100'
+                    }`}
                 >
                   <span className="text-xl w-6 text-center">{module.icon}</span>
                   {isSidebarOpen && (
@@ -99,19 +97,6 @@ const CareerManagementLayout = ({
       {/* Main Content */}
       <main className="flex-1 overflow-auto bg-gray-50">
         <div className="p-6">
-          {/* Content Header */}
-          {/* <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Manage Testimonials</h2>
-            <div className="flex space-x-4">
-              <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors duration-200">
-                Refresh
-              </button>
-              <button className="px-4 py-2 bg-indigo-600 rounded-lg text-white hover:bg-indigo-700 transition-colors duration-200">
-                Add New
-              </button>
-            </div>
-          </div> */}
-
           {/* Page Content */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             {children}

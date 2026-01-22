@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../../../hooks/useAuth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.realtraspaces.com";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 interface LoginFormData {
   mobileNumber: string;
@@ -117,7 +117,7 @@ const AdminLoginPage = () => {
       if (response.ok && data.success) {
         // Use the login function from useAuth hook
         login(data.token, data.data.admin);
-        
+
         // Redirect to dashboard
         router.push("/dashboard");
       } else {
@@ -161,9 +161,8 @@ const AdminLoginPage = () => {
                 required
                 value={formData.mobileNumber}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.mobileNumber ? "border-red-300" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.mobileNumber ? "border-red-300" : "border-gray-300"
+                  }`}
                 placeholder="Enter your mobile number"
                 maxLength={10}
               />
@@ -185,9 +184,8 @@ const AdminLoginPage = () => {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-3 pr-10 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                    errors.password ? "border-red-300" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-3 pr-10 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.password ? "border-red-300" : "border-gray-300"
+                    }`}
                   placeholder="Enter your password"
                 />
                 <button

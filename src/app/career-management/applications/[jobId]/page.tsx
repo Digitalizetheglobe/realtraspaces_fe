@@ -43,19 +43,19 @@ const ApplicationsPage = ({ params }: PageProps) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const jobResponse = await fetch(`https://api.realtraspaces.com/api/jobs/${jobId}`);
+        const jobResponse = await fetch(`http://localhost:8000/api/jobs/${jobId}`);
         if (!jobResponse.ok) {
           throw new Error('Failed to fetch job details');
         }
         const jobData = await jobResponse.json();
         setJob(jobData.data);
 
-        const applicationsResponse = await fetch(`https://api.realtraspaces.com/api/applications/job/${jobId}`);
+        const applicationsResponse = await fetch(`http://localhost:8000/api/applications/job/${jobId}`);
         if (!applicationsResponse.ok) {
           throw new Error('Failed to fetch applications');
         }
         const applicationsData = await applicationsResponse.json();
-        
+
         // Ensure applications is an array
         let applicationsArray: Application[] = [];
         if (Array.isArray(applicationsData)) {
@@ -65,7 +65,7 @@ const ApplicationsPage = ({ params }: PageProps) => {
         } else if (applicationsData.data) {
           applicationsArray = Array.isArray(applicationsData.data) ? applicationsData.data : [];
         }
-        
+
         setApplications(applicationsArray);
       } catch (error) {
         setError(error instanceof Error ? error.message : 'An error occurred');
@@ -80,7 +80,7 @@ const ApplicationsPage = ({ params }: PageProps) => {
 
   const handleStatusUpdate = async (applicationId: number, newStatus: Application['status']) => {
     try {
-      const response = await fetch(`https://api.realtraspaces.com/api/applications/${applicationId}/status`, {
+      const response = await fetch(`http://localhost:8000/api/applications/${applicationId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -90,7 +90,7 @@ const ApplicationsPage = ({ params }: PageProps) => {
         throw new Error('Failed to update application status');
       }
 
-      setApplications(applications.map(app => 
+      setApplications(applications.map(app =>
         app.id === applicationId ? { ...app, status: newStatus } : app
       ));
     } catch (error) {

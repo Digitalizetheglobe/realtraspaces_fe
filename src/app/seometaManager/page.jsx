@@ -40,7 +40,7 @@ const SEOMetaManager = () => {
   const fetchAllMetaTags = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('https://api.realtraspaces.com/api/seo/meta-tags/');
+      const response = await axios.get('http://localhost:8000/api/seo/meta-tags/');
       setMetaTags(response.data.data);
     } catch (err) {
       showNotification('Failed to fetch meta tags', 'error');
@@ -53,7 +53,7 @@ const SEOMetaManager = () => {
   const fetchPageMeta = async (page) => {
     setLoading(true);
     try {
-      const response = await axios.get(`https://api.realtraspaces.com/api/seo/meta-tags/${page}`);
+      const response = await axios.get(`http://localhost:8000/api/seo/meta-tags/${page}`);
       setCurrentPage(response.data.data);
       setFormData(response.data.data);
     } catch (err) {
@@ -66,10 +66,10 @@ const SEOMetaManager = () => {
   // Handle delete meta tags
   const handleDelete = async (page) => {
     if (!confirm(`Are you sure you want to delete the meta tags for ${page}?`)) return;
-    
+
     setLoading(true);
     try {
-      await axios.delete(`https://api.realtraspaces.com/api/seo/meta-tags/${page}`);
+      await axios.delete(`http://localhost:8000/api/seo/meta-tags/${page}`);
       showNotification('Meta tags deleted successfully!', 'success');
       setCurrentPage(null);
       fetchAllMetaTags();
@@ -92,10 +92,10 @@ const SEOMetaManager = () => {
     setLoading(true);
     try {
       if (isEditing) {
-        await axios.put(`https://api.realtraspaces.com/api/seo/meta-tags/${formData.page}`, formData);
+        await axios.put(`http://localhost:8000/api/seo/meta-tags/${formData.page}`, formData);
         showNotification('Meta tags updated successfully!', 'success');
       } else {
-        await axios.post('https://api.realtraspaces.com/api/seo/meta-tags/', formData);
+        await axios.post('http://localhost:8000/api/seo/meta-tags/', formData);
         showNotification('Meta tags created successfully!', 'success');
       }
       fetchAllMetaTags();
@@ -116,10 +116,10 @@ const SEOMetaManager = () => {
     <div className="min-h-screen" style={{ backgroundColor: colors.light }}>
       {/* Notification */}
       {notification.show && (
-        <div 
+        <div
           className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white z-50 transition-all duration-300 transform ${notification.show ? 'translate-x-0' : 'translate-x-full'}`}
-          style={{ 
-            backgroundColor: notification.type === 'success' ? colors.success : colors.error 
+          style={{
+            backgroundColor: notification.type === 'success' ? colors.success : colors.error
           }}
         >
           <div className="flex items-center">
@@ -153,7 +153,7 @@ const SEOMetaManager = () => {
               });
             }}
             className="flex items-center px-4 py-3 rounded-lg shadow-md transition-all duration-200 hover:shadow-lg"
-            style={{ 
+            style={{
               backgroundColor: colors.primary,
               color: 'white',
               cursor: 'pointer'
@@ -167,11 +167,11 @@ const SEOMetaManager = () => {
         {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Pages List */}
-          <div 
+          <div
             className="rounded-xl shadow-md overflow-hidden border border-gray-200"
             style={{ backgroundColor: 'white' }}
           >
-            <div 
+            <div
               className="p-5 border-b border-gray-200"
               style={{ backgroundColor: colors.primary }}
             >
@@ -180,22 +180,22 @@ const SEOMetaManager = () => {
             <div className="divide-y divide-gray-200 max-h-[600px] overflow-y-auto">
               {loading && !metaTags.length ? (
                 <div className="p-5 flex justify-center">
-                  <div 
+                  <div
                     className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2"
                     style={{ borderColor: colors.primary }}
                   ></div>
                 </div>
               ) : metaTags.length > 0 ? (
                 metaTags.map((meta) => (
-                  <div 
-                    key={meta.id} 
+                  <div
+                    key={meta.id}
                     className={`p-4 hover:bg-gray-50 cursor-pointer transition ${currentPage?.page === meta.page ? 'bg-blue-50' : ''}`}
                     onClick={() => fetchPageMeta(meta.page)}
                   >
                     <div className="flex justify-between items-center">
                       <h3 className="font-medium" style={{ color: colors.dark }}>{meta.page}</h3>
                       <div className="flex space-x-2">
-                        <button 
+                        <button
                           onClick={(e) => {
                             e.stopPropagation();
                             fetchPageMeta(meta.page);
@@ -206,7 +206,7 @@ const SEOMetaManager = () => {
                         >
                           <FiEdit2 className="mr-1" />
                         </button>
-                        <button 
+                        <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDelete(meta.page);
@@ -232,16 +232,16 @@ const SEOMetaManager = () => {
           {/* Form/Details Panel */}
           <div className="lg:col-span-2">
             {isEditing || !currentPage ? (
-              <div 
+              <div
                 className="rounded-xl shadow-md overflow-hidden border border-gray-200"
                 style={{ backgroundColor: 'white' }}
               >
-                <div 
+                <div
                   className="p-5 border-b border-gray-200 flex items-center"
                   style={{ backgroundColor: colors.primary }}
                 >
                   {isEditing && (
-                    <button 
+                    <button
                       onClick={() => setIsEditing(false)}
                       className="mr-3 text-white"
                       style={{ cursor: 'pointer' }}
@@ -266,7 +266,7 @@ const SEOMetaManager = () => {
                         value={formData.page}
                         onChange={handleInputChange}
                         className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                        style={{ 
+                        style={{
                           borderColor: colors.secondary,
                           focusRing: colors.accent,
                           color: '#000000',
@@ -276,7 +276,7 @@ const SEOMetaManager = () => {
                         placeholder="e.g., home, about, contact"
                       />
                     </div>
-                    
+
                     <div>
                       <label htmlFor="metaTitle" className="block text-sm font-medium mb-2" style={{ color: colors.dark }}>
                         Meta Title
@@ -288,7 +288,7 @@ const SEOMetaManager = () => {
                         value={formData.metaTitle}
                         onChange={handleInputChange}
                         className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                        style={{ 
+                        style={{
                           borderColor: colors.secondary,
                           focusRing: colors.accent,
                           color: '#000000',
@@ -300,7 +300,7 @@ const SEOMetaManager = () => {
                         Recommended: 50-60 characters ({formData.metaTitle?.length || 0}/60)
                       </p>
                     </div>
-                    
+
                     <div>
                       <label htmlFor="metaDescription" className="block text-sm font-medium mb-2" style={{ color: colors.dark }}>
                         Meta Description
@@ -312,7 +312,7 @@ const SEOMetaManager = () => {
                         value={formData.metaDescription}
                         onChange={handleInputChange}
                         className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                        style={{ 
+                        style={{
                           borderColor: colors.secondary,
                           focusRing: colors.accent,
                           color: '#000000',
@@ -324,7 +324,7 @@ const SEOMetaManager = () => {
                         Recommended: 150-160 characters ({formData.metaDescription?.length || 0}/160)
                       </p>
                     </div>
-                    
+
                     <div>
                       <label htmlFor="metaKeywords" className="block text-sm font-medium mb-2" style={{ color: colors.dark }}>
                         Meta Keywords
@@ -336,7 +336,7 @@ const SEOMetaManager = () => {
                         value={formData.metaKeywords}
                         onChange={handleInputChange}
                         className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                        style={{ 
+                        style={{
                           borderColor: colors.secondary,
                           focusRing: colors.accent,
                           color: '#000000',
@@ -347,7 +347,7 @@ const SEOMetaManager = () => {
                         Example: real estate, property
                       </p>
                     </div>
-                    
+
                     <div>
                       <label htmlFor="canonicalUrl" className="block text-sm font-medium mb-2" style={{ color: colors.dark }}>
                         Canonical URL
@@ -359,7 +359,7 @@ const SEOMetaManager = () => {
                         value={formData.canonicalUrl}
                         onChange={handleInputChange}
                         className="w-full px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                        style={{ 
+                        style={{
                           borderColor: colors.secondary,
                           focusRing: colors.accent,
                           color: '#000000',
@@ -400,7 +400,7 @@ const SEOMetaManager = () => {
                         type="button"
                         onClick={() => setIsEditing(false)}
                         className="px-4 py-2 rounded-md shadow-sm text-sm font-medium transition-all duration-200"
-                        style={{ 
+                        style={{
                           backgroundColor: 'white',
                           color: colors.primary,
                           border: `1px solid ${colors.primary}`,
@@ -414,14 +414,14 @@ const SEOMetaManager = () => {
                       type="submit"
                       disabled={loading}
                       className="px-6 py-2 rounded-md shadow-sm text-sm font-medium text-white transition-all duration-200 hover:shadow-md flex items-center"
-                      style={{ 
+                      style={{
                         backgroundColor: loading ? colors.secondary : colors.primary,
                         opacity: loading ? 0.7 : 1,
                         cursor: loading ? 'not-allowed' : 'pointer'
                       }}
                     >
                       {loading && (
-                        <div 
+                        <div
                           className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"
                         ></div>
                       )}
@@ -431,11 +431,11 @@ const SEOMetaManager = () => {
                 </form>
               </div>
             ) : (
-              <div 
+              <div
                 className="rounded-xl shadow-md overflow-hidden border border-gray-200"
                 style={{ backgroundColor: 'white' }}
               >
-                <div 
+                <div
                   className="p-5 border-b border-gray-200 flex justify-between items-center"
                   style={{ backgroundColor: colors.primary }}
                 >
@@ -461,31 +461,31 @@ const SEOMetaManager = () => {
                   </div>
                 </div>
                 <div className="p-6 space-y-5">
-                  <DetailItem 
-                    label="Meta Title" 
-                    value={currentPage.metaTitle} 
+                  <DetailItem
+                    label="Meta Title"
+                    value={currentPage.metaTitle}
                     color={colors.dark}
                   />
-                  <DetailItem 
-                    label="Meta Description" 
-                    value={currentPage.metaDescription} 
+                  <DetailItem
+                    label="Meta Description"
+                    value={currentPage.metaDescription}
                     color={colors.dark}
                   />
-                  <DetailItem 
-                    label="Meta Keywords" 
-                    value={currentPage.metaKeywords} 
+                  <DetailItem
+                    label="Meta Keywords"
+                    value={currentPage.metaKeywords}
                     color={colors.dark}
                   />
-                  <DetailItem 
-                    label="Canonical URL" 
-                    value={currentPage.canonicalUrl} 
+                  <DetailItem
+                    label="Canonical URL"
+                    value={currentPage.canonicalUrl}
                     color={colors.dark}
                     isUrl={true}
                   />
                   <div className="pt-4 border-t border-gray-200">
-                    <DetailItem 
-                      label="Last Updated" 
-                      value={new Date(currentPage.updatedAt).toLocaleString()} 
+                    <DetailItem
+                      label="Last Updated"
+                      value={new Date(currentPage.updatedAt).toLocaleString()}
                       color={colors.dark}
                     />
                   </div>
@@ -506,9 +506,9 @@ const DetailItem = ({ label, value, color, isUrl = false }) => (
       {label}
     </h3>
     {isUrl ? (
-      <a 
-        href={value} 
-        target="_blank" 
+      <a
+        href={value}
+        target="_blank"
         rel="noopener noreferrer"
         className="break-all block"
         style={{ color: '#5B9CBD' }}

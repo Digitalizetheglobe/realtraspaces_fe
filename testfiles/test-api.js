@@ -1,5 +1,5 @@
 // Simple test script to check API endpoint accessibility
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 
 async function testApiEndpoint() {
   const endpoints = [
@@ -18,7 +18,7 @@ async function testApiEndpoint() {
       console.log(`Testing: ${endpoint}`);
       const response = await fetch(endpoint);
       console.log(`Status: ${response.status} ${response.statusText}`);
-      
+
       if (response.ok) {
         const data = await response.json();
         console.log('Response:', JSON.stringify(data, null, 2));

@@ -6,7 +6,7 @@ const COOKIE_KEY = "cookiesAccepted";
 const SESSION_ID_KEY = "cookieSessionId";
 
 // Get API base URL from environment or default to localhost
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.realtraspaces.com";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface CookieResponse {
   status: string;
@@ -51,13 +51,13 @@ const CookiesBanner: React.FC = () => {
       // Check with the API using consistent session ID
       const sessionId = getSessionId();
       const response = await fetch(`${API_BASE_URL}/api/cookie-policy/check?sessionId=${sessionId}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const result: CookieResponse = await response.json();
-      
+
       if (result.status === 'success' && result.data?.accepted) {
         setVisible(false);
         localStorage.setItem(COOKIE_KEY, "true");
@@ -88,11 +88,11 @@ const CookiesBanner: React.FC = () => {
           policyVersion: '1.0'
         })
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const result: CookieResponse = await response.json();
       if (result.status === 'success') {
         setVisible(false);
@@ -117,7 +117,7 @@ const CookiesBanner: React.FC = () => {
   if (!visible) return null;
 
   return (
-    <div 
+    <div
       role="banner"
       aria-label="Cookie consent banner"
       style={{
@@ -137,8 +137,8 @@ const CookiesBanner: React.FC = () => {
     >
       <span style={{ marginRight: "1rem", fontSize: "14px" }}>
         We use cookies to improve your experience. Read our {" "}
-        <a 
-          href="/privacy-policy" 
+        <a
+          href="/privacy-policy"
           style={{ color: "#4fd1c5", textDecoration: "underline" }}
           aria-label="Read our cookies policy"
         >

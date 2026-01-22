@@ -55,22 +55,22 @@ export default function TestimonialPage() {
 
   // Use fallback testimonials if API failed or returned no data
   const displayTestimonials = testimonials.length > 0 ? testimonials : fallbackTestimonials;
-  
+
   // Fetch testimonials from API
   useEffect(() => {
     const fetchTestimonials = async () => {
       try {
         setLoading(true);
         setError(null); // Reset error state
-        
-        const response = await fetch('https://api.realtraspaces.com/api/testimonials');
-        
+
+        const response = await fetch('http://localhost:8000/api/testimonials');
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const result = await response.json();
-        
+
         if (result.status === 'success' && result.data && Array.isArray(result.data)) {
           setTestimonials(result.data);
         } else {
@@ -102,7 +102,7 @@ export default function TestimonialPage() {
   // Default avatar for testimonials without images
   const getDefaultAvatar = (name: string) => {
     const colors = [
-      'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500', 
+      'bg-blue-500', 'bg-green-500', 'bg-yellow-500', 'bg-red-500',
       'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-teal-500'
     ];
     const colorIndex = name.charCodeAt(0) % colors.length;
@@ -156,7 +156,7 @@ export default function TestimonialPage() {
                         className={`bg-white p-6 rounded-md shadow-sm flex-none ${
                           // Make cards a fixed width to ensure consistent overflow
                           offset < 2 ? "w-full md:w-4/12" : "w-full md:w-4/12"
-                        }`}
+                          }`}
                       >
                         <Image
                           src={smallquotation}

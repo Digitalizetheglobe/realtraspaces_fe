@@ -1,13 +1,13 @@
 import { Blog, CreateBlogRequest, UpdateBlogRequest, BlogApiResponse, BlogFilters } from '@/types/blog';
 
-const API_BASE_URL = 'https://api.realtraspaces.com/api/blogs';
+const API_BASE_URL = 'http://localhost:8000/api/blogs';
 
 class BlogService {
   // Get all blogs
   static async getAllBlogs(filters?: BlogFilters): Promise<Blog[]> {
     try {
       const queryParams = new URLSearchParams();
-      
+
       if (filters) {
         Object.entries(filters).forEach(([key, value]) => {
           if (value !== undefined && value !== null && value !== '') {
@@ -22,17 +22,17 @@ class BlogService {
 
       const url = queryParams.toString() ? `${API_BASE_URL}?${queryParams.toString()}` : API_BASE_URL;
       const response = await fetch(url);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data: BlogApiResponse = await response.json();
-      
+
       if (data.status === 'error') {
         throw new Error(data.message || 'Failed to fetch blogs');
       }
-      
+
       if (!data.data) {
         throw new Error('No data received from API');
       }
@@ -47,17 +47,17 @@ class BlogService {
   static async getBlogById(id: number): Promise<Blog> {
     try {
       const response = await fetch(`${API_BASE_URL}/${id}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data: BlogApiResponse = await response.json();
-      
+
       if (data.status === 'error') {
         throw new Error(data.message || 'Blog not found');
       }
-      
+
       return data.data as Blog;
     } catch (error) {
       console.error('Error fetching blog:', error);
@@ -69,17 +69,17 @@ class BlogService {
   static async getBlogBySlug(slug: string): Promise<Blog> {
     try {
       const response = await fetch(`${API_BASE_URL}/slug/${slug}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data: BlogApiResponse = await response.json();
-      
+
       if (data.status === 'error') {
         throw new Error(data.message || 'Blog not found');
       }
-      
+
       return data.data as Blog;
     } catch (error) {
       console.error('Error fetching blog by slug:', error);
@@ -97,17 +97,17 @@ class BlogService {
         },
         body: JSON.stringify(blogData),
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data: BlogApiResponse = await response.json();
-      
+
       if (data.status === 'error') {
         throw new Error(data.message || 'Failed to create blog');
       }
-      
+
       return data.data as Blog;
     } catch (error) {
       console.error('Error creating blog:', error);
@@ -119,7 +119,7 @@ class BlogService {
   static async updateBlog(id: number, blogData: UpdateBlogRequest, images?: File[]): Promise<Blog> {
     try {
       const formData = new FormData();
-      
+
       // Add form fields
       Object.entries(blogData).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -132,29 +132,29 @@ class BlogService {
           }
         }
       });
-      
+
       // Add images if provided
       if (images && images.length > 0) {
         images.forEach((image) => {
           formData.append('images', image);
         });
       }
-      
+
       const response = await fetch(`${API_BASE_URL}/${id}`, {
         method: 'PUT',
         body: formData,
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data: BlogApiResponse = await response.json();
-      
+
       if (data.status === 'error') {
         throw new Error(data.message || 'Failed to update blog');
       }
-      
+
       return data.data as Blog;
     } catch (error) {
       console.error('Error updating blog:', error);
@@ -168,13 +168,13 @@ class BlogService {
       const response = await fetch(`${API_BASE_URL}/${id}`, {
         method: 'DELETE',
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data: BlogApiResponse = await response.json();
-      
+
       if (data.status === 'error') {
         throw new Error(data.message || 'Failed to delete blog');
       }
@@ -190,17 +190,17 @@ class BlogService {
       const response = await fetch(`${API_BASE_URL}/${id}/like`, {
         method: 'POST',
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data: BlogApiResponse = await response.json();
-      
+
       if (data.status === 'error') {
         throw new Error(data.message || 'Failed to like blog');
       }
-      
+
       return data.data as Blog;
     } catch (error) {
       console.error('Error liking blog:', error);
@@ -214,17 +214,17 @@ class BlogService {
       const response = await fetch(`${API_BASE_URL}/${id}/bookmark`, {
         method: 'POST',
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data: BlogApiResponse = await response.json();
-      
+
       if (data.status === 'error') {
         throw new Error(data.message || 'Failed to bookmark blog');
       }
-      
+
       return data.data as Blog;
     } catch (error) {
       console.error('Error bookmarking blog:', error);
@@ -242,13 +242,13 @@ class BlogService {
         },
         body: JSON.stringify(schema),
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data: BlogApiResponse = await response.json();
-      
+
       if (data.status === 'error') {
         throw new Error(data.message || 'Failed to update field schema');
       }
@@ -261,12 +261,12 @@ class BlogService {
   // Helper method to format image URL
   static getImageUrl(imagePath: string): string {
     if (!imagePath) return '';
-    
+
     // If it's already a full URL, return as is
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
-    
+
     // Otherwise, prepend the API base URL
     return `${API_BASE_URL.replace('/api/blogs', '')}/${imagePath}`;
   }
@@ -274,27 +274,27 @@ class BlogService {
   // Helper method to validate blog data
   static validateBlogData(data: Partial<Blog>): string[] {
     const errors: string[] = [];
-    
+
     if (!data.blogTitle?.trim()) {
       errors.push('Blog title is required');
     }
-    
+
     if (!data.blogDescription?.trim()) {
       errors.push('Blog description is required');
     }
-    
+
     if (!data.blogContent?.trim()) {
       errors.push('Blog content is required');
     }
-    
+
     if (!data.writer?.trim()) {
       errors.push('Writer is required');
     }
-    
+
     if (!data.category?.trim()) {
       errors.push('Category is required');
     }
-    
+
     return errors;
   }
 }

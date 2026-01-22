@@ -144,7 +144,7 @@ export default function PropertyDetails() {
   // Helper function to get the best image URL for a property
   const getPropertyImage = (property: Property | null): string => {
     if (!property) return propertydetails.src;
-    
+
     // First check imageUrls.images (new structure)
     if (property.imageUrls?.images && property.imageUrls.images.length > 0) {
       // First try to find a cover image
@@ -160,7 +160,7 @@ export default function PropertyDetails() {
         return firstImage.imageFilePath;
       }
     }
-    
+
     // Fallback to property.images (old structure for backward compatibility)
     if (property.images && property.images.length > 0) {
       // First try to find a cover image
@@ -180,26 +180,26 @@ export default function PropertyDetails() {
   // Helper function to extract title from complex slug
   const extractTitleFromSlug = (slug: string): string => {
     console.log("Original slug:", slug);
-    
+
     // For the specific case: "office-space-dipti-classic-a-wing-rent-furnished"
     // We want to extract: "dipti-classic-a-wing"
-    
+
     const parts = slug.split('-');
-    
+
     // Look for the pattern: [prefix]-[title]-[suffix1]-[suffix2]
     // Remove common prefixes and suffixes
-    
+
     // Remove common prefixes
     const prefixes = ['office-space', 'commercial', 'residential', 'apartment', 'villa'];
     let startIndex = 0;
     if (prefixes.includes(parts[0])) {
       startIndex = 1;
     }
-    
+
     // Remove common suffixes from the end
     const suffixes = ['rent', 'sale', 'lease', 'furnished', 'semi-furnished', 'unfurnished'];
     let endIndex = parts.length;
-    
+
     // Check last 2-3 parts for suffixes
     for (let i = parts.length - 1; i >= Math.max(startIndex, parts.length - 3); i--) {
       if (suffixes.includes(parts[i])) {
@@ -207,14 +207,14 @@ export default function PropertyDetails() {
         break;
       }
     }
-    
+
     const titleParts = parts.slice(startIndex, endIndex);
     const extractedTitle = titleParts.join('-');
-    
+
     console.log("Extracted title:", extractedTitle);
     console.log("Parts:", parts);
     console.log("Start index:", startIndex, "End index:", endIndex);
-    
+
     return extractedTitle;
   };
 
@@ -231,7 +231,7 @@ export default function PropertyDetails() {
         // Extract the actual title from the complex slug
         const actualTitle = extractTitleFromSlug(propertyTitle);
         const decodedTitle = decodeURIComponent(actualTitle).replace(/-/g, " ");
-        
+
         console.log("API will be called with title:", decodedTitle);
 
         const response = await fetch(
@@ -249,14 +249,14 @@ export default function PropertyDetails() {
 
         const data = await response.json();
         console.log("API response:", data);
-        
+
         const properties = Array.isArray(data)
           ? data
           : data.items || data.data || [];
 
         if (properties.length > 0) {
           setProperty(properties[0]);
-          
+
           // Reset failed and loading images for new property
           setFailedImages(new Set());
           setLoadingImages(new Set());
@@ -291,7 +291,7 @@ export default function PropertyDetails() {
             // Use the helper function to get the best image
             const bestImage = getPropertyImage(properties[0]);
             setMainImage(bestImage);
-            
+
             // Set loading state for the new main image if it's a string URL
             if (bestImage !== propertydetails.src) {
               setLoadingImages(prev => new Set(prev).add(bestImage));
@@ -334,12 +334,12 @@ export default function PropertyDetails() {
   const handleMainImagePrev = () => {
     const allImages = imageUrls.length > 0 ? imageUrls : thumbnails;
     if (allImages.length === 0) return;
-    
-    let currentIndex = allImages.findIndex(img => 
+
+    let currentIndex = allImages.findIndex(img =>
       (typeof img === "string" && typeof mainImage === "string" && img === mainImage) ||
       (typeof img !== "string" && typeof mainImage !== "string" && mainImage === img)
     );
-    
+
     if (currentIndex === -1) {
       // If mainImage is not found in the array, start from the end
       currentIndex = allImages.length - 1;
@@ -350,19 +350,19 @@ export default function PropertyDetails() {
       // Go to previous image
       currentIndex = currentIndex - 1;
     }
-    
+
     setMainImage(allImages[currentIndex]);
   };
 
   const handleMainImageNext = () => {
     const allImages = imageUrls.length > 0 ? imageUrls : thumbnails;
     if (allImages.length === 0) return;
-    
-    let currentIndex = allImages.findIndex(img => 
+
+    let currentIndex = allImages.findIndex(img =>
       (typeof img === "string" && typeof mainImage === "string" && img === mainImage) ||
       (typeof img !== "string" && typeof mainImage !== "string" && mainImage === img)
     );
-    
+
     if (currentIndex === -1) {
       // If mainImage is not found in the array, start from the beginning
       currentIndex = 0;
@@ -373,7 +373,7 @@ export default function PropertyDetails() {
       // Go to next image
       currentIndex = currentIndex + 1;
     }
-    
+
     setMainImage(allImages[currentIndex]);
   };
 
@@ -381,14 +381,14 @@ export default function PropertyDetails() {
   const handlePrev = () => {
     const totalImages = imageUrls.length > 0 ? imageUrls.length : thumbnails.length;
     let newStartIndex;
-    
+
     if (startIndex === 0) {
       // If at the beginning, wrap to the end
       newStartIndex = Math.max(0, totalImages - visibleCount);
     } else {
       newStartIndex = startIndex - 1;
     }
-    
+
     setStartIndex(newStartIndex);
     // Update mainImage to the new first visible image
     const newVisibleImages =
@@ -402,14 +402,14 @@ export default function PropertyDetails() {
   const handleNext = () => {
     const totalImages = imageUrls.length > 0 ? imageUrls.length : thumbnails.length;
     let newStartIndex;
-    
+
     if (startIndex + visibleCount >= totalImages) {
       // If at the end, wrap to the beginning
       newStartIndex = 0;
     } else {
       newStartIndex = startIndex + 1;
     }
-    
+
     setStartIndex(newStartIndex);
     // Update mainImage to the new first visible image
     const newVisibleImages =
@@ -504,7 +504,7 @@ export default function PropertyDetails() {
       setIsSaving(true);
 
       const response = await fetch(
-        "https://api.realtraspaces.com/api/webusers/save-property",
+        "http://localhost:8000/api/webusers/save-property",
         {
           method: "POST",
           headers: {
@@ -566,22 +566,22 @@ export default function PropertyDetails() {
   const handleCompareClick = async () => {
     // Check if user is logged in
     const token = localStorage.getItem("authToken");
-    
+
     if (!token) {
       toast.error("Please log in to compare properties");
       router.push("/signin");
       return;
     }
-  
+
     if (!property) {
       toast.error("Property information is not available");
       return;
     }
-  
+
     try {
       setIsComparing(true);
-      
-      const response = await fetch("https://api.realtraspaces.com/api/webusers/compare/add", {
+
+      const response = await fetch("http://localhost:8000/api/webusers/compare/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -592,23 +592,23 @@ export default function PropertyDetails() {
           propertyData: property
         })
       });
-  
+
       if (response.status === 401 || response.status === 403) {
         toast.error("You Are Not Login");
         router.push("/signin");
         return;
       }
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to add property to comparison");
       }
-  
+
       toast.success("Property added to comparison");
-      
+
       // Optionally navigate to compare page
       router.push("/compareproperties");
-      
+
     } catch (error) {
       console.error("Error adding to compare:", error);
       toast.error(error instanceof Error ? error.message : "Failed to add to comparison");
@@ -876,7 +876,7 @@ export default function PropertyDetails() {
             </button>
 
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                Schedule a Visit
+              Schedule a Visit
             </h2>
             <p className="text-gray-600 mb-6">
               Please fill out the form below and we'll get back to you soon.
@@ -1012,10 +1012,10 @@ export default function PropertyDetails() {
               </div>
 
               <div className="text-sm text-gray-700">
-   Schedule a Visit for - <span className="font-medium text-black">{property?.title}</span>
-</div>
+                Schedule a Visit for - <span className="font-medium text-black">{property?.title}</span>
+              </div>
 
-                
+
               <div className="mt-6">
                 <button
                   type="submit"
@@ -1068,18 +1068,16 @@ export default function PropertyDetails() {
           <div className="flex flex-col md:flex-row gap-8">
             {/* Left Side - Image Gallery */}
             <div
-              className={`max-w-5xl mx-auto p-4 ${
-                isSticky ? "sticky top-4 self-start" : ""
-              }`}
+              className={`max-w-5xl mx-auto p-4 ${isSticky ? "sticky top-4 self-start" : ""
+                }`}
             >
               {/* Main Image */}
               <div className="mb-4 rounded-lg overflow-hidden shadow-lg border border-gray-200 relative">
                 {/* Previous Button */}
                 <button
                   onClick={handleMainImagePrev}
-                  className={`absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 ${
-                    isFirstImageActive ? "ring-2 ring-blue-500" : ""
-                  }`}
+                  className={`absolute left-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 ${isFirstImageActive ? "ring-2 ring-blue-500" : ""
+                    }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1147,9 +1145,8 @@ export default function PropertyDetails() {
                 {/* Next Button */}
                 <button
                   onClick={handleMainImageNext}
-                  className={`absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 ${
-                    isLastImageActive ? "ring-2 ring-blue-500" : ""
-                  }`}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 z-10 p-2 rounded-full bg-white shadow-md hover:bg-gray-100 ${isLastImageActive ? "ring-2 ring-blue-500" : ""
+                    }`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -1170,7 +1167,7 @@ export default function PropertyDetails() {
 
               {/* Thumbnails with arrows */}
               <div className="flex items-center justify-center gap-2">
-               
+
 
                 <div className="flex gap-3 overflow-hidden">
                   {visibleImages.map((img, index) => {
@@ -1181,9 +1178,8 @@ export default function PropertyDetails() {
                     return (
                       <div
                         key={index}
-                        className={`cursor-pointer rounded-md overflow-hidden border-2 transition ${
-                          isActive ? "border-blue-500" : "border-transparent"
-                        }`}
+                        className={`cursor-pointer rounded-md overflow-hidden border-2 transition ${isActive ? "border-blue-500" : "border-transparent"
+                          }`}
                         onClick={() => handleThumbnailClick(img)}
                       >
                         {typeof img === "string" ? (
@@ -1235,8 +1231,8 @@ export default function PropertyDetails() {
                     );
                   })}
                 </div>
-                  
-               
+
+
               </div>
               <div className="mt-4">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">
@@ -1255,13 +1251,13 @@ export default function PropertyDetails() {
                     ) : (
                       <>
                         <p className="text-gray-700 leading-relaxed">
-                          This property offers excellent investment and living opportunities with prime location benefits. 
-                          Featuring modern amenities and strategic connectivity, it's perfect for those seeking quality 
+                          This property offers excellent investment and living opportunities with prime location benefits.
+                          Featuring modern amenities and strategic connectivity, it's perfect for those seeking quality
                           real estate in a well-connected area.
                         </p>
                         <p className="text-gray-700 leading-relaxed">
-                          The property is designed to meet contemporary living standards with thoughtful planning and 
-                          attention to detail. Contact us for detailed information about this exceptional property 
+                          The property is designed to meet contemporary living standards with thoughtful planning and
+                          attention to detail. Contact us for detailed information about this exceptional property
                           and schedule a visit to experience it firsthand.
                         </p>
                       </>
@@ -1273,17 +1269,15 @@ export default function PropertyDetails() {
 
             {/* Right Side - Property Details */}
             <div
-              className={`${
-                isSticky ? " sticky w-full md:w-1/2 font-sans" : ""
-              }`}
+              className={`${isSticky ? " sticky w-full md:w-1/2 font-sans" : ""
+                }`}
             >
               {/* Sticky Header Section */}
               <div
-                className={`${
-                  isSticky
-                    ? "sticky top-0 bg-white z-10 pb-4 pt-4 border-b border-gray-200"
-                    : ""
-                }`}
+                className={`${isSticky
+                  ? "sticky top-0 bg-white z-10 pb-4 pt-4 border-b border-gray-200"
+                  : ""
+                  }`}
               >
                 <h1 className="text-xl font-semibold text-black">
                   {isLoggedIn ? (property.title || "Property") : "Property Details"}
@@ -1326,74 +1320,73 @@ export default function PropertyDetails() {
                       {new Date(property.possessionDate) <= new Date()
                         ? "Immediate Possession"
                         : `Possession on ${formatDate(
-                            property.possessionDate
-                          )}`}
+                          property.possessionDate
+                        )}`}
                     </span>
                   )}
                 </div>
 
                 {/* Buttons */}
-              <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-  {/* Enquire Now */}
-  <button
-    onClick={handleEnquireClick}
-    className="w-full cursor-pointer border border-black text-black text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-100 transition"
-  >
-    Enquire Now
-  </button>
+                <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Enquire Now */}
+                  <button
+                    onClick={handleEnquireClick}
+                    className="w-full cursor-pointer border border-black text-black text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-100 transition"
+                  >
+                    Enquire Now
+                  </button>
 
-  {/* Schedule a Visit */}
-  <button
-    className="w-full bg-black cursor-pointer text-white text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-800 transition"
-    onClick={handleScheduleClick}
-  >
-    Schedule a Visit
-  </button>
+                  {/* Schedule a Visit */}
+                  <button
+                    className="w-full bg-black cursor-pointer text-white text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-800 transition"
+                    onClick={handleScheduleClick}
+                  >
+                    Schedule a Visit
+                  </button>
 
-  {/* Save Property */}
-  <button
-    className={`w-full flex items-center cursor-pointer justify-center gap-2 border border-black text-black text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-100 transition ${
-      isSaving ? "opacity-70 cursor-not-allowed" : ""
-    }`}
-    onClick={handleSaveProperty}
-    disabled={isSaving}
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-5 w-5"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-      />
-    </svg>
-    {isSaving ? "Saving..." : "Save Property"}
-  </button>
+                  {/* Save Property */}
+                  <button
+                    className={`w-full flex items-center cursor-pointer justify-center gap-2 border border-black text-black text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-100 transition ${isSaving ? "opacity-70 cursor-not-allowed" : ""
+                      }`}
+                    onClick={handleSaveProperty}
+                    disabled={isSaving}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                      />
+                    </svg>
+                    {isSaving ? "Saving..." : "Save Property"}
+                  </button>
 
-  {/* Compare */}
-  <button
-    onClick={handleCompareClick}
-    disabled={isComparing}
-    className="w-full flex items-center cursor-pointer justify-center gap-2 border border-black text-black text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-100 transition"
-  >
-    {isComparing ? (
-      <>
-        <div className="h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-        Adding...
-      </>
-    ) : (
-      <>
-        <GitCompare className="h-5 w-5" />
-        Compare
-      </>
-    )}
-  </button>
-</div>
+                  {/* Compare */}
+                  <button
+                    onClick={handleCompareClick}
+                    disabled={isComparing}
+                    className="w-full flex items-center cursor-pointer justify-center gap-2 border border-black text-black text-sm font-medium py-2 px-6 rounded-lg hover:bg-gray-100 transition"
+                  >
+                    {isComparing ? (
+                      <>
+                        <div className="h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        Adding...
+                      </>
+                    ) : (
+                      <>
+                        <GitCompare className="h-5 w-5" />
+                        Compare
+                      </>
+                    )}
+                  </button>
+                </div>
 
               </div>
 
@@ -1500,7 +1493,7 @@ export default function PropertyDetails() {
                       </p>
                       <p className="font-medium text-[11px] text-gray-800">
                         {property.dimension?.length &&
-                        property.dimension?.breadth
+                          property.dimension?.breadth
                           ? `${property.dimension.length} x ${property.dimension.breadth}`
                           : "N/A"}
                       </p>
@@ -1519,12 +1512,12 @@ export default function PropertyDetails() {
                       <p className="text-[13px] text-gray-500">Efficiency</p>
                       <p className="font-medium text-[11px] text-gray-800">
                         {property.dimension?.carpetArea &&
-                        property.dimension?.area
+                          property.dimension?.area
                           ? `${Math.round(
-                              (Number(property.dimension.carpetArea) /
-                                Number(property.dimension.area)) *
-                                100
-                            )}%`
+                            (Number(property.dimension.carpetArea) /
+                              Number(property.dimension.area)) *
+                            100
+                          )}%`
                           : "N/A"}
                       </p>
                     </div>
@@ -1543,7 +1536,7 @@ export default function PropertyDetails() {
                       <p className="font-medium text-[11px] text-gray-800">
                         {formatPrice(
                           property.monetaryInfo?.expectedPrice ||
-                            property.monetaryInfo?.monthlyRentAmount,
+                          property.monetaryInfo?.monthlyRentAmount,
                           property.enquiredFor
                         )}
                       </p>
@@ -1876,7 +1869,7 @@ export default function PropertyDetails() {
                 </div>
               </div>
 
-             
+
 
               <div className="max-w-5xl mx-auto mt-10">
                 <h1 className="text-black text-xl font-semibold">
@@ -1920,9 +1913,9 @@ export default function PropertyDetails() {
           </div>
         </div>
       </main>
-       <Similarproperties />
-      
-     {/* ,snbkjdashdkjhsadkjsakdjaspod
+      <Similarproperties />
+
+      {/* ,snbkjdashdkjhsadkjsakdjaspod
      ,xmcnkdjkodn
      d;jaoidjsaoidja */}
     </div>

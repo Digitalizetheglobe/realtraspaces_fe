@@ -42,8 +42,8 @@ const BlogPage = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        //https://api.realtraspaces.com
-        const response = await fetch(`https://api.realtraspaces.com/api/blogs/`);
+        //http://localhost:8000
+        const response = await fetch(`http://localhost:8000/api/blogs/`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -71,8 +71,7 @@ const BlogPage = () => {
         setBlogs(blogsArray);
       } catch (error) {
         setError(
-          `Failed to load blogs: ${
-            error instanceof Error ? error.message : "Unknown error"
+          `Failed to load blogs: ${error instanceof Error ? error.message : "Unknown error"
           }`
         );
       } finally {
@@ -84,14 +83,14 @@ const BlogPage = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`https://api.realtraspaces.com/api/blogs/${id}`, {
+      const response = await fetch(`http://localhost:8000/api/blogs/${id}`, {
         method: 'DELETE',
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to delete blog');
       }
-  
+
       router.push('/blog');
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred');
@@ -101,7 +100,7 @@ const BlogPage = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div 
+        <div
           className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
           style={{ borderColor: colors.primary }}
         ></div>
@@ -115,10 +114,10 @@ const BlogPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold" style={{ color: colors.dark }}>Blog Posts</h1>
-            <Link 
-              href="/blog/create" 
+            <Link
+              href="/blog/create"
               className="flex items-center px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all"
-              style={{ 
+              style={{
                 backgroundColor: colors.primary,
                 color: 'white'
               }}
@@ -141,10 +140,10 @@ const BlogPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold" style={{ color: colors.dark }}>Blog Posts</h1>
-            <Link 
-              href="/blog/create" 
+            <Link
+              href="/blog/create"
               className="flex items-center px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all"
-              style={{ 
+              style={{
                 backgroundColor: colors.primary,
                 color: 'white'
               }}
@@ -160,7 +159,7 @@ const BlogPage = () => {
             <Link
               href="/blog/create"
               className="inline-flex items-center px-6 py-3 rounded-lg text-white hover:shadow-md transition-all"
-              style={{ 
+              style={{
                 backgroundColor: colors.primary
               }}
             >
@@ -183,10 +182,10 @@ const BlogPage = () => {
               <h1 className="text-3xl font-bold" style={{ color: colors.dark }}>Blog Posts</h1>
               <p className="text-gray-600 mt-2">Discover the latest insights and trends in real estate</p>
             </div>
-            <Link 
-              href="/blog/create" 
+            <Link
+              href="/blog/create"
               className="flex items-center px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all"
-              style={{ 
+              style={{
                 background: `linear-gradient(135deg, ${colors.gradientStart} 0%, ${colors.gradientEnd} 100%)`,
                 color: 'white'
               }}
@@ -262,14 +261,14 @@ const BlogPage = () => {
                     </div>
                   )}
                 </div>
-                
+
                 {/* Blog Content */}
                 <div className="p-6 h-full flex flex-col min-h-[300px]">
                   {/* Category and Author */}
                   <div className="flex items-center justify-between mb-4">
-                    <span 
+                    <span
                       className="px-3 py-1 rounded-full text-xs font-medium uppercase tracking-wider"
-                      style={{ 
+                      style={{
                         backgroundColor: colors.light,
                         color: colors.primary
                       }}
@@ -284,7 +283,7 @@ const BlogPage = () => {
                     <h2 className="text-xl font-bold mb-3 group-hover:text-blue-600 transition-colors" style={{ color: colors.dark }}>
                       {blog.blogTitle}
                     </h2>
-                    <p className="text-gray-600 mb-4 overflow-hidden" style={{ 
+                    <p className="text-gray-600 mb-4 overflow-hidden" style={{
                       display: '-webkit-box',
                       WebkitLineClamp: 3,
                       WebkitBoxOrient: 'vertical'

@@ -44,7 +44,7 @@ const DevelopersPage = () => {
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/developers`);
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
@@ -59,8 +59,7 @@ const DevelopersPage = () => {
         setDevelopers(data.data || []);
       } catch (error) {
         setError(
-          `Failed to load developers: ${
-            error instanceof Error ? error.message : "Unknown error"
+          `Failed to load developers: ${error instanceof Error ? error.message : "Unknown error"
           }`
         );
       } finally {
@@ -76,14 +75,14 @@ const DevelopersPage = () => {
       ?.toLowerCase()
       .includes(searchTerm.toLowerCase()) ||
       (developer.descriptions?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-      (developer.project_name || []).some(project => 
+      (developer.project_name || []).some(project =>
         project?.toLowerCase().includes(searchTerm.toLowerCase())
       );
-    
-    const matchesStatus = filterStatus === "all" || 
+
+    const matchesStatus = filterStatus === "all" ||
       (filterStatus === "active" && developer.status) ||
       (filterStatus === "inactive" && !developer.status);
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -125,7 +124,7 @@ const DevelopersPage = () => {
     return (
       <div className="min-h-screen" style={{ backgroundColor: colors.light }}>
         {/* Hero Section Skeleton */}
-        <div 
+        <div
           className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden"
           style={{
             backgroundImage: `url('/assets/hero.jpg')`,
@@ -196,23 +195,23 @@ const DevelopersPage = () => {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.light }}>
-             {/* Hero Section */}
-       <div 
-         className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden"
-         style={{
-           backgroundImage: `url('/assets/hero.jpg')`,
-           backgroundSize: 'cover',
-           backgroundPosition: 'center',
-           backgroundRepeat: 'no-repeat'
-         }}
-       >
-         <div className="absolute inset-0 bg-black opacity-50"></div>
+      {/* Hero Section */}
+      <div
+        className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden"
+        style={{
+          backgroundImage: `url('/assets/hero.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="relative max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
             Top Real Estate Developers
           </h1>
           <p className="text-xl text-white/90 mb-8 max-w-3xl mx-auto">
-            Discover the most trusted and innovative real estate developers in the market. 
+            Discover the most trusted and innovative real estate developers in the market.
             Explore their projects and find your perfect investment opportunity.
           </p>
           {/* <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -274,7 +273,7 @@ const DevelopersPage = () => {
                 No developers found
               </h3>
               <p className="text-gray-600">
-                {searchTerm || filterStatus !== "all" 
+                {searchTerm || filterStatus !== "all"
                   ? "Try adjusting your search or filter criteria."
                   : "No developers are currently available."
                 }
@@ -305,10 +304,10 @@ const DevelopersPage = () => {
                         img.src = '/assets/signin.jpeg';
                       }}
                     />
-                    
+
                     {/* Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
-                    
+
                     {/* View Details Icon */}
                     <div className="absolute top-4 right-4">
                       <div className="bg-white/20 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-all duration-300">
@@ -322,27 +321,26 @@ const DevelopersPage = () => {
                     <h3 className="text-2xl font-bold mb-3 text-gray-800 group-hover:text-blue-600 transition-colors">
                       {developer.buildername}
                     </h3>
-                    
+
                     <p className="text-gray-600 text-sm line-clamp-3 mb-4 leading-relaxed">
                       {developer.descriptions || 'No description available'}
                     </p>
-                    
+
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center text-sm text-gray-500">
                         <FiHome className="mr-2 text-blue-500" />
                         <span className="font-medium">{(developer.project_name || []).length} Projects</span>
                       </div>
                       <div className="flex items-center">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          developer.status 
-                            ? "bg-green-100 text-green-700" 
-                            : "bg-gray-100 text-gray-700"
-                        }`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${developer.status
+                          ? "bg-green-100 text-green-700"
+                          : "bg-gray-100 text-gray-700"
+                          }`}>
                           {developer.status ? "Active" : "Inactive"}
                         </span>
                       </div>
                     </div>
-                    
+
                     <div className="text-center">
                       <span className="text-sm text-gray-400 group-hover:text-blue-500 transition-colors">
                         Click to view details
@@ -360,11 +358,11 @@ const DevelopersPage = () => {
       {isModalOpen && selectedDeveloper && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fadeIn"
             onClick={closeModal}
           ></div>
-          
+
           {/* Modal Content */}
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scaleIn">
             {/* Modal Header */}
@@ -381,7 +379,7 @@ const DevelopersPage = () => {
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-              
+
               {/* Close Button */}
               <button
                 onClick={closeModal}
@@ -393,11 +391,10 @@ const DevelopersPage = () => {
               {/* Status Badge */}
               <div className="absolute top-4 left-4">
                 <span
-                  className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                    selectedDeveloper.status
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-500 text-white"
-                  }`}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold ${selectedDeveloper.status
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-500 text-white"
+                    }`}
                 >
                   {selectedDeveloper.status ? "Active" : "Inactive"}
                 </span>
@@ -414,16 +411,16 @@ const DevelopersPage = () => {
                 </div>
               </div>
               <div className="absolute bottom-4 right-4 z-10">
-              <button
-                onClick={() => {
-                  // Navigate to contact page or open contact form
-                  window.open('/contact', '_blank');
-                }}
-                className="bg-gradient-to-r from-black to-black hover:from-black/80 hover:to-black/80 text-white px-6 py-3 rounded-full font-semibold text-sm shadow-lg hover:shadow-xl transform transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
-              >
-                Inquire Now
-              </button>
-            </div>
+                <button
+                  onClick={() => {
+                    // Navigate to contact page or open contact form
+                    window.open('/contact', '_blank');
+                  }}
+                  className="bg-gradient-to-r from-black to-black hover:from-black/80 hover:to-black/80 text-white px-6 py-3 rounded-full font-semibold text-sm shadow-lg hover:shadow-xl transform transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
+                >
+                  Inquire Now
+                </button>
+              </div>
             </div>
 
             {/* Modal Body */}
@@ -458,7 +455,7 @@ const DevelopersPage = () => {
                             }}
                           />
                         </div>
-                      
+
                       </div>
                     ))}
                   </div>

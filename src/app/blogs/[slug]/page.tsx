@@ -70,17 +70,17 @@ const BlogDetail = ({ params }: PageProps) => {
         setLoading(false);
       }
     };
-    
+
     resolveParams();
   }, [params]);
 
   useEffect(() => {
     const fetchBlog = async () => {
       if (!slug) return;
-      
+
       try {
         console.log('Fetching blog for slug:', slug);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/blogs/slug/${slug}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/blogs/slug/${slug}`);
         if (!response.ok) {
           throw new Error(`Failed to fetch blog data: ${response.status}`);
         }
@@ -97,7 +97,7 @@ const BlogDetail = ({ params }: PageProps) => {
         setLoading(false);
       }
     };
-    
+
     if (slug) {
       fetchBlog();
     }
@@ -112,12 +112,12 @@ const BlogDetail = ({ params }: PageProps) => {
       day: 'numeric'
     });
   };
-  
+
   // Function to render HTML content safely
   const createMarkup = (htmlContent: string) => {
     return { __html: htmlContent };
   };
-  
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -125,7 +125,7 @@ const BlogDetail = ({ params }: PageProps) => {
       </div>
     );
   }
-  
+
   if (error || !blog) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
@@ -141,15 +141,15 @@ const BlogDetail = ({ params }: PageProps) => {
   }
 
   return (
-    <> 
+    <>
       {/* Hero Section */}
       <section id="top" className="relative ">
         <div className="absolute inset-0 z-0">
           {/* Use blog image if available, otherwise use default */}
           {blog.blogImages && blog.blogImages.length > 0 ? (
-            <Image 
+            <Image
               src={getBlogImageUrl(blog.blogImages[0])}
-              alt={blog.blogTitle} 
+              alt={blog.blogTitle}
               fill
               style={{ objectFit: "cover" }}
               priority
@@ -160,9 +160,9 @@ const BlogDetail = ({ params }: PageProps) => {
               }}
             />
           ) : (
-            <Image 
+            <Image
               src="/assets/hero.jpg"
-              alt="Default blog image" 
+              alt="Default blog image"
               fill
               style={{ objectFit: "cover" }}
               priority
@@ -170,7 +170,7 @@ const BlogDetail = ({ params }: PageProps) => {
           )}
           <div className="absolute inset-0 bg-black opacity-40"></div>
         </div>
-        
+
         {/* Hero Content */}
         <div className="relative z-10 flex items-center justify-center pt-20 pb-10 px-4">
           <div className="text-center max-w-3xl mx-auto text-white">
@@ -184,21 +184,21 @@ const BlogDetail = ({ params }: PageProps) => {
                 </span>
               )}
             </div>
-            
+
             <h2 className="text-4xl md:text-5xl font-serif leading-tight mb-6">
               Blogs
             </h2>
-{/*             
+            {/*             
             <h1 className="text-4xl md:text-5xl font-serif leading-tight mb-6" data-aos="fade-up">
               {blog.blogTitle}
             </h1> */}
-            
+
             <p className="mb-8 max-w-xl mx-auto" data-aos="fade-up" data-aos-delay="100">
               {blog.blogDescription}
             </p>
-            
+
             {/* Blog Meta Information */}
-           
+
 
             {/* Tags */}
             {/* {blog.tags && blog.tags.length > 0 && (
@@ -210,9 +210,9 @@ const BlogDetail = ({ params }: PageProps) => {
                 ))}
               </div>
             )} */}
-            
+
             {/* CTA Button */}
-          
+
           </div>
         </div>
       </section>
@@ -223,9 +223,9 @@ const BlogDetail = ({ params }: PageProps) => {
           {/* Article Header */}
           <div className="mb-8">
             <h1 className="text-4xl md:text-5xl font-serif leading-tight mb-6">
-              {blog.blogTitle} 
+              {blog.blogTitle}
             </h1>
-            
+
             <p className="text-lg text-gray-700 mb-6">
               {blog.blogDescription}
             </p>
@@ -256,9 +256,9 @@ const BlogDetail = ({ params }: PageProps) => {
           {blog.blogImages && blog.blogImages.length > 0 && (
             <div className="mb-8">
               <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden">
-                <Image 
+                <Image
                   src={getBlogImageUrl(blog.blogImages[0])}
-                  alt={blog.blogTitle} 
+                  alt={blog.blogTitle}
                   fill
                   style={{ objectFit: "cover" }}
                   priority
@@ -273,7 +273,7 @@ const BlogDetail = ({ params }: PageProps) => {
           )}
 
           {/* Blog Content */}
-          <div 
+          <div
             className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-blue-600 prose-strong:text-gray-900"
             data-aos="fade-up"
           >
@@ -286,7 +286,7 @@ const BlogDetail = ({ params }: PageProps) => {
                 </p>
               ))}
           </div>
-          
+
           {/* Additional Images */}
           {blog.blogImages && blog.blogImages.length > 1 && (
             <div className="mt-8">
@@ -294,9 +294,9 @@ const BlogDetail = ({ params }: PageProps) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {blog.blogImages.slice(1).map((image, index) => (
                   <div key={index} className="relative h-48 rounded-lg overflow-hidden">
-                    <Image 
+                    <Image
                       src={getBlogImageUrl(image)}
-                      alt={`${blog.blogTitle} - Image ${index + 2}`} 
+                      alt={`${blog.blogTitle} - Image ${index + 2}`}
                       fill
                       style={{ objectFit: "cover" }}
                       onError={(e) => {
@@ -310,7 +310,7 @@ const BlogDetail = ({ params }: PageProps) => {
               </div>
             </div>
           )}
-          
+
           {/* Tags Section */}
           {/* {blog.tags && blog.tags.length > 0 && (
             <div className="mt-12 pt-8 border-t border-gray-200">

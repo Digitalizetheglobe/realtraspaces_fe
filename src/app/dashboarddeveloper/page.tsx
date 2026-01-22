@@ -30,7 +30,7 @@ const mapApiResponseToDeveloper = (apiData: any): Developer => {
   console.log('Images array:', apiData.images);
   console.log('Image URLs array:', apiData.image_urls);
   console.log('Is images array?', Array.isArray(apiData.images));
-  
+
   const mapped = {
     id: apiData.id,
     buildername: apiData.buildername || '',
@@ -44,7 +44,7 @@ const mapApiResponseToDeveloper = (apiData: any): Developer => {
     created_at: apiData.created_at || '',
     updated_at: apiData.updated_at || ''
   };
-  
+
   console.log('Mapped result:', mapped);
   return mapped;
 };
@@ -90,7 +90,7 @@ const DevelopersPage = () => {
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/developers`);
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error("API endpoint not found. Please check if the backend server is running.");
@@ -108,7 +108,7 @@ const DevelopersPage = () => {
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         if (errorMessage.includes("Failed to fetch")) {
-          setError("Cannot connect to server. Please check if the backend server is running on https://api.realtraspaces.com");
+          setError("Cannot connect to server. Please check if the backend server is running on http://localhost:8000");
         } else {
           setError(`Failed to load developers: ${errorMessage}`);
         }
@@ -149,7 +149,7 @@ const DevelopersPage = () => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       const newPreviews = files.map(file => URL.createObjectURL(file));
-      
+
       setFormData((prev) => ({
         ...prev,
         images: [...prev.images, ...files],
@@ -177,7 +177,7 @@ const DevelopersPage = () => {
     });
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers/${developerId}/images`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/developers/${developerId}/images`, {
         method: 'POST',
         body: formData,
       });
@@ -197,7 +197,7 @@ const DevelopersPage = () => {
   // Delete image from server
   const deleteImage = async (developerId: number, imageIndex: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers/${developerId}/images/${imageIndex}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/developers/${developerId}/images/${imageIndex}`, {
         method: 'DELETE',
       });
 
@@ -269,8 +269,8 @@ const DevelopersPage = () => {
       }
 
       const url = currentDeveloper
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers/${currentDeveloper.id}`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/developers/${currentDeveloper.id}`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/developers`;
 
       const method = currentDeveloper ? "PUT" : "POST";
 
@@ -296,13 +296,13 @@ const DevelopersPage = () => {
             images: [...(result.data.images || []), ...uploadedImages],
             image_urls: [...(result.data.image_urls || []), ...uploadedImages]
           };
-          
+
           if (currentDeveloper) {
             setDevelopers((prev) =>
               prev.map((d) => (d.id === currentDeveloper.id ? updatedDeveloper : d))
             );
           } else {
-            setDevelopers((prev) => 
+            setDevelopers((prev) =>
               prev.map((d) => (d.id === result.data.id ? updatedDeveloper : d))
             );
           }
@@ -347,7 +347,7 @@ const DevelopersPage = () => {
     setIsDeleting(id);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers/${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/developers/${id}`,
         {
           method: "DELETE",
         }
@@ -396,29 +396,29 @@ const DevelopersPage = () => {
               <FiPlus className="mr-2" /> Add Developer
             </button>
           </div>
-                                  <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
-              <p className="font-medium mb-2">Error Loading Developers</p>
-              <p className="text-sm mb-3">{error}</p>
-              <div className="text-xs text-red-600 mb-4">
-                <p className="mb-1">Troubleshooting tips:</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>Make sure the backend server is running on https://api.realtraspaces.com</li>
-                  <li>Check if the API endpoint is accessible</li>
-                  <li>Verify your internet connection</li>
-                  <li>Try refreshing the page</li>
-                </ul>
-              </div>
-              <button
-                onClick={() => {
-                  setError(null);
-                  setLoading(true);
-                  window.location.reload();
-                }}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm"
-              >
-                Retry Loading
-              </button>
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
+            <p className="font-medium mb-2">Error Loading Developers</p>
+            <p className="text-sm mb-3">{error}</p>
+            <div className="text-xs text-red-600 mb-4">
+              <p className="mb-1">Troubleshooting tips:</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Make sure the backend server is running on http://localhost:8000</li>
+                <li>Check if the API endpoint is accessible</li>
+                <li>Verify your internet connection</li>
+                <li>Try refreshing the page</li>
+              </ul>
             </div>
+            <button
+              onClick={() => {
+                setError(null);
+                setLoading(true);
+                window.location.reload();
+              }}
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-sm"
+            >
+              Retry Loading
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -501,10 +501,10 @@ const DevelopersPage = () => {
                     />
                   )}
                   {/* Fallback when no logo or image fails to load */}
-                  <div 
+                  <div
                     className={`flex flex-col items-center justify-center text-gray-400 ${developer.builder_logo ? 'image-fallback' : ''}`}
-                    style={{ 
-                      display: (developer.builder_logo && !failedImages.has(developer.builder_logo)) ? 'none' : 'flex' 
+                    style={{
+                      display: (developer.builder_logo && !failedImages.has(developer.builder_logo)) ? 'none' : 'flex'
                     }}
                   >
                     <div
@@ -515,9 +515,9 @@ const DevelopersPage = () => {
                     </div>
                     <span className="mt-2 text-sm">
                       {developer.builder_logo && failedImages.has(developer.builder_logo)
-                        ? 'Image Failed to Load' 
-                        : developer.builder_logo 
-                          ? 'Loading...' 
+                        ? 'Image Failed to Load'
+                        : developer.builder_logo
+                          ? 'Loading...'
                           : 'No Logo'
                       }
                     </span>
@@ -557,11 +557,10 @@ const DevelopersPage = () => {
                     </h2>
                     <div className="flex items-center mt-1">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          developer.status
-                            ? "bg-green-100 text-green-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${developer.status
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                          }`}
                       >
                         {developer.status ? "Active" : "Inactive"}
                       </span>
@@ -624,11 +623,11 @@ const DevelopersPage = () => {
                                     setDevelopers((prev) =>
                                       prev.map((d) =>
                                         d.id === developer.id
-                                          ? { 
-                                              ...d, 
-                                              images: d.images.filter((_, i) => i !== index),
-                                              image_urls: d.image_urls?.filter((_, i) => i !== index) || []
-                                            }
+                                          ? {
+                                            ...d,
+                                            images: d.images.filter((_, i) => i !== index),
+                                            image_urls: d.image_urls?.filter((_, i) => i !== index) || []
+                                          }
                                           : d
                                       )
                                     );
@@ -825,7 +824,7 @@ const DevelopersPage = () => {
                   onChange={handleImagesChange}
                   className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
-                
+
                 {/* Existing Images (for edit mode) */}
                 {currentDeveloper && currentDeveloper.images && currentDeveloper.images.length > 0 && (
                   <div className="mt-4">
@@ -854,7 +853,7 @@ const DevelopersPage = () => {
                     </div>
                   </div>
                 )}
-                
+
                 {/* New Image Previews */}
                 {(formData.imagePreviews.length > 0 || formData.images.length > 0) && (
                   <div className="mt-4">

@@ -1,423 +1,420 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-
-interface CVSubmission {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email_id: string;
-  phone_number: string;
-  message?: string;
-  cv_file?: string;
-  cv_file_url?: string;
-  status: 'pending' | 'reviewed' | 'contacted' | 'rejected';
-  submission_date: string;
-  admin_notes?: string;
+interface Job {
+    id: number;
+    jobId: string;
+    jobTitle: string;
+    location: string;
+    jobType: string;
+    salaryRange: string;
+    postedDate: string;
+    isActive: boolean;
+    applicationDeadline?: string;
 }
 
-interface CVStats {
-  total: number;
-  byStatus: {
-    pending: number;
-    reviewed: number;
-    contacted: number;
-    rejected: number;
-  };
+interface Submission {
+    id: number;
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    email_id: string;
+    message: string | null;
+    cv_file: string | null;
+    cv_file_url?: string;
+    status: 'pending' | 'reviewed' | 'contacted' | 'rejected';
+    admin_notes: string | null;
+    submission_date: string;
+    created_at?: string;
 }
 
-const CareerManagementPage = () => {
+export default function CareerManagementPage() {
+    const router = useRouter();
+    const [activeTab, setActiveTab] = useState<'jobs' | 'submissions'>('jobs');
 
-  // CV Submissions State
-  const [cvSubmissions, setCvSubmissions] = useState<CVSubmission[]>([]);
-  const [cvStats, setCvStats] = useState<CVStats | null>(null);
-  const [cvLoading, setCvLoading] = useState(false);
-  const [cvError, setCvError] = useState<string | null>(null);
-  
-  // CV Submissions Filters
-  const [searchSubmissions, setSearchSubmissions] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
-  const [pageNumber, setPageNumber] = useState(1);
-  const [pageLimit, setPageLimit] = useState(10);
-  
-  // Update submission modal state
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
-  const [selectedSubmission, setSelectedSubmission] = useState<CVSubmission | null>(null);
-  const [updateStatus, setUpdateStatus] = useState('');
-  const [adminNotes, setAdminNotes] = useState('');
+    // Jobs State
+    const [jobs, setJobs] = useState<Job[]>([]);
+    const [loadingJobs, setLoadingJobs] = useState(true);
+    const [jobsError, setJobsError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchCVSubmissions();
-    fetchCVStats();
-  }, [searchSubmissions, statusFilter, pageNumber, pageLimit]);
+    // Submissions State
+    const [submissions, setSubmissions] = useState<Submission[]>([]);
+    const [loadingSubmissions, setLoadingSubmissions] = useState(false);
+    const [submissionsError, setSubmissionsError] = useState<string | null>(null);
 
+    useEffect(() => {
+        if (activeTab === 'jobs') {
+            fetchJobs();
+        } else {
+            fetchSubmissions();
+        }
+    }, [activeTab]);
 
-  // CV Submissions API Functions
-  const fetchCVStats = async () => {
-    try {
-      const response = await fetch('https://api.realtraspaces.com/api/cv-submissions/stats');
-      const result = await response.json();
-      
-      if (response.ok && result.success) {
-        setCvStats(result.data);
-      }
-    } catch (error) {
-      console.error('Error fetching CV stats:', error);
+    const fetchJobs = async () => {
+        try {
+            setLoadingJobs(true);
+            const response = await fetch('http://localhost:8000/api/jobs');
+            if (!response.ok) {
+                throw new Error('Failed to fetch jobs');
+            }
+            const data = await response.json();
+
+            // Assuming the API returns { status: 'success', data: [...] }
+            if (data.status === 'success' && Array.isArray(data.data)) {
+                setJobs(data.data);
+            } else {
+                // Fallback if structure is different
+                setJobs([]);
+                console.error('Unexpected API response structure:', data);
+            }
+        } catch (err) {
+            setJobsError(err instanceof Error ? err.message : 'An error occurred while fetching jobs');
+            console.error(err);
+        } finally {
+            setLoadingJobs(false);
+        }
+    };
+
+    const fetchSubmissions = async () => {
+        try {
+            setLoadingSubmissions(true);
+            const response = await fetch('http://localhost:8000/api/cv-submissions');
+            if (!response.ok) {
+                throw new Error('Failed to fetch submissions');
+            }
+            const data = await response.json();
+
+            if (data.success && Array.isArray(data.data)) {
+                setSubmissions(data.data);
+            } else {
+                setSubmissions([]);
+                console.error('Unexpected API response structure:', data);
+            }
+        } catch (err) {
+            setSubmissionsError(err instanceof Error ? err.message : 'An error occurred while fetching submissions');
+            console.error(err);
+        } finally {
+            setLoadingSubmissions(false);
+        }
+    };
+
+    const handleDeleteJob = async (jobId: string) => {
+        if (!confirm('Are you sure you want to deactivate this job?')) return;
+
+        try {
+            const response = await fetch(`http://localhost:8000/api/jobs/${jobId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete job');
+            }
+
+            // Refresh list
+            fetchJobs();
+        } catch (err) {
+            alert('Error deleting job');
+            console.error(err);
+        }
     }
-  };
 
-  const fetchCVSubmissions = async () => {
-    setCvLoading(true);
-    setCvError(null);
-    
-    try {
-      const params = new URLSearchParams();
-      if (searchSubmissions) params.append('search', searchSubmissions);
-      if (statusFilter) params.append('status', statusFilter);
-      params.append('page', pageNumber.toString());
-      params.append('limit', pageLimit.toString());
-      
-      const url = `https://api.realtraspaces.com/api/cv-submissions?${params.toString()}`;
-      const response = await fetch(url);
-      const result = await response.json();
-      
-      if (response.ok && result.success) {
-        setCvSubmissions(result.data);
-      } else {
-        setCvError(result.message || 'Failed to fetch CV submissions');
-      }
-    } catch (error) {
-      setCvError(error instanceof Error ? error.message : 'An error occurred');
-    } finally {
-      setCvLoading(false);
+    const handleDeleteSubmission = async (id: number) => {
+        if (!confirm('Are you sure you want to delete this submission?')) return;
+
+        try {
+            const response = await fetch(`http://localhost:8000/api/cv-submissions/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete submission');
+            }
+
+            // Refresh list
+            fetchSubmissions();
+        } catch (err) {
+            alert('Error deleting submission');
+            console.error(err);
+        }
     }
-  };
 
-  const updateSubmissionStatus = async (id: number, status: string, notes?: string) => {
-    try {
-      const response = await fetch(`https://api.realtraspaces.com/api/cv-submissions/${id}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          status,
-          admin_notes: notes || undefined
-        })
-      });
-      
-      const result = await response.json();
-      
-      if (response.ok) {
-        fetchCVSubmissions();
-        fetchCVStats();
-        setShowUpdateModal(false);
-        setSelectedSubmission(null);
-        setUpdateStatus('');
-        setAdminNotes('');
-      } else {
-        setCvError(result.message || 'Failed to update submission');
-      }
-    } catch (error) {
-      setCvError(error instanceof Error ? error.message : 'An error occurred');
-    }
-  };
-
-  const deleteSubmission = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this submission? This action cannot be undone.')) {
-      return;
-    }
-    
-    try {
-      const response = await fetch(`https://api.realtraspaces.com/api/cv-submissions/${id}`, {
-        method: 'DELETE'
-      });
-      
-      const result = await response.json();
-      
-      if (response.ok) {
-        fetchCVSubmissions();
-        fetchCVStats();
-      } else {
-        setCvError(result.message || 'Failed to delete submission');
-      }
-    } catch (error) {
-      setCvError(error instanceof Error ? error.message : 'An error occurred');
-    }
-  };
-
-  const downloadCV = (filename: string) => {
-    const downloadUrl = `https://api.realtraspaces.com/api/cv-submissions/download/${filename}`;
-    window.open(downloadUrl, '_blank');
-  };
-
-
-  const openUpdateModal = (submission: CVSubmission) => {
-    setSelectedSubmission(submission);
-    setUpdateStatus(submission.status);
-    setAdminNotes(submission.admin_notes || '');
-    setShowUpdateModal(true);
-  };
-
-  const handleUpdateSubmit = () => {
-    if (selectedSubmission && updateStatus) {
-      updateSubmissionStatus(selectedSubmission.id, updateStatus, adminNotes);
-    }
-  };
-
-
-  return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50">
-        {/* Header */}
-        <div className="flex justify-between items-center p-8 bg-white shadow-sm">
-          <h1 className="text-3xl font-bold text-gray-900">CV Submissions Management</h1>
+    const LoadingSpinner = () => (
+        <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
         </div>
+    );
 
-        {/* Content */}
-        <div className="p-8">
-          <div className="space-y-6">
-              {/* CV Statistics */}
-              {cvStats && (
-                <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">CV Submission Statistics</h2>
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                    <div className="text-center p-4 bg-gray-50 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600">{cvStats.total}</div>
-                      <div className="text-sm text-gray-600">Total</div>
-                    </div>
-                    <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                      <div className="text-2xl font-bold text-yellow-600">{cvStats.byStatus.pending || 0}</div>
-                      <div className="text-sm text-gray-600">Pending</div>
-                    </div>
-                    <div className="text-center p-4 bg-blue-50 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600">{cvStats.byStatus.reviewed || 0}</div>
-                      <div className="text-sm text-gray-600">Reviewed</div>
-                    </div>
-                    <div className="text-center p-4 bg-green-50 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">{cvStats.byStatus.contacted || 0}</div>
-                      <div className="text-sm text-gray-600">Contacted</div>
-                    </div>
-                    <div className="text-center p-4 bg-red-50 rounded-lg">
-                      <div className="text-2xl font-bold text-red-600">{cvStats.byStatus.rejected || 0}</div>
-                      <div className="text-sm text-gray-600">Rejected</div>
-                    </div>
-                  </div>
-                </div>
-              )}
+    const ErrorView = ({ error, onRetry }: { error: string, onRetry: () => void }) => (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong className="font-bold">Error: </strong>
+            <span className="block sm:inline">{error}</span>
+            <button
+                className="mt-2 bg-red-100 hover:bg-red-200 text-red-800 font-bold py-1 px-3 rounded text-sm"
+                onClick={onRetry}
+            >
+                Retry
+            </button>
+        </div>
+    );
 
-              {/* CV Filters */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Filter Submissions</h3>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
-                    <input
-                      type="text"
-                      value={searchSubmissions}
-                      onChange={(e) => setSearchSubmissions(e.target.value)}
-                      placeholder="Search by name, email, or phone"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">All Statuses</option>
-                      <option value="pending">Pending</option>
-                      <option value="reviewed">Reviewed</option>
-                      <option value="contacted">Contacted</option>
-                      <option value="rejected">Rejected</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Page</label>
-                    <input
-                      type="number"
-                      value={pageNumber}
-                      onChange={(e) => setPageNumber(parseInt(e.target.value) || 1)}
-                      min="1"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Per Page</label>
-                    <select
-                      value={pageLimit}
-                      onChange={(e) => setPageLimit(parseInt(e.target.value))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value={5}>5</option>
-                      <option value={10}>10</option>
-                      <option value={20}>20</option>
-                      <option value={50}>50</option>
-                    </select>
-                  </div>
+    return (
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-gray-900">Career Management</h1>
+                    <p className="text-gray-500 mt-1">Manage job postings and applications</p>
                 </div>
-              </div>
 
-              {/* CV Submissions List */}
-              <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900">CV Submissions</h3>
-                </div>
-                
-                {cvLoading ? (
-                  <div className="p-8 text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Loading submissions...</p>
-                  </div>
-                ) : cvError ? (
-                  <div className="p-8 text-center">
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                      {cvError}
+                <div className="flex items-center gap-4">
+                    {/* Tabs */}
+                    <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+                        <button
+                            onClick={() => setActiveTab('jobs')}
+                            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'jobs'
+                                    ? 'bg-white text-indigo-600 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            Job Postings
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('submissions')}
+                            className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'submissions'
+                                    ? 'bg-white text-indigo-600 shadow-sm'
+                                    : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            CV Submissions
+                        </button>
                     </div>
-                  </div>
-                ) : cvSubmissions.length === 0 ? (
-                  <div className="p-8 text-center">
-                    <p className="text-gray-600">No CV submissions found.</p>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-gray-200">
-                    {cvSubmissions.map((submission) => (
-                      <div key={submission.id} className="p-6 hover:bg-gray-50">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-4 mb-2">
-                              <h4 className="text-lg font-medium text-gray-900">
-                                {submission.first_name} {submission.last_name}
-                              </h4>
-                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                submission.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                submission.status === 'reviewed' ? 'bg-blue-100 text-blue-800' :
-                                submission.status === 'contacted' ? 'bg-green-100 text-green-800' :
-                                'bg-red-100 text-red-800'
-                              }`}>
-                                {submission.status.toUpperCase()}
-                              </span>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
-                              <div>
-                                <p><span className="font-medium">ID:</span> {submission.id}</p>
-                                <p><span className="font-medium">Email:</span> {submission.email_id}</p>
-                                <p><span className="font-medium">Phone:</span> {submission.phone_number}</p>
-                              </div>
-                              <div>
-                                <p><span className="font-medium">Submitted:</span> {new Date(submission.submission_date).toLocaleString()}</p>
-                                {submission.cv_file && (
-                                  <p>
-                                    <span className="font-medium">CV:</span>{' '}
-                                    <button
-                                      onClick={() => downloadCV(submission.cv_file!)}
-                                      className="text-blue-600 hover:text-blue-800 underline"
+
+                    {activeTab === 'jobs' && (
+                        <Link
+                            href="/career-management/create"
+                            className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                        >
+                            <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
+                            Create New Job
+                        </Link>
+                    )}
+                </div>
+            </div>
+
+            {/* Content */}
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg border border-gray-200">
+                {activeTab === 'jobs' ? (
+                    // Jobs View
+                    loadingJobs ? <LoadingSpinner /> : jobsError ? <ErrorView error={jobsError} onRetry={fetchJobs} /> : (
+                        jobs.length === 0 ? (
+                            <div className="text-center py-12">
+                                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <h3 className="mt-2 text-sm font-medium text-gray-900">No jobs found</h3>
+                                <p className="mt-1 text-sm text-gray-500">Get started by creating a new job posting.</p>
+                                <div className="mt-6">
+                                    <Link
+                                        href="/career-management/create"
+                                        className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                     >
-                                      Download CV
-                                    </button>
-                                  </p>
-                                )}
-                              </div>
+                                        Create Job
+                                    </Link>
+                                </div>
                             </div>
-                            {submission.message && (
-                              <div className="mt-3">
-                                <p className="text-sm"><span className="font-medium">Message:</span> {submission.message}</p>
-                              </div>
-                            )}
-                            {submission.admin_notes && (
-                              <div className="mt-3 p-3 bg-gray-100 rounded-md">
-                                <p className="text-sm"><span className="font-medium">Admin Notes:</span> {submission.admin_notes}</p>
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex flex-col space-y-2 ml-4">
-                            <button
-                              onClick={() => openUpdateModal(submission)}
-                              className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
-                            >
-                              Update Status
-                            </button>
-                            <button
-                              onClick={() => deleteSubmission(submission.id)}
-                              className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Job Info
+                                            </th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Type / Salary
+                                            </th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Location
+                                            </th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Posted Date
+                                            </th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Status
+                                            </th>
+                                            <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {jobs.map((job) => (
+                                            <tr key={job.id} className="hover:bg-gray-50 transition-colors">
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        <div>
+                                                            <div className="text-sm font-medium text-indigo-600 truncate max-w-xs" title={job.jobTitle}>
+                                                                {job.jobTitle}
+                                                            </div>
+                                                            <div className="text-sm text-gray-500">
+                                                                ID: {job.jobId}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">{job.jobType}</div>
+                                                    <div className="text-sm text-gray-500">{job.salaryRange}</div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">{job.location}</div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">
+                                                        {new Date(job.postedDate).toLocaleDateString()}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${job.isActive
+                                                        ? 'bg-green-100 text-green-800'
+                                                        : 'bg-red-100 text-red-800'
+                                                        }`}>
+                                                        {job.isActive ? 'Active' : 'Inactive'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                    <div className="flex justify-end space-x-3">
+                                                        <Link
+                                                            href={`/career-management/edit/${job.jobId}`}
+                                                            className="text-indigo-600 hover:text-indigo-900"
+                                                        >
+                                                            Edit
+                                                        </Link>
+                                                        <button
+                                                            className="text-red-600 hover:text-red-900"
+                                                            onClick={() => handleDeleteJob(job.jobId)}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )
+                    )
+                ) : (
+                    // Submissions View
+                    loadingSubmissions ? <LoadingSpinner /> : submissionsError ? <ErrorView error={submissionsError} onRetry={fetchSubmissions} /> : (
+                        submissions.length === 0 ? (
+                            <div className="text-center py-12">
+                                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                <h3 className="mt-2 text-sm font-medium text-gray-900">No submissions found</h3>
+                                <p className="mt-1 text-sm text-gray-500">Wait for candidates to submit their CVs.</p>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Candidate
+                                            </th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Contact Info
+                                            </th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Submitted Date
+                                            </th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Status
+                                            </th>
+                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                CV File
+                                            </th>
+                                            <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {submissions.map((submission) => (
+                                            <tr key={submission.id} className="hover:bg-gray-50 transition-colors">
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        <div className="h-10 w-10 flex-shrink-0">
+                                                            <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
+                                                                {submission.first_name.charAt(0)}{submission.last_name.charAt(0)}
+                                                            </div>
+                                                        </div>
+                                                        <div className="ml-4">
+                                                            <div className="text-sm font-medium text-gray-900">
+                                                                {submission.first_name} {submission.last_name}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">{submission.email_id}</div>
+                                                    <div className="text-sm text-gray-500">{submission.phone_number}</div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">
+                                                        {new Date(submission.submission_date || submission.created_at || Date.now()).toLocaleDateString()}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                        ${submission.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                            submission.status === 'reviewed' ? 'bg-blue-100 text-blue-800' :
+                                                                submission.status === 'contacted' ? 'bg-green-100 text-green-800' :
+                                                                    'bg-red-100 text-red-800'}`}>
+                                                        {submission.status.charAt(0).toUpperCase() + submission.status.slice(1)}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    {submission.cv_file_url ? (
+                                                        <a
+                                                            href={submission.cv_file_url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-indigo-600 hover:text-indigo-900 inline-flex items-center"
+                                                        >
+                                                            <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                            </svg>
+                                                            Download CV
+                                                        </a>
+                                                    ) : (
+                                                        <span className="text-gray-400 italic">No file</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                    <button
+                                                        className="text-red-600 hover:text-red-900"
+                                                        onClick={() => handleDeleteSubmission(submission.id)}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )
+                    )
                 )}
-              </div>
             </div>
         </div>
-
-        {/* Update Status Modal */}
-        {showUpdateModal && selectedSubmission && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Update Submission Status
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Submission ID: {selectedSubmission.id}
-                  </label>
-                  <p className="text-sm text-gray-600">
-                    {selectedSubmission.first_name} {selectedSubmission.last_name}
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                  <select
-                    value={updateStatus}
-                    onChange={(e) => setUpdateStatus(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">Select Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="reviewed">Reviewed</option>
-                    <option value="contacted">Contacted</option>
-                    <option value="rejected">Rejected</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Admin Notes</label>
-                  <textarea
-                    value={adminNotes}
-                    onChange={(e) => setAdminNotes(e.target.value)}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Internal notes about this submission"
-                  />
-                </div>
-              </div>
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => setShowUpdateModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleUpdateSubmit}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  Update Status
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </ProtectedRoute>
-  );
-};
-
-export default CareerManagementPage; 
+    );
+}

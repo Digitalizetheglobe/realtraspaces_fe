@@ -31,14 +31,14 @@ interface PropertyListingFilters {
 }
 
 class PropertyListingService {
-  private baseUrl = 'https://api.realtraspaces.com/api/property-listings';
+  private baseUrl = 'http://localhost:8000/api/property-listings';
 
   private async makeRequest(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<PropertyListingResponse> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     try {
       const response = await fetch(url, {
         headers: {
@@ -49,7 +49,7 @@ class PropertyListingService {
       });
 
       const data = await response.json();
-      
+
       return {
         success: response.ok,
         data: data,
@@ -76,7 +76,7 @@ class PropertyListingService {
   // Get all property listings with optional filters
   async getAllPropertyListings(filters?: PropertyListingFilters): Promise<PropertyListingResponse> {
     const queryParams = new URLSearchParams();
-    
+
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -130,7 +130,7 @@ class PropertyListingService {
     // This is a placeholder implementation
     // In a real application, you would upload files to your storage service
     // (AWS S3, Cloudinary, etc.) and return the URLs
-    
+
     // For now, we'll simulate the upload and return mock filenames
     const timestamp = Date.now();
     return files.map((file, index) => {

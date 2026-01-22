@@ -72,7 +72,7 @@ type Property = {
 };
 
 export default function Similarproperties() {
-   const router = useRouter();
+  const router = useRouter();
   const [properties, setProperties] = useState<Property[]>([]);
   const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,7 +83,7 @@ export default function Similarproperties() {
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
   const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set());
   const [isLoggedIn, setIsLoggedIn] = useState(false);
- const [isComparing, setIsComparing] = useState(false);
+  const [isComparing, setIsComparing] = useState(false);
   // Check authentication status
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -94,7 +94,7 @@ export default function Similarproperties() {
   // Helper function to get the best image URL for a property
   const getPropertyImage = (property: Property | null): string => {
     if (!property) return defaultPropertyImage.src;
-    
+
     // First check imageUrls.images (new structure)
     if (property.imageUrls?.images && property.imageUrls.images.length > 0) {
       // First try to find a cover image
@@ -110,7 +110,7 @@ export default function Similarproperties() {
         return firstImage.imageFilePath;
       }
     }
-    
+
     // Fallback to property.images (old structure for backward compatibility)
     if (property.images && property.images.length > 0) {
       // First try to find a cover image
@@ -124,7 +124,7 @@ export default function Similarproperties() {
         return firstImage.imageFilePath;
       }
     }
-    
+
     return defaultPropertyImage.src;
   };
 
@@ -213,11 +213,11 @@ export default function Similarproperties() {
   const [citySearchTerm, setCitySearchTerm] = useState<string>("");
   const [subLocationSearchTerm, setSubLocationSearchTerm] = useState<string>("");
   const [allProperties, setAllProperties] = useState<Property[]>([]); // NEW: Combined properties from both pages
-  
+
   // Add missing state variables for search functionality
   const [selectedType, setSelectedType] = useState<string>("");
   const [enquiredForFilter, setEnquiredForFilter] = useState<string>("");
- 
+
   // Add state for contact form
   const [showContactForm, setShowContactForm] = useState(false);
   const [contactFormData, setContactFormData] = useState({
@@ -242,7 +242,7 @@ export default function Similarproperties() {
   // Carpet area options
   const carpetAreaOptions = [
     "Under 500 sqft",
-    "500 - 1000 sqft", 
+    "500 - 1000 sqft",
     "1000 - 1500 sqft",
     "1500 - 2000 sqft",
     "2000 - 3000 sqft",
@@ -253,59 +253,59 @@ export default function Similarproperties() {
   // Get available sub-locations for selected cities
   const getAvailableSubLocations = () => {
     if (selectedCities.length === 0) return [];
-    
+
     // Get all sub-locations from all selected cities
     const allSubLocations = new Set<string>();
     selectedCities.forEach(city => {
       const citySubLocations = allSublocalities[city] || [];
       citySubLocations.forEach(subLoc => allSubLocations.add(subLoc));
     });
-    
+
     return Array.from(allSubLocations);
   };
 
   // Get filtered and organized cities
   const getFilteredCities = () => {
     const priorityCities = [
-      "Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", 
+      "Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad",
       "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"
     ];
-    
+
     let filteredCities = allCities;
-    
+
     // Filter by search term if provided
     if (citySearchTerm.trim()) {
       const searchLower = citySearchTerm.toLowerCase();
-      filteredCities = allCities.filter(city => 
+      filteredCities = allCities.filter(city =>
         city.toLowerCase().startsWith(searchLower)
       );
     }
-    
+
     // Organize cities: priority cities first, then others
-    const priorityCitiesInFiltered = priorityCities.filter(city => 
+    const priorityCitiesInFiltered = priorityCities.filter(city =>
       filteredCities.includes(city)
     );
-    const otherCitiesInFiltered = filteredCities.filter(city => 
+    const otherCitiesInFiltered = filteredCities.filter(city =>
       !priorityCities.includes(city)
     );
-    
+
     return [...priorityCitiesInFiltered, ...otherCitiesInFiltered];
   };
 
   // Get filtered sub-locations
   const getFilteredSubLocations = () => {
     if (selectedCities.length === 0) return [];
-    
+
     let filteredSubLocations = getAvailableSubLocations();
-    
+
     // Filter by search term if provided
     if (subLocationSearchTerm.trim()) {
       const searchLower = subLocationSearchTerm.toLowerCase();
-      filteredSubLocations = filteredSubLocations.filter(subLocation => 
+      filteredSubLocations = filteredSubLocations.filter(subLocation =>
         subLocation.toLowerCase().startsWith(searchLower)
       );
     }
-    
+
     return filteredSubLocations;
   };
 
@@ -327,7 +327,7 @@ export default function Similarproperties() {
   // Simple detection for cities, sub-locations, and property types
   const detectLocationType = (searchTerm: string) => {
     const searchLower = searchTerm.toLowerCase().trim();
-    
+
     // Fixed list of major cities - EXACT MATCH ONLY
     const majorCities = [
       'mumbai', 'pune', 'thane', 'new mumbai', 'bangalore', 'chennai'
@@ -363,13 +363,13 @@ export default function Similarproperties() {
 
     // STEP 1: Check if it EXACTLY matches a property type
     const isExactPropertyType = propertyTypes.includes(searchLower);
-    
+
     if (isExactPropertyType) {
       return 'propertyType';
     }
 
     // STEP 2: Check if it contains ANY sub-location keyword
-    const hasSubLocationKeyword = subLocationKeywords.some(keyword => 
+    const hasSubLocationKeyword = subLocationKeywords.some(keyword =>
       searchLower.includes(keyword)
     );
 
@@ -379,7 +379,7 @@ export default function Similarproperties() {
 
     // STEP 3: Check if it EXACTLY matches a major city
     const isExactCity = majorCities.includes(searchLower);
-    
+
     if (isExactCity) {
       return 'city';
     }
@@ -391,7 +391,7 @@ export default function Similarproperties() {
         allSubLocations.add(p.address.subLocality.toLowerCase());
       }
     });
-    
+
     if (allSubLocations.has(searchLower)) {
       return 'subLocation';
     }
@@ -406,7 +406,7 @@ export default function Similarproperties() {
         allPropertyTypes.add(p.propertyType.childType.displayName.toLowerCase());
       }
     });
-    
+
     if (allPropertyTypes.has(searchLower)) {
       return 'propertyType';
     }
@@ -454,37 +454,37 @@ export default function Similarproperties() {
     // Generate suggestions based on detection
     if (locationType === 'city') {
       // Show cities that match
-      const matchingCities = allCities.filter(city => 
+      const matchingCities = allCities.filter(city =>
         city.toLowerCase().includes(searchLower)
       ).slice(0, 5);
       suggestions.cities = matchingCities;
     } else if (locationType === 'subLocation') {
       // Show sub-locations that match
-      const matchingSubLocations = allSubLocationsArray.filter(subLoc => 
+      const matchingSubLocations = allSubLocationsArray.filter(subLoc =>
         subLoc.toLowerCase().includes(searchLower)
       ).slice(0, 5);
       suggestions.subLocations = matchingSubLocations;
     } else if (locationType === 'propertyType') {
       // Show property types that match
-      const matchingPropertyTypes = allPropertyTypesArray.filter(propertyType => 
+      const matchingPropertyTypes = allPropertyTypesArray.filter(propertyType =>
         propertyType.toLowerCase().includes(searchLower)
       ).slice(0, 5);
       // For now, add property types to property names section
       suggestions.propertyNames = matchingPropertyTypes;
     } else {
       // Show all categories
-      const matchingCities = allCities.filter(city => 
+      const matchingCities = allCities.filter(city =>
         city.toLowerCase().includes(searchLower)
       ).slice(0, 2);
-      
-      const matchingSubLocations = allSubLocationsArray.filter(subLoc => 
+
+      const matchingSubLocations = allSubLocationsArray.filter(subLoc =>
         subLoc.toLowerCase().includes(searchLower)
       ).slice(0, 2);
-      
-      const matchingPropertyTypes = allPropertyTypesArray.filter(propertyType => 
+
+      const matchingPropertyTypes = allPropertyTypesArray.filter(propertyType =>
         propertyType.toLowerCase().includes(searchLower)
       ).slice(0, 2);
-      
+
       suggestions.cities = matchingCities;
       suggestions.subLocations = matchingSubLocations;
       suggestions.propertyNames = matchingPropertyTypes;
@@ -520,27 +520,27 @@ export default function Similarproperties() {
   useEffect(() => {
     // Check for search data from latestpropertytype page
     const searchData = sessionStorage.getItem('searchData');
-    
+
     if (searchData) {
       try {
         const parsedData = JSON.parse(searchData);
-        
+
         // Apply search data if it exists
         if (parsedData.search) {
           setSearchTerm(parsedData.search);
         }
-        
+
         if (parsedData.locations && parsedData.locations.length > 0) {
           setSelectedLocations(parsedData.locations);
-          
+
           // Categorize each location properly using our detection logic
           const categorizedCities: string[] = [];
           const categorizedSubLocations: string[] = [];
           const categorizedPropertyTypes: string[] = [];
-          
+
           parsedData.locations.forEach((location: string) => {
             const detectedType = detectLocationType(location);
-            
+
             if (detectedType === 'city') {
               categorizedCities.push(location);
             } else if (detectedType === 'subLocation') {
@@ -550,20 +550,20 @@ export default function Similarproperties() {
             }
             // If unknown, don't add to any category
           });
-          
+
           setSelectedCities(categorizedCities);
           setSelectedSubLocations(categorizedSubLocations);
           setSelectedPropertyTypes(categorizedPropertyTypes);
         }
-        
+
         if (parsedData.type) {
           setSelectedType(parsedData.type);
         }
-        
+
         if (parsedData.enquiredFor) {
           setEnquiredForFilter(parsedData.enquiredFor);
         }
-        
+
         // Clear the search data after reading it
         sessionStorage.removeItem('searchData');
       } catch (error) {
@@ -571,26 +571,26 @@ export default function Similarproperties() {
         sessionStorage.removeItem('searchData');
       }
     }
-    
+
     // Check sessionStorage for backward compatibility with other search methods
     const searchCity = sessionStorage.getItem('searchCity');
     const searchSubLocation = sessionStorage.getItem('searchSubLocation');
-    
+
     if (searchCity && !searchData) {
       setSelectedCities([searchCity]);
     }
     if (searchSubLocation && !searchData) {
       setSelectedSubLocations([searchSubLocation]);
     }
-    
+
     // Clear sessionStorage after reading the values
     sessionStorage.removeItem('searchCity');
     sessionStorage.removeItem('searchSubLocation');
   }, []);
-const handleCompareClick = async () => {
+  const handleCompareClick = async () => {
     // Check if user is logged in
     const token = localStorage.getItem("authToken");
-    
+
     if (!token) {
       toast.error("Please log in to compare properties");
       router.push("/signin");
@@ -602,19 +602,19 @@ const handleCompareClick = async () => {
       toast.error("Please select at least one property to compare");
       return;
     }
-    
+
     try {
       setIsComparing(true);
-      
+
       // Get selected properties
       const selectedProperties = allProperties.filter(prop => bookmarkedProperties.has(prop.id));
       let addedCount = 0;
       let alreadyInListCount = 0;
-      
+
       // Add each selected property to comparison
       for (const property of selectedProperties) {
         try {
-          const response = await fetch("https://api.realtraspaces.com/api/webusers/compare/add", {
+          const response = await fetch("http://localhost:8000/api/webusers/compare/add", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -625,35 +625,35 @@ const handleCompareClick = async () => {
               propertyData: property
             })
           });
-      
+
           if (response.status === 401 || response.status === 403) {
             toast.error("You Are Not Login");
             router.push("/signin");
             return;
           }
-      
+
           if (!response.ok) {
             const errorData = await response.json();
             const errorMessage = errorData.message || "Failed to add property to comparison";
-            
+
             // Check if property is already in comparison list
-            if (errorMessage.toLowerCase().includes("already in comparison") || 
-                errorMessage.toLowerCase().includes("already exists")) {
+            if (errorMessage.toLowerCase().includes("already in comparison") ||
+              errorMessage.toLowerCase().includes("already exists")) {
               alreadyInListCount++;
               continue; // Skip this property and continue with others
             }
-            
+
             throw new Error(errorMessage);
           }
-          
+
           addedCount++;
-          
+
         } catch (propertyError) {
           console.error(`Error adding property ${property.id}:`, propertyError);
           // Continue with other properties even if one fails
         }
       }
-  
+
       // Show appropriate success message
       if (addedCount > 0 && alreadyInListCount > 0) {
         toast.success(`${addedCount} properties added to comparison. ${alreadyInListCount} were already in your list.`);
@@ -662,12 +662,12 @@ const handleCompareClick = async () => {
       } else if (alreadyInListCount > 0) {
         toast.success(`All ${alreadyInListCount} selected properties are already in your comparison list`);
       }
-      
+
       // Navigate to compare page if any properties were added
       if (addedCount > 0) {
         router.push("/compareproperties");
       }
-      
+
     } catch (error) {
       console.error("Error adding to compare:", error);
       toast.error(error instanceof Error ? error.message : "Failed to add to comparison");
@@ -688,12 +688,12 @@ const handleCompareClick = async () => {
             },
           }
         );
-        
+
         const data = await response.json();
         const propertiesArray = Array.isArray(data)
           ? data
           : data.items || data.data || [];
-        
+
         setProperties(propertiesArray);
         setAllProperties(propertiesArray);
         setFilteredProperties(propertiesArray);
@@ -722,12 +722,12 @@ const handleCompareClick = async () => {
     });
     // Unique property types
     const propertyTypes = Array.from(new Set(allProperties.map(p => p.propertyType?.displayName).filter((t): t is string => Boolean(t))));
-    
+
     // Add pre-fed popular cities that might not have properties yet
     const popularCities = [
-      "Mumbai","New Mumbai","Thane","Pune","Pimpri-Chinchwad", "Bangalore",  "Chennai","Hyderabad", "Kolkata", "Delhi",
-      "Ahmedabad", "Jaipur", "Surat", "Lucknow", "Kanpur", "Nagpur", "Indore", 
-       "Bhopal", "Visakhapatnam",  "Patna", "Vadodara",
+      "Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi",
+      "Ahmedabad", "Jaipur", "Surat", "Lucknow", "Kanpur", "Nagpur", "Indore",
+      "Bhopal", "Visakhapatnam", "Patna", "Vadodara",
       "Ghaziabad", "Ludhiana", "Agra", "Nashik", "Faridabad", "Meerut", "Rajkot",
       "Kalyan-Dombivli", "Vasai-Virar", "Varanasi", "Srinagar", "Aurangabad",
       "Dhanbad", "Amritsar", "Allahabad", "Ranchi", "Howrah", "Coimbatore",
@@ -779,10 +779,10 @@ const handleCompareClick = async () => {
       "Hajipur", "Sasaram", "Dharmavaram", "Bilaspur", "Batala",
       "Mandi", "Hoshiarpur", "Etawah", "Saharsa", "Chhapra"
     ];
-    
+
     // Combine existing cities with popular cities and remove duplicates
     const allCitiesCombined = Array.from(new Set([...cities, ...popularCities])).sort();
-    
+
     setAllCities(allCitiesCombined);
     setAllSublocalities(sublocalities);
     setAllPropertyTypes(propertyTypes);
@@ -794,8 +794,8 @@ const handleCompareClick = async () => {
       setFilteredProperties([]);
       return;
     }
-    
-    
+
+
     let results = allProperties;
 
     // Enhanced search by property name, city, and sub-location
@@ -820,14 +820,14 @@ const handleCompareClick = async () => {
         if (property.enquiredFor) {
           return property.enquiredFor === enquiredForFilter;
         }
-        
+
         // Otherwise, check based on forSale/forRent
         if (enquiredForFilter === "Rent") {
           return property.forRent === true;
         } else if (enquiredForFilter === "Sale") {
           return property.forSale === true;
         }
-        
+
         return false;
       });
     }
@@ -835,7 +835,7 @@ const handleCompareClick = async () => {
     // Filter by search type (Rent/Investment/Research) - keep this for backward compatibility
     if (selectedType && !enquiredForFilter) {
       const typeLower = selectedType.toLowerCase().trim();
-      
+
       // Filter by property type based on search type
       if (typeLower === "rent") {
         results = results.filter((property) => property.forRent);
@@ -864,7 +864,7 @@ const handleCompareClick = async () => {
     // Filter by property type
     if (selectedPropertyTypes.length > 0) {
       results = results.filter((property) => {
-        return selectedPropertyTypes.some(propertyType => 
+        return selectedPropertyTypes.some(propertyType =>
           property.propertyType?.displayName === propertyType ||
           property.propertyType?.childType?.displayName === propertyType
         );
@@ -875,7 +875,7 @@ const handleCompareClick = async () => {
     if (selectedCarpetArea || minCarpetArea || maxCarpetArea) {
       results = results.filter((property) => {
         const carpetArea = Number(property.dimension?.carpetArea) || 0;
-        
+
         // Handle predefined ranges
         if (selectedCarpetArea) {
           switch (selectedCarpetArea) {
@@ -897,12 +897,12 @@ const handleCompareClick = async () => {
               return true;
           }
         }
-        
+
         // Handle custom min/max range
         if (minCarpetArea || maxCarpetArea) {
           const minArea = minCarpetArea ? Number(minCarpetArea) : 0;
           const maxArea = maxCarpetArea ? Number(maxCarpetArea) : Infinity;
-          
+
           if (minCarpetArea && maxCarpetArea) {
             return carpetArea >= minArea && carpetArea <= maxArea;
           } else if (minCarpetArea) {
@@ -911,7 +911,7 @@ const handleCompareClick = async () => {
             return carpetArea <= maxArea;
           }
         }
-        
+
         return true;
       });
     }
@@ -992,7 +992,7 @@ const handleCompareClick = async () => {
     }
 
     setFilteredProperties(results);
-    
+
     // Show contact form if no properties found and user has selected specific filters
     if (results.length === 0 && (selectedCities.length > 0 || selectedSubLocations.length > 0 || selectedPropertyTypes.length > 0 || selectedCarpetArea || minCarpetArea || maxCarpetArea || searchTerm)) {
       setShowContactForm(true);
@@ -1072,15 +1072,15 @@ const handleCompareClick = async () => {
   const handleContactFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-      if (!contactFormTermsAccepted) {
-        setContactFormError("You must accept the terms to continue");
-        return;
-      }
-    
+    if (!contactFormTermsAccepted) {
+      setContactFormError("You must accept the terms to continue");
+      return;
+    }
+
     // Here you would typically send the form data to your backend
     // For now, we'll just show an alert
     alert("Thank you for your interest! Our team will contact you soon.");
-    
+
     // Reset form
     setContactFormData({
       name: "",
@@ -1125,10 +1125,10 @@ const handleCompareClick = async () => {
   const handleSuggestionClick = (suggestion: string, type: 'city' | 'subLocation' | 'propertyName') => {
     // Use smart detection to determine the correct category - prioritize detection over manual type
     const detectedType = detectLocationType(suggestion);
-    
+
     // Use detected type if available, otherwise use manual type
     const finalType = detectedType !== 'unknown' ? detectedType : type;
-    
+
     if (finalType === 'city') {
       if (!selectedCities.includes(suggestion)) {
         setSelectedCities([...selectedCities, suggestion]);
@@ -1262,7 +1262,7 @@ const handleCompareClick = async () => {
                           d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                         />
                       </svg>
-                      
+
                       {/* Search Suggestions Dropdown */}
                       {showSearchSuggestions && (searchSuggestions.cities.length > 0 || searchSuggestions.subLocations.length > 0 || searchSuggestions.propertyNames.length > 0) && (
                         <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
@@ -1274,7 +1274,7 @@ const handleCompareClick = async () => {
                               {detectLocationType(searchTerm) === 'unknown' && "🔍 Searching all categories"}
                             </div>
                           )}
-                          
+
                           {/* Sub-locations Section - Show first if available */}
                           {searchSuggestions.subLocations.length > 0 && (
                             <>
@@ -1295,7 +1295,7 @@ const handleCompareClick = async () => {
                               ))}
                             </>
                           )}
-                          
+
                           {/* Cities Section - Show after sub-locations */}
                           {searchSuggestions.cities.length > 0 && (
                             <>
@@ -1317,7 +1317,7 @@ const handleCompareClick = async () => {
                               ))}
                             </>
                           )}
-                          
+
                           {/* Property Names Section */}
                           {searchSuggestions.propertyNames.length > 0 && (
                             <>
@@ -1378,7 +1378,7 @@ const handleCompareClick = async () => {
                               onClick={(e) => e.stopPropagation()}
                             />
                           </div>
-                          
+
                           {/* Clear All Option */}
                           {selectedCities.length > 0 && (
                             <div
@@ -1393,81 +1393,81 @@ const handleCompareClick = async () => {
                             </div>
                           )}
                           {/* Priority Cities Section */}
-                          {getFilteredCities().filter(city => 
+                          {getFilteredCities().filter(city =>
                             ["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
                           ).length > 0 && (
-                            <>
-                              {/* <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
+                              <>
+                                {/* <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
                                 Popular Cities
                               </div> */}
-                              {getFilteredCities()
-                                .filter(city => 
-                                  ["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
-                                )
-                                .map((city) => (
-                                  <div
-                                    key={city}
-                                    className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black flex items-center"
-                                    onClick={() => {
-                                      const isSelected = selectedCities.includes(city);
-                                      if (isSelected) {
-                                        setSelectedCities(selectedCities.filter(c => c !== city));
-                                      } else {
-                                        setSelectedCities([...selectedCities, city]);
-                                      }
-                                      setSelectedSubLocations([]);
-                                    }}
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedCities.includes(city)}
-                                      onChange={() => {}} // Handled by parent div onClick
-                                      className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                    />
-                                    {city}
-                                  </div>
-                                ))}
-                            </>
-                          )}
-                          
+                                {getFilteredCities()
+                                  .filter(city =>
+                                    ["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
+                                  )
+                                  .map((city) => (
+                                    <div
+                                      key={city}
+                                      className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black flex items-center"
+                                      onClick={() => {
+                                        const isSelected = selectedCities.includes(city);
+                                        if (isSelected) {
+                                          setSelectedCities(selectedCities.filter(c => c !== city));
+                                        } else {
+                                          setSelectedCities([...selectedCities, city]);
+                                        }
+                                        setSelectedSubLocations([]);
+                                      }}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedCities.includes(city)}
+                                        onChange={() => { }} // Handled by parent div onClick
+                                        className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                      />
+                                      {city}
+                                    </div>
+                                  ))}
+                              </>
+                            )}
+
                           {/* Other Cities Section */}
-                          {getFilteredCities().filter(city => 
+                          {getFilteredCities().filter(city =>
                             !["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
                           ).length > 0 && (
-                            <>
-                              {/* <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
+                              <>
+                                {/* <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
                                 All Cities
                               </div> */}
-                              {getFilteredCities()
-                                .filter(city => 
-                                  !["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
-                                )
-                                .map((city) => (
-                                  <div
-                                    key={city}
-                                    className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black flex items-center"
-                                    onClick={() => {
-                                      const isSelected = selectedCities.includes(city);
-                                      if (isSelected) {
-                                        setSelectedCities(selectedCities.filter(c => c !== city));
-                                      } else {
-                                        setSelectedCities([...selectedCities, city]);
-                                      }
-                                      setSelectedSubLocations([]);
-                                    }}
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedCities.includes(city)}
-                                      onChange={() => {}} // Handled by parent div onClick
-                                      className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                    />
-                                    {city}
-                                  </div>
-                                ))}
-                            </>
-                          )}
-                          
+                                {getFilteredCities()
+                                  .filter(city =>
+                                    !["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
+                                  )
+                                  .map((city) => (
+                                    <div
+                                      key={city}
+                                      className="px-4 py-2 cursor-pointer hover:bg-gray-100 text-sm text-black flex items-center"
+                                      onClick={() => {
+                                        const isSelected = selectedCities.includes(city);
+                                        if (isSelected) {
+                                          setSelectedCities(selectedCities.filter(c => c !== city));
+                                        } else {
+                                          setSelectedCities([...selectedCities, city]);
+                                        }
+                                        setSelectedSubLocations([]);
+                                      }}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedCities.includes(city)}
+                                        onChange={() => { }} // Handled by parent div onClick
+                                        className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                      />
+                                      {city}
+                                    </div>
+                                  ))}
+                              </>
+                            )}
+
                           {/* No results message */}
                           {getFilteredCities().length === 0 && (
                             <div className="px-4 py-2 text-sm text-gray-500">
@@ -1514,7 +1514,7 @@ const handleCompareClick = async () => {
                               onClick={(e) => e.stopPropagation()}
                             />
                           </div>
-                          
+
                           {/* Clear All Option */}
                           {selectedSubLocations.length > 0 && (
                             <div
@@ -1527,7 +1527,7 @@ const handleCompareClick = async () => {
                               Clear All Sub-Locations
                             </div>
                           )}
-                          
+
                           {/* Filtered Sub-Locations */}
                           {getFilteredSubLocations().map((subLocation) => (
                             <div
@@ -1546,13 +1546,13 @@ const handleCompareClick = async () => {
                               <input
                                 type="checkbox"
                                 checked={selectedSubLocations.includes(subLocation)}
-                                onChange={() => {}} // Handled by parent div onClick
+                                onChange={() => { }} // Handled by parent div onClick
                                 className="mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                               />
                               {subLocation}
                             </div>
                           ))}
-                          
+
                           {/* No results message */}
                           {getFilteredSubLocations().length === 0 && (
                             <div className="px-4 py-2 text-sm text-gray-500">
@@ -1575,8 +1575,8 @@ const handleCompareClick = async () => {
                           setShowCarpetAreaDropdown(false);
                         }}
                       >
-                        {selectedPropertyTypes.length > 0 
-                          ? selectedPropertyTypes.length === 1 
+                        {selectedPropertyTypes.length > 0
+                          ? selectedPropertyTypes.length === 1
                             ? selectedPropertyTypes[0]
                             : `${selectedPropertyTypes.length} Property Types Selected`
                           : "Select Property Type"}
@@ -1732,7 +1732,7 @@ const handleCompareClick = async () => {
                           >
                             All Areas
                           </div>
-                          
+
                           {/* Min/Max Input Fields */}
                           <div className="px-4 py-3 border-t border-gray-100">
                             <div className="text-xs font-medium text-gray-600 mb-2">Custom Range (sqft)</div>
@@ -1768,7 +1768,7 @@ const handleCompareClick = async () => {
                               Apply Range
                             </button>
                           </div>
-                          
+
                           <div className="px-4 py-2 text-xs font-medium text-gray-600 border-t border-gray-100">Predefined Ranges</div>
                           {carpetAreaOptions.map((area) => (
                             <div
@@ -1894,7 +1894,7 @@ const handleCompareClick = async () => {
                           Don't worry! We love unique requirements. Let's connect you with our expert team who will work closely to find exactly what you're looking for.
                         </p>
                       </div>
-                      
+
                       <form onSubmit={handleContactFormSubmit} className="max-w-2xl mx-auto">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <div>
@@ -1957,11 +1957,11 @@ const handleCompareClick = async () => {
                               <option value="Buy">Buy</option>
                               <option value="Rent">Rent</option>
                               <option value="Sell">Sell</option>
-                            
+
                             </select>
                           </div>
                         </div>
-                        
+
                         <div className="mb-4">
                           <label className="block text-sm font-medium text-gray-700 mb-1">Inquiry</label>
                           <textarea
@@ -2006,7 +2006,7 @@ const handleCompareClick = async () => {
                             <p className="text-red-500 text-sm mt-1 flex items-center">{contactFormError}</p>
                           )}
                         </div>
-                        
+
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                           <button
                             type="submit"
@@ -2028,7 +2028,7 @@ const handleCompareClick = async () => {
                 )}
 
                 {/* Property Cards */}
-                
+
                 {loading ? (
                   // Loading state - show skeleton cards
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
@@ -2066,9 +2066,9 @@ const handleCompareClick = async () => {
                             <div className="h-3 bg-gray-300 rounded w-20"></div>
                             <div className="h-3 bg-gray-300 rounded w-16 ml-auto"></div>
                           </div>
-                          
+
                           <div className="border-t border-gray-200 my-2"></div>
-                          
+
                           <div className="flex justify-between items-center mt-1">
                             <div>
                               <div className="h-4 bg-gray-300 rounded w-24 mb-1"></div>
@@ -2099,231 +2099,230 @@ const handleCompareClick = async () => {
                   </div>
                 ) : (
                   <div>
-                     <div className="flex gap-4 mb-4">
-                {bookmarkedProperties.size > 0 && (
-                  <button
-                    className="block bg-black cursor-pointer text-white px-4 py-2 mb-4 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
-                    onClick={handleCompareClick} 
-                  >
-                    Compare Properties ({bookmarkedProperties.size})
-                  </button>
-                 
-                )}
-                                {bookmarkedProperties.size > 0 && (
-                  <button
-                    className="block bg-black cursor-pointer text-white px-4 py-2 mb-4 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
-                    onClick={() => {
-                      const selectedPropertyLinks = Array.from(bookmarkedProperties).map(propertyId => {
-                        const property = properties.find(p => p.id === propertyId);
-                        if (property) {
-                          const baseUrl = window.location.origin;
-                          return `${baseUrl}/property-details/${property.title}`;
-                        }
-                        return null;
-                      }).filter(Boolean).join('\n');
-                      
-                      const message = `I want to inquire about these properties:\n\n${selectedPropertyLinks}`;
-                      const whatsappUrl = `https://wa.me/918384848485?text=${encodeURIComponent(message)}`;
-                      window.open(whatsappUrl, '_blank');
-                    }}
-                  >
-                    Inquire this ({bookmarkedProperties.size}) properties
-                  </button>
-                )}
-                </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                    {filteredProperties.map((property, index) => (
-                      <div
-                        key={`${property.id}-${index}`}
-                        className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col transform transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-gray-400/20 hover:-translate-y-2 hover:border-gray-300 animate-fade-in-up"
-                        style={{ animationDelay: `${index * 150}ms` }}
-                      >
-                        {/* Header with title and checkbox */}
-                        <div className="p-2 sm:p-3 flex justify-between items-center transition-all duration-300 hover:bg-gray-50/50">
-                          <Link href={`/property-details/${property.title}`} className="block">
-                            <div className="h-14">
-                              <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
-                                {isLoggedIn ? (property.title || "Prime Business Hub") : "Property Details"}
-                              </h3>
-                              <div className="flex items-center text-gray-700 text-xs transition-all duration-300 hover:text-gray-900">
-                                <svg
-                                  className="w-4 h-4 mr-1 transition-all duration-300 hover:scale-110"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                                  />
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                                  />
-                                </svg>
-                                {property.address?.subLocality || property.address?.city || "Location Name"}
-                              </div>
-                            </div>
-                          </Link>
-                          <button
-                            onClick={() => handleCheckboxClick(property.id)}
-                            className={`w-5 h-5 border rounded flex items-center justify-center cursor-pointer ${
-                              bookmarkedProperties.has(property.id)
-                                ? "border-green-500 bg-green-500"
-                                : "border-gray-400"
-                            }`}
-                          >
-                            {bookmarkedProperties.has(property.id) && (
-                              <svg
-                                className="w-3 h-3 text-white"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                            )}
-                          </button>
-                        </div>
-                        {/* Property Image */}
-                        <Link href={`/property-details/${property.title}`} className="block">
-                          <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
-                            <Image
-                              src={getPropertyImage(property)}
-                              alt={isLoggedIn ? (property.title || "Property") : "Property Details"}
-                              className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
-                              width={340}
-                              height={180}
-                              onLoad={() => {
-                                // Remove from loading state when image loads successfully
-                                const imageUrl = getPropertyImage(property);
-                                if (imageUrl !== defaultPropertyImage.src) {
-                                  setLoadingImages(prev => {
-                                    const newSet = new Set(prev);
-                                    newSet.delete(imageUrl);
-                                    return newSet;
-                                  });
-                                }
-                              }}
-                              onError={(e) => {
-                                // Add failed image URL to state and fallback to default image
-                                const target = e.target as HTMLImageElement;
-                                const failedUrl = target.src;
-                                setFailedImages(prev => new Set(prev).add(failedUrl));
-                                setLoadingImages(prev => {
-                                  const newSet = new Set(prev);
-                                  newSet.delete(failedUrl);
-                                  return newSet;
-                                });
-                                target.src = defaultPropertyImage.src;
-                              }}
-                            />
-                            {/* For Sale/Rent / Property Type overlay */}
-                            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
-                              <span className="mr-2 transition-all duration-300 group-hover:font-medium">
-                                {(property as any).enquiredFor === "Sale"
-                                  ? "For Sale"
-                                  : (property as any).enquiredFor === "Rent"
-                                  ? "For Rent"
-                                  : property.forSale
-                                  ? "For Sale"
-                                  : property.forRent
-                                  ? "For Rent"
-                                  : "For Sale"}
-                              </span>
-                              <span className="mx-1 transition-all duration-300 group-hover:scale-110">•</span>
-                              <span className="ml-1 transition-all duration-300 group-hover:font-medium">
-                                {property.propertyType?.childType?.displayName ||
-                                  "Office space"}
-                              </span>
-                            </div>
-                          </div>
-                        </Link>
-                        {/* Property Details */}
-                        <div className="p-2 sm:p-3 flex-grow font-monotransition-all duration-300 hover:bg-gray-50/30">
-                          <Link href={`/property-details/${property.title}`} className="block">
-                            <div className="grid grid-cols-2 gap-1 text-xs">
-                              <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Built up Area</div>
-                              <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                                {property.dimension?.area || "5490"} sqft
-                              </div>
+                    <div className="flex gap-4 mb-4">
+                      {bookmarkedProperties.size > 0 && (
+                        <button
+                          className="block bg-black cursor-pointer text-white px-4 py-2 mb-4 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                          onClick={handleCompareClick}
+                        >
+                          Compare Properties ({bookmarkedProperties.size})
+                        </button>
 
-                              <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Carpet Area</div>
-                              <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                                {property.dimension?.carpetArea ? `${property.dimension.carpetArea} sqft` : "N/A"}
-                              </div>
+                      )}
+                      {bookmarkedProperties.size > 0 && (
+                        <button
+                          className="block bg-black cursor-pointer text-white px-4 py-2 mb-4 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
+                          onClick={() => {
+                            const selectedPropertyLinks = Array.from(bookmarkedProperties).map(propertyId => {
+                              const property = properties.find(p => p.id === propertyId);
+                              if (property) {
+                                const baseUrl = window.location.origin;
+                                return `${baseUrl}/property-details/${property.title}`;
+                              }
+                              return null;
+                            }).filter(Boolean).join('\n');
 
-                              <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Parking</div>
-                              <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                                {property.dimension?.parking || "N/A"}
-                              </div>
-
-                              <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">No of Cabin</div>
-                              <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                                {property.furnishStatus || "N/A"}
-                              </div>
-                            </div>
-                          </Link>
-                          <div className="border-t border-gray-200 my-2 transition-all duration-300 hover:border-gray-300"></div>
-                          {/* Price and Actions */}
-                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
+                            const message = `I want to inquire about these properties:\n\n${selectedPropertyLinks}`;
+                            const whatsappUrl = `https://wa.me/918384848485?text=${encodeURIComponent(message)}`;
+                            window.open(whatsappUrl, '_blank');
+                          }}
+                        >
+                          Inquire this ({bookmarkedProperties.size}) properties
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                      {filteredProperties.map((property, index) => (
+                        <div
+                          key={`${property.id}-${index}`}
+                          className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col transform transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-gray-400/20 hover:-translate-y-2 hover:border-gray-300 animate-fade-in-up"
+                          style={{ animationDelay: `${index * 150}ms` }}
+                        >
+                          {/* Header with title and checkbox */}
+                          <div className="p-2 sm:p-3 flex justify-between items-center transition-all duration-300 hover:bg-gray-50/50">
                             <Link href={`/property-details/${property.title}`} className="block">
-                              <div className="transition-all duration-300 hover:scale-105">
-                                <div className="text-base text-black font-mono font-semibold transition-all duration-300 hover:text-gray-800">
-                                  {property.forRent
-                                    ? `₹ ${(property.monetaryInfo?.expectedRent || 4500).toLocaleString("en-IN")}`
-                                    : formatPrice(property.monetaryInfo?.expectedPrice)}
-                                </div>
-                                <div className="text-gray-500 text-xs transition-all duration-300 hover:text-gray-600">
-                                  {property.forRent ? "rent/month" : ""}
+                              <div className="h-14">
+                                <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
+                                  {isLoggedIn ? (property.title || "Prime Business Hub") : "Property Details"}
+                                </h3>
+                                <div className="flex items-center text-gray-700 text-xs transition-all duration-300 hover:text-gray-900">
+                                  <svg
+                                    className="w-4 h-4 mr-1 transition-all duration-300 hover:scale-110"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                                    />
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                    />
+                                  </svg>
+                                  {property.address?.subLocality || property.address?.city || "Location Name"}
                                 </div>
                               </div>
                             </Link>
-                            <div className="flex space-x-1 relative">
-                              {/* Map button */}
-                              <button
-                                className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-red-200 hover:scale-110 hover:shadow-md active:scale-95"
-                                aria-label="View on Map"
-                                onClick={() => {
-                                  const address = [
-                                    property.address?.subLocality,
-                                    property.address?.city,
-                                    property.address?.state
-                                  ].filter(Boolean).join(", ");
-                                  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
-                                  window.open(mapUrl, '_blank');
-                                }}
-                              >
+                            <button
+                              onClick={() => handleCheckboxClick(property.id)}
+                              className={`w-5 h-5 border rounded flex items-center justify-center cursor-pointer ${bookmarkedProperties.has(property.id)
+                                ? "border-green-500 bg-green-500"
+                                : "border-gray-400"
+                                }`}
+                            >
+                              {bookmarkedProperties.has(property.id) && (
                                 <svg
-                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="w-3 h-3 text-white"
                                   fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={1.5}
                                   stroke="currentColor"
-                                  className="w-5 h-5 text-red-500"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
                                 >
                                   <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    d="M12 21c-4.418 0-8-5.373-8-10A8 8 0 0112 3a8 8 0 018 8c0 4.627-3.582 10-8 10zm0-7a3 3 0 100-6 3 3 0 000 6z"
+                                    strokeWidth={2}
+                                    d="M5 13l4 4L19 7"
                                   />
                                 </svg>
-                              </button>
-                              {/* Share button */}
-                               {/* Share button */}
-                        <div className="relative">
-                          {/* <button
+                              )}
+                            </button>
+                          </div>
+                          {/* Property Image */}
+                          <Link href={`/property-details/${property.title}`} className="block">
+                            <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
+                              <Image
+                                src={getPropertyImage(property)}
+                                alt={isLoggedIn ? (property.title || "Property") : "Property Details"}
+                                className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
+                                width={340}
+                                height={180}
+                                onLoad={() => {
+                                  // Remove from loading state when image loads successfully
+                                  const imageUrl = getPropertyImage(property);
+                                  if (imageUrl !== defaultPropertyImage.src) {
+                                    setLoadingImages(prev => {
+                                      const newSet = new Set(prev);
+                                      newSet.delete(imageUrl);
+                                      return newSet;
+                                    });
+                                  }
+                                }}
+                                onError={(e) => {
+                                  // Add failed image URL to state and fallback to default image
+                                  const target = e.target as HTMLImageElement;
+                                  const failedUrl = target.src;
+                                  setFailedImages(prev => new Set(prev).add(failedUrl));
+                                  setLoadingImages(prev => {
+                                    const newSet = new Set(prev);
+                                    newSet.delete(failedUrl);
+                                    return newSet;
+                                  });
+                                  target.src = defaultPropertyImage.src;
+                                }}
+                              />
+                              {/* For Sale/Rent / Property Type overlay */}
+                              <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
+                                <span className="mr-2 transition-all duration-300 group-hover:font-medium">
+                                  {(property as any).enquiredFor === "Sale"
+                                    ? "For Sale"
+                                    : (property as any).enquiredFor === "Rent"
+                                      ? "For Rent"
+                                      : property.forSale
+                                        ? "For Sale"
+                                        : property.forRent
+                                          ? "For Rent"
+                                          : "For Sale"}
+                                </span>
+                                <span className="mx-1 transition-all duration-300 group-hover:scale-110">•</span>
+                                <span className="ml-1 transition-all duration-300 group-hover:font-medium">
+                                  {property.propertyType?.childType?.displayName ||
+                                    "Office space"}
+                                </span>
+                              </div>
+                            </div>
+                          </Link>
+                          {/* Property Details */}
+                          <div className="p-2 sm:p-3 flex-grow font-monotransition-all duration-300 hover:bg-gray-50/30">
+                            <Link href={`/property-details/${property.title}`} className="block">
+                              <div className="grid grid-cols-2 gap-1 text-xs">
+                                <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Built up Area</div>
+                                <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
+                                  {property.dimension?.area || "5490"} sqft
+                                </div>
+
+                                <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Carpet Area</div>
+                                <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
+                                  {property.dimension?.carpetArea ? `${property.dimension.carpetArea} sqft` : "N/A"}
+                                </div>
+
+                                <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Parking</div>
+                                <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
+                                  {property.dimension?.parking || "N/A"}
+                                </div>
+
+                                <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">No of Cabin</div>
+                                <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
+                                  {property.furnishStatus || "N/A"}
+                                </div>
+                              </div>
+                            </Link>
+                            <div className="border-t border-gray-200 my-2 transition-all duration-300 hover:border-gray-300"></div>
+                            {/* Price and Actions */}
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
+                              <Link href={`/property-details/${property.title}`} className="block">
+                                <div className="transition-all duration-300 hover:scale-105">
+                                  <div className="text-base text-black font-mono font-semibold transition-all duration-300 hover:text-gray-800">
+                                    {property.forRent
+                                      ? `₹ ${(property.monetaryInfo?.expectedRent || 4500).toLocaleString("en-IN")}`
+                                      : formatPrice(property.monetaryInfo?.expectedPrice)}
+                                  </div>
+                                  <div className="text-gray-500 text-xs transition-all duration-300 hover:text-gray-600">
+                                    {property.forRent ? "rent/month" : ""}
+                                  </div>
+                                </div>
+                              </Link>
+                              <div className="flex space-x-1 relative">
+                                {/* Map button */}
+                                <button
+                                  className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-red-200 hover:scale-110 hover:shadow-md active:scale-95"
+                                  aria-label="View on Map"
+                                  onClick={() => {
+                                    const address = [
+                                      property.address?.subLocality,
+                                      property.address?.city,
+                                      property.address?.state
+                                    ].filter(Boolean).join(", ");
+                                    const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+                                    window.open(mapUrl, '_blank');
+                                  }}
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="w-5 h-5 text-red-500"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M12 21c-4.418 0-8-5.373-8-10A8 8 0 0112 3a8 8 0 018 8c0 4.627-3.582 10-8 10zm0-7a3 3 0 100-6 3 3 0 000 6z"
+                                    />
+                                  </svg>
+                                </button>
+                                {/* Share button */}
+                                {/* Share button */}
+                                <div className="relative">
+                                  {/* <button
                             className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
                             onClick={() => setOpenShareIndex(openShareIndex === index ? null : index)}
                             aria-label="Share"
@@ -2331,77 +2330,77 @@ const handleCompareClick = async () => {
                           >
                            
                           </button> */}
-                                         {isLoggedIn && (
-                  <button
-                    type="button"
-                    className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
-                    onClick={() => {
-                      if (navigator.share) {
-                        navigator.share({
-                          title: property.title,
-                          text: `Check out this property: ${property.title}`,
-                          url: `https://realtraspaces.com/property-details/${property.title}`,
-                        });
-                      } else {
-                        alert("Share not supported on this browser.");
-                      }
-                    }}
-                    title="Share"
-                  >
-                    <Image
-                      src={share}
-                      alt="Share"
-                      width={20}
-                      height={20}
-                      className="object-contain transition-all duration-300 hover:scale-110"
-                    />
-                  </button>
-                )}
-                        </div>
-                              {/* WhatsApp button */}
-                              <a
-                                href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(`${window.location.origin}/property-details/${encodeURIComponent(property.title || '')}`)}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
-                                aria-label="WhatsApp"
-                              >
-                                <Image
-                                  src={whatsapp}
-                                  alt="WhatsApp"
-                                  width={20}
-                                  height={20}
-                                  className="object-contain transition-all duration-300 hover:scale-110"
-                                />
-                              </a>
-                              <Link href="/contact">
-                          <button
-                            className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-purple-200 hover:scale-110 hover:shadow-md active:scale-95"
-                            aria-label="Inquire"
-                            title="Inquire about this property"
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth={1.5}
-                              stroke="currentColor"
-                              className="w-5 h-5 text-purple-600"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
-                              />
-                            </svg>
-                          </button>
-                        </Link>
+                                  {isLoggedIn && (
+                                    <button
+                                      type="button"
+                                      className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
+                                      onClick={() => {
+                                        if (navigator.share) {
+                                          navigator.share({
+                                            title: property.title,
+                                            text: `Check out this property: ${property.title}`,
+                                            url: `https://realtraspaces.com/property-details/${property.title}`,
+                                          });
+                                        } else {
+                                          alert("Share not supported on this browser.");
+                                        }
+                                      }}
+                                      title="Share"
+                                    >
+                                      <Image
+                                        src={share}
+                                        alt="Share"
+                                        width={20}
+                                        height={20}
+                                        className="object-contain transition-all duration-300 hover:scale-110"
+                                      />
+                                    </button>
+                                  )}
+                                </div>
+                                {/* WhatsApp button */}
+                                <a
+                                  href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(`${window.location.origin}/property-details/${encodeURIComponent(property.title || '')}`)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
+                                  aria-label="WhatsApp"
+                                >
+                                  <Image
+                                    src={whatsapp}
+                                    alt="WhatsApp"
+                                    width={20}
+                                    height={20}
+                                    className="object-contain transition-all duration-300 hover:scale-110"
+                                  />
+                                </a>
+                                <Link href="/contact">
+                                  <button
+                                    className="p-1.5 rounded flex items-center cursor-pointer justify-center transition-all duration-300 hover:bg-purple-200 hover:scale-110 hover:shadow-md active:scale-95"
+                                    aria-label="Inquire"
+                                    title="Inquire about this property"
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      strokeWidth={1.5}
+                                      stroke="currentColor"
+                                      className="w-5 h-5 text-purple-600"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
+                                      />
+                                    </svg>
+                                  </button>
+                                </Link>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
                   </div>
                 )}
               </div>

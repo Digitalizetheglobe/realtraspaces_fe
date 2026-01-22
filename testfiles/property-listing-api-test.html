@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,23 +13,27 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
+
         .container {
             background: white;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
         .endpoint {
             background: #e8f4fd;
             padding: 15px;
             border-left: 4px solid #007acc;
             margin-bottom: 15px;
         }
+
         .method {
             font-weight: bold;
             color: #007acc;
         }
+
         textarea {
             width: 100%;
             height: 200px;
@@ -38,6 +43,7 @@
             border-radius: 4px;
             padding: 10px;
         }
+
         button {
             background: #007acc;
             color: white;
@@ -47,9 +53,11 @@
             cursor: pointer;
             margin: 5px;
         }
+
         button:hover {
             background: #005a9e;
         }
+
         .response {
             background: #f8f9fa;
             border: 1px solid #dee2e6;
@@ -62,29 +70,36 @@
             max-height: 300px;
             overflow-y: auto;
         }
+
         .success {
             border-left: 4px solid #28a745;
             background: #d4edda;
         }
+
         .error {
             border-left: 4px solid #dc3545;
             background: #f8d7da;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input, select {
+
+        input,
+        select {
             width: 100%;
             padding: 8px;
             border: 1px solid #ddd;
             border-radius: 4px;
             box-sizing: border-box;
         }
+
         .json-examples {
             background: #fff3cd;
             border: 1px solid #ffeaa7;
@@ -92,6 +107,7 @@
             padding: 15px;
             margin-bottom: 15px;
         }
+
         .integration-info {
             background: #d1ecf1;
             border: 1px solid #bee5eb;
@@ -101,9 +117,10 @@
         }
     </style>
 </head>
+
 <body>
     <h1>Property Listing API Test Suite</h1>
-    
+
     <div class="integration-info">
         <h3>🚀 Integration Complete!</h3>
         <p><strong>Your Next.js form is now ready at:</strong> <code>/list-property</code></p>
@@ -117,12 +134,12 @@
             <li>✅ Toast notifications for user feedback</li>
         </ul>
     </div>
-    
+
     <div class="container">
         <h2>Base Configuration</h2>
         <div class="form-group">
             <label>API Base URL:</label>
-            <input type="text" id="baseUrl" value="https://api.realtraspaces.com/api/property-listings">
+            <input type="text" id="baseUrl" value="http://localhost:8000/api/property-listings">
         </div>
     </div>
 
@@ -131,7 +148,7 @@
         <div class="endpoint">
             <span class="method">POST</span> /api/property-listings/create
         </div>
-        
+
         <div class="json-examples">
             <h4>📝 Load Test Data:</h4>
             <button onclick="loadCreateExample(1)">Office Space</button>
@@ -170,12 +187,12 @@
         <div class="endpoint">
             <span class="method">GET</span> /api/property-listings/all
         </div>
-        
+
         <div class="form-group">
             <label>Query Parameters (optional):</label>
             <input type="text" id="getAllParams" placeholder="page=1&limit=10&status=approved&propertyType=Office">
         </div>
-        
+
         <button onclick="testGetAll()">📋 Test Get All</button>
         <div id="getAllResponse" class="response"></div>
     </div>
@@ -185,12 +202,12 @@
         <div class="endpoint">
             <span class="method">GET</span> /api/property-listings/:id
         </div>
-        
+
         <div class="form-group">
             <label>Property ID:</label>
             <input type="number" id="getById" placeholder="1">
         </div>
-        
+
         <button onclick="testGetById()">🔍 Test Get By ID</button>
         <div id="getByIdResponse" class="response"></div>
     </div>
@@ -200,7 +217,7 @@
         <div class="endpoint">
             <span class="method">PUT</span> /api/property-listings/:id
         </div>
-        
+
         <div class="form-group">
             <label>Property ID to Update:</label>
             <input type="number" id="updateId" placeholder="1">
@@ -225,12 +242,12 @@
         <div class="endpoint">
             <span class="method">PATCH</span> /api/property-listings/:id/status
         </div>
-        
+
         <div class="form-group">
             <label>Property ID:</label>
             <input type="number" id="statusId" placeholder="1">
         </div>
-        
+
         <div class="form-group">
             <label>New Status:</label>
             <select id="newStatus">
@@ -241,7 +258,7 @@
                 <option value="inactive">inactive</option>
             </select>
         </div>
-        
+
         <button onclick="testUpdateStatus()">🔄 Test Update Status</button>
         <div id="statusResponse" class="response"></div>
     </div>
@@ -416,9 +433,10 @@
         }
 
         // Load first example on page load
-        window.addEventListener('load', function() {
+        window.addEventListener('load', function () {
             loadCreateExample(1);
         });
     </script>
 </body>
+
 </html>

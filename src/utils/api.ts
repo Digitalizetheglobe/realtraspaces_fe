@@ -20,7 +20,7 @@ export interface SeoMetaData {
 const isBrowser = typeof window !== 'undefined';
 
 class ApiService {
-  private baseUrl = 'https://api.realtraspaces.com';
+  private baseUrl = 'http://localhost:8000';
 
   private async makeRequest<T>(
     endpoint: string,
@@ -28,7 +28,7 @@ class ApiService {
   ): Promise<T> {
     // Only try to get token if we're in a browser environment
     const token = isBrowser ? localStorage.getItem('adminToken') : null;
-    
+
     if (!token) {
       throw new Error('Authentication token not found');
     }
@@ -73,8 +73,8 @@ class ApiService {
   // Web Users API
   async getWebUsers(): Promise<ApiResponse> {
     // Use localhost for web users dashboard
-    const url = `https://api.realtraspaces.com/api/webusers`;
-    
+    const url = `http://localhost:8000/api/webusers`;
+
     try {
       const response = await fetch(url, {
         method: 'GET',
@@ -99,8 +99,8 @@ class ApiService {
 
   async updateWebUserStatus(userId: number, isActive: boolean): Promise<ApiResponse> {
     // Use localhost for web users dashboard
-    const url = `https://api.realtraspaces.com/api/webusers/${userId}/status`;
-    
+    const url = `http://localhost:8000/api/webusers/${userId}/status`;
+
     try {
       const response = await fetch(url, {
         method: 'PATCH',
@@ -133,7 +133,7 @@ class ApiService {
   async validateToken(): Promise<boolean> {
     try {
       const token = isBrowser ? localStorage.getItem('adminToken') : null;
-      
+
       if (!token) {
         return false;
       }
@@ -172,13 +172,13 @@ export async function fetchSeoMetaData(page: string): Promise<SeoMetaData | null
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-    const response = await fetch(`https://api.realtraspaces.com/api/seo/meta-tags/`, {
+    const response = await fetch(`http://localhost:8000/api/seo/meta-tags/`, {
       signal: controller.signal,
       next: { revalidate: 3600 } // Cache for 1 hour
     });
-    
+
     clearTimeout(timeoutId);
-    
+
     if (!response.ok) {
       // If the endpoint doesn't exist or returns an error, return null
       // This is expected behavior as mentioned in the useSeo hook
@@ -186,7 +186,7 @@ export async function fetchSeoMetaData(page: string): Promise<SeoMetaData | null
     }
 
     const data = await response.json();
-    
+
     // Find the SEO data for the specific page
     if (data.status === 'success' && data.data && Array.isArray(data.data)) {
       const pageData = data.data.find((item: any) => item.page === page);
@@ -199,7 +199,7 @@ export async function fetchSeoMetaData(page: string): Promise<SeoMetaData | null
         };
       }
     }
-    
+
     return null;
   } catch (error) {
     // Silently fall back when SEO service is unreachable or times out

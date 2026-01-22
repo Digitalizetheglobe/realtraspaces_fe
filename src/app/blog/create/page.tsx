@@ -49,7 +49,7 @@ const CreateBlogContent = () => {
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    
+
     files.forEach(file => {
       if (file.type.startsWith('image/')) {
         const reader = new FileReader();
@@ -74,7 +74,7 @@ const CreateBlogContent = () => {
     try {
       // Create FormData for multipart/form-data submission
       const formDataToSend = new FormData();
-      
+
       // Add text fields
       formDataToSend.append('blogTitle', formData.blogTitle);
       formDataToSend.append('blogDescription', formData.blogDescription);
@@ -83,13 +83,13 @@ const CreateBlogContent = () => {
       formDataToSend.append('category', formData.category);
       formDataToSend.append('tags', formData.tags);
       formDataToSend.append('slug', formData.slug);
-      
+
       // Add images
       selectedImages.forEach((image, index) => {
         formDataToSend.append('images', image.file);
       });
 
-      const response = await fetch(`https://api.realtraspaces.com/api/blogs/`, {
+      const response = await fetch(`http://localhost:8000/api/blogs/`, {
         method: 'POST',
         body: formDataToSend, // Don't set Content-Type header, let browser set it with boundary
       });
@@ -112,7 +112,7 @@ const CreateBlogContent = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  
+
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: colors.light }}>
@@ -135,7 +135,7 @@ const CreateBlogContent = () => {
         {/* Form Container */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
           {error && (
-            <div 
+            <div
               className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4"
               role="alert"
             >
@@ -158,9 +158,9 @@ const CreateBlogContent = () => {
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                  style={{ 
+                  style={{
                     borderColor: colors.secondary,
-                    color:"black"
+                    color: "black"
                   }}
                   placeholder="Enter your blog title"
                 />
@@ -179,9 +179,9 @@ const CreateBlogContent = () => {
                   required
                   rows={3}
                   className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                  style={{ 
+                  style={{
                     borderColor: colors.secondary,
-                    color:"black"
+                    color: "black"
                   }}
                   placeholder="Write a brief description of your blog..."
                 />
@@ -200,9 +200,9 @@ const CreateBlogContent = () => {
                   required
                   rows={10}
                   className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                  style={{ 
+                  style={{
                     borderColor: colors.secondary,
-                    color:"black"
+                    color: "black"
                   }}
                   placeholder="Write your blog content here..."
                 />
@@ -277,9 +277,9 @@ const CreateBlogContent = () => {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ 
+                    style={{
                       borderColor: colors.secondary,
-                      color:"black"
+                      color: "black"
                     }}
                     placeholder="Enter writer name"
                   />
@@ -297,10 +297,10 @@ const CreateBlogContent = () => {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ 
+                    style={{
                       borderColor: colors.secondary,
-                      color:"black"
-                      }}
+                      color: "black"
+                    }}
                   >
                     <option value="">Select a category</option>
                     <option value="RealEstate">Real Estate</option>
@@ -327,10 +327,10 @@ const CreateBlogContent = () => {
                     value={formData.tags}
                     onChange={handleChange}
                     className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ 
+                    style={{
                       borderColor: colors.secondary,
-                      color:"black"
-                      }}
+                      color: "black"
+                    }}
                     placeholder="tag1, tag2, tag3"
                   />
                 </div>
@@ -348,10 +348,10 @@ const CreateBlogContent = () => {
                     onChange={handleChange}
                     required
                     className="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ 
+                    style={{
                       borderColor: colors.secondary,
-                      color:"black"
-                      }}
+                      color: "black"
+                    }}
                     placeholder="blog-post-title"
                   />
                 </div>
@@ -394,13 +394,13 @@ const CreateBlogContent = () => {
                 type="submit"
                 disabled={loading}
                 className="flex items-center px-6 py-3 rounded-md text-white hover:shadow-md transition-all"
-                style={{ 
+                style={{
                   backgroundColor: loading ? colors.secondary : colors.primary,
                   cursor: loading ? 'not-allowed' : 'pointer'
                 }}
               >
                 {loading ? (
-                  <div 
+                  <div
                     className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white mr-2"
                   ></div>
                 ) : (

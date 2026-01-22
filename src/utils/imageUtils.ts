@@ -1,6 +1,6 @@
 // Utility functions for handling blog images
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.realtraspaces.com';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 /**
  * Get the full URL for a blog image
@@ -9,12 +9,12 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.realtraspac
  */
 export const getBlogImageUrl = (filename: string): string => {
   if (!filename) return '';
-  
+
   // If it's already a full URL, return as is
   if (filename.startsWith('http://') || filename.startsWith('https://')) {
     return filename;
   }
-  
+
   // Return the URL using the blogImages static route
   return `${API_BASE_URL}/blogImages/${filename}`;
 };
@@ -26,12 +26,12 @@ export const getBlogImageUrl = (filename: string): string => {
  */
 export const getBlogImageApiUrl = (filename: string): string => {
   if (!filename) return '';
-  
+
   // If it's already a full URL, return as is
   if (filename.startsWith('http://') || filename.startsWith('https://')) {
     return filename;
   }
-  
+
   // Return the URL using the API route
   return `${API_BASE_URL}/api/blogs/image/${filename}`;
 };

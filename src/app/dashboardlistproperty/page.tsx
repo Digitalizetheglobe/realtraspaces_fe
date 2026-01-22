@@ -2,16 +2,16 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { 
-  Trash2, 
-  Edit, 
-  Eye, 
-  Search, 
-  Filter, 
-  MoreHorizontal, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
+import {
+  Trash2,
+  Edit,
+  Eye,
+  Search,
+  Filter,
+  MoreHorizontal,
+  CheckCircle,
+  XCircle,
+  Clock,
   AlertCircle,
   Building2,
   MapPin,
@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 
 // API utility functions
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.realtraspaces.com';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 const apiCall = async (endpoint: string, options: RequestInit = {}) => {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -108,7 +108,7 @@ export default function DashboardListProperty() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  
+
   // Modal states
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedProperty, setSelectedProperty] = useState<PropertyListing | null>(null);
@@ -128,14 +128,14 @@ export default function DashboardListProperty() {
     { name: "Career Management", icon: "💼", href: "/career-management" },
     { name: "Blog", icon: "📝", href: "/blog" },
     { name: "Manage Testimonials", icon: "⭐", href: "/manage-testimonials" },
-    {name :'All properties', icon:"🏠", href: '/PropertyListing'},
-    {name :'SEO Meta Manager',icon:"🌐", href: '/seometaManager'},
-    {name :'Team Management',icon:"👥", href: '/dashboardteam'},
-    {name :'Developer Management',icon:"🛠️", href: '/dashboarddeveloper'},
-    {name :'List Properties',icon:"💼", href: '/dashboardlistproperty'},
-    {name :'Cookie Policy',icon:"📝", href: '/dashboardcookies'},
-    {name :'Contact Leads',icon:"📝", href: '/dashboardcontactleads'},
-    {name :'Awards Management',icon:"🏆", href: '/awardmanagement'},
+    { name: 'All properties', icon: "🏠", href: '/PropertyListing' },
+    { name: 'SEO Meta Manager', icon: "🌐", href: '/seometaManager' },
+    { name: 'Team Management', icon: "👥", href: '/dashboardteam' },
+    { name: 'Developer Management', icon: "🛠️", href: '/dashboarddeveloper' },
+    { name: 'List Properties', icon: "💼", href: '/dashboardlistproperty' },
+    { name: 'Cookie Policy', icon: "📝", href: '/dashboardcookies' },
+    { name: 'Contact Leads', icon: "📝", href: '/dashboardcontactleads' },
+    { name: 'Awards Management', icon: "🏆", href: '/awardmanagement' },
 
   ];
 
@@ -153,14 +153,14 @@ export default function DashboardListProperty() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const queryParams = new URLSearchParams();
       Object.entries(filters).forEach(([key, value]) => {
         if (value) queryParams.append(key, value.toString());
       });
 
       const result = await apiCall(`/api/property-listings/all?${queryParams}`);
-      
+
       if (result.success) {
         setListings(result.data.listings);
         setPagination(result.data.pagination);
@@ -180,7 +180,7 @@ export default function DashboardListProperty() {
     try {
       setDeleteLoading(true);
       const result = await apiCall(`/api/property-listings/${id}`, { method: 'DELETE' });
-      
+
       if (result.success) {
         setListings(prev => prev.filter(item => item.id !== id));
         setSelectedItems(prev => prev.filter(item => item !== id));
@@ -201,7 +201,7 @@ export default function DashboardListProperty() {
     try {
       setDeleteLoading(true);
       const result = await apiCall('/api/property-listings/delete-all?confirm=true', { method: 'DELETE' });
-      
+
       if (result.success) {
         setListings([]);
         setSelectedItems([]);
@@ -225,9 +225,9 @@ export default function DashboardListProperty() {
         method: 'PATCH',
         body: JSON.stringify({ status })
       });
-      
+
       if (result.success) {
-        setListings(prev => prev.map(item => 
+        setListings(prev => prev.map(item =>
           item.id === id ? { ...item, status: status as any } : item
         ));
       } else {
@@ -244,14 +244,14 @@ export default function DashboardListProperty() {
     setSelectedProperty(property);
     setShowDetailsModal(true);
     setCurrentImageIndex(0);
-    
+
     // Use images from property listing response
     setIsLoadingImages(true);
     try {
       // Convert property images array to the expected format
       const images = property.images || [];
       console.log('Property images from API:', images);
-      
+
       if (images.length > 0) {
         const formattedImages = images.map((imageUrl, index) => {
           console.log(`Processing image ${index}:`, imageUrl);
@@ -303,10 +303,10 @@ export default function DashboardListProperty() {
         `${API_BASE_URL}/${imageUrl}`,  // Direct from root
         `${API_BASE_URL}/public/${imageUrl}`,  // From public directory
       ];
-      
+
       let fullImageUrl = possiblePaths[0];
       let response;
-      
+
       // Try each path until one works
       for (const path of possiblePaths) {
         try {
@@ -319,11 +319,11 @@ export default function DashboardListProperty() {
           continue;
         }
       }
-      
+
       if (!response || !response.ok) {
         throw new Error('Image not found at any expected path');
       }
-      
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -348,7 +348,7 @@ export default function DashboardListProperty() {
 
   const downloadPDF = () => {
     if (!selectedProperty) return;
-    
+
     const element = document.createElement('div');
     element.innerHTML = `
       <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 800px;">
@@ -393,12 +393,12 @@ export default function DashboardListProperty() {
 
         <div style="margin: 20px 0;">
           <h3 style="color: #374151; margin-bottom: 10px;">Property Images</h3>
-          ${propertyImages.length > 0 ? 
-            propertyImages.map((img, index) => 
-              `<p style="color: #6b7280; margin: 5px 0;">Image ${index + 1}: ${getImageUrl(img.images[0])}</p>`
-            ).join('') : 
-            '<p style="color: #6b7280;">No images available</p>'
-          }
+          ${propertyImages.length > 0 ?
+        propertyImages.map((img, index) =>
+          `<p style="color: #6b7280; margin: 5px 0;">Image ${index + 1}: ${getImageUrl(img.images[0])}</p>`
+        ).join('') :
+        '<p style="color: #6b7280;">No images available</p>'
+      }
         </div>
 
         <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #6b7280; font-size: 12px;">
@@ -510,9 +510,8 @@ export default function DashboardListProperty() {
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
       <div
-        className={`${
-          isSidebarOpen ? "w-64" : "w-20"
-        } bg-gray-200 shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
+        className={`${isSidebarOpen ? "w-64" : "w-20"
+          } bg-gray-200 shadow-lg transition-all duration-300 ease-in-out flex flex-col`}
       >
         <div className="p-4 flex items-center gap-x-2">
           {/* Toggle Button */}
@@ -822,7 +821,7 @@ export default function DashboardListProperty() {
                           >
                             <Eye className="w-4 h-4" />
                           </button>
-                          
+
                           <button
                             onClick={() => setShowDeleteModal(true)}
                             className="text-red-600 hover:text-red-900"
@@ -877,11 +876,10 @@ export default function DashboardListProperty() {
                         <button
                           key={page}
                           onClick={() => handlePageChange(page)}
-                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                            page === pagination.currentPage
-                              ? 'z-10 bg-[#FFB400] border-[#FFB400] text-white'
-                              : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                          }`}
+                          className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${page === pagination.currentPage
+                            ? 'z-10 bg-[#FFB400] border-[#FFB400] text-white'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                            }`}
                         >
                           {page}
                         </button>
@@ -990,17 +988,15 @@ export default function DashboardListProperty() {
                   {selectedProperty.location}
                 </div>
                 <div className="flex items-center space-x-4">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    selectedProperty.status === 'approved' ? 'bg-green-100 text-green-800' :
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedProperty.status === 'approved' ? 'bg-green-100 text-green-800' :
                     selectedProperty.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                    selectedProperty.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
+                      selectedProperty.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                    }`}>
                     {selectedProperty.status}
                   </span>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    selectedProperty.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${selectedProperty.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
                     {selectedProperty.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
@@ -1051,13 +1047,13 @@ export default function DashboardListProperty() {
                           console.error('Image load error for URL:', getImageUrl(propertyImages[currentImageIndex]?.images[0]));
                           console.log('Image filename:', propertyImages[currentImageIndex]?.images[0]);
                           console.log('This image file does not exist on the server. Showing placeholder.');
-                          
+
                           // Show placeholder immediately since the image doesn't exist
                           e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIE5vdCBGb3VuZDwvdGV4dD48L3N2Zz4=';
                         }}
                       />
                     </div>
-                    
+
                     {propertyImages.length > 1 && (
                       <>
                         <button
@@ -1084,9 +1080,8 @@ export default function DashboardListProperty() {
                         <div key={image.id} className="flex-shrink-0">
                           <button
                             onClick={() => setCurrentImageIndex(index)}
-                            className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${
-                              index === currentImageIndex ? 'border-blue-600' : 'border-gray-200'
-                            }`}
+                            className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${index === currentImageIndex ? 'border-blue-600' : 'border-gray-200'
+                              }`}
                           >
                             <img
                               src={getImageUrl(image.images[0])}
@@ -1096,7 +1091,7 @@ export default function DashboardListProperty() {
                                 console.error('Thumbnail load error for URL:', getImageUrl(image.images[0]));
                                 console.log('Thumbnail filename:', image.images[0]);
                                 console.log('This image file does not exist on the server. Showing placeholder.');
-                                
+
                                 // Show placeholder immediately since the image doesn't exist
                                 e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNiIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTAiIGZpbGw9IiM2YjcyODAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
                               }}
@@ -1121,7 +1116,7 @@ export default function DashboardListProperty() {
                       <p className="text-gray-400 text-sm mt-1">Images will appear here when uploaded</p>
                       <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
                         <p className="text-red-800 text-xs">
-                          <strong>Issue:</strong> The property listing contains image filenames but the actual image files are missing from the server. 
+                          <strong>Issue:</strong> The property listing contains image filenames but the actual image files are missing from the server.
                           This indicates that the image upload functionality is not properly implemented in the backend.
                         </p>
                       </div>

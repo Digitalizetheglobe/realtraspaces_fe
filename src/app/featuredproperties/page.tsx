@@ -24,7 +24,7 @@ type Property = {
   id: string;
   title?: string;
   imageUrls?: {
-    Images?: Array<{
+    images?: Array<{
       imageFilePath: string;
       isCoverImage: boolean;
       orderRank?: number | null;
@@ -73,7 +73,7 @@ const FeaturedProperties = () => {
     const fetchProperties = async () => {
       try {
         const response = await fetch(
-          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=6",
+          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=20",
           {
             method: "GET",
             headers: {
@@ -84,9 +84,8 @@ const FeaturedProperties = () => {
         );
         const data = await response.json();
         console.log("API response:", data);
-        setProperties(
-          Array.isArray(data) ? data : data.items || data.data || []
-        );
+        const allProperties = Array.isArray(data) ? data : data.items || data.data || [];
+        setProperties(allProperties.slice(8, 14));
         setLoading(false);
       } catch (error) {
         console.error("Error fetching properties:", error);
@@ -302,7 +301,7 @@ const FeaturedProperties = () => {
         <div className="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
           <div className="mb-6 max-w-5xl mx-auto">
             <h2 className="text-2xl sm:text-3xl font-bold text-black header-animate">
-              Explore Commercial Properties in BKC
+              Explore Commercial Properties
             </h2>
           </div>
 
@@ -310,23 +309,21 @@ const FeaturedProperties = () => {
             {properties.map((property, index) => (
               <div
                 key={property.id}
-                className={`property-card bg-white rounded-lg shadow-sm overflow-hidden ${
-                  visibleItems.has(index) 
-                    ? (index % 2 === 0 ? 'visible-left' : 'visible-right')
-                    : ''
-                }`}
+                className={`property-card bg-white rounded-lg shadow-sm overflow-hidden ${visibleItems.has(index)
+                  ? (index % 2 === 0 ? 'visible-left' : 'visible-right')
+                  : ''
+                  }`}
                 data-index={index}
               >
                 <div
-                  className={`flex flex-col sm:flex-row ${
-                    index % 2 !== 0 ? "sm:flex-row-reverse" : ""
-                  }`}
+                  className={`flex flex-col sm:flex-row ${index % 2 !== 0 ? "sm:flex-row-reverse" : ""
+                    }`}
                 >
                   {/* Image */}
                   <div className="w-full sm:w-1/3 p-2 overflow-hidden flex items-center justify-center">
-                    {property.imageUrls?.Images && property.imageUrls.Images.length > 0 ? (
+                    {property.imageUrls?.images && property.imageUrls.images.length > 0 ? (
                       <img
-                        src={property.imageUrls.Images[0].imageFilePath}
+                        src={property.imageUrls.images[0].imageFilePath}
                         alt={isLoggedIn ? property.title : "Property Details"}
                         className="property-image w-full h-56 object-cover rounded-2xl p-2"
                       />
@@ -362,7 +359,7 @@ const FeaturedProperties = () => {
                     <h4 className="text-base text-gray-500 font-mono mb-4 transition-colors duration-300">
                       {formatPrice(
                         property.monetaryInfo?.expectedPrice ||
-                          property.monetaryInfo?.monthlyRentAmount,
+                        property.monetaryInfo?.monthlyRentAmount,
                         property.enquiredFor
                       )}
                     </h4>

@@ -78,9 +78,9 @@ const TopDevelopers = () => {
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
-        const response = await fetch('https://api.realtraspaces.com/api/developers');
+        const response = await fetch('http://localhost:8000/api/developers');
         const data = await response.json();
-        
+
         if (data.success && data.data) {
           // Take only the first 4 developers and map them with default images
           const limitedDevelopers = data.data.slice(0, 4).map((developer: ApiDeveloper, index: number) => ({
@@ -100,16 +100,16 @@ const TopDevelopers = () => {
             created_at: developer.created_at,
             updated_at: developer.updated_at
           }));
-          
+
           setDevelopers(limitedDevelopers);
         }
       } catch (error) {
         console.error('Error fetching developers:', error);
         // Fallback to default developers if API fails
         setDevelopers([
-          { 
-            id: 1, 
-            name: "Developer Name 1", 
+          {
+            id: 1,
+            name: "Developer Name 1",
             logo: devloperimg1,
             buildername: "Developer Name 1",
             builder_logo: null,
@@ -120,9 +120,9 @@ const TopDevelopers = () => {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           },
-          { 
-            id: 2, 
-            name: "Developer Name 2", 
+          {
+            id: 2,
+            name: "Developer Name 2",
             logo: devloperimg2,
             buildername: "Developer Name 2",
             builder_logo: null,
@@ -133,9 +133,9 @@ const TopDevelopers = () => {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           },
-          { 
-            id: 3, 
-            name: "Developer Name 3", 
+          {
+            id: 3,
+            name: "Developer Name 3",
             logo: devloperimg3,
             buildername: "Developer Name 3",
             builder_logo: null,
@@ -146,9 +146,9 @@ const TopDevelopers = () => {
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
           },
-          { 
-            id: 4, 
-            name: "Developer Name 4", 
+          {
+            id: 4,
+            name: "Developer Name 4",
             logo: devloperimg4,
             buildername: "Developer Name 4",
             builder_logo: null,
@@ -293,9 +293,9 @@ const TopDevelopers = () => {
                   property that fits your needs and vision.
                 </p>
                 <Link href="/contact" >
-                <button className={`${raleway.className} bg-black hover:bg-white hover:text-black hover:border hover:border-black cursor-pointer text-white px-4 p-2 rounded-lg transform transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95`}>
-                  Contact Us
-                </button>
+                  <button className={`${raleway.className} bg-black hover:bg-white hover:text-black hover:border hover:border-black cursor-pointer text-white px-4 p-2 rounded-lg transform transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95`}>
+                    Contact Us
+                  </button>
                 </Link>
               </div>
             </div>
@@ -314,8 +314,8 @@ const TopDevelopers = () => {
                   <div className="w-full h-42 shadow-2xl border border-gray-200 rounded-lg flex items-center justify-center transition-all duration-300 group-hover:bg-gray-200 group-hover:shadow-lg overflow-hidden bg-white">
                     <Image
                       src={
-                        developer.builder_logo && typeof developer.builder_logo === 'string' 
-                          ? getDeveloperImageUrl(developer.builder_logo) 
+                        developer.builder_logo && typeof developer.builder_logo === 'string'
+                          ? getDeveloperImageUrl(developer.builder_logo)
                           : '/assets/signin.jpeg'
                       }
                       alt={developer.buildername}
@@ -328,14 +328,14 @@ const TopDevelopers = () => {
                       }}
                     />
                   </div>
-                  
+
                   {/* Hover Text Overlay */}
                   <div className="absolute inset-0  bg-black bg-opacity-0 flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:bg-opacity-70 transition-all duration-300 rounded-lg">
                     <h3 className="text-white text-xl mx-6  font-bold text-center transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                       {developer.name}
                     </h3>
                   </div>
-                  
+
                   {/* Subtle border animation */}
                   <div className="absolute inset-0 group-hover:border-black rounded-lg transition-all duration-300"></div>
                 </div>
@@ -354,19 +354,19 @@ const TopDevelopers = () => {
       {isModalOpen && selectedDeveloper && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
           {/* Backdrop */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fadeIn"
             onClick={closeModal}
           ></div>
-          
+
           {/* Modal Content */}
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden animate-scaleIn">
             {/* Modal Header */}
             <div className="relative h-64 bg-gray-100 flex items-center justify-center">
               <Image
                 src={
-                  selectedDeveloper.builder_logo && typeof selectedDeveloper.builder_logo === 'string' 
-                    ? getDeveloperImageUrl(selectedDeveloper.builder_logo) 
+                  selectedDeveloper.builder_logo && typeof selectedDeveloper.builder_logo === 'string'
+                    ? getDeveloperImageUrl(selectedDeveloper.builder_logo)
                     : '/assets/signin.jpeg'
                 }
                 alt={selectedDeveloper.buildername}
@@ -379,7 +379,7 @@ const TopDevelopers = () => {
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-              
+
               {/* Close Button */}
               <button
                 onClick={closeModal}
@@ -391,11 +391,10 @@ const TopDevelopers = () => {
               {/* Status Badge */}
               <div className="absolute top-4 left-4">
                 <span
-                  className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                    selectedDeveloper.status
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-500 text-white"
-                  }`}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold ${selectedDeveloper.status
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-500 text-white"
+                    }`}
                 >
                   {selectedDeveloper.status ? "Active" : "Inactive"}
                 </span>
@@ -412,18 +411,18 @@ const TopDevelopers = () => {
                 </div>
               </div>
               <div className="absolute bottom-4 right-4 z-10">
-              <button
-                onClick={() => {
-                  // Close lightbox first
-                  closeLightbox();
-                  // Navigate to contact page or open contact form
-                  window.open('/contact', '_blank');
-                }}
-                className="bg-gradient-to-r from-black to-black hover:from-black/80 hover:to-black/80 text-white px-6 py-3 rounded-full font-semibold text-sm shadow-lg hover:shadow-xl transform transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
-              >
-                Inquire Now
-              </button>
-            </div>
+                <button
+                  onClick={() => {
+                    // Close lightbox first
+                    closeLightbox();
+                    // Navigate to contact page or open contact form
+                    window.open('/contact', '_blank');
+                  }}
+                  className="bg-gradient-to-r from-black to-black hover:from-black/80 hover:to-black/80 text-white px-6 py-3 rounded-full font-semibold text-sm shadow-lg hover:shadow-xl transform transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-sm"
+                >
+                  Inquire Now
+                </button>
+              </div>
             </div>
 
             {/* Modal Body */}
@@ -446,8 +445,8 @@ const TopDevelopers = () => {
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {selectedDeveloper.images.map((image, idx) => (
-                      <div 
-                        key={idx} 
+                      <div
+                        key={idx}
                         className="bg-white rounded-xl border border-gray-200 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group cursor-pointer"
                         onClick={() => openLightbox(
                           typeof image === 'string' ? getDeveloperImageUrl(image) : '/assets/signin.jpeg',
@@ -457,8 +456,8 @@ const TopDevelopers = () => {
                         <div className="aspect-[4/3] overflow-hidden relative bg-gray-100 flex items-center justify-center">
                           <Image
                             src={
-                              typeof image === 'string' 
-                                ? getDeveloperImageUrl(image) 
+                              typeof image === 'string'
+                                ? getDeveloperImageUrl(image)
                                 : '/assets/signin.jpeg'
                             }
                             alt={`${selectedDeveloper.buildername} gallery ${idx + 1}`}
@@ -483,9 +482,9 @@ const TopDevelopers = () => {
                             Gallery Image {idx + 1}
                           </p>
                         </div> */}
-                            
+
                       </div>
-                      
+
                     ))}
                   </div>
                 </div>
@@ -655,7 +654,7 @@ const TopDevelopers = () => {
             )}
 
             {/* Inquired Now Button */}
-           
+
           </div>
         </div>
       )}

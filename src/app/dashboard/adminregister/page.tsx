@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../../../hooks/useAuth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://api.realtraspaces.com";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
 interface RegisterFormData {
   fullName: string;
@@ -86,7 +86,7 @@ const AdminRegisterPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -136,7 +136,7 @@ const AdminRegisterPage = () => {
           lastLogin: new Date().toISOString(), // New admins don't have lastLogin, use current time
         };
         login(data.token, adminData);
-        
+
         // Redirect to dashboard
         router.push("/dashboard");
       } else {
@@ -178,9 +178,8 @@ const AdminRegisterPage = () => {
                 required
                 value={formData.fullName}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.fullName ? "border-red-300" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.fullName ? "border-red-300" : "border-gray-300"
+                  }`}
                 placeholder="Enter your full name"
               />
               {errors.fullName && (
@@ -200,15 +199,31 @@ const AdminRegisterPage = () => {
                 required
                 value={formData.mobileNumber}
                 onChange={handleInputChange}
-                className={`w-full px-3 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                  errors.mobileNumber ? "border-red-300" : "border-gray-300"
-                }`}
+                className={`w-full px-3 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.mobileNumber ? "border-red-300" : "border-gray-300"
+                  }`}
                 placeholder="Enter 10-digit mobile number"
                 maxLength={10}
               />
               {errors.mobileNumber && (
                 <p className="mt-1 text-sm text-red-600">{errors.mobileNumber}</p>
               )}
+            </div>
+
+            {/* Role */}
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
+                Role
+              </label>
+              <select
+                id="role"
+                name="role"
+                value={formData.role}
+                onChange={handleInputChange}
+                className="w-full px-3 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+              >
+                <option value="admin">Admin</option>
+                <option value="superadmin">Super Admin</option>
+              </select>
             </div>
 
             {/* Password */}
@@ -224,9 +239,8 @@ const AdminRegisterPage = () => {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-3 pr-10 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                    errors.password ? "border-red-300" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-3 pr-10 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.password ? "border-red-300" : "border-gray-300"
+                    }`}
                   placeholder="Enter your password"
                 />
                 <button
@@ -264,9 +278,8 @@ const AdminRegisterPage = () => {
                   required
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className={`w-full px-3 py-3 pr-10 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
-                    errors.confirmPassword ? "border-red-300" : "border-gray-300"
-                  }`}
+                  className={`w-full px-3 py-3 pr-10 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${errors.confirmPassword ? "border-red-300" : "border-gray-300"
+                    }`}
                   placeholder="Confirm your password"
                 />
                 <button

@@ -65,7 +65,7 @@ export default function AwardManagementPage() {
   const [showGetResponse, setShowGetResponse] = useState(false);
   const [apiResponse, setApiResponse] = useState('');
 
-  const API_BASE = 'https://api.realtraspaces.com/api/awards';
+  const API_BASE = 'http://localhost:8000/api/awards';
 
   // Dashboard modules for sidebar
   const modules = [
@@ -90,7 +90,7 @@ export default function AwardManagementPage() {
     try {
       const response = await fetch(API_BASE);
       const result: ApiResponse = await response.json();
-      
+
       if (response.ok && result.success && Array.isArray(result.data)) {
         setAwards(result.data);
         calculateStats(result.data);
@@ -113,7 +113,7 @@ export default function AwardManagementPage() {
     const active = awardsData.filter(award => award.status).length;
     const inactive = total - active;
     const withImages = awardsData.filter(award => award.award_image_url).length;
-    
+
     setStats({ total, active, inactive, withImages });
   };
 
@@ -155,7 +155,7 @@ export default function AwardManagementPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     const formDataToSend = new FormData();
     formDataToSend.append('award_title', formData.award_title);
     formDataToSend.append('demo_field', formData.demo_field);
@@ -163,19 +163,19 @@ export default function AwardManagementPage() {
     if (formData.award_image) {
       formDataToSend.append('award_image', formData.award_image);
     }
-    
+
     try {
       const url = currentAward ? `${API_BASE}/${currentAward.id}` : API_BASE;
       const method = currentAward ? 'PUT' : 'POST';
-      
+
       const response = await fetch(url, {
         method,
         body: formDataToSend
       });
-      
+
       const result = await response.json();
       setApiResponse(JSON.stringify(result, null, 2));
-      
+
       if (response.ok) {
         setShowModal(false);
         loadAwards();
@@ -197,16 +197,16 @@ export default function AwardManagementPage() {
   // Handle delete
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this award?')) return;
-    
+
     setIsDeleting(id);
     try {
       const response = await fetch(`${API_BASE}/${id}`, {
         method: 'DELETE'
       });
-      
+
       const result = await response.json();
       setApiResponse(JSON.stringify(result, null, 2));
-      
+
       if (response.ok) {
         loadAwards();
         setShowDeleteResponse(true);
@@ -241,7 +241,7 @@ export default function AwardManagementPage() {
   // Response modal component
   const ResponseModal = ({ show, onClose, title }: { show: boolean; onClose: () => void; title: string }) => {
     if (!show) return null;
-    
+
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-96 overflow-y-auto">
@@ -293,9 +293,8 @@ export default function AwardManagementPage() {
               <Link
                 key={module.name}
                 href={module.href}
-                className={`flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 ${
-                  module.href === '/awardmanagement' ? 'bg-gray-100 border-r-4 border-blue-500' : ''
-                }`}
+                className={`flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 ${module.href === '/awardmanagement' ? 'bg-gray-100 border-r-4 border-blue-500' : ''
+                  }`}
               >
                 <span className="text-xl">{module.icon}</span>
                 {isSidebarOpen && <span className="ml-3">{module.name}</span>}
@@ -410,7 +409,7 @@ export default function AwardManagementPage() {
             <div className="px-6 py-4 border-b border-gray-200">
               <h2 className="text-xl font-semibold text-gray-800">Awards List</h2>
             </div>
-            
+
             {awards.length === 0 ? (
               <div className="p-12 text-center">
                 <FiAward className="mx-auto text-gray-400 text-6xl mb-4" />
@@ -438,15 +437,14 @@ export default function AwardManagementPage() {
                         <FiAward className="text-gray-400 text-3xl" />
                       )}
                     </div>
-                    
+
                     {/* Award Details */}
                     <div className="space-y-2">
                       <h3 className="text-lg font-semibold text-gray-800 truncate">{award.award_title}</h3>
                       <p className="text-sm text-gray-600 line-clamp-2">{award.demo_field || 'No description'}</p>
                       <div className="flex items-center justify-between">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          award.status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${award.status ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                          }`}>
                           {award.status ? 'Active' : 'Inactive'}
                         </span>
                         <span className="text-xs text-gray-500">
@@ -457,7 +455,7 @@ export default function AwardManagementPage() {
                         Created: {new Date(award.created_at).toLocaleDateString()}
                       </div>
                     </div>
-                    
+
                     {/* Action Buttons */}
                     <div className="flex justify-end space-x-2 mt-4 pt-4 border-t border-gray-100">
                       <button
@@ -503,7 +501,7 @@ export default function AwardManagementPage() {
                 <FiX size={24} />
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="p-6">
               <div className="space-y-4">
                 <div>
@@ -519,7 +517,7 @@ export default function AwardManagementPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Demo Field
@@ -532,7 +530,7 @@ export default function AwardManagementPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Status
@@ -547,7 +545,7 @@ export default function AwardManagementPage() {
                     <option value="false">Inactive</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Award Image
@@ -570,29 +568,29 @@ export default function AwardManagementPage() {
                 </div>
               </div>
 
-            <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Terms & Conditions *
-              </label>
-              <div className="flex items-start space-x-2">
-                <input
-                  type="checkbox"
-                  required
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
-                />
-                <p className="text-sm text-gray-600">
-                  I agree to the{" "}
-                  <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link href="/privacy-policy" className="text-blue-600 hover:underline">
-                    Privacy Policy
-                  </Link>
-                  .
-                </p>
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Terms & Conditions *
+                </label>
+                <div className="flex items-start space-x-2">
+                  <input
+                    type="checkbox"
+                    required
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+                  />
+                  <p className="text-sm text-gray-600">
+                    I agree to the{" "}
+                    <Link href="/terms-and-condition" className="text-blue-600 hover:underline">
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                      Privacy Policy
+                    </Link>
+                    .
+                  </p>
+                </div>
               </div>
-            </div>
 
               <div className="flex justify-end space-x-3 mt-6">
                 <button
@@ -623,25 +621,25 @@ export default function AwardManagementPage() {
       )}
 
       {/* Response Modals */}
-      <ResponseModal 
-        show={showCreateResponse} 
-        onClose={() => setShowCreateResponse(false)} 
-        title="Create Award Response" 
+      <ResponseModal
+        show={showCreateResponse}
+        onClose={() => setShowCreateResponse(false)}
+        title="Create Award Response"
       />
-      <ResponseModal 
-        show={showUpdateResponse} 
-        onClose={() => setShowUpdateResponse(false)} 
-        title="Update Award Response" 
+      <ResponseModal
+        show={showUpdateResponse}
+        onClose={() => setShowUpdateResponse(false)}
+        title="Update Award Response"
       />
-      <ResponseModal 
-        show={showDeleteResponse} 
-        onClose={() => setShowDeleteResponse(false)} 
-        title="Delete Award Response" 
+      <ResponseModal
+        show={showDeleteResponse}
+        onClose={() => setShowDeleteResponse(false)}
+        title="Delete Award Response"
       />
-      <ResponseModal 
-        show={showGetResponse} 
-        onClose={() => setShowGetResponse(false)} 
-        title="Get All Awards Response" 
+      <ResponseModal
+        show={showGetResponse}
+        onClose={() => setShowGetResponse(false)}
+        title="Get All Awards Response"
       />
     </ProtectedRoute>
   );

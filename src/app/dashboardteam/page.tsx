@@ -62,15 +62,14 @@ const TeamPage = () => {
   useEffect(() => {
     const fetchTeamMembers = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/team/`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/team/`);
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         setTeamMembers(data.data || []);
       } catch (error) {
         setError(
-          `Failed to load team members: ${
-            error instanceof Error ? error.message : "Unknown error"
+          `Failed to load team members: ${error instanceof Error ? error.message : "Unknown error"
           }`
         );
       } finally {
@@ -137,8 +136,8 @@ const TeamPage = () => {
       }
 
       const url = currentMember
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/team/${currentMember.id}`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/team/`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/team/${currentMember.id}`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/team/`;
 
       const method = currentMember ? "PUT" : "POST";
 
@@ -182,7 +181,7 @@ const TeamPage = () => {
 
     setIsDeleting(id);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/team/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/team/${id}`, {
         method: "DELETE",
       });
 
@@ -306,10 +305,10 @@ const TeamPage = () => {
                     />
                   ) : null}
                   {/* Fallback when no photo or image fails to load */}
-                  <div 
+                  <div
                     className={`flex flex-col items-center justify-center text-gray-400 h-full cursor-pointer ${member.photo ? 'photo-fallback' : ''}`}
-                    style={{ 
-                      display: member.photo ? 'none' : 'flex' 
+                    style={{
+                      display: member.photo ? 'none' : 'flex'
                     }}
                   >
                     <FiUser size={48} />
@@ -329,11 +328,10 @@ const TeamPage = () => {
                       {member.designation}
                     </p>
                     <span
-                      className={`mt-1 inline-block text-xs font-medium px-2 py-1 rounded-full ${
-                        member.is_working
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-100 text-gray-600"
-                      }`}
+                      className={`mt-1 inline-block text-xs font-medium px-2 py-1 rounded-full ${member.is_working
+                        ? "bg-green-100 text-green-700"
+                        : "bg-gray-100 text-gray-600"
+                        }`}
                     >
                       {member.is_working ? "Active" : "Inactive"}
                     </span>

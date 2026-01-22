@@ -134,7 +134,7 @@ const SignUpPage = () => {
 
     try {
       const response = await fetch(
-        "https://api.realtraspaces.com/api/webusers/send-registration-otp",
+        "http://localhost:8000/api/webusers/send-registration-otp",
         {
           method: "POST",
           headers: {
@@ -174,7 +174,7 @@ const SignUpPage = () => {
 
     try {
       const response = await fetch(
-        "https://api.realtraspaces.com/api/webusers/verify-registration-otp",
+        "http://localhost:8000/api/webusers/verify-registration-otp",
         {
           method: "POST",
           headers: {
@@ -287,7 +287,7 @@ const SignUpPage = () => {
                     {otpSent ? "Verify Your Email" : "Create Account"}
                   </h2>
                   <p className="text-[#6E6E73]">
-                    {otpSent 
+                    {otpSent
                       ? "Enter the OTP sent to your email to complete registration"
                       : "Join Realtraspaces to find your perfect property"
                     }
@@ -313,9 +313,8 @@ const SignUpPage = () => {
                             name="fullName"
                             value={formData.fullName}
                             onChange={handleInputChange}
-                            className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                              errors.fullName ? "border-red-500" : "border-[#E5E5E7]"
-                            }`}
+                            className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.fullName ? "border-red-500" : "border-[#E5E5E7]"
+                              }`}
                             placeholder="Enter your full name"
                             style={{ color: "#1A1A1A" }}
                           />
@@ -342,9 +341,8 @@ const SignUpPage = () => {
                             name="email"
                             value={formData.email}
                             onChange={handleInputChange}
-                            className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                              errors.email ? "border-red-500" : "border-[#E5E5E7]"
-                            }`}
+                            className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.email ? "border-red-500" : "border-[#E5E5E7]"
+                              }`}
                             placeholder="Enter your email"
                             style={{ color: "#1A1A1A" }}
                           />
@@ -372,11 +370,10 @@ const SignUpPage = () => {
                             name="mobileNumber"
                             value={formData.mobileNumber}
                             onChange={handleInputChange}
-                            className={`flex-1 px-4 py-3 bg-[#F1F1F4] border rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                              errors.mobileNumber
-                                ? "border-red-500"
-                                : "border-[#E5E5E7]"
-                            }`}
+                            className={`flex-1 px-4 py-3 bg-[#F1F1F4] border rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.mobileNumber
+                              ? "border-red-500"
+                              : "border-[#E5E5E7]"
+                              }`}
                             placeholder="Enter Mobile Number"
                             style={{ color: "#1A1A1A" }}
                           />
@@ -403,9 +400,8 @@ const SignUpPage = () => {
                             name="location"
                             value={formData.location}
                             onChange={handleInputChange}
-                            className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                              errors.location ? "border-red-500" : "border-[#E5E5E7]"
-                            }`}
+                            className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.location ? "border-red-500" : "border-[#E5E5E7]"
+                              }`}
                             placeholder="Enter your location"
                             style={{ color: "#1A1A1A" }}
                           />
@@ -433,9 +429,8 @@ const SignUpPage = () => {
                           name="company"
                           value={formData.company}
                           onChange={handleInputChange}
-                          className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                            errors.company ? "border-red-500" : "border-[#E5E5E7]"
-                          }`}
+                          className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.company ? "border-red-500" : "border-[#E5E5E7]"
+                            }`}
                           placeholder="Enter your company name"
                           style={{ color: "#1A1A1A" }}
                         />
@@ -553,9 +548,8 @@ const SignUpPage = () => {
                           name="otpCode"
                           value={otpData.otpCode}
                           onChange={handleOtpChange}
-                          className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                            errors.otpCode ? "border-red-500" : "border-[#E5E5E7]"
-                          }`}
+                          className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.otpCode ? "border-red-500" : "border-[#E5E5E7]"
+                            }`}
                           placeholder="Enter 6-digit OTP"
                           style={{ color: "#1A1A1A" }}
                           maxLength={6}
