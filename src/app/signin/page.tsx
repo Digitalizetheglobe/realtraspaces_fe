@@ -72,8 +72,10 @@ const SignInPage = () => {
     setIsLoading(true);
 
     try {
+      // Use localhost for development/testing since the backend changes are local
+      // TODO: Use environment variable or switch back to production URL when backend is deployed
       const response = await fetch(
-        "https://api.realtraspaces.com/api/webusers/login",
+        "http://localhost:8000/api/webusers/login",
         {
           method: "POST",
           headers: {
@@ -92,7 +94,7 @@ const SignInPage = () => {
       if (result.status === "success" && result.data?.token) {
         localStorage.setItem("authToken", result.data.token);
         toast.success("Login successful!");
-        router.push("/dashboard");
+        router.push("/");
       } else {
         throw new Error(result.message || "Login failed");
       }
