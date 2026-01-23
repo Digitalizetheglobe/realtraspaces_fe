@@ -20,7 +20,7 @@ export interface SeoMetaData {
 const isBrowser = typeof window !== 'undefined';
 
 class ApiService {
-  private baseUrl = 'http://localhost:8000';
+  private baseUrl = 'https://api.realtraspaces.com';
 
   private async makeRequest<T>(
     endpoint: string,
@@ -73,7 +73,7 @@ class ApiService {
   // Web Users API
   async getWebUsers(): Promise<ApiResponse> {
     // Use localhost for web users dashboard
-    const url = `http://localhost:8000/api/webusers`;
+    const url = `https://api.realtraspaces.com/api/webusers`;
 
     try {
       const response = await fetch(url, {
@@ -99,7 +99,7 @@ class ApiService {
 
   async updateWebUserStatus(userId: number, isActive: boolean): Promise<ApiResponse> {
     // Use localhost for web users dashboard
-    const url = `http://localhost:8000/api/webusers/${userId}/status`;
+    const url = `https://api.realtraspaces.com/api/webusers/${userId}/status`;
 
     try {
       const response = await fetch(url, {
@@ -172,7 +172,7 @@ export async function fetchSeoMetaData(page: string): Promise<SeoMetaData | null
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
-    const response = await fetch(`http://localhost:8000/api/seo/meta-tags/`, {
+    const response = await fetch(`https://api.realtraspaces.com/api/seo/meta-tags/`, {
       signal: controller.signal,
       next: { revalidate: 3600 } // Cache for 1 hour
     });

@@ -56,7 +56,7 @@ export default function CareerManagementPage() {
     const fetchJobs = async () => {
         try {
             setLoadingJobs(true);
-            const response = await fetch('http://localhost:8000/api/jobs');
+            const response = await fetch('https://api.realtraspaces.com/api/jobs');
             if (!response.ok) {
                 throw new Error('Failed to fetch jobs');
             }
@@ -81,7 +81,7 @@ export default function CareerManagementPage() {
     const fetchSubmissions = async () => {
         try {
             setLoadingSubmissions(true);
-            const response = await fetch('http://localhost:8000/api/cv-submissions');
+            const response = await fetch('https://api.realtraspaces.com/api/cv-submissions');
             if (!response.ok) {
                 throw new Error('Failed to fetch submissions');
             }
@@ -105,7 +105,7 @@ export default function CareerManagementPage() {
         if (!confirm('Are you sure you want to deactivate this job?')) return;
 
         try {
-            const response = await fetch(`http://localhost:8000/api/jobs/${jobId}`, {
+            const response = await fetch(`https://api.realtraspaces.com/api/jobs/${jobId}`, {
                 method: 'DELETE',
             });
 
@@ -125,7 +125,7 @@ export default function CareerManagementPage() {
         if (!confirm('Are you sure you want to delete this submission?')) return;
 
         try {
-            const response = await fetch(`http://localhost:8000/api/cv-submissions/${id}`, {
+            const response = await fetch(`https://api.realtraspaces.com/api/cv-submissions/${id}`, {
                 method: 'DELETE',
             });
 

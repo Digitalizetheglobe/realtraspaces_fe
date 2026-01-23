@@ -31,7 +31,7 @@ interface PropertyListingFilters {
 }
 
 class PropertyListingService {
-  private baseUrl = 'http://localhost:8000/api/property-listings';
+  private baseUrl = 'https://api.realtraspaces.com/api/property-listings';
 
   private async makeRequest(
     endpoint: string,

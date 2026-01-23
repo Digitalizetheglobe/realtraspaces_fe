@@ -33,16 +33,16 @@ const DashboardPage = () => {
       try {
         // Fetch testimonials count
         const testimonialsRes = await fetch(
-          "http://localhost:8000/api/testimonials"
+          "https://api.realtraspaces.com/api/testimonials"
         );
         const testimonialsData = await testimonialsRes.json();
 
         // Fetch blogs count
-        const blogsRes = await fetch("http://localhost:8000/api/blogs");
+        const blogsRes = await fetch("https://api.realtraspaces.com/api/blogs");
         const blogsData = await blogsRes.json();
 
         // Fetch active jobs count
-        const jobsRes = await fetch("http://localhost:8000/api/jobs");
+        const jobsRes = await fetch("https://api.realtraspaces.com/api/jobs");
         const jobsData = await jobsRes.json();
 
         setStats((prevStats) => ({

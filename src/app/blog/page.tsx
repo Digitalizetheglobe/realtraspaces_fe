@@ -42,8 +42,8 @@ const BlogPage = () => {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        //http://localhost:8000
-        const response = await fetch(`http://localhost:8000/api/blogs/`);
+        //https://api.realtraspaces.com
+        const response = await fetch(`https://api.realtraspaces.com/api/blogs/`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -83,7 +83,7 @@ const BlogPage = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/blogs/${id}`, {
+      const response = await fetch(`https://api.realtraspaces.com/api/blogs/${id}`, {
         method: 'DELETE',
       });
 

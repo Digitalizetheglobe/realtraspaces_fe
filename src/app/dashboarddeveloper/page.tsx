@@ -90,7 +90,7 @@ const DevelopersPage = () => {
   useEffect(() => {
     const fetchDevelopers = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/developers`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers`);
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error("API endpoint not found. Please check if the backend server is running.");
@@ -108,7 +108,7 @@ const DevelopersPage = () => {
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         if (errorMessage.includes("Failed to fetch")) {
-          setError("Cannot connect to server. Please check if the backend server is running on http://localhost:8000");
+          setError("Cannot connect to server. Please check if the backend server is running on https://api.realtraspaces.com");
         } else {
           setError(`Failed to load developers: ${errorMessage}`);
         }
@@ -177,7 +177,7 @@ const DevelopersPage = () => {
     });
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/developers/${developerId}/images`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers/${developerId}/images`, {
         method: 'POST',
         body: formData,
       });
@@ -197,7 +197,7 @@ const DevelopersPage = () => {
   // Delete image from server
   const deleteImage = async (developerId: number, imageIndex: number) => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/developers/${developerId}/images/${imageIndex}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers/${developerId}/images/${imageIndex}`, {
         method: 'DELETE',
       });
 
@@ -269,8 +269,8 @@ const DevelopersPage = () => {
       }
 
       const url = currentDeveloper
-        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/developers/${currentDeveloper.id}`
-        : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/developers`;
+        ? `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers/${currentDeveloper.id}`
+        : `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers`;
 
       const method = currentDeveloper ? "PUT" : "POST";
 
@@ -347,7 +347,7 @@ const DevelopersPage = () => {
     setIsDeleting(id);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/developers/${id}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/developers/${id}`,
         {
           method: "DELETE",
         }
@@ -402,7 +402,7 @@ const DevelopersPage = () => {
             <div className="text-xs text-red-600 mb-4">
               <p className="mb-1">Troubleshooting tips:</p>
               <ul className="list-disc list-inside space-y-1">
-                <li>Make sure the backend server is running on http://localhost:8000</li>
+                <li>Make sure the backend server is running on https://api.realtraspaces.com</li>
                 <li>Check if the API endpoint is accessible</li>
                 <li>Verify your internet connection</li>
                 <li>Try refreshing the page</li>

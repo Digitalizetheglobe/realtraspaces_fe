@@ -53,7 +53,7 @@ const CreateJobPage = () => {
         benefits: formData.benefits || null,
       };
 
-      const response = await fetch('http://localhost:8000/api/jobs', {
+      const response = await fetch('https://api.realtraspaces.com/api/jobs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
