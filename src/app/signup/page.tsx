@@ -21,6 +21,7 @@ import PageWithSeo from "../../components/PageWithSeo";
 type FormData = {
   fullName: string;
   email: string;
+  password: string;
   mobileNumber: string;
   location: string;
   company: string;
@@ -35,6 +36,7 @@ type OtpData = {
 type FormErrors = {
   fullName?: string;
   email?: string;
+  password?: string;
   mobileNumber?: string;
   location?: string;
   company?: string;
@@ -46,6 +48,7 @@ const SignUpPage = () => {
   const [formData, setFormData] = useState<FormData>({
     fullName: "",
     email: "",
+    password: "",
     mobileNumber: "",
     location: "",
     company: "",
@@ -63,6 +66,7 @@ const SignUpPage = () => {
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [registrationTermsAccepted, setRegistrationTermsAccepted] = useState(false);
   const [verifyTermsAccepted, setVerifyTermsAccepted] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -97,6 +101,9 @@ const SignUpPage = () => {
     if (!formData.email.trim()) newErrors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(formData.email))
       newErrors.email = "Email is invalid";
+    if (!formData.password) newErrors.password = "Password is required";
+    else if (formData.password.length < 6)
+      newErrors.password = "Password must be at least 6 characters";
     if (!formData.mobileNumber.trim())
       newErrors.mobileNumber = "Mobile number is required";
     else if (!/^\d{10}$/.test(formData.mobileNumber))
@@ -134,13 +141,16 @@ const SignUpPage = () => {
 
     try {
       const response = await fetch(
-        "https://api.realtraspaces.com/api/webusers/send-registration-otp",
+        "http://localhost:8000/api/webusers/send-registration-otp",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            email: formData.email.trim(),
+          }),
         }
       );
 
@@ -174,7 +184,7 @@ const SignUpPage = () => {
 
     try {
       const response = await fetch(
-        "https://api.realtraspaces.com/api/webusers/verify-registration-otp",
+        "http://localhost:8000/api/webusers/verify-registration-otp",
         {
           method: "POST",
           headers: {
@@ -182,7 +192,9 @@ const SignUpPage = () => {
           },
           body: JSON.stringify({
             ...otpData,
+            ...otpData,
             ...formData,
+            email: formData.email.trim(),
           }),
         }
       );
@@ -352,6 +364,43 @@ const SignUpPage = () => {
                         )}
                       </div>
 
+                      {/* Password */}
+                      <div>
+                        <label
+                          className="block text-sm font-medium mb-1"
+                          style={{ color: "#6E6E73" }}
+                        >
+                          Password *
+                        </label>
+                        <div className="relative">
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#6E6E73]" />
+                          <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            className={`w-full pl-10 pr-12 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.password ? "border-red-500" : "border-[#E5E5E7]"
+                              }`}
+                            placeholder="Enter your password"
+                            style={{ color: "#1A1A1A" }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#6E6E73]"
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-5 w-5" />
+                            ) : (
+                              <Eye className="h-5 w-5" />
+                            )}
+                          </button>
+                        </div>
+                        {errors.password && (
+                          <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+                        )}
+                      </div>
+
                       {/* Mobile Number */}
                       <div>
                         <label
@@ -412,32 +461,32 @@ const SignUpPage = () => {
                           </p>
                         )}
                       </div>
-                    </div>
 
-                    {/* Company */}
-                    <div>
-                      <label
-                        className="block text-sm font-medium mb-1"
-                        style={{ color: "#6E6E73" }}
-                      >
-                        Company *
-                      </label>
-                      <div className="relative">
-                        <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#6E6E73]" />
-                        <input
-                          type="text"
-                          name="company"
-                          value={formData.company}
-                          onChange={handleInputChange}
-                          className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.company ? "border-red-500" : "border-[#E5E5E7]"
-                            }`}
-                          placeholder="Enter your company name"
-                          style={{ color: "#1A1A1A" }}
-                        />
+                      {/* Company */}
+                      <div>
+                        <label
+                          className="block text-sm font-medium mb-1"
+                          style={{ color: "#6E6E73" }}
+                        >
+                          Company *
+                        </label>
+                        <div className="relative">
+                          <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#6E6E73]" />
+                          <input
+                            type="text"
+                            name="company"
+                            value={formData.company}
+                            onChange={handleInputChange}
+                            className={`w-full pl-10 pr-4 py-3 bg-[#F1F1F4] border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.company ? "border-red-500" : "border-[#E5E5E7]"
+                              }`}
+                            placeholder="Enter your company name"
+                            style={{ color: "#1A1A1A" }}
+                          />
+                        </div>
+                        {errors.company && (
+                          <p className="text-red-500 text-sm mt-1">{errors.company}</p>
+                        )}
                       </div>
-                      {errors.company && (
-                        <p className="text-red-500 text-sm mt-1">{errors.company}</p>
-                      )}
                     </div>
 
                     {/* Checkbox */}

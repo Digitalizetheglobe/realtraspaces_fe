@@ -56,7 +56,7 @@ export default function CareerManagementPage() {
     const fetchJobs = async () => {
         try {
             setLoadingJobs(true);
-            const response = await fetch('https://api.realtraspaces.com/api/jobs');
+            const response = await fetch('http://localhost:8000/api/jobs');
             if (!response.ok) {
                 throw new Error('Failed to fetch jobs');
             }
@@ -81,7 +81,7 @@ export default function CareerManagementPage() {
     const fetchSubmissions = async () => {
         try {
             setLoadingSubmissions(true);
-            const response = await fetch('https://api.realtraspaces.com/api/cv-submissions');
+            const response = await fetch('http://localhost:8000/api/cv-submissions');
             if (!response.ok) {
                 throw new Error('Failed to fetch submissions');
             }
@@ -105,7 +105,7 @@ export default function CareerManagementPage() {
         if (!confirm('Are you sure you want to deactivate this job?')) return;
 
         try {
-            const response = await fetch(`https://api.realtraspaces.com/api/jobs/${jobId}`, {
+            const response = await fetch(`http://localhost:8000/api/jobs/${jobId}`, {
                 method: 'DELETE',
             });
 
@@ -125,7 +125,7 @@ export default function CareerManagementPage() {
         if (!confirm('Are you sure you want to delete this submission?')) return;
 
         try {
-            const response = await fetch(`https://api.realtraspaces.com/api/cv-submissions/${id}`, {
+            const response = await fetch(`http://localhost:8000/api/cv-submissions/${id}`, {
                 method: 'DELETE',
             });
 
@@ -175,8 +175,8 @@ export default function CareerManagementPage() {
                         <button
                             onClick={() => setActiveTab('jobs')}
                             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'jobs'
-                                    ? 'bg-white text-indigo-600 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                ? 'bg-white text-indigo-600 shadow-sm'
+                                : 'text-gray-500 hover:text-gray-700'
                                 }`}
                         >
                             Job Postings
@@ -184,8 +184,8 @@ export default function CareerManagementPage() {
                         <button
                             onClick={() => setActiveTab('submissions')}
                             className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${activeTab === 'submissions'
-                                    ? 'bg-white text-indigo-600 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                ? 'bg-white text-indigo-600 shadow-sm'
+                                : 'text-gray-500 hover:text-gray-700'
                                 }`}
                         >
                             CV Submissions

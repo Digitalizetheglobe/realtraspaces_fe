@@ -80,7 +80,7 @@ const BlogDetail = ({ params }: PageProps) => {
 
       try {
         console.log('Fetching blog for slug:', slug);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/blogs/slug/${slug}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/blogs/slug/${slug}`);
         if (!response.ok) {
           throw new Error(`Failed to fetch blog data: ${response.status}`);
         }

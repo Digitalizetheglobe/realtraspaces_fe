@@ -67,7 +67,7 @@
         <h2>✅ API Integration Status</h2>
         <p>The SEO API integration is working correctly. The system can now:</p>
         <ul>
-            <li>Fetch SEO data from <code>https://api.realtraspaces.com/api/seo/meta-tags/</code></li>
+            <li>Fetch SEO data from <code>http://localhost:8000/api/seo/meta-tags/</code></li>
             <li>Parse the response and find page-specific data</li>
             <li>Extract metaTitle, metaDescription, metaKeywords, and canonicalUrl</li>
         </ul>
@@ -145,7 +145,7 @@
         // Test the API directly in browser
         async function testApiInBrowser() {
             try {
-                const response = await fetch('https://api.realtraspaces.com/api/seo/meta-tags/');
+                const response = await fetch('http://localhost:8000/api/seo/meta-tags/');
                 const data = await response.json();
 
                 console.log('SEO API Response:', data);

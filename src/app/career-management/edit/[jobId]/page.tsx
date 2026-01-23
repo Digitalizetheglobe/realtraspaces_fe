@@ -44,7 +44,7 @@ const EditJobPage = ({ params }: PageProps) => {
           throw new Error('Invalid job ID format. Expected format: XX-000');
         }
 
-        const response = await fetch(`https://api.realtraspaces.com/api/jobs/${jobId}`);
+        const response = await fetch(`http://localhost:8000/api/jobs/${jobId}`);
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error(`Job with ID ${jobId} not found`);
@@ -66,7 +66,7 @@ const EditJobPage = ({ params }: PageProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`https://api.realtraspaces.com/api/jobs/${jobId}`, {
+      const response = await fetch(`http://localhost:8000/api/jobs/${jobId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

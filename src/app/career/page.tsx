@@ -109,7 +109,7 @@ const BenefitsSection = () => {
         submissionData.append('cv_file', formData.resume);
       }
 
-      const response = await fetch('https://api.realtraspaces.com/api/cv-submissions/submit', {
+      const response = await fetch('http://localhost:8000/api/cv-submissions/submit', {
         method: 'POST',
         body: submissionData,
       });
@@ -158,20 +158,23 @@ const BenefitsSection = () => {
     const fetchJobs = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.realtraspaces.com'}/api/jobs`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'}/api/jobs`);
 
         if (!response.ok) {
           throw new Error(`Failed to fetch: ${response.status}`);
         }
 
-        const data = await response.json();
+        const result = await response.json();
 
-        const formattedJobs: FormattedJob[] = data.map((job: Job) => ({
+        // Check if the structure matches { data: [...] }
+        const jobsData = Array.isArray(result) ? result : (result.data || []);
+
+        const formattedJobs: FormattedJob[] = jobsData.map((job: Job) => ({
           id: job.id,
           jobTitle: job.jobTitle || 'Job Opening',
           location: job.location || 'Remote',
           jobType: job.jobType || 'Full-time',
-          link: `/careers/careerdetail?id=${job.id}`
+          link: '#apply'
         }));
 
         setJobs(formattedJobs);
@@ -187,28 +190,28 @@ const BenefitsSection = () => {
             jobTitle: 'Senior Property Manager',
             location: 'New York, NY',
             jobType: 'Full-time',
-            link: '/careers/careerdetail?id=1'
+            link: '#apply'
           },
           {
             id: 2,
             jobTitle: 'Real Estate Marketing Specialist',
             location: 'Los Angeles, CA',
             jobType: 'Full-time',
-            link: '/careers/careerdetail?id=2'
+            link: '#apply'
           },
           {
             id: 3,
             jobTitle: 'Digital Innovation Manager',
             location: 'Remote',
             jobType: 'Full-time',
-            link: '/careers/careerdetail?id=3'
+            link: '#apply'
           },
           {
             id: 4,
             jobTitle: 'Client Relations Coordinator',
             location: 'Miami, FL',
             jobType: 'Full-time',
-            link: '/careers/careerdetail?id=4'
+            link: '#apply'
           },
         ]);
       } finally {

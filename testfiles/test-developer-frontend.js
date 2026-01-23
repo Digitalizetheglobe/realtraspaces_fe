@@ -8,7 +8,7 @@ const mockApiResponse = {
       id: 1,
       buildername: "Test Developer",
       builder_logo: "developer-1234567890.jpg",
-      builder_logo_url: "https://api.realtraspaces.com/developers/developer-1234567890.jpg",
+      builder_logo_url: "http://localhost:8000/developers/developer-1234567890.jpg",
       descriptions: "Test description",
       project_name: ["Project 1", "Project 2"],
       images: [
@@ -16,8 +16,8 @@ const mockApiResponse = {
         "developer-1234567892.jpg"
       ],
       image_urls: [
-        "https://api.realtraspaces.com/developers/developer-1234567891.jpg",
-        "https://api.realtraspaces.com/developers/developer-1234567892.jpg"
+        "http://localhost:8000/developers/developer-1234567891.jpg",
+        "http://localhost:8000/developers/developer-1234567892.jpg"
       ],
       status: true,
       created_at: "2024-01-01T00:00:00.000Z",
@@ -62,7 +62,7 @@ function testMappingFunction() {
   // Verify the mapping worked correctly
   console.log('\nVerification:');
   console.log('✅ Filenames stored:', result.builder_logo === 'developer-1234567890.jpg');
-  console.log('✅ URLs available:', result.builder_logo_url === 'https://api.realtraspaces.com/developers/developer-1234567890.jpg');
+  console.log('✅ URLs available:', result.builder_logo_url === 'http://localhost:8000/developers/developer-1234567890.jpg');
   console.log('✅ Image filenames:', result.images);
   console.log('✅ Image URLs:', result.image_urls);
 

@@ -75,13 +75,16 @@ const SignInPage = () => {
       // Use localhost for development/testing since the backend changes are local
       // TODO: Use environment variable or switch back to production URL when backend is deployed
       const response = await fetch(
-        "https://api.realtraspaces.com/api/webusers/login",
+        "http://localhost:8000/api/webusers/login",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            email: formData.email.trim(),
+          }),
         }
       );
 

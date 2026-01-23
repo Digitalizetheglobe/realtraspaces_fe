@@ -1,5 +1,5 @@
 // Test file to verify developer API and gallery functionality
-const API_BASE_URL = 'https://api.realtraspaces.com';
+const API_BASE_URL = 'http://localhost:8000';
 
 async function testDeveloperAPI() {
   try {

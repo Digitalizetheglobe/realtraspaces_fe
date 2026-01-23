@@ -6,7 +6,7 @@ const COOKIE_KEY = "cookiesAccepted";
 const SESSION_ID_KEY = "cookieSessionId";
 
 // Get API base URL from environment or default to localhost
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.realtraspaces.com";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 interface CookieResponse {
   status: string;
