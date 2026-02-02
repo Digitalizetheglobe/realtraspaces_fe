@@ -186,16 +186,16 @@ const Blogs = () => {
                     >
                       {blogs.length > 0 ? (
                         Array.from({ length: Math.ceil(blogs.length / 3) }, (_, slideIndex) => (
-                          <div key={slideIndex} className="flex gap-8 w-full flex-shrink-0">
+                          <div key={slideIndex} className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full flex-shrink-0">
                             {blogs.slice(slideIndex * 3, slideIndex * 3 + 3).map((blog, index) => (
-                              <div key={blog.slug} className="flex-shrink-0 w-full md:w-1/3">
-                                <Link href={`/blogs/${blog.slug}`} className="block group">
-                                  <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                              <div key={blog.slug} className="w-full">
+                                <Link href={`/blogs/${blog.slug}`} className="block group h-full">
+                                  <div className="bg-white rounded-lg shadow-lg overflow-hidden h-full flex flex-col">
                                     <div className="relative overflow-hidden rounded-lg">
                                       <Image
                                         src={blog.blogImages && blog.blogImages.length > 0 ? getBlogImageUrl(blog.blogImages[0]) : latestpropertytype}
                                         alt={blog.blogTitle || "blog"}
-                                        className="object-cover p-3 rounded-2xl h-[220px] transform group-hover:scale-110 transition-transform duration-500"
+                                        className="object-cover p-3 rounded-2xl h-[220px] w-full transform group-hover:scale-110 transition-transform duration-500"
                                         width={400}
                                         height={220}
                                         onError={(e) => {
@@ -211,7 +211,7 @@ const Blogs = () => {
                                         </span>
                                       </div>
                                     </div>
-                                    <div className="p-6">
+                                    <div className="p-6 flex flex-col flex-grow">
                                       {/* Category and Date */}
                                       <div className="flex items-center justify-between mb-3">
                                         <span className="text-sm text-blue-600 font-medium">
@@ -227,14 +227,14 @@ const Blogs = () => {
                                           ? blog.blogTitle.split(' ').slice(0, 7).join(' ') + '...'
                                           : blog.blogTitle}
                                       </h3>
-                                      <p className="text-gray-600 mb-4">
+                                      <p className="text-gray-600 mb-4 flex-grow">
                                         {blog.blogDescription.split(' ').length > 15
                                           ? blog.blogDescription.split(' ').slice(0, 15).join(' ') + '...'
                                           : blog.blogDescription}
                                       </p>
 
                                       {/* Read More Button */}
-                                      <div className="text-center">
+                                      <div className="text-right mt-auto">
                                         <span className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors">
                                           Read More →
                                         </span>
