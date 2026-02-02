@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { FiEdit2, FiTrash2, FiHeart, FiBookmark, FiPlus, FiArrowRight } from "react-icons/fi";
-import router from "next/router";
+
 import { getBlogImageUrl } from "@/utils/imageUtils";
 
 interface Blog {
@@ -91,7 +91,7 @@ const BlogPage = () => {
         throw new Error('Failed to delete blog');
       }
 
-      router.push('/blog');
+      window.location.reload();
     } catch (error) {
       setError(error instanceof Error ? error.message : 'An error occurred');
     }
