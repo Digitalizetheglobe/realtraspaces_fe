@@ -53,7 +53,7 @@ const FALLBACK_DATA: RawProperty[] = [
   { Id: "4", Title: "Premium Office Space for Lease in Powai", PropertyTypeText: "Commercial Office/Space", WantToText: "Rent", PropertyName: "Hiranandani Gardens", BuildingName: "Hiranandani Gardens", Price: "1500000", PriceText: "15.00 Lac", SaleArea: "18000", SaleAreaText: "18000 Sq.Ft.", CarpetArea: "12000", CarpetAreaText: "12000 Sq.Ft.", Furnishing: "Semi Furnished", Possession: "Immediately", Location: "Powai", City: "Mumbai", ImageUrl: "", RefNumber: "REF004", FloorNumber: "5", NoOfParking: "8" },
 ];
 
-const API_URL = 'https://connector.b2bbricks.com/api/Property/getrecentproperties';
+const API_URL = '/api/b2b/properties';
 const TOKEN   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InJhaHVsc29uYXJAY3JlZGVmaW5lLmNvbSIsIm5iZiI6MTc3NTEyMTM0MSwiZXhwIjoxOTMyODg3NzQxLCJpYXQiOjE3NzUxMjEzNDEsImlzcyI6Imh0dHBzOi8vY29ubmVjdG9yLmIyYmJyaWNrcy5jb20iLCJhdWQiOiJodHRwczovL2Nvbm5lY3Rvci5iMmJicmlja3MuY29tIn0.sgFhfl2X3DhaDckUkVqLQ1pAkSsRFUuRJT8eTwekVZs';
 
 

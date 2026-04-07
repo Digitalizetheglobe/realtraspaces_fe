@@ -94,7 +94,7 @@ const Research = () => {
     const fetchProperties = async () => {
       try {
         const response = await fetch(
-          'https://connector.b2bbricks.com/api/Property/getrecentproperties',
+          '/api/b2b/properties',
           {
             method: 'GET',
             headers: {

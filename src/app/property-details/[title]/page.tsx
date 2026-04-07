@@ -231,11 +231,7 @@ export default function PropertyDetails() {
         const decodedTitle = decodeURIComponent(propertyTitle).replace(/-/g, " ").toLowerCase();
         console.log("Searching for property with title:", decodedTitle);
 
-        const response = await fetch(`https://connector.b2bbricks.com/api/Property/getrecentproperties`, {
-          headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InJhaHVsc29uYXJAY3JlZGVmaW5lLmNvbSIsIm5iZiI6MTc3NTEyMTM0MSwiZXhwIjoxOTMyODg3NzQxLCJpYXQiOjE3NzUxMjEzNDEsImlzcyI6Imh0dHBzOi8vY29ubmVjdG9yLmIyYmJyaWNrcy5jb20iLCJhdWQiOiJodHRwczovL2Nvbm5lY3Rvci5iMmJicmlja3MuY29tIn0.sgFhfl2X3DhaDckUkVqLQ1pAkSsRFUuRJT8eTwekVZs`,
-          },
-        });
+        const response = await fetch('/api/b2b/properties');
 
         const data = await response.json();
         console.log("API response:", data);

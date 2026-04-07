@@ -91,40 +91,11 @@ export default function Similarproperties() {
     }
   }, []);
 
-  // Helper function to get the best image URL for a property
+  // Helper: B2BBricks uses a plain ImageUrl string (not an array)
   const getPropertyImage = (property: Property | null): string => {
     if (!property) return defaultPropertyImage.src;
-
-    // First check imageUrls.images (new structure)
-    if (property.imageUrls?.images && property.imageUrls.images.length > 0) {
-      // First try to find a cover image
-      const coverImage = property.imageUrls.images.find(img => img.isCoverImage);
-      if (coverImage && coverImage.imageFilePath && !failedImages.has(coverImage.imageFilePath)) {
-        return coverImage.imageFilePath;
-      }
-      // If no cover image or cover image failed, return the first non-failed image
-      const firstImage = property.imageUrls.images.find(
-        img => img.imageFilePath && !failedImages.has(img.imageFilePath)
-      );
-      if (firstImage && firstImage.imageFilePath) {
-        return firstImage.imageFilePath;
-      }
-    }
-
-    // Fallback to property.images (old structure for backward compatibility)
-    if (property.images && property.images.length > 0) {
-      // First try to find a cover image
-      const coverImage = property.images.find(img => img.isCoverImage);
-      if (coverImage && !failedImages.has(coverImage.imageFilePath)) {
-        return coverImage.imageFilePath;
-      }
-      // If no cover image or cover image failed, return the first non-failed image
-      const firstImage = property.images.find(img => !failedImages.has(img.imageFilePath));
-      if (firstImage) {
-        return firstImage.imageFilePath;
-      }
-    }
-
+    const url = property.ImageUrl as string;
+    if (url && !failedImages.has(url)) return url;
     return defaultPropertyImage.src;
   };
 
@@ -170,8 +141,8 @@ export default function Similarproperties() {
 
   // Helper to get property URL
   const getPropertyUrl = (property: Property) => {
-    if (!property.title) return window.location.href;
-    return `${window.location.origin}/property-details/${encodeURIComponent(property.title)}`;
+    if (!property.Title) return window.location.href;
+    return `${window.location.origin}/property-details/${encodeURIComponent(property.Title)}`;
   };
 
   // Helper to copy link
@@ -313,10 +284,10 @@ export default function Similarproperties() {
   const getAllPropertyTypes = () => {
     const types = new Set<string>();
     allProperties.forEach(p => {
-      if (p.propertyType?.displayName) {
-        types.add(p.propertyType.displayName);
+      if (p.PropertyTypeText) {
+        types.add(p.PropertyTypeText);
       }
-      if (p.propertyType?.childType?.displayName) {
+      if (p.PropertyTypeText) {
         types.add(p.propertyType.childType.displayName);
       }
     });
@@ -387,8 +358,8 @@ export default function Similarproperties() {
     // STEP 4: Check if it's in property data as sub-location
     const allSubLocations = new Set<string>();
     allProperties.forEach(p => {
-      if (p.address?.subLocality) {
-        allSubLocations.add(p.address.subLocality.toLowerCase());
+      if (p.Location) {
+        allSubLocations.add(p.Location.toLowerCase());
       }
     });
 
@@ -399,10 +370,10 @@ export default function Similarproperties() {
     // STEP 5: Check if it's in property data as property type
     const allPropertyTypes = new Set<string>();
     allProperties.forEach(p => {
-      if (p.propertyType?.displayName) {
-        allPropertyTypes.add(p.propertyType.displayName.toLowerCase());
+      if (p.PropertyTypeText) {
+        allPropertyTypes.add(p.PropertyTypeText.toLowerCase());
       }
-      if (p.propertyType?.childType?.displayName) {
+      if (p.PropertyTypeText) {
         allPropertyTypes.add(p.propertyType.childType.displayName.toLowerCase());
       }
     });
@@ -430,8 +401,8 @@ export default function Similarproperties() {
     // Get all sub-locations from properties
     const allSubLocations = new Set<string>();
     allProperties.forEach(p => {
-      if (p.address?.subLocality) {
-        allSubLocations.add(p.address.subLocality);
+      if (p.Location) {
+        allSubLocations.add(p.Location);
       }
     });
     const allSubLocationsArray = Array.from(allSubLocations);
@@ -439,10 +410,10 @@ export default function Similarproperties() {
     // Get all property types from properties
     const allPropertyTypes = new Set<string>();
     allProperties.forEach(p => {
-      if (p.propertyType?.displayName) {
-        allPropertyTypes.add(p.propertyType.displayName);
+      if (p.PropertyTypeText) {
+        allPropertyTypes.add(p.PropertyTypeText);
       }
-      if (p.propertyType?.childType?.displayName) {
+      if (p.PropertyTypeText) {
         allPropertyTypes.add(p.propertyType.childType.displayName);
       }
     });
@@ -493,8 +464,8 @@ export default function Similarproperties() {
     // Always search in property names (if not already filled with property types)
     if (suggestions.propertyNames.length === 0) {
       const matchingPropertyNames = allProperties
-        .filter(p => p.title?.toLowerCase().includes(searchLower))
-        .map(p => p.title)
+        .filter(p => p.Title?.toLowerCase().includes(searchLower))
+        .map(p => p.Title)
         .filter(Boolean)
         .slice(0, 5) as string[];
       suggestions.propertyNames = matchingPropertyNames;
@@ -560,8 +531,8 @@ export default function Similarproperties() {
           setSelectedType(parsedData.type);
         }
 
-        if (parsedData.enquiredFor) {
-          setEnquiredForFilter(parsedData.enquiredFor);
+        if (parsedData.WantToText) {
+          setEnquiredForFilter(parsedData.WantToText);
         }
 
         // Clear the search data after reading it
@@ -607,7 +578,7 @@ export default function Similarproperties() {
       setIsComparing(true);
 
       // Get selected properties
-      const selectedProperties = allProperties.filter(prop => bookmarkedProperties.has(prop.id));
+      const selectedProperties = allProperties.filter(prop => bookmarkedProperties.has(prop.Id));
       let addedCount = 0;
       let alreadyInListCount = 0;
 
@@ -621,7 +592,7 @@ export default function Similarproperties() {
               "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({
-              propertyId: property.id,
+              propertyId: property.Id,
               propertyData: property
             })
           });
@@ -649,7 +620,7 @@ export default function Similarproperties() {
           addedCount++;
 
         } catch (propertyError) {
-          console.error(`Error adding property ${property.id}:`, propertyError);
+          console.error(`Error adding property ${property.Id}:`, propertyError);
           // Continue with other properties even if one fails
         }
       }
@@ -679,7 +650,7 @@ export default function Similarproperties() {
     const fetchProperties = async () => {
       try {
         const response = await fetch(
-          "https://connector.b2bbricks.com/api/Property/getrecentproperties",
+          "/api/b2b/properties",
           {
             method: "GET",
             headers: {
@@ -711,17 +682,17 @@ export default function Similarproperties() {
   useEffect(() => {
     if (allProperties.length === 0) return;
     // Unique cities
-    const cities = Array.from(new Set(allProperties.map(p => p.address?.city).filter((c): c is string => Boolean(c))));
+    const cities = Array.from(new Set(allProperties.map(p => p.City).filter((c): c is string => Boolean(c))));
     // Unique sublocalities grouped by city
     const sublocalities: { [city: string]: Set<string> } = {};
     allProperties.forEach(p => {
-      if (p.address?.city && p.address?.subLocality) {
-        if (!sublocalities[p.address.city]) sublocalities[p.address.city] = new Set();
-        sublocalities[p.address.city].add(p.address.subLocality);
+      if (p.City && p.Location) {
+        if (!sublocalities[p.City]) sublocalities[p.City] = new Set();
+        sublocalities[p.City].add(p.Location);
       }
     });
     // Unique property types
-    const propertyTypes = Array.from(new Set(allProperties.map(p => p.propertyType?.displayName).filter((t): t is string => Boolean(t))));
+    const propertyTypes = Array.from(new Set(allProperties.map(p => p.PropertyTypeText).filter((t): t is string => Boolean(t))));
 
     // Add pre-fed popular cities that might not have properties yet
     const popularCities = [
@@ -803,12 +774,12 @@ export default function Similarproperties() {
       const searchLower = searchTerm.toLowerCase();
       results = results.filter((property) => {
         return (
-          property.title?.toLowerCase().includes(searchLower) ||
-          property.address?.city?.toLowerCase().includes(searchLower) ||
-          property.address?.subLocality?.toLowerCase().includes(searchLower) ||
-          property.address?.state?.toLowerCase().includes(searchLower) ||
-          property.propertyType?.displayName?.toLowerCase().includes(searchLower) ||
-          property.propertyType?.childType?.displayName?.toLowerCase().includes(searchLower)
+          property.Title?.toLowerCase().includes(searchLower) ||
+          property.City?.toLowerCase().includes(searchLower) ||
+          property.Location?.toLowerCase().includes(searchLower) ||
+          property.City?.toLowerCase().includes(searchLower) ||
+          property.PropertyTypeText?.toLowerCase().includes(searchLower) ||
+          property.PropertyTypeText?.toLowerCase().includes(searchLower)
         );
       });
     }
@@ -817,15 +788,15 @@ export default function Similarproperties() {
     if (enquiredForFilter) {
       results = results.filter((property) => {
         // Check based on enquiredFor field first (like latestpropertytype page)
-        if (property.enquiredFor) {
-          return property.enquiredFor === enquiredForFilter;
+        if (property.WantToText) {
+          return property.WantToText === enquiredForFilter;
         }
 
         // Otherwise, check based on forSale/forRent
         if (enquiredForFilter === "Rent") {
-          return property.forRent === true;
+          return (property.WantToText === "Rent") === true;
         } else if (enquiredForFilter === "Sale") {
-          return property.forSale === true;
+          return (property.WantToText === "Sale") === true;
         }
 
         return false;
@@ -838,26 +809,26 @@ export default function Similarproperties() {
 
       // Filter by property type based on search type
       if (typeLower === "rent") {
-        results = results.filter((property) => property.forRent);
+        results = results.filter((property) => (property.WantToText === "Rent"));
       } else if (typeLower === "investment") {
-        results = results.filter((property) => property.forSale);
+        results = results.filter((property) => (property.WantToText === "Sale"));
       } else if (typeLower === "research") {
         // For research, show both sale and rent properties
-        results = results.filter((property) => property.forSale || property.forRent);
+        results = results.filter((property) => (property.WantToText === "Sale") || (property.WantToText === "Rent"));
       }
     }
 
     // Filter by cities
     if (selectedCities.length > 0) {
       results = results.filter((property) => {
-        return selectedCities.includes(property.address?.city || "");
+        return selectedCities.includes(property.City || "");
       });
     }
 
     // Filter by sub-locations
     if (selectedSubLocations.length > 0) {
       results = results.filter((property) => {
-        return selectedSubLocations.includes(property.address?.subLocality || "");
+        return selectedSubLocations.includes(property.Location || "");
       });
     }
 
@@ -865,8 +836,8 @@ export default function Similarproperties() {
     if (selectedPropertyTypes.length > 0) {
       results = results.filter((property) => {
         return selectedPropertyTypes.some(propertyType =>
-          property.propertyType?.displayName === propertyType ||
-          property.propertyType?.childType?.displayName === propertyType
+          property.PropertyTypeText === propertyType ||
+          property.PropertyTypeText === propertyType
         );
       });
     }
@@ -874,7 +845,7 @@ export default function Similarproperties() {
     // Filter by carpet area
     if (selectedCarpetArea || minCarpetArea || maxCarpetArea) {
       results = results.filter((property) => {
-        const carpetArea = Number(property.dimension?.carpetArea) || 0;
+        const carpetArea = Number(property.CarpetArea) || 0;
 
         // Handle predefined ranges
         if (selectedCarpetArea) {
@@ -920,8 +891,8 @@ export default function Similarproperties() {
     if (filters.propertyType) {
       results = results.filter((property) => {
         return (
-          property.propertyType?.displayName === filters.propertyType ||
-          property.propertyType?.childType?.displayName === filters.propertyType
+          property.PropertyTypeText === filters.propertyType ||
+          property.PropertyTypeText === filters.propertyType
         );
       });
     }
@@ -930,8 +901,8 @@ export default function Similarproperties() {
     if (filters.priceRange) {
       results = results.filter((property) => {
         const price =
-          property.monetaryInfo?.expectedPrice ||
-          property.monetaryInfo?.expectedRent ||
+          property.Price ||
+          property.Price ||
           0;
 
         switch (filters.priceRange) {
@@ -954,7 +925,7 @@ export default function Similarproperties() {
     // Apply area range filter
     if (filters.areaRange) {
       results = results.filter((property) => {
-        const area = Number(property.dimension?.area) || 0;
+        const area = Number(property.SaleArea) || 0;
 
         switch (filters.areaRange) {
           case "Under 1000 sqft":
@@ -985,9 +956,9 @@ export default function Similarproperties() {
     // Apply transaction type filter
     if (filters.transactionType) {
       if (filters.transactionType === "sale") {
-        results = results.filter((property) => property.forSale);
+        results = results.filter((property) => (property.WantToText === "Sale"));
       } else if (filters.transactionType === "rent") {
-        results = results.filter((property) => property.forRent);
+        results = results.filter((property) => (property.WantToText === "Rent"));
       }
     }
 
@@ -2114,10 +2085,10 @@ export default function Similarproperties() {
                           className="block bg-black cursor-pointer text-white px-4 py-2 mb-4 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
                           onClick={() => {
                             const selectedPropertyLinks = Array.from(bookmarkedProperties).map(propertyId => {
-                              const property = properties.find(p => p.id === propertyId);
+                              const property = properties.find(p => p.Id === propertyId);
                               if (property) {
                                 const baseUrl = window.location.origin;
-                                return `${baseUrl}/property-details/${property.title}`;
+                                return `${baseUrl}/property-details/${property.Title}`;
                               }
                               return null;
                             }).filter(Boolean).join('\n');
@@ -2134,16 +2105,16 @@ export default function Similarproperties() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                       {filteredProperties.map((property, index) => (
                         <div
-                          key={`${property.id}-${index}`}
+                          key={`${property.Id}-${index}`}
                           className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col transform transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-gray-400/20 hover:-translate-y-2 hover:border-gray-300 animate-fade-in-up"
                           style={{ animationDelay: `${index * 150}ms` }}
                         >
                           {/* Header with title and checkbox */}
                           <div className="p-2 sm:p-3 flex justify-between items-center transition-all duration-300 hover:bg-gray-50/50">
-                            <Link href={`/property-details/${property.title}`} className="block">
+                            <Link href={`/property-details/${property.Title}`} className="block">
                               <div className="h-14">
                                 <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
-                                  {isLoggedIn ? (property.title || "Prime Business Hub") : "Property Details"}
+                                  {isLoggedIn ? (property.Title || "Prime Business Hub") : "Property Details"}
                                 </h3>
                                 <div className="flex items-center text-gray-700 text-xs transition-all duration-300 hover:text-gray-900">
                                   <svg
@@ -2166,18 +2137,18 @@ export default function Similarproperties() {
                                       d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                                     />
                                   </svg>
-                                  {property.address?.subLocality || property.address?.city || "Location Name"}
+                                  {property.Location || property.City || "Location Name"}
                                 </div>
                               </div>
                             </Link>
                             <button
-                              onClick={() => handleCheckboxClick(property.id)}
-                              className={`w-5 h-5 border rounded flex items-center justify-center cursor-pointer ${bookmarkedProperties.has(property.id)
+                              onClick={() => handleCheckboxClick(property.Id)}
+                              className={`w-5 h-5 border rounded flex items-center justify-center cursor-pointer ${bookmarkedProperties.has(property.Id)
                                 ? "border-green-500 bg-green-500"
                                 : "border-gray-400"
                                 }`}
                             >
-                              {bookmarkedProperties.has(property.id) && (
+                              {bookmarkedProperties.has(property.Id) && (
                                 <svg
                                   className="w-3 h-3 text-white"
                                   fill="none"
@@ -2196,11 +2167,11 @@ export default function Similarproperties() {
                             </button>
                           </div>
                           {/* Property Image */}
-                          <Link href={`/property-details/${property.title}`} className="block">
+                          <Link href={`/property-details/${property.Title}`} className="block">
                             <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
                               <Image
                                 src={getPropertyImage(property)}
-                                alt={isLoggedIn ? (property.title || "Property") : "Property Details"}
+                                alt={isLoggedIn ? (property.Title || "Property") : "Property Details"}
                                 className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
                                 width={340}
                                 height={180}
@@ -2231,19 +2202,19 @@ export default function Similarproperties() {
                               {/* For Sale/Rent / Property Type overlay */}
                               <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
                                 <span className="mr-2 transition-all duration-300 group-hover:font-medium">
-                                  {(property as any).enquiredFor === "Sale"
+                                  {(property as any).WantToText === "Sale"
                                     ? "For Sale"
-                                    : (property as any).enquiredFor === "Rent"
+                                    : (property as any).WantToText === "Rent"
                                       ? "For Rent"
-                                      : property.forSale
+                                      : (property.WantToText === "Sale")
                                         ? "For Sale"
-                                        : property.forRent
+                                        : (property.WantToText === "Rent")
                                           ? "For Rent"
                                           : "For Sale"}
                                 </span>
                                 <span className="mx-1 transition-all duration-300 group-hover:scale-110">•</span>
                                 <span className="ml-1 transition-all duration-300 group-hover:font-medium">
-                                  {property.propertyType?.childType?.displayName ||
+                                  {property.PropertyTypeText ||
                                     "Office space"}
                                 </span>
                               </div>
@@ -2251,41 +2222,41 @@ export default function Similarproperties() {
                           </Link>
                           {/* Property Details */}
                           <div className="p-2 sm:p-3 flex-grow font-monotransition-all duration-300 hover:bg-gray-50/30">
-                            <Link href={`/property-details/${property.title}`} className="block">
+                            <Link href={`/property-details/${property.Title}`} className="block">
                               <div className="grid grid-cols-2 gap-1 text-xs">
                                 <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Built up Area</div>
                                 <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                                  {property.dimension?.area || "5490"} sqft
+                                  {property.SaleArea || "5490"} sqft
                                 </div>
 
                                 <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Carpet Area</div>
                                 <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                                  {property.dimension?.carpetArea ? `${property.dimension.carpetArea} sqft` : "N/A"}
+                                  {property.CarpetArea ? `${property.CarpetArea} sqft` : "N/A"}
                                 </div>
 
                                 <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Parking</div>
                                 <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                                  {property.dimension?.parking || "N/A"}
+                                  {property.NoOfParking || "N/A"}
                                 </div>
 
                                 <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">No of Cabin</div>
                                 <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                                  {property.furnishStatus || "N/A"}
+                                  {property.Furnishing || "N/A"}
                                 </div>
                               </div>
                             </Link>
                             <div className="border-t border-gray-200 my-2 transition-all duration-300 hover:border-gray-300"></div>
                             {/* Price and Actions */}
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
-                              <Link href={`/property-details/${property.title}`} className="block">
+                              <Link href={`/property-details/${property.Title}`} className="block">
                                 <div className="transition-all duration-300 hover:scale-105">
                                   <div className="text-base text-black font-mono font-semibold transition-all duration-300 hover:text-gray-800">
-                                    {property.forRent
-                                      ? `₹ ${(property.monetaryInfo?.expectedRent || 4500).toLocaleString("en-IN")}`
-                                      : formatPrice(property.monetaryInfo?.expectedPrice)}
+                                    {(property.WantToText === "Rent")
+                                      ? `₹ ${(property.Price || 4500).toLocaleString("en-IN")}`
+                                      : formatPrice(property.Price)}
                                   </div>
                                   <div className="text-gray-500 text-xs transition-all duration-300 hover:text-gray-600">
-                                    {property.forRent ? "rent/month" : ""}
+                                    {(property.WantToText === "Rent") ? "rent/month" : ""}
                                   </div>
                                 </div>
                               </Link>
@@ -2296,9 +2267,9 @@ export default function Similarproperties() {
                                   aria-label="View on Map"
                                   onClick={() => {
                                     const address = [
-                                      property.address?.subLocality,
-                                      property.address?.city,
-                                      property.address?.state
+                                      property.Location,
+                                      property.City,
+                                      property.City
                                     ].filter(Boolean).join(", ");
                                     const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
                                     window.open(mapUrl, '_blank');
@@ -2337,9 +2308,9 @@ export default function Similarproperties() {
                                       onClick={() => {
                                         if (navigator.share) {
                                           navigator.share({
-                                            title: property.title,
-                                            text: `Check out this property: ${property.title}`,
-                                            url: `https://realtraspaces.com/property-details/${property.title}`,
+                                            title: property.Title,
+                                            text: `Check out this property: ${property.Title}`,
+                                            url: `https://realtraspaces.com/property-details/${property.Title}`,
                                           });
                                         } else {
                                           alert("Share not supported on this browser.");
@@ -2359,7 +2330,7 @@ export default function Similarproperties() {
                                 </div>
                                 {/* WhatsApp button */}
                                 <a
-                                  href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(`${window.location.origin}/property-details/${encodeURIComponent(property.title || '')}`)}`}
+                                  href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.Title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(`${window.location.origin}/property-details/${encodeURIComponent(property.Title || '')}`)}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
