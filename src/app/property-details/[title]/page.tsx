@@ -228,79 +228,57 @@ export default function PropertyDetails() {
   useEffect(() => {
     const fetchPropertyDetails = async () => {
       try {
-        // Extract the actual title from the complex slug
-        const actualTitle = extractTitleFromSlug(propertyTitle);
-        const decodedTitle = decodeURIComponent(actualTitle).replace(/-/g, " ");
+        const decodedTitle = decodeURIComponent(propertyTitle).replace(/-/g, " ").toLowerCase();
+        console.log("Searching for property with title:", decodedTitle);
 
-        console.log("API will be called with title:", decodedTitle);
-
-        const response = await fetch(
-          `https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=100&PropertyTitle=${encodeURIComponent(
-            decodedTitle
-          )}`,
-          {
-            method: "GET",
-            headers: {
-              accept: "application/json",
-              tenant: "realtraspaces",
-            },
-          }
-        );
+        const response = await fetch(`https://connector.b2bbricks.com/api/Property/getrecentproperties`, {
+          headers: {
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InJhaHVsc29uYXJAY3JlZGVmaW5lLmNvbSIsIm5iZiI6MTc3NTEyMTM0MSwiZXhwIjoxOTMyODg3NzQxLCJpYXQiOjE3NzUxMjEzNDEsImlzcyI6Imh0dHBzOi8vY29ubmVjdG9yLmIyYmJyaWNrcy5jb20iLCJhdWQiOiJodHRwczovL2Nvbm5lY3Rvci5iMmJicmlja3MuY29tIn0.sgFhfl2X3DhaDckUkVqLQ1pAkSsRFUuRJT8eTwekVZs`,
+          },
+        });
 
         const data = await response.json();
         console.log("API response:", data);
 
         const properties = Array.isArray(data)
           ? data
-          : data.items || data.data || [];
+          : data.data || data.items || [];
 
-        if (properties.length > 0) {
-          setProperty(properties[0]);
+        // Find best match by BuildingName, PropertyName or Title
+        const matched = properties.find((p: Record<string,unknown>) => {
+          const name = String(p.BuildingName ?? p.PropertyName ?? p.Title ?? "").toLowerCase();
+          return name.includes(decodedTitle) || decodedTitle.includes(name.split(" ")[0] ?? "");
+        }) || (properties.length > 0 ? properties[0] : null);
+
+        if (matched) {
+          setProperty(matched);
 
           // Reset failed and loading images for new property
           setFailedImages(new Set());
           setLoadingImages(new Set());
 
-          // Set image URLs from API if available, otherwise use default images
-          // Check imageUrls.images (new structure) first, then fallback to old structures
-          if (
-            properties[0].imageUrls?.images &&
-            properties[0].imageUrls.images.length > 0
-          ) {
-            const urls = properties[0].imageUrls.images
-              .filter((img: { imageFilePath?: string }) => img.imageFilePath)
-              .map((img: { imageFilePath: string }) => img.imageFilePath);
-            setImageUrls(urls);
-            // Use the helper function to get the best image
-            const bestImage = getPropertyImage(properties[0]);
-            setMainImage(bestImage);
-          } else if (
-            (properties[0].imageUrls as any)?.Images &&
-            (properties[0].imageUrls as any).Images.length > 0
-          ) {
-            // Fallback for old structure with capital I
-            const urls = (properties[0].imageUrls as any).Images.map((img: { imageFilePath: string; isCoverImage: boolean; orderRank?: number | null }) => img.imageFilePath);
-            setImageUrls(urls);
-            // Use the helper function to get the best image
-            const bestImage = getPropertyImage(properties[0]);
-            setMainImage(bestImage);
-          } else if (properties[0].images && properties[0].images.length > 0) {
-            // Fallback to direct images array
-            const urls = properties[0].images.map((img: { imageFilePath: string }) => img.imageFilePath);
-            setImageUrls(urls);
-            // Use the helper function to get the best image
-            const bestImage = getPropertyImage(properties[0]);
-            setMainImage(bestImage);
-
-            // Set loading state for the new main image if it's a string URL
-            if (bestImage !== propertydetails.src) {
-              setLoadingImages(prev => new Set(prev).add(bestImage));
-            }
+          // Set image URLs from API if available; B2BBricks uses ImageUrl (string)
+          const imgUrl: string | undefined = (matched as Record<string, unknown>).ImageUrl as string | undefined;
+          if (imgUrl) {
+            setImageUrls([imgUrl]);
+            setMainImage(imgUrl);
           } else {
-            // No images found, use default
-            const bestImage = getPropertyImage(properties[0]);
-            setMainImage(bestImage);
-            setImageUrls([]);
+            // Fallback to nested imageUrls or images arrays (Leadrat-style)
+            const mp = matched as Property;
+            if (mp.imageUrls?.images && mp.imageUrls.images.length > 0) {
+              const urls = mp.imageUrls.images
+                .filter((img: { imageFilePath?: string }) => img.imageFilePath)
+                .map((img: { imageFilePath: string }) => img.imageFilePath);
+              setImageUrls(urls);
+              setMainImage(getPropertyImage(mp));
+            } else if (mp.images && mp.images.length > 0) {
+              const urls = mp.images.map((img: { imageFilePath: string }) => img.imageFilePath);
+              setImageUrls(urls);
+              setMainImage(getPropertyImage(mp));
+            } else {
+              setImageUrls([]);
+              setMainImage(propertydetails);
+            }
           }
         } else {
           console.warn("No property found with this title:", decodedTitle);
@@ -504,7 +482,7 @@ export default function PropertyDetails() {
       setIsSaving(true);
 
       const response = await fetch(
-        "https://api.realtraspaces.com/api/webusers/save-property",
+        "http://localhost:8000/api/webusers/save-property",
         {
           method: "POST",
           headers: {
@@ -581,7 +559,7 @@ export default function PropertyDetails() {
     try {
       setIsComparing(true);
 
-      const response = await fetch("https://api.realtraspaces.com/api/webusers/compare/add", {
+      const response = await fetch("http://localhost:8000/api/webusers/compare/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

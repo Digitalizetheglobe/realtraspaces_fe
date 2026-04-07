@@ -614,7 +614,7 @@ export default function Similarproperties() {
       // Add each selected property to comparison
       for (const property of selectedProperties) {
         try {
-          const response = await fetch("https://api.realtraspaces.com/api/webusers/compare/add", {
+          const response = await fetch("http://localhost:8000/api/webusers/compare/add", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -679,12 +679,12 @@ export default function Similarproperties() {
     const fetchProperties = async () => {
       try {
         const response = await fetch(
-          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=1000",
+          "https://connector.b2bbricks.com/api/Property/getrecentproperties",
           {
             method: "GET",
             headers: {
               accept: "application/json",
-              tenant: "realtraspaces",
+              Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InJhaHVsc29uYXJAY3JlZGVmaW5lLmNvbSIsIm5iZiI6MTc3NTEyMTM0MSwiZXhwIjoxOTMyODg3NzQxLCJpYXQiOjE3NzUxMjEzNDEsImlzcyI6Imh0dHBzOi8vY29ubmVjdG9yLmIyYmJyaWNrcy5jb20iLCJhdWQiOiJodHRwczovL2Nvbm5lY3Rvci5iMmJicmlja3MuY29tIn0.sgFhfl2X3DhaDckUkVqLQ1pAkSsRFUuRJT8eTwekVZs",
             },
           }
         );
@@ -692,7 +692,7 @@ export default function Similarproperties() {
         const data = await response.json();
         const propertiesArray = Array.isArray(data)
           ? data
-          : data.items || data.data || [];
+          : data.data || data.items || [];
 
         setProperties(propertiesArray);
         setAllProperties(propertiesArray);

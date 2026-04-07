@@ -10,13 +10,13 @@ This document shows the proper mapping structure for handling images and builder
     {
       "id": 1,
       "buildername": "Example Developer",
-      "builder_logo": "https://api.realtraspaces.com/developers/developer-1755504736105-339049249.webp",
+      "builder_logo": "http://localhost:8000/developers/developer-1755504736105-339049249.webp",
       "descriptions": "A great developer description",
       "project_name": ["Project A", "Project B"],
       "images": [
-        "https://api.realtraspaces.com/developers/developer-1755504736250-676769176.jpeg",
-        "https://api.realtraspaces.com/developers/developer-1755504736253-425676178.jpeg",
-        "https://api.realtraspaces.com/developers/developer-1755504736259-357606125.jpeg"
+        "http://localhost:8000/developers/developer-1755504736250-676769176.jpeg",
+        "http://localhost:8000/developers/developer-1755504736253-425676178.jpeg",
+        "http://localhost:8000/developers/developer-1755504736259-357606125.jpeg"
       ],
       "status": true,
       "created_at": "2024-01-15T10:00:00.000Z",
@@ -67,7 +67,7 @@ const mapApiResponseToDeveloper = (apiData: any): Developer => {
 ```typescript
 const fetchDevelopers = async () => {
   try {
-    const response = await fetch("https://api.realtraspaces.com/api/developers");
+    const response = await fetch("http://localhost:8000/api/developers");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

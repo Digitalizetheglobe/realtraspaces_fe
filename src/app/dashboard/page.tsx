@@ -26,23 +26,23 @@ const DashboardPage = () => {
     activeProperties: 500, // Set static count for properties
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [statsError, setStatsError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         // Fetch testimonials count
         const testimonialsRes = await fetch(
-          "https://api.realtraspaces.com/api/testimonials"
+          "http://localhost:8000/api/testimonials"
         );
         const testimonialsData = await testimonialsRes.json();
 
         // Fetch blogs count
-        const blogsRes = await fetch("https://api.realtraspaces.com/api/blogs");
+        const blogsRes = await fetch("http://localhost:8000/api/blogs");
         const blogsData = await blogsRes.json();
 
         // Fetch active jobs count
-        const jobsRes = await fetch("https://api.realtraspaces.com/api/jobs");
+        const jobsRes = await fetch("http://localhost:8000/api/jobs");
         const jobsData = await jobsRes.json();
 
         setStats((prevStats) => ({
@@ -52,7 +52,7 @@ const DashboardPage = () => {
           activeJobs: jobsData.data?.filter((job: Job) => job.isActive)?.length || 0,
         }));
       } catch (err) {
-        setError("Failed to fetch dashboard data");
+        setStatsError("Could not load live stats. The API may be temporarily unavailable.");
         console.error("Error fetching dashboard data:", err);
       } finally {
         setLoading(false);
@@ -64,16 +64,6 @@ const DashboardPage = () => {
 
   const allModules = [
     { name: "Dashboard", icon: "📊", href: "/dashboard" },
-
-    // Wait, the previous file view didn't have "Register Admin" in the list I saw in step 53.
-    // However, in step 39 (admin register page), it exists.
-    // The user's request says "it must show all the pages".
-    // I will stick to the list I saw in the file, but apply the filtering.
-    // Actually, looking at the previous file content (Step 53), "Register Admin" was NOT in the list.
-    // But logically "superadmin" usually sees "Register Admin".
-    // I will proceed with the list present in the file, plus allow for "Register Admin" if the user wants it, but strictly following the "subset" instruction for admin.
-    // Let's just use the existing list and filter it.
-
     { name: "All Web Users", icon: "👥", href: "/dashboardallwebusers" },
     { name: "Career Management", icon: "💼", href: "/career-management" },
     { name: "Blog", icon: "📝", href: "/blog" },
@@ -116,17 +106,6 @@ const DashboardPage = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex h-screen bg-gray-100">
-        <div className="flex-1 flex items-center justify-center">
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            {error}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <ProtectedRoute>
@@ -181,6 +160,12 @@ const DashboardPage = () => {
 
         {/* Main Content */}
         <div className="flex-1 p-8 overflow-auto">
+          {statsError && (
+            <div className="mb-4 bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded-lg text-sm flex items-center gap-2">
+              <span>⚠️</span>
+              <span>{statsError}</span>
+            </div>
+          )}
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-800">
               Dashboard Overview

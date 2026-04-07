@@ -1,5 +1,5 @@
 // Test file to verify image URL construction and accessibility
-const API_BASE_URL = 'https://api.realtraspaces.com';
+const API_BASE_URL = 'http://localhost:8000';
 
 // Mock the getDeveloperImageUrl function
 function getDeveloperImageUrl(filename) {

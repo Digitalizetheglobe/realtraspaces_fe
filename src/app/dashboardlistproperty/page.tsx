@@ -37,33 +37,181 @@ import {
   User
 } from "lucide-react";
 
-// API utility functions
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.realtraspaces.com';
+// ─── B2B Bricks API ─────────────────────────────────────────────────────────
+// Browser → /api/b2b/... → connector.b2bbricks.com (server-side, no CORS)
+class B2BApiError extends Error {
+  status: number;
+  details: unknown;
 
-const apiCall = async (endpoint: string, options: RequestInit = {}) => {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+  constructor(status: number, message: string, details: unknown) {
+    super(message);
+    this.name = 'B2BApiError';
+    this.status = status;
+    this.details = details;
+  }
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const toFiniteNumber = (value: unknown): number | undefined => {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string') {
+    const normalized = value.replace(/,/g, '').trim();
+    if (!normalized) return undefined;
+    // Strip currency symbols / units while keeping digits, minus, and decimal separators.
+    const cleaned = normalized.replace(/[^0-9.+-]/g, '');
+    if (!cleaned) return undefined;
+    const n = Number(cleaned);
+    if (Number.isFinite(n)) return n;
+  }
+  return undefined;
+};
+
+const extractTotalCount = (payload: unknown, fallback: number): number => {
+  const queue: unknown[] = [payload];
+
+  for (let depth = 0; depth < 3; depth++) {
+    const next: unknown[] = [];
+    for (const node of queue) {
+      if (!isRecord(node)) continue;
+
+      for (const key of ['totalCount', 'total', 'TotalCount', 'Total'] as const) {
+        const num = toFiniteNumber(node[key]);
+        if (num !== undefined) return num;
+      }
+
+      const candidates = [node.data, node.Data, node.result, node.Result].filter(Boolean);
+      for (const c of candidates) {
+        if (isRecord(c)) next.push(c);
+      }
+    }
+    queue.splice(0, queue.length, ...next);
+  }
+
+  return fallback;
+};
+
+const extractArrayPayload = (payload: unknown): unknown[] => {
+  if (Array.isArray(payload)) return payload;
+  if (!isRecord(payload)) return [];
+
+  let queue: unknown[] = [payload];
+  for (let depth = 0; depth < 3; depth++) {
+    const next: unknown[] = [];
+
+    for (const node of queue) {
+      if (Array.isArray(node)) return node;
+      if (!isRecord(node)) continue;
+
+      const direct = [node.data, node.Data, node.result, node.Result];
+      for (const cand of direct) {
+        if (Array.isArray(cand)) return cand;
+      }
+
+      for (const cand of direct) {
+        if (isRecord(cand)) next.push(cand);
+      }
+    }
+
+    queue = next;
+  }
+
+  return [];
+};
+
+const extractStringArray = (payload: unknown): string[] => {
+  const arr = extractArrayPayload(payload);
+  return arr.filter((x): x is string => typeof x === 'string');
+};
+
+const shouldDebugB2B = process.env.NODE_ENV !== 'production';
+
+const b2bApiCall = async (endpoint: string, options: RequestInit = {}) => {
+  const response = await fetch(`/api/b2b${endpoint}`, {
+    headers: { Accept: 'application/json', ...options.headers },
     ...options,
   });
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+  if (response.ok) return response.json();
+
+  const contentType = response.headers.get('content-type') || '';
+  const text = await response.text();
+
+  let details: unknown = text;
+  if (contentType.includes('application/json')) {
+    try {
+      details = JSON.parse(text);
+    } catch {
+      // Keep raw text in `details` if it's not valid JSON
+    }
   }
 
-  return await response.json();
+  let message = `B2B API error ${response.status}`;
+  if (isRecord(details) && typeof details.error === 'string') {
+    message = details.error;
+  } else if (typeof details === 'string' && details.trim()) {
+    message = `${message}: ${details.slice(0, 500)}`;
+  }
+
+  throw new B2BApiError(response.status, message, details);
 };
 
-// Utility function to get the correct image URL
-const getImageUrl = (imageFilename: string): string => {
-  // Based on the backend configuration, property images are served from /propertyImages path
-  return `${API_BASE_URL}/propertyImages/${imageFilename}`;
-};
+// B2B returns absolute image URLs — pass through as-is
+const getImageUrl = (imageUrl: string): string => imageUrl;
+
+// ─── B2B Bricks — Raw API response shape ───────────────────────────────
+interface B2BProperty {
+  propertyId?: string;
+  refNumber?: string;
+  buildingName?: string;
+  location?: string;
+  propertyType?: string;
+  wantTo?: string;
+  transaction?: string;
+  bedRoom?: string;
+  budgetFrom?: number;
+  budgetTo?: number;
+  areaFrom?: number;
+  areaTo?: number;
+  areaUnit?: string;
+  additionalInfo?: string;
+  postedDate?: string;
+  [key: string]: unknown;
+}
+
+// Map raw B2B shape → normalised UI shape
+const mapB2BProperty = (p: B2BProperty, index: number): PropertyListing => ({
+  id: index + 1,
+  propertyId: String(p.propertyId || p.refNumber || index + 1),
+  propertyName: String(p.buildingName || 'Unnamed Property'),
+  location: String(p.location || 'Location not specified'),
+  propertyType: String(p.propertyType || 'N/A'),
+  transactionType: String(p.transaction || p.wantTo || 'N/A'),
+  areaCarpet:
+    toFiniteNumber(p.areaFrom) !== undefined
+      ? `${toFiniteNumber(p.areaFrom)} ${p.areaUnit || 'sqft'}`.trim()
+      : 'N/A',
+  areaBuiltup:
+    toFiniteNumber(p.areaTo) !== undefined
+      ? `${toFiniteNumber(p.areaTo)} ${p.areaUnit || 'sqft'}`.trim()
+      : 'N/A',
+  rent: p.wantTo === 'Rent' ? (toFiniteNumber(p.budgetFrom) ?? null) : null,
+  price: p.wantTo === 'Buy' ? (toFiniteNumber(p.budgetFrom) ?? null) : null,
+  contactName: 'N/A',
+  contactNumber: 'N/A',
+  emailAddress: 'N/A',
+  description: String(p.additionalInfo || ''),
+  images: [],
+  status: 'active',
+  isActive: true,
+  createdAt: String(p.postedDate || new Date().toISOString()),
+  updatedAt: String(p.postedDate || new Date().toISOString()),
+});
 
 interface PropertyListing {
   id: number;
+  propertyId: string;
   propertyName: string;
   location: string;
   propertyType: string;
@@ -96,6 +244,7 @@ interface PaginationInfo {
   totalItems: number;
   itemsPerPage: number;
 }
+
 
 export default function DashboardListProperty() {
   const router = useRouter();
@@ -148,128 +297,131 @@ export default function DashboardListProperty() {
     router.push('/signin');
   };
 
-  // Fetch property listings
+  // Fetch property listings from B2B Bricks
   const fetchListings = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const queryParams = new URLSearchParams();
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value) queryParams.append(key, value.toString());
-      });
+      const qp = new URLSearchParams();
+      qp.append('filter.pageIndex', String(Math.max(0, filters.page - 1)));
+      qp.append('filter.pageSize', String(filters.limit));
+      if (filters.search)          qp.append('filter.searchText',    filters.search);
+      if (filters.propertyType)   qp.append('filter.propertyTypeCsv', filters.propertyType);
+      if (filters.transactionType) qp.append('filter.wantToCsv',      filters.transactionType);
 
-      const result = await apiCall(`/api/property-listings/all?${queryParams}`);
+      const result = await b2bApiCall(`/Property/getproperties?${qp}`);
 
-      if (result.success) {
-        setListings(result.data.listings);
-        setPagination(result.data.pagination);
-      } else {
-        setError(result.message || 'Failed to fetch listings');
+      if (shouldDebugB2B) {
+        const topKeys = isRecord(result) ? Object.keys(result).slice(0, 30) : [];
+        console.debug('[B2B fetchListings] response summary', {
+          endpoint: '/Property/getproperties',
+          query: qp.toString(),
+          responseType: Array.isArray(result) ? 'array' : typeof result,
+          topLevelKeys: topKeys,
+        });
       }
-    } catch (error) {
-      console.error('Error fetching listings:', error);
-      setError('Failed to load property listings');
+
+      const extractedArray = extractArrayPayload(result);
+      const rawList = extractedArray.filter(isRecord) as B2BProperty[];
+
+      const totalItems = extractTotalCount(result, rawList.length);
+
+      if (shouldDebugB2B) {
+        console.debug('[B2B fetchListings] extracted', {
+          rawListLength: rawList.length,
+          totalItems,
+        });
+      }
+
+      setListings(rawList.map(mapB2BProperty));
+      setPagination({
+        currentPage: filters.page,
+        totalPages: Math.max(1, Math.ceil(Math.max(0, totalItems) / Math.max(1, filters.limit))),
+        totalItems: Math.max(0, totalItems),
+        itemsPerPage: filters.limit,
+      });
+    } catch (error: unknown) {
+      if (error instanceof B2BApiError) {
+        console.error('[B2B fetchListings] B2BApiError', {
+          status: error.status,
+          message: error.message,
+          details: error.details,
+        });
+
+        if (error.status === 401) {
+          setError('B2B Bricks: Unauthorized (401). Check the B2B bearer token configuration.');
+        } else if (error.status === 404) {
+          setError('B2B Bricks: Endpoint not found (404). Check the B2B API path.');
+        } else if (error.status >= 500) {
+          setError('B2B Bricks: Server error (500). If it persists, verify the configured bearer token/permissions in the B2B proxy.');
+        } else {
+          setError(`Failed to load B2B properties: ${error.message}`);
+        }
+      } else {
+        const msg = error instanceof Error ? error.message : String(error);
+        console.error('[B2B fetchListings] Unknown error', msg);
+        setError(`Failed to load B2B properties: ${msg}`);
+      }
+
+      setListings([]);
+      setPagination(null);
     } finally {
       setLoading(false);
     }
   };
 
-  // Delete single listing
+  // Delete single listing (B2B is read-only — remove from local state only)
   const deleteListing = async (id: number) => {
     try {
       setDeleteLoading(true);
-      const result = await apiCall(`/api/property-listings/${id}`, { method: 'DELETE' });
-
-      if (result.success) {
-        setListings(prev => prev.filter(item => item.id !== id));
-        setSelectedItems(prev => prev.filter(item => item !== id));
-      } else {
-        setError(result.message || 'Failed to delete listing');
-      }
+      setListings(prev => prev.filter(item => item.id !== id));
+      setSelectedItems(prev => prev.filter(item => item !== id));
     } catch (error) {
-      console.error('Error deleting listing:', error);
-      setError('Failed to delete listing');
+      console.error('Error:', error);
     } finally {
       setDeleteLoading(false);
       setShowDeleteModal(false);
     }
   };
 
-  // Delete all listings
+  // Delete all (B2B is read-only — clear local state only)
   const deleteAllListings = async () => {
     try {
       setDeleteLoading(true);
-      const result = await apiCall('/api/property-listings/delete-all?confirm=true', { method: 'DELETE' });
-
-      if (result.success) {
-        setListings([]);
-        setSelectedItems([]);
-        setPagination(null);
-      } else {
-        setError(result.message || 'Failed to delete all listings');
-      }
+      setListings([]);
+      setSelectedItems([]);
+      setPagination(null);
     } catch (error) {
-      console.error('Error deleting all listings:', error);
-      setError('Failed to delete all listings');
+      console.error('Error:', error);
     } finally {
       setDeleteLoading(false);
       setShowDeleteAllModal(false);
     }
   };
 
-  // Update listing status
-  const updateStatus = async (id: number, status: string) => {
-    try {
-      const result = await apiCall(`/api/property-listings/${id}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status })
-      });
-
-      if (result.success) {
-        setListings(prev => prev.map(item =>
-          item.id === id ? { ...item, status: status as any } : item
-        ));
-      } else {
-        setError(result.message || 'Failed to update status');
-      }
-    } catch (error) {
-      console.error('Error updating status:', error);
-      setError('Failed to update status');
-    }
+  // Status update is local-only (B2B is read-only)
+  const updateStatus = (id: number, status: string) => {
+    setListings(prev => prev.map(item =>
+      item.id === id ? { ...item, status: status as PropertyListing['status'] } : item
+    ));
   };
 
-  // Modal functions
+  // Modal: view property details & fetch its images from B2B
   const handleViewDetails = async (property: PropertyListing) => {
     setSelectedProperty(property);
     setShowDetailsModal(true);
     setCurrentImageIndex(0);
-
-    // Use images from property listing response
     setIsLoadingImages(true);
     try {
-      // Convert property images array to the expected format
-      const images = property.images || [];
-      console.log('Property images from API:', images);
-
-      if (images.length > 0) {
-        const formattedImages = images.map((imageUrl, index) => {
-          console.log(`Processing image ${index}:`, imageUrl);
-          return {
-            id: index + 1,
-            images: [imageUrl],
-            propertyId: property.id,
-            createdAt: property.createdAt
-          };
-        });
-        console.log('Formatted images for display:', formattedImages);
-        setPropertyImages(formattedImages);
-      } else {
-        console.log('No images found in property data');
-        setPropertyImages([]);
-      }
-    } catch (error) {
-      console.error('Error processing images:', error);
+      const imgResult = await b2bApiCall(
+        `/Property/getpropertyimages?propertyid=${encodeURIComponent(property.propertyId)}`
+      );
+      const rawImages: string[] = extractStringArray(imgResult);
+      setPropertyImages(
+        rawImages.map((url, i) => ({ id: i + 1, images: [url], propertyId: property.id, createdAt: property.createdAt }))
+      );
+    } catch {
       setPropertyImages([]);
     } finally {
       setIsLoadingImages(false);
@@ -297,31 +449,11 @@ export default function DashboardListProperty() {
 
   const downloadImage = async (imageUrl: string, imageName: string) => {
     try {
-      // Try multiple possible paths for the image, starting with the most likely
-      const possiblePaths = [
-        `${API_BASE_URL}/propertyImages/${imageUrl}`,  // From propertyImages directory (most likely)
-        `${API_BASE_URL}/${imageUrl}`,  // Direct from root
-        `${API_BASE_URL}/public/${imageUrl}`,  // From public directory
-      ];
+      // B2B Bricks returns absolute image URLs — fetch directly
+      const response = await fetch(imageUrl);
 
-      let fullImageUrl = possiblePaths[0];
-      let response;
-
-      // Try each path until one works
-      for (const path of possiblePaths) {
-        try {
-          response = await fetch(path);
-          if (response.ok) {
-            fullImageUrl = path;
-            break;
-          }
-        } catch (e) {
-          continue;
-        }
-      }
-
-      if (!response || !response.ok) {
-        throw new Error('Image not found at any expected path');
+      if (!response.ok) {
+        throw new Error(`Image not found: ${imageUrl}`);
       }
 
       const blob = await response.blob();

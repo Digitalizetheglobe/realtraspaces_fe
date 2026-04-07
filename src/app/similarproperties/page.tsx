@@ -85,20 +85,19 @@ export default function Similarproperties() {
     const fetchProperties = async () => {
       try {
         const response = await fetch(
-          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=20",
+          "https://connector.b2bbricks.com/api/Property/getrecentproperties",
           {
             method: "GET",
             headers: {
               accept: "application/json",
-              tenant: "realtraspaces",
+              Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InJhaHVsc29uYXJAY3JlZGVmaW5lLmNvbSIsIm5iZiI6MTc3NTEyMTM0MSwiZXhwIjoxOTMyODg3NzQxLCJpYXQiOjE3NzUxMjEzNDEsImlzcyI6Imh0dHBzOi8vY29ubmVjdG9yLmIyYmJyaWNrcy5jb20iLCJhdWQiOiJodHRwczovL2Nvbm5lY3Rvci5iMmJicmlja3MuY29tIn0.sgFhfl2X3DhaDckUkVqLQ1pAkSsRFUuRJT8eTwekVZs",
             },
           }
         );
         const data = await response.json();
-        // Inspect the response structure and set the correct array
-        // Example: if data.items is the array
+        // B2BBricks returns a direct array
         setProperties(
-          Array.isArray(data) ? data : data.items || data.data || []
+          Array.isArray(data) ? data : data.data || data.items || []
         );
         setLoading(false);
       } catch (error) {

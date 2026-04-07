@@ -65,7 +65,7 @@ export default function AwardManagementPage() {
   const [showGetResponse, setShowGetResponse] = useState(false);
   const [apiResponse, setApiResponse] = useState('');
 
-  const API_BASE = 'https://api.realtraspaces.com/api/awards';
+  const API_BASE = 'http://localhost:8000/api/awards';
 
   // Dashboard modules for sidebar
   const modules = [

@@ -46,7 +46,7 @@ const ManageTestimonialsPage = () => {
   const fetchTestimonials = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://api.realtraspaces.com/api/testimonials');
+      const response = await fetch('http://localhost:8000/api/testimonials');
       if (!response.ok) throw new Error('Failed to fetch testimonials');
       const { data } = await response.json();
       setTestimonials(data || []);
@@ -60,7 +60,7 @@ const ManageTestimonialsPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://api.realtraspaces.com/api/testimonials', {
+      const response = await fetch('http://localhost:8000/api/testimonials', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ const ManageTestimonialsPage = () => {
     if (!confirm('Are you sure you want to delete this testimonial?')) return;
 
     try {
-      const response = await fetch(`https://api.realtraspaces.com/api/testimonials/${id}`, {
+      const response = await fetch(`http://localhost:8000/api/testimonials/${id}`, {
         method: 'DELETE',
       });
 
@@ -102,7 +102,7 @@ const ManageTestimonialsPage = () => {
 
   const handleStatusChange = async (id: number, isActive: boolean) => {
     try {
-      const response = await fetch(`https://api.realtraspaces.com/api/testimonials/${id}`, {
+      const response = await fetch(`http://localhost:8000/api/testimonials/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

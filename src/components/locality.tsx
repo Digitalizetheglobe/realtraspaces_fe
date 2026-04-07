@@ -3,14 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 // Define types for property and address
-interface Address {
-  city?: string;
-  subLocality?: string;
-}
-
+// B2BBricks raw property shape
 interface Property {
-  address?: Address;
-  enquiredFor?: string;
+  City?: string;
+  Location?: string;    // subLocality equivalent
+  WantToText?: string;  // "Rent" | "Sale"
+  [key: string]: unknown;
 }
 
 // Type for locations state
@@ -34,12 +32,12 @@ const PropertyLocations = () => {
         setError(null);
 
         const response = await fetch(
-          'https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=100',
+          'https://connector.b2bbricks.com/api/Property/getrecentproperties',
           {
             method: 'GET',
             headers: {
               'accept': 'application/json',
-              'tenant': 'realtraspaces',
+              'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InJhaHVsc29uYXJAY3JlZGVmaW5lLmNvbSIsIm5iZiI6MTc3NTEyMTM0MSwiZXhwIjoxOTMyODg3NzQxLCJpYXQiOjE3NzUxMjEzNDEsImlzcyI6Imh0dHBzOi8vY29ubmVjdG9yLmIyYmJyaWNrcy5jb20iLCJhdWQiOiJodHRwczovL2Nvbm5lY3Rvci5iMmJicmlja3MuY29tIn0.sgFhfl2X3DhaDckUkVqLQ1pAkSsRFUuRJT8eTwekVZs',
             },
           }
         );
@@ -50,28 +48,26 @@ const PropertyLocations = () => {
 
         const data = await response.json();
 
-        // Handle different response structures
+        // B2BBricks returns a direct array
         const propertiesArray = Array.isArray(data)
           ? data
-          : data.items || data.data || [];
+          : data.data || data.items || [];
 
         setAllProperties(propertiesArray);
 
-        // Process the data to group by city and subLocality based on active filter
+        // Group by City → Location (B2BBricks field names)
         const locationMap: { [city: string]: Set<string> } = {};
 
         if (propertiesArray && propertiesArray.length > 0) {
           propertiesArray.forEach((property: Property) => {
-            if (property.address) {
-              const city = property.address.city;
-              const subLocality = property.address.subLocality;
+            const city = property.City;
+            const subLocality = property.Location;
 
-              if (city && subLocality) {
-                if (!locationMap[city]) {
-                  locationMap[city] = new Set<string>();
-                }
-                locationMap[city].add(subLocality);
+            if (city && subLocality) {
+              if (!locationMap[city]) {
+                locationMap[city] = new Set<string>();
               }
+              locationMap[city].add(subLocality);
             }
           });
         }
@@ -138,32 +134,29 @@ const PropertyLocations = () => {
     });
   };
 
-  // Function to filter properties based on enquiredFor
+  // Function to filter properties based on WantToText (B2BBricks)
   const filterProperties = (filterType: string) => {
     setActiveFilter(filterType);
 
     const locationMap: { [city: string]: Set<string> } = {};
 
     allProperties.forEach((property: Property) => {
-      if (property.address) {
-        const city = property.address.city;
-        const subLocality = property.address.subLocality;
+      const city = property.City;
+      const subLocality = property.Location;
 
-        // Apply filter based on enquiredFor
-        let shouldInclude = true;
-        if (filterType === "rent" && property.enquiredFor !== "Rent") {
-          shouldInclude = false;
-        } else if (filterType === "investment" && property.enquiredFor !== "Sale") {
-          shouldInclude = false;
-        }
-        // For "all" filter, include all properties
+      // Apply filter based on WantToText
+      let shouldInclude = true;
+      if (filterType === "rent" && property.WantToText !== "Rent") {
+        shouldInclude = false;
+      } else if (filterType === "investment" && property.WantToText !== "Sale") {
+        shouldInclude = false;
+      }
 
-        if (shouldInclude && city && subLocality) {
-          if (!locationMap[city]) {
-            locationMap[city] = new Set<string>();
-          }
-          locationMap[city].add(subLocality);
+      if (shouldInclude && city && subLocality) {
+        if (!locationMap[city]) {
+          locationMap[city] = new Set<string>();
         }
+        locationMap[city].add(subLocality);
       }
     });
 

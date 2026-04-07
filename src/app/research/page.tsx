@@ -94,12 +94,12 @@ const Research = () => {
     const fetchProperties = async () => {
       try {
         const response = await fetch(
-          'https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=500',
+          'https://connector.b2bbricks.com/api/Property/getrecentproperties',
           {
             method: 'GET',
             headers: {
               accept: 'application/json',
-              tenant: 'realtraspaces',
+              Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InJhaHVsc29uYXJAY3JlZGVmaW5lLmNvbSIsIm5iZiI6MTc3NTEyMTM0MSwiZXhwIjoxOTMyODg3NzQxLCJpYXQiOjE3NzUxMjEzNDEsImlzcyI6Imh0dHBzOi8vY29ubmVjdG9yLmIyYmJyaWNrcy5jb20iLCJhdWQiOiJodHRwczovL2Nvbm5lY3Rvci5iMmJicmlja3MuY29tIn0.sgFhfl2X3DhaDckUkVqLQ1pAkSsRFUuRJT8eTwekVZs',
             },
           }
         );
@@ -107,7 +107,7 @@ const Research = () => {
         console.log('API Response:', data);
         const propertiesArray = Array.isArray(data)
           ? data
-          : data.items || data.data || [];
+          : data.data || data.items || [];
         console.log('Properties Array:', propertiesArray);
         setProperties(propertiesArray);
         setLoading(false);

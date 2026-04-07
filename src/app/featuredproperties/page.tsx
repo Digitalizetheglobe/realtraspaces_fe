@@ -20,44 +20,45 @@ const raleway = Raleway({
   variable: "--font-raleway",
 });
 
-type Property = {
-  id: string;
-  title?: string;
-  imageUrls?: {
-    images?: Array<{
-      imageFilePath: string;
-      isCoverImage: boolean;
-      orderRank?: number | null;
-    }>;
-  };
-  propertyType?: {
-    displayName?: string;
-    childType?: {
-      displayName?: string;
-    };
-  };
-  monetaryInfo?: {
-    expectedPrice?: number;
-    monthlyRentAmount?: number;
-  };
-  dimension?: {
-    area?: string | number;
-    unit?: string;
-  };
-  furnishStatus?: string;
-  status?: string;
-  address?: {
-    subLocality?: string;
-    city?: string;
-    state?: string;
-  };
-  notes?: string;
-  enquiredFor?: string;
-  serialNo?: string;
+// ── Raw shape from B2BBricks API (PascalCase) ───────────────────────────────
+type RawProperty = {
+  Id: string;
+  Title: string;
+  PropertyTypeText: string;
+  WantToText: string;
+  PropertyName: string;
+  BuildingName: string;
+  Price: string;
+  PriceText: string;
+  SaleArea: string;
+  SaleAreaText: string;
+  CarpetArea: string;
+  CarpetAreaText: string;
+  Furnishing: string;
+  Possession: string;
+  Location: string;
+  City: string;
+  ImageUrl: string;
+  RefNumber: string;
+  FloorNumber: string;
+  NoOfParking: string;
+  [key: string]: unknown;
 };
 
+// ── Fallback data (shown when API fails) ─────────────────────────────────────
+const FALLBACK_DATA: RawProperty[] = [
+  { Id: "1", Title: "Commercial Office Space for Rent in Andheri East", PropertyTypeText: "Commercial Office/Space", WantToText: "Rent", PropertyName: "Arena House", BuildingName: "Arena House", Price: "1762500", PriceText: "17.63 Lac", SaleArea: "23800", SaleAreaText: "23800 Sq.Ft.", CarpetArea: "14100", CarpetAreaText: "14100 Sq.Ft.", Furnishing: "Fully Furnished", Possession: "Immediately", Location: "Andheri (East)", City: "Mumbai", ImageUrl: "", RefNumber: "REF001", FloorNumber: "3", NoOfParking: "12" },
+  { Id: "2", Title: "Commercial Office Space for Rent in BKC", PropertyTypeText: "Commercial Office/Space", WantToText: "Rent", PropertyName: "Ackruti Star", BuildingName: "Ackruti Star", Price: "2200000", PriceText: "22.00 Lac", SaleArea: "23900", SaleAreaText: "23900 Sq.Ft.", CarpetArea: "13800", CarpetAreaText: "13800 Sq.Ft.", Furnishing: "Fully Furnished", Possession: "Immediately", Location: "BKC", City: "Mumbai", ImageUrl: "", RefNumber: "REF002", FloorNumber: "7", NoOfParking: "23" },
+  { Id: "3", Title: "Commercial Office Space in Andheri East", PropertyTypeText: "Commercial Office/Space", WantToText: "Sale", PropertyName: "Nand Ghanshyam", BuildingName: "Nand Ghanshyam", Price: "200000", PriceText: "2.00 Lac", SaleArea: "2000", SaleAreaText: "2000 Sq.Ft.", CarpetArea: "", CarpetAreaText: "", Furnishing: "Fully Furnished", Possession: "Immediately", Location: "Andheri (East)", City: "Mumbai", ImageUrl: "", RefNumber: "REF003", FloorNumber: "1", NoOfParking: "" },
+  { Id: "4", Title: "Premium Office Space for Lease in Powai", PropertyTypeText: "Commercial Office/Space", WantToText: "Rent", PropertyName: "Hiranandani Gardens", BuildingName: "Hiranandani Gardens", Price: "1500000", PriceText: "15.00 Lac", SaleArea: "18000", SaleAreaText: "18000 Sq.Ft.", CarpetArea: "12000", CarpetAreaText: "12000 Sq.Ft.", Furnishing: "Semi Furnished", Possession: "Immediately", Location: "Powai", City: "Mumbai", ImageUrl: "", RefNumber: "REF004", FloorNumber: "5", NoOfParking: "8" },
+];
+
+const API_URL = 'https://connector.b2bbricks.com/api/Property/getrecentproperties';
+const TOKEN   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InJhaHVsc29uYXJAY3JlZGVmaW5lLmNvbSIsIm5iZiI6MTc3NTEyMTM0MSwiZXhwIjoxOTMyODg3NzQxLCJpYXQiOjE3NzUxMjEzNDEsImlzcyI6Imh0dHBzOi8vY29ubmVjdG9yLmIyYmJyaWNrcy5jb20iLCJhdWQiOiJodHRwczovL2Nvbm5lY3Rvci5iMmJicmlja3MuY29tIn0.sgFhfl2X3DhaDckUkVqLQ1pAkSsRFUuRJT8eTwekVZs';
+
+
 const FeaturedProperties = () => {
-  const [properties, setProperties] = useState<Property[]>([]);
+  const [properties, setProperties] = useState<RawProperty[]>([]);
   const [loading, setLoading] = useState(true);
   const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -70,30 +71,21 @@ const FeaturedProperties = () => {
   }, []);
 
   useEffect(() => {
-    const fetchProperties = async () => {
+    (async () => {
       try {
-        const response = await fetch(
-          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=20",
-          {
-            method: "GET",
-            headers: {
-              accept: "application/json",
-              tenant: "realtraspaces",
-            },
-          }
-        );
-        const data = await response.json();
-        console.log("API response:", data);
-        const allProperties = Array.isArray(data) ? data : data.items || data.data || [];
-        setProperties(allProperties.slice(8, 14));
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching properties:", error);
+        const res = await fetch(API_URL, { headers: { Authorization: `Bearer ${TOKEN}` } });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const items: RawProperty[] = Array.isArray(data) ? data : data.data || data.items || [];
+        if (!items.length) throw new Error("empty");
+        setProperties(items.slice(8, 14));
+      } catch {
+        console.warn("[B2BBricks] Live API unreachable — using local snapshot.");
+        setProperties(FALLBACK_DATA);
+      } finally {
         setLoading(false);
       }
-    };
-
-    fetchProperties();
+    })();
   }, []);
 
   useEffect(() => {
@@ -130,55 +122,21 @@ const FeaturedProperties = () => {
     );
   }
 
-  interface FormatPrice {
-    (price?: number, enquiredFor?: string): string;
-  }
-
-  const formatPrice: FormatPrice = (price, enquiredFor) => {
-    if (!price) return "Price on request";
-
-    if (enquiredFor === "Rent") {
-      return `₹ ${price.toLocaleString()} /month`;
-    } else {
-      // For sale properties
-      if (price >= 10000000) {
-        return `₹ ${(price / 10000000).toFixed(2)} Cr`;
-      } else if (price >= 100000) {
-        return `₹ ${(price / 100000).toFixed(2)} Lac`;
-      } else {
-        return `₹ ${price.toLocaleString()}`;
-      }
-    }
+  const formatPrice = (p: RawProperty): string => {
+    if (p.PriceText) return `₹ ${p.PriceText}`;
+    const val = parseFloat(String(p.Price || 0).replace(/[^0-9.]/g, "")) || 0;
+    if (!val) return "Price on Request";
+    if (p.WantToText === "Rent") return `₹ ${val.toLocaleString()} /month`;
+    if (val >= 10000000) return `₹ ${(val / 10000000).toFixed(2)} Cr`;
+    if (val >= 100000) return `₹ ${(val / 100000).toFixed(2)} Lac`;
+    return `₹ ${val.toLocaleString()}`;
   };
 
-  interface FurnishStatusMap {
-    [key: string]: string;
-  }
-
-  const getFurnishStatus = (status?: string): string => {
-    const statusMap: FurnishStatusMap = {
-      FullyFurnished: "Fully Furnished",
-      SemiFurnished: "Semi Furnished",
-      Unfurnished: "Unfurnished",
-      Unknown: "Status Unknown",
-    };
-    return statusMap[status ?? ""] || "Status Unknown";
-  };
-
-  const getPropertyNotes = (notes?: string): string => {
-    if (!notes) return "";
-    // Extract the first sentence or limit to 100 characters
-    const firstSentence = notes.split(".")[0];
-    return firstSentence.length > 100
-      ? firstSentence.substring(0, 100) + "..."
-      : firstSentence;
-  };
-
-  // Function to create a URL-friendly slug from the property title
   const createSlug = (title?: string): string => {
     if (!title) return "property";
     return title.replace(/\s+/g, "-").toLowerCase();
   };
+
 
   return (
     <>
@@ -308,7 +266,7 @@ const FeaturedProperties = () => {
           <div className="space-y-6 max-w-5xl mx-auto">
             {properties.map((property, index) => (
               <div
-                key={property.id}
+                key={property.Id}
                 className={`property-card bg-white rounded-lg shadow-sm overflow-hidden ${visibleItems.has(index)
                   ? (index % 2 === 0 ? 'visible-left' : 'visible-right')
                   : ''
@@ -321,10 +279,10 @@ const FeaturedProperties = () => {
                 >
                   {/* Image */}
                   <div className="w-full sm:w-1/3 p-2 overflow-hidden flex items-center justify-center">
-                    {property.imageUrls?.images && property.imageUrls.images.length > 0 ? (
+                    {property.ImageUrl ? (
                       <img
-                        src={property.imageUrls.images[0].imageFilePath}
-                        alt={isLoggedIn ? property.title : "Property Details"}
+                        src={property.ImageUrl}
+                        alt={property.Title || "Property"}
                         className="property-image w-full h-56 object-cover rounded-2xl p-2"
                       />
                     ) : (
@@ -343,25 +301,19 @@ const FeaturedProperties = () => {
                     {/* Property Tag */}
                     <div className="property-tags mb-3">
                       <span className="bg-[#6E6E73] text-white px-3 py-1 rounded-full text-sm">
-                        {property.propertyType?.childType?.displayName ||
-                          property.propertyType?.displayName ||
-                          "Office Space"}
+                        {property.PropertyTypeText || "Office Space"}
                       </span>
                       <span className="ml-2 bg-[#6E6E73] text-white px-3 py-1 rounded-full text-sm">
-                        {property.enquiredFor || "For Sale/Rent"}
+                        {property.WantToText || "For Sale/Rent"}
                       </span>
                     </div>
 
                     {/* Title and Price */}
                     <h3 className="font-semibold text-xl text-gray-900 transition-colors duration-300">
-                      {isLoggedIn ? (property.title || "ONE BKC C Wing") : "Property Details"}
+                      {isLoggedIn ? (property.Title || property.BuildingName || "Property") : "Property Details"}
                     </h3>
                     <h4 className="text-base text-gray-500 font-mono mb-4 transition-colors duration-300">
-                      {formatPrice(
-                        property.monetaryInfo?.expectedPrice ||
-                        property.monetaryInfo?.monthlyRentAmount,
-                        property.enquiredFor
-                      )}
+                      {formatPrice(property)}
                     </h4>
 
                     {/* Property Details */}
@@ -371,8 +323,7 @@ const FeaturedProperties = () => {
                         <div className="flex flex-col">
                           <span className="text-md text-gray-600">Area</span>
                           <span className="text-sm font-medium text-gray-500">
-                            {property.dimension?.area || "N/A"}{" "}
-                            {property.dimension?.unit || "Sq. Feet"}
+                            {property.SaleAreaText || property.CarpetAreaText || "N/A"}
                           </span>
                         </div>
                       </div>
@@ -382,7 +333,7 @@ const FeaturedProperties = () => {
                         <div className="flex flex-col">
                           <span className="text-md text-gray-600">Status</span>
                           <span className="text-sm font-medium text-gray-500">
-                            {getFurnishStatus(property.furnishStatus)}
+                            {property.Furnishing || "N/A"}
                           </span>
                         </div>
                       </div>
@@ -399,9 +350,7 @@ const FeaturedProperties = () => {
                             Availability
                           </span>
                           <span className="text-sm font-medium text-gray-500">
-                            {property.status === "Active"
-                              ? "Ready to Move"
-                              : "Coming Soon"}
+                            {property.Possession || "Ready to Move"}
                           </span>
                         </div>
                       </div>
@@ -418,7 +367,7 @@ const FeaturedProperties = () => {
                             Property ID
                           </span>
                           <span className="text-sm font-medium text-gray-500">
-                            {property.serialNo || "N/A"}
+                            {property.RefNumber || "N/A"}
                           </span>
                         </div>
                       </div>
@@ -434,9 +383,7 @@ const FeaturedProperties = () => {
                           height={20}
                         />
                         <span className="text-md text-gray-700">
-                          {property.address?.subLocality || ""},{" "}
-                          {property.address?.city || "Mumbai"},{" "}
-                          {property.address?.state || "Maharashtra"}
+                          {[property.Location, property.City].filter(Boolean).join(", ") || "Location N/A"}
                         </span>
                       </div>
 
@@ -450,7 +397,7 @@ const FeaturedProperties = () => {
                           />
                         </button>
                         <Link
-                          href={`/property-details/${createSlug(property.title)}`}
+                          href={`/property-details/${createSlug(property.Title)}`}
                           className="details-btn bg-black text-white px-5 py-1 text-md rounded cursor-pointer hover:bg-gray-800 transition-colors"
                         >
                           Details

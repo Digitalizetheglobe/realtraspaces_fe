@@ -22,60 +22,48 @@ const raleway = Raleway({
   variable: "--font-raleway",
 });
 
-type Property = {
-  id: string;
-  title?: string;
-  images?: Array<{
-    imageFilePath: string;
-    isCoverImage: boolean;
-    orderRank?: number | null;
-  }>;
-  imageUrls?: {
-    images?: Array<{
-      imageFilePath: string;
-      isCoverImage?: boolean;
-      orderRank?: number | null;
-      height?: number | null;
-      width?: number | null;
-    }>;
-  };
-  propertyType?: {
-    displayName?: string;
-    childType?: {
-      displayName?: string;
-      type?: string;
-    };
-  };
-  address?: {
-    subLocality?: string;
-    city?: string;
-    state?: string;
-  };
-  monetaryInfo?: {
-    expectedPrice?: number;
-    expectedRent?: number;
-  };
-  dimension?: {
-    area?: string | number;
-    carpetArea?: number | null;
-    parking?: number | null;
-  };
-  furnishStatus?: string;
-  unitNo?: string | number;
-  attributes?: Array<{
-    masterPropertyAttributeId: string;
-    value?: string | number;
-    displayName?: string;
-  }>;
-  forSale?: boolean;
-  forRent?: boolean;
-  enquiredFor?: string;
+// ── Raw shape from B2BBricks API (PascalCase) ───────────────────────────────
+type RawProperty = {
+  Id: string;
+  Title: string;
+  PropertyTypeText: string;
+  WantToText: string;
+  PropertyName: string;
+  BuildingName: string;
+  Price: string;
+  PriceText: string;
+  SaleArea: string;
+  SaleAreaText: string;
+  CarpetArea: string;
+  CarpetAreaText: string;
+  Furnishing: string;
+  Possession: string;
+  FloorNumber: string;
+  TotalFloor: string;
+  NoOfParking: string;
+  Location: string;
+  City: string;
+  Landmark: string;
+  ImageUrl: string;
+  Url: string;
+  RefNumber: string;
+  Description: string;
+  IsFeatured: boolean;
+  EmployeeName: string;
+  EmployeeMobile: string;
+  [key: string]: unknown;
 };
+
+// ── Fallback data ─────────────────────────────────────────────────────────────────────────────
+const FALLBACK_DATA: RawProperty[] = [{"Id":"05a753a8-66d7-4a69-ac45-0341564e8fc3","RefNumber":"JP040426-151256-1550","Title":"Commercial Office/Space for Rent in Andheri (East), Mumbai Bandra - Dahisar","Description":"","CreateDate":"2:54 PM","PropertyType":"11","PropertyTypeText":"Commercial Office/Space","PropertyGroup":null,"WantTo":"3","WantToText":"Rent","PropertyTypeArea":"2","PropertyName":"Arena House","TotalRoom":"","MasterBedRoom":null,"ChildBedRoom":"","GuestRoom":"","OtherRoom":"","EnsuiteBathRoom":"","CommonBathRoom":"","TotalBathRoom":"","Furnishing":"Fully Furnished","Flooring":"Tiles","FloorNumber":"3","TotalLift":"1","TotalFloor":"5","SaleArea":"23800.00","SaleAreaText":"23800 Sq.Ft.","SaleAreaUnit":"1","BuiltArea":"","BuiltAreaText":"","BuiltAreaUnit":"1","CarpetArea":"14100.00","CarpetAreaText":"14100 Sq.Ft.","CarpetAreaUnit":"1","TerraceArea":"","TerraceAreaText":"","TerraceAreaUnit":"1","MaxArea":null,"MaxAreaUnit":null,"MinArea":null,"MinAreaUnit":null,"PlotSize":null,"PlotSizeUnit":null,"DepositePrice":null,"Price":"1762500","PriceText":"17.63 Lac","Rate":"74.05","NegotiableAmount":null,"IsNegotiable":true,"Transaction":"Resale","PropertyAge":"","Ownership":"Lease Hold","SocietyName":null,"Possession":"Immediately","Facing":"","Obligation":"","LocationId":"10","Location":"Andheri (East)","City":"Mumbai Bandra - Dahisar","State":null,"PinCode":"","LastUpdated":"07-Apr-2026 2:54 PM","Url":"","Latitude":19.1195,"Longitude":72.8712,"EmployeeName":"Administrator","EmployeeMobile":"9769971110","EmployeeEmail":"rahulsonar@credefine.com","WebsiteKeyword":"Furnished office for Lease at Andheri East","BuildingName":"Arena House","FlatNumber":null,"Landmark":"Marol MIDC Industrial Estate","StreetName":null,"OtherAmenities":"","NoOfParking":"12","TotalRecords":3,"IsFeatured":false,"Suitable":"Corporate Office","Unique":"Easy Public transport, 24/7 Water Supply","ImageUrl":""},{"Id":"7869e6af-fd4e-4b39-bbab-885fd8cb841b","RefNumber":"JP060426-163733-2467","Title":"Commercial Office/Space for Rent in Andheri (East), Mumbai Bandra - Dahisar","Description":"","CreateDate":"2:53 PM","PropertyType":"11","PropertyTypeText":"Commercial Office/Space","PropertyGroup":null,"WantTo":"3","WantToText":"Rent","PropertyTypeArea":"2","PropertyName":"Ackruti Star","TotalRoom":"","MasterBedRoom":null,"ChildBedRoom":"","GuestRoom":"","OtherRoom":"","EnsuiteBathRoom":"","CommonBathRoom":"","TotalBathRoom":"","Furnishing":"Fully Furnished","Flooring":"","FloorNumber":"7","TotalLift":"","TotalFloor":"","SaleArea":"23900.00","SaleAreaText":"23900 Sq.Ft.","SaleAreaUnit":"1","BuiltArea":"","BuiltAreaText":"","BuiltAreaUnit":"1","CarpetArea":"13800.00","CarpetAreaText":"13800 Sq.Ft.","CarpetAreaUnit":"1","TerraceArea":"","TerraceAreaText":"","TerraceAreaUnit":"1","MaxArea":null,"MaxAreaUnit":null,"MinArea":null,"MinAreaUnit":null,"PlotSize":null,"PlotSizeUnit":null,"DepositePrice":null,"Price":"2200000","PriceText":"22.00 Lac","Rate":"92.05","NegotiableAmount":null,"IsNegotiable":true,"Transaction":"Resale","PropertyAge":"","Ownership":"Free Hold","SocietyName":null,"Possession":"Immediately","Facing":"","Obligation":"","LocationId":"10","Location":"Andheri (East)","City":"Mumbai Bandra - Dahisar","State":null,"PinCode":"","LastUpdated":"07-Apr-2026 2:53 PM","Url":"","Latitude":19.1185,"Longitude":72.8703,"EmployeeName":"Administrator","EmployeeMobile":"9769971110","EmployeeEmail":"rahulsonar@credefine.com","WebsiteKeyword":"Furnished office for Lease at Andheri East","BuildingName":"Ackruti Star","FlatNumber":null,"Landmark":"MIDC Central Road","StreetName":null,"OtherAmenities":"","NoOfParking":"23","TotalRecords":3,"IsFeatured":false,"Suitable":"Corporate Office","Unique":"Good No. of Reserved Parking, Easy Public transport, 24/7 Water Supply","ImageUrl":""},{"Id":"dda2f29d-6a83-42ce-a3e2-c03d72f53b19","RefNumber":"JP070426-140527-1285","Title":"Commercial Office/Space for Rent in Andheri (East), Mumbai Bandra - Dahisar","Description":"","CreateDate":"2:52 PM","PropertyType":"11","PropertyTypeText":"Commercial Office/Space","PropertyGroup":null,"WantTo":"3","WantToText":"Rent","PropertyTypeArea":"2","PropertyName":"Nand Ghanshyam","TotalRoom":"","MasterBedRoom":null,"ChildBedRoom":"","GuestRoom":"","OtherRoom":"","EnsuiteBathRoom":"","CommonBathRoom":"","TotalBathRoom":"","Furnishing":"Fully Furnished","Flooring":"","FloorNumber":"1","TotalLift":"","TotalFloor":"","SaleArea":"2000.00","SaleAreaText":"2000 Sq.Ft.","SaleAreaUnit":"1","BuiltArea":"","BuiltAreaText":"","BuiltAreaUnit":"1","CarpetArea":"","CarpetAreaText":"","CarpetAreaUnit":"1","TerraceArea":"","TerraceAreaText":"","TerraceAreaUnit":"1","MaxArea":null,"MaxAreaUnit":null,"MinArea":null,"MinAreaUnit":null,"PlotSize":null,"PlotSizeUnit":null,"DepositePrice":null,"Price":"200000","PriceText":"2.00 Lac","Rate":"100.00","NegotiableAmount":null,"IsNegotiable":true,"Transaction":"Resale","PropertyAge":"","Ownership":"Free Hold","SocietyName":null,"Possession":"","Facing":"","Obligation":"","LocationId":"10","Location":"Andheri (East)","City":"Mumbai Bandra - Dahisar","State":null,"PinCode":"","LastUpdated":"07-Apr-2026 2:52 PM","Url":"","Latitude":19.1234,"Longitude":72.862,"EmployeeName":"Administrator","EmployeeMobile":"9769971110","EmployeeEmail":"rahulsonar@credefine.com","WebsiteKeyword":"Furnished office for Lease at Andheri East","BuildingName":"Nand Ghanshyam","FlatNumber":null,"Landmark":"Opp Sun pharma building","StreetName":null,"OtherAmenities":"","NoOfParking":"","TotalRecords":3,"IsFeatured":false,"Suitable":"Corporate Office","Unique":"Easy Public transport, Earthquake resistance, 24/7 Water Supply","ImageUrl":""}];
+
+const API_URL = 'https://connector.b2bbricks.com/api/Property/getrecentproperties';
+const TOKEN   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6InJhaHVsc29uYXJAY3JlZGVmaW5lLmNvbSIsIm5iZiI6MTc3NTEyMTM0MSwiZXhwIjoxOTMyODg3NzQxLCJpYXQiOjE3NzUxMjEzNDEsImlzcyI6Imh0dHBzOi8vY29ubmVjdG9yLmIyYmJyaWNrcy5jb20iLCJhdWQiOiJodHRwczovL2Nvbm5lY3Rvci5iMmJicmlja3MuY29tIn0.sgFhfl2X3DhaDckUkVqLQ1pAkSsRFUuRJT8eTwekVZs';
 
 export default function PropertyCards() {
   const router = useRouter();
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [allProperties, setAllProperties] = useState<Property[]>([]); // NEW: Combined properties from both pages
+  const [properties, setProperties] = useState<RawProperty[]>([]);
+  const [allProperties, setAllProperties] = useState<RawProperty[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedLocations, setSelectedLocations] = useState<string[]>([]); // NEW
@@ -171,21 +159,21 @@ export default function PropertyCards() {
       setIsComparing(true);
 
       // Get selected properties
-      const selectedProperties = allProperties.filter(prop => bookmarkedProperties.has(prop.id));
+      const selectedProperties = allProperties.filter(prop => bookmarkedProperties.has(prop.Id));
       let addedCount = 0;
       let alreadyInListCount = 0;
 
       // Add each selected property to comparison
       for (const property of selectedProperties) {
         try {
-          const response = await fetch("https://api.realtraspaces.com/api/webusers/compare/add", {
+          const response = await fetch("http://localhost:8000/api/webusers/compare/add", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify({
-              propertyId: property.id,
+              propertyId: property.Id,
               propertyData: property
             })
           });
@@ -213,7 +201,7 @@ export default function PropertyCards() {
           addedCount++;
 
         } catch (propertyError) {
-          console.error(`Error adding property ${property.id}:`, propertyError);
+          console.error(`Error adding property ${property.Id}:`, propertyError);
           // Continue with other properties even if one fails
         }
       }
@@ -260,109 +248,56 @@ export default function PropertyCards() {
     }
   }, [openShareIndex]);
 
-  // Fetch properties effect
+  // Fetch properties — same pattern as PropertyListing
   useEffect(() => {
-    const fetchProperties = async () => {
+    (async () => {
       try {
-        // Fetch properties from latestpropertytype page
-        const response = await fetch(
-          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=500",
-          {
-            method: "GET",
-            headers: {
-              accept: "application/json",
-              tenant: "realtraspaces",
-            },
-          }
-        );
-        const data = await response.json();
-        const propertiesData = Array.isArray(data) ? data : data.items || data.data || [];
-        console.log('Fetched latestpropertytype properties:', propertiesData);
-
-        // Fetch properties from properties page
-        const propertiesResponse = await fetch(
-          "https://prd-lrb-webapi.leadrat.com/api/v1/property/anonymous?PageNumber=1&PageSize=500",
-          {
-            method: "GET",
-            headers: {
-              accept: "application/json",
-              tenant: "realtraspaces",
-            },
-          }
-        );
-        const propertiesData2 = await propertiesResponse.json();
-        const propertiesPageData = Array.isArray(propertiesData2) ? propertiesData2 : propertiesData2.items || propertiesData2.data || [];
-        console.log('Fetched properties page properties:', propertiesPageData);
-
-        // Combine both sets of properties and remove duplicates based on ID
-        const allPropertiesArray = [...propertiesData, ...propertiesPageData];
-        const uniqueProperties = allPropertiesArray.filter((property, index, self) =>
-          index === self.findIndex(p => p.id === property.id)
-        );
-        console.log('Combined properties:', uniqueProperties);
-
-        setProperties(uniqueProperties);
-        setAllProperties(uniqueProperties);
-        console.log('Total unique properties loaded:', uniqueProperties.length);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching properties:", error);
+        const res = await fetch(API_URL, { headers: { Authorization: `Bearer ${TOKEN}` } });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const items: RawProperty[] = Array.isArray(data) ? data : data.data || data.items || [];
+        if (!items.length) throw new Error("empty");
+        const unique = items.filter((p, i, arr) => i === arr.findIndex(q => q.Id === p.Id));
+        setProperties(unique);
+        setAllProperties(unique);
+      } catch {
+        console.warn("[B2BBricks] Live API unreachable — using local snapshot.");
+        setProperties(FALLBACK_DATA);
+        setAllProperties(FALLBACK_DATA);
+      } finally {
         setLoading(false);
       }
-    };
-
-    fetchProperties();
+    })();
   }, []);
 
-  // After fetching properties, preprocess unique values
+  // After fetching, preprocess unique values for search/filter
   useEffect(() => {
     if (properties.length === 0) return;
-    // Unique cities
-    const cities = Array.from(new Set(properties.map(p => p.address?.city).filter((c): c is string => Boolean(c))));
-    // Unique sublocalities grouped by city
+    const cities = Array.from(new Set(properties.map(p => p.City).filter((c): c is string => Boolean(c))));
     const sublocalities: { [city: string]: Set<string> } = {};
     properties.forEach(p => {
-      if (p.address?.city && p.address?.subLocality) {
-        if (!sublocalities[p.address.city]) sublocalities[p.address.city] = new Set();
-        sublocalities[p.address.city].add(p.address.subLocality);
+      if (p.City && p.Location) {
+        if (!sublocalities[p.City]) sublocalities[p.City] = new Set();
+        sublocalities[p.City].add(p.Location);
       }
     });
-    // Unique property types
-    const propertyTypes = Array.from(new Set(allProperties.map(p => p.propertyType?.displayName).filter((t): t is string => Boolean(t))));
-    // Universal search: collect all searchable strings
+    const propertyTypes = Array.from(new Set(allProperties.map(p => p.PropertyTypeText).filter((t): t is string => Boolean(t))));
     const universal = new Set<string>();
     allProperties.forEach(p => {
-      if (p.title) universal.add(p.title);
-      if (p.address?.city) universal.add(p.address.city);
-      if (p.address?.subLocality) universal.add(p.address.subLocality);
-      if (p.address?.state) universal.add(p.address.state);
-      if (p.propertyType?.displayName) universal.add(p.propertyType.displayName);
-      if (p.propertyType?.childType?.displayName) universal.add(p.propertyType.childType.displayName);
-      if (p.monetaryInfo?.expectedPrice) universal.add(p.monetaryInfo.expectedPrice.toString());
-      if (p.monetaryInfo?.expectedRent) universal.add(p.monetaryInfo.expectedRent.toString());
-      if (p.unitNo) universal.add(p.unitNo.toString());
-      if (p.dimension?.area) universal.add(p.dimension.area.toString());
-      if (p.attributes) p.attributes.forEach(attr => {
-        if (attr.displayName) universal.add(attr.displayName);
-        if (attr.value) universal.add(attr.value.toString());
-      });
-      // Add property status
-      if (p.forSale) universal.add("For Sale");
-      if (p.forRent) universal.add("For Rent");
-      // Add price ranges
-      if (p.monetaryInfo?.expectedPrice) {
-        const price = p.monetaryInfo.expectedPrice;
-        if (price < 1000000) universal.add("Under 10 Lakhs");
-        else if (price < 5000000) universal.add("Under 50 Lakhs");
-        else if (price < 10000000) universal.add("Under 1 Crore");
-        else universal.add("Above 1 Crore");
-      }
+      if (p.Title) universal.add(p.Title);
+      if (p.City) universal.add(p.City);
+      if (p.Location) universal.add(p.Location);
+      if (p.PropertyTypeText) universal.add(p.PropertyTypeText);
+      if (p.PriceText) universal.add(p.PriceText);
+      if (p.WantToText) universal.add(p.WantToText);
+      if (p.Furnishing) universal.add(p.Furnishing);
     });
     setAllCities(cities);
     setAllSublocalities(sublocalities);
     setAllPropertyTypes(propertyTypes);
     setAllUniversal(Array.from(universal));
   }, [allProperties]);
+
 
   // Update suggestions as user types
   useEffect(() => {
@@ -449,9 +384,9 @@ export default function PropertyCards() {
   }, []);
 
   // Helper to get property URL
-  const getPropertyUrl = (property: Property) => {
-    if (!property.title) return window.location.href;
-    return `${window.location.origin}/property-details/${encodeURIComponent(property.title)}`;
+  const getPropertyUrl = (property: RawProperty) => {
+    if (!property.Title) return window.location.href;
+    return `${window.location.origin}/property-details/${encodeURIComponent(property.Title)}`;
   };
 
   // Helper to copy link
@@ -493,7 +428,7 @@ export default function PropertyCards() {
     setSubmitStatus({ type: null, message: '' });
 
     try {
-      const response = await fetch('https://api.realtraspaces.com/api/contacts/submit', {
+      const response = await fetch('http://localhost:8000/api/contacts/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -538,67 +473,24 @@ export default function PropertyCards() {
     }
   };
 
-  // Helper function to get attribute value by ID
-  const getAttributeValue = (property: Property, attributeId: string) => {
-    const attribute = property.attributes?.find(
-      (attr) => attr.masterPropertyAttributeId === attributeId
-    );
-    return attribute?.value || "N/A";
-  };
+  const getAttributeValue = (_property: RawProperty, _attributeId: string) => "N/A";
 
-  // Helper function to get the best image for a property
-  const getPropertyImage = (property: Property): string => {
-    // First check imageUrls.images (new structure)
-    if (property.imageUrls?.images && property.imageUrls.images.length > 0) {
-      // First try to find a cover image
-      const coverImage = property.imageUrls.images.find(img => img.isCoverImage);
-      if (coverImage && coverImage.imageFilePath && !failedImages.has(coverImage.imageFilePath)) {
-        return coverImage.imageFilePath;
-      }
-      // If no cover image or cover image failed, return the first non-failed image
-      const firstImage = property.imageUrls.images.find(
-        img => img.imageFilePath && !failedImages.has(img.imageFilePath)
-      );
-      if (firstImage && firstImage.imageFilePath) {
-        return firstImage.imageFilePath;
-      }
-    }
-
-    // Fallback to property.images (old structure for backward compatibility)
-    if (property.images && property.images.length > 0) {
-      // First try to find a cover image
-      const coverImage = property.images.find(img => img.isCoverImage);
-      if (coverImage && !failedImages.has(coverImage.imageFilePath)) {
-        return coverImage.imageFilePath;
-      }
-      // If no cover image or cover image failed, return the first non-failed image
-      const firstImage = property.images.find(img => !failedImages.has(img.imageFilePath));
-      if (firstImage) {
-        return firstImage.imageFilePath;
-      }
-    }
-
-    // Return default image if no images found
+  // Get image from B2BBricks ImageUrl field
+  const getPropertyImage = (property: RawProperty): string => {
+    if (property.ImageUrl && !failedImages.has(property.ImageUrl)) return property.ImageUrl;
     return defaultPropertyImage.src;
   };
 
-  // Format price in Indian currency format (e.g., ₹ 45,00,000)
-  const formatPrice = (price?: number) => {
-    if (!price) return "Price not available";
-
-    // For values less than 100,000, show directly
-    if (price < 100000) return `₹ ${price}`;
-
-    // For values in lakhs (1 lakh = 100,000)
-    if (price < 10000000) {
-      const lakhs = (price / 100000).toFixed(2);
-      return `₹ ${lakhs} Lakhs`;
-    }
-
-    // For values in crores (1 crore = 10,000,000)
-    const crores = (price / 10000000).toFixed(2);
-    return `₹ ${crores} Cr`;
+  // Format price using B2BBricks PriceText / Price fields
+  const formatPrice = (property: RawProperty) => {
+    if (property.PriceText) return `₹ ${property.PriceText}`;
+    const val = parseFloat(String(property.Price || 0).replace(/[^0-9.]/g, "")) || 0;
+    if (!val) return "Price not available";
+    if (val >= 10000000) return `₹ ${(val / 10000000).toFixed(2)} Cr`;
+    if (val >= 100000) return `₹ ${(val / 100000).toFixed(2)} Lakhs`;
+    return `₹ ${val}`;
   };
+
 
   // Add location to selectedLocations
   const addLocation = (location: string) => {
@@ -621,130 +513,46 @@ export default function PropertyCards() {
     }
   };
 
-  // Helper function to check if a property matches the enquiredFor filter
-  const propertyMatchesEnquiredFor = (property: Property, filter: string): boolean => {
-    // If enquiredFor is explicitly set, check it directly
-    if (property.enquiredFor) {
-      return property.enquiredFor === filter;
-    }
-
-    // Otherwise, check based on forSale/forRent
-    if (filter === "Rent") {
-      return property.forRent === true;
-    } else if (filter === "Sale") {
-      return property.forSale === true;
-    }
-
-    return false;
+  // Simplified matching for B2BBricks fields — check WantToText
+  const propertyMatchesEnquiredFor = (property: RawProperty, filter: string): boolean => {
+    return property.WantToText === filter;
   };
 
-  // Enhanced filtering logic with multiple filter types - now searches across both pages
+  // Filter across B2BBricks fields
   const filteredProperties = allProperties.filter((property) => {
-    // Filter by enquiredFor (Rent/Investment)
-    if (enquiredForFilter) {
-      if (!propertyMatchesEnquiredFor(property, enquiredForFilter)) {
-        return false;
-      }
-    }
-
-    // Filter by search type (Rent/Investment/Research) - keep this for backward compatibility
+    if (enquiredForFilter && !propertyMatchesEnquiredFor(property, enquiredForFilter)) return false;
     if (selectedType && !enquiredForFilter) {
-      const typeLower = selectedType.toLowerCase().trim();
-
-      // Filter by property type based on search type
-      if (typeLower === "rent") {
-        if (!property.forRent) return false;
-      } else if (typeLower === "investment") {
-        if (!property.forSale) return false;
-      } else if (typeLower === "research") {
-        // For research, show both sale and rent properties
-        if (!property.forSale && !property.forRent) return false;
-      }
+      const t = selectedType.toLowerCase();
+      if (t === "rent" && property.WantToText !== "Rent") return false;
+      if (t === "investment" && property.WantToText !== "Sale") return false;
     }
-
-    // Filter by search text and selected locations
     if (search.trim() || selectedLocations.length > 0) {
-      const searchLower = search.toLowerCase().trim();
+      const s = search.toLowerCase();
+      const matches = (v?: string) => v?.toLowerCase().includes(s) ?? false;
       const hasSearchMatch = search.trim() ? (
-        (property.title?.toLowerCase().includes(searchLower) ?? false) ||
-        (property.address?.subLocality?.toLowerCase().includes(searchLower) ?? false) ||
-        (property.address?.city?.toLowerCase().includes(searchLower) ?? false) ||
-        (property.address?.state?.toLowerCase().includes(searchLower) ?? false) ||
-        (property.propertyType?.displayName?.toLowerCase().includes(searchLower) ?? false) ||
-        (property.propertyType?.childType?.displayName?.toLowerCase().includes(searchLower) ?? false) ||
-        (property.dimension?.area?.toString().toLowerCase().includes(searchLower) ?? false) ||
-        (property.monetaryInfo?.expectedPrice?.toString().includes(searchLower) ?? false) ||
-        (property.monetaryInfo?.expectedRent?.toString().includes(searchLower) ?? false) ||
-        (property.unitNo?.toString().toLowerCase().includes(searchLower) ?? false) ||
-        (property.attributes?.some(attr =>
-          (attr.displayName?.toLowerCase().includes(searchLower) ?? false) ||
-          (attr.value?.toString().toLowerCase().includes(searchLower) ?? false)
-        ) ?? false) ||
-        // Price range matching
-        (searchLower.includes("under 10 lakhs") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice < 1000000) ||
-        (searchLower.includes("under 50 lakhs") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice < 5000000) ||
-        (searchLower.includes("under 1 crore") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice < 10000000) ||
-        (searchLower.includes("above 1 crore") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice >= 10000000) ||
-        // Property status matching
-        (searchLower.includes("for sale") && property.forSale) ||
-        (searchLower.includes("for rent") && property.forRent)
+        matches(property.Title) || matches(property.City) || matches(property.Location) ||
+        matches(property.PropertyTypeText) || matches(property.WantToText) ||
+        matches(property.Furnishing) || matches(property.PriceText)
       ) : true;
-
-      const hasLocationMatch = selectedLocations.length > 0 ? selectedLocations.some((loc) => {
-        const locLower = loc.toLowerCase();
+      const hasLocationMatch = selectedLocations.length > 0 ? selectedLocations.some(loc => {
+        const l = loc.toLowerCase();
         return (
-          (property.address?.subLocality?.toLowerCase().includes(locLower) ?? false) ||
-          (property.address?.city?.toLowerCase().includes(locLower) ?? false) ||
-          (property.address?.state?.toLowerCase().includes(locLower) ?? false) ||
-          (property.propertyType?.displayName?.toLowerCase().includes(locLower) ?? false) ||
-          (property.propertyType?.childType?.displayName?.toLowerCase().includes(locLower) ?? false) ||
-          (property.title?.toLowerCase().includes(locLower) ?? false) ||
-          (property.monetaryInfo?.expectedPrice?.toString().includes(loc) ?? false) ||
-          (property.monetaryInfo?.expectedRent?.toString().includes(loc) ?? false) ||
-          (property.unitNo?.toString().toLowerCase().includes(locLower) ?? false) ||
-          (property.attributes?.some(attr =>
-            (attr.displayName?.toLowerCase().includes(locLower) ?? false) ||
-            (attr.value?.toString().toLowerCase().includes(locLower) ?? false)
-          ) ?? false) ||
-          // Price range matching for location chips
-          (locLower.includes("under 10 lakhs") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice < 1000000) ||
-          (locLower.includes("under 50 lakhs") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice < 5000000) ||
-          (locLower.includes("under 1 crore") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice < 10000000) ||
-          (locLower.includes("above 1 crore") && property.monetaryInfo?.expectedPrice && property.monetaryInfo.expectedPrice >= 10000000) ||
-          // Property status matching for location chips
-          (locLower.includes("for sale") && property.forSale) ||
-          (locLower.includes("for rent") && property.forRent)
+          property.City?.toLowerCase().includes(l) ||
+          property.Location?.toLowerCase().includes(l) ||
+          property.Title?.toLowerCase().includes(l) ||
+          property.PropertyTypeText?.toLowerCase().includes(l)
         );
       }) : true;
-
-      return hasSearchMatch && hasLocationMatch;
+      if (!hasSearchMatch || !hasLocationMatch) return false;
     }
-
-    // If no filters applied, show all properties
     return true;
   });
 
-  // Helper function to determine enquiredFor value for a property
-  const getPropertyEnquiredFor = (property: Property): string | null => {
-    // If enquiredFor is explicitly set, use it
-    if (property.enquiredFor) {
-      return property.enquiredFor;
-    }
 
-    // Otherwise, derive from forSale/forRent
-    if (property.forRent && !property.forSale) {
-      return "Rent";
-    } else if (property.forSale && !property.forRent) {
-      return "Sale";
-    } else if (property.forSale && property.forRent) {
-      // If both are true, we can't determine - return null
-      return null;
-    }
+  // Determine sale/rent label for B2BBricks
+  const getPropertyEnquiredFor = (property: RawProperty): string => property.WantToText || "N/A";
 
-    return null;
-  };
 
-  // Handle bookmark button click
   const handleCheckboxClick = (propertyId: string) => {
     setBookmarkedProperties(prev => {
       const newBookmarks = new Set(prev);
@@ -1148,10 +956,10 @@ export default function PropertyCards() {
                         className="block bg-black cursor-pointer text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition-colors uppercase tracking-wider"
                         onClick={() => {
                           const selectedPropertyLinks = Array.from(bookmarkedProperties).map(propertyId => {
-                            const property = properties.find(p => p.id === propertyId);
+                            const property = properties.find(p => p.Id === propertyId);
                             if (property) {
                               const baseUrl = window.location.origin;
-                              return `${baseUrl}/property-details/${property.title}`;
+                              return `${baseUrl}/property-details/${property.Title}`;
                             }
                             return null;
                           }).filter(Boolean).join('\n');
@@ -1189,16 +997,16 @@ export default function PropertyCards() {
                   {filteredProperties.slice(0, 8).map((property, index) => (
 
                     <div
-                      key={`${property.id}-${index}`}
+                    key={`${property.Id}-${index}`}
                       className="w-full max-w-full sm:max-w-[340px] bg-[#F1F1F4] rounded-lg overflow-hidden border border-gray-200 mx-auto flex flex-col transform transition-all duration-500 ease-in-out hover:scale-105 hover:shadow-2xl hover:shadow-gray-400/20 hover:-translate-y-2 hover:border-gray-300 animate-fade-in-up"
                       style={{ animationDelay: `${index * 150}ms` }}
                     >
                       {/* Header with title and checkbox */}
                       <div className="p-2 sm:p-3 flex justify-between items-center transition-all duration-300 hover:bg-gray-50/50">
-                        <Link href={`/property-details/${property.title}`} key={property.title} className="block">
+                         <Link href={`/property-details/${property.Title}`} key={property.Title} className="block">
                           <div className="h-14">
                             <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
-                              {isLoggedIn ? (property.title || "Prime Business Hub") : "Property Details"}
+                              {isLoggedIn ? (property.Title || "Prime Business Hub") : "Property Details"}
                             </h3>
                             <div className="flex items-center text-gray-700 text-xs transition-all duration-300 hover:text-gray-900">
                               <svg
@@ -1221,7 +1029,7 @@ export default function PropertyCards() {
                                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                                 />
                               </svg>
-                              {[property.address?.subLocality, property.address?.city]
+                              {[property.Location, property.City]
                                 .filter(Boolean)
                                 .join(", ") || "Location Name"}
                             </div>
@@ -1244,13 +1052,13 @@ export default function PropertyCards() {
                       </svg>
                     </div> */}
                         <button
-                          onClick={() => handleCheckboxClick(property.id)}
-                          className={`w-5 h-5 border rounded flex items-center justify-center cursor-pointer ${bookmarkedProperties.has(property.id)
+                          onClick={() => handleCheckboxClick(property.Id)}
+                          className={`w-5 h-5 border rounded flex items-center justify-center cursor-pointer ${bookmarkedProperties.has(property.Id)
                             ? "border-green-500 bg-green-500"
                             : "border-gray-400"
                             }`}
                         >
-                          {bookmarkedProperties.has(property.id) && (
+                          {bookmarkedProperties.has(property.Id) && (
                             <svg
                               className="w-3 h-3 text-white"
                               fill="none"
@@ -1270,11 +1078,11 @@ export default function PropertyCards() {
                       </div>
 
                       {/* Property Image */}
-                      <Link href={`/property-details/${property.title}`} key={property.title} className="block">
+                      <Link href={`/property-details/${property.Title}`} key={property.Title} className="block">
                         <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
                           <Image
                             src={getPropertyImage(property)}
-                            alt={isLoggedIn ? (property.title || "Property") : "Property Details"}
+                            alt={isLoggedIn ? (property.Title || "Property") : "Property Details"}
                             className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
                             width={340}
                             height={180}
@@ -1316,16 +1124,12 @@ export default function PropertyCards() {
                                 ? "For Rent"
                                 : enquiredForFilter === "Sale"
                                   ? "For Sale"
-                                  : property.forSale
-                                    ? "For Sale"
-                                    : property.forRent
-                                      ? "For Rent"
-                                      : `For ${property.enquiredFor}`}
+                                  : `For ${property.WantToText || "Sale/Rent"}`}
                             </span>
                             <span className="mx-1 transition-all duration-300 group-hover:scale-110">•</span>
                             <span className="ml-1 transition-all duration-300 group-hover:font-medium">
                               {
-                                property.propertyType?.childType?.type ||
+                                property.PropertyTypeText ||
                                 "Office space"}
                             </span>
                           </div>
@@ -1334,41 +1138,39 @@ export default function PropertyCards() {
                       </Link>
                       {/* Property Details */}
                       <div className="p-2 sm:p-3 flex-grow font-mono transition-all duration-300 hover:bg-gray-50/30">
-                        <Link href={`/property-details/${property.title}`} key={property.title} className="block">
+                         <Link href={`/property-details/${property.Title}`} key={property.Title} className="block">
                           <div className="grid grid-cols-2 gap-1 text-xs">
                             <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Built up Area</div>
                             <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                              {property.dimension?.area || "5490"} sqft
+                              {property.SaleAreaText || property.SaleArea || "5490"} sqft
                             </div>
 
                             <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Carpet Area</div>
                             <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                              {property.dimension?.carpetArea ? `${property.dimension.carpetArea} sqft` : "N/A"}
+                              {property.CarpetAreaText || property.CarpetArea || "N/A"}
                             </div>
 
                             <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Parking</div>
                             <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                              {property.dimension?.parking || "N/A"}
+                              {property.NoOfParking || "N/A"}
                             </div>
 
-                            <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">No of Cabin</div>
+                            <div className="text-gray-500 transition-all duration-300 hover:text-gray-600">Furnishing</div>
                             <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
-                              {property.furnishStatus || "N/A"}
+                              {property.Furnishing || "N/A"}
                             </div>
                           </div>
                         </Link>
                         <div className="border-t border-gray-200 my-2 transition-all duration-300 hover:border-gray-300"></div>
 
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
-                          <Link href={`/property-details/${property.title}`} key={property.title} className="block">
+                         <Link href={`/property-details/${property.Title}`} key={property.Title} className="block">
                             <div className="transition-all duration-300 hover:scale-105">
                               <div className="text-base text-black font-mono font-semibold transition-all duration-300 hover:text-gray-800">
-                                {property.forRent
-                                  ? `₹ ${property.monetaryInfo?.expectedRent || 4500}`
-                                  : formatPrice(property.monetaryInfo?.expectedPrice)}
+                                {formatPrice(property)}
                               </div>
                               <div className="text-gray-500 text-xs transition-all duration-300 hover:text-gray-600">
-                                {property.forRent ? "rent/month" : ""}
+                                {property.WantToText === "Rent" ? "rent/month" : ""}
                               </div>
                             </div>
                           </Link>
@@ -1379,9 +1181,8 @@ export default function PropertyCards() {
                               aria-label="View on Map"
                               onClick={() => {
                                 const address = [
-                                  property.address?.subLocality,
-                                  property.address?.city,
-                                  property.address?.state
+                                  property.Location,
+                                  property.City
                                 ].filter(Boolean).join(", ");
                                 const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
                                 window.open(mapUrl, '_blank');
@@ -1411,9 +1212,9 @@ export default function PropertyCards() {
                                   onClick={() => {
                                     if (navigator.share) {
                                       navigator.share({
-                                        title: property.title,
-                                        text: `Check out this property: ${property.title}`,
-                                        url: `https://realtraspaces.com/property-details/${property.title}`,
+                                        title: property.Title,
+                                        text: `Check out this property: ${property.Title}`,
+                                        url: `https://realtraspaces.com/property-details/${property.Title}`,
                                       });
                                     } else {
                                       alert("Share not supported on this browser.");
@@ -1433,7 +1234,7 @@ export default function PropertyCards() {
                             )}
                             {/* WhatsApp button */}
                             <a
-                              href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
+                              href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.Title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"

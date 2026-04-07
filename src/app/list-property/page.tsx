@@ -115,7 +115,7 @@ export default function ListPropertyPage() {
       });
 
       // Call the API with FormData
-      const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://api.realtraspaces.com';
+      const baseURL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const response = await fetch(`${baseURL}/api/property-listings/create`, {
         method: 'POST',
         body: formData, // Send FormData instead of JSON
