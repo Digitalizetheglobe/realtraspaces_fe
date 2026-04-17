@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Raleway } from "next/font/google";
@@ -22,53 +22,28 @@ const raleway = Raleway({
   variable: "--font-raleway",
 });
 
+// B2BBricks API PascalCase property type
 type Property = {
-  id: string;
-  title?: string;
-  images?: Array<{
-    imageFilePath: string;
-    isCoverImage: boolean;
-    orderRank?: number | null;
-  }>;
-  imageUrls?: {
-    images?: Array<{
-      imageFilePath: string;
-      isCoverImage?: boolean;
-      orderRank?: number | null;
-      height?: number | null;
-      width?: number | null;
-    }>;
-  };
-  propertyType?: {
-    displayName?: string;
-    childType?: {
-      displayName?: string;
-    };
-  };
-  address?: {
-    subLocality?: string;
-    city?: string;
-    state?: string;
-  };
-  monetaryInfo?: {
-    expectedPrice?: number;
-    expectedRent?: number;
-  };
-  dimension?: {
-    area?: string | number;
-    carpetArea?: string | number;
-    parking?: string | number;
-  };
-  unitNo?: string | number;
-  furnishStatus?: string;
+  Id: string;
+  Title?: string;
+  PropertyName?: string;
+  ImageUrl?: string;
+  City?: string;
+  Location?: string;
+  PropertyTypeText?: string;
+  WantToText?: string;
+  Price?: number;
+  SaleArea?: string | number;
+  CarpetArea?: string | number;
+  NoOfParking?: string | number;
+  Furnishing?: string;
+  // Legacy camelCase fields (kept for backward compat, may not be present)
   attributes?: Array<{
     masterPropertyAttributeId: string;
     value?: string | number;
     displayName?: string;
   }>;
-  forSale?: boolean;
-  forRent?: boolean;
-  enquiredFor?: string;
+  [key: string]: unknown;
 };
 
 export default function Similarproperties() {
@@ -141,8 +116,8 @@ export default function Similarproperties() {
 
   // Helper to get property URL
   const getPropertyUrl = (property: Property) => {
-    if (!property.Title) return window.location.href;
-    return `${window.location.origin}/property-details/${encodeURIComponent(property.Title)}`;
+    if (!property.PropertyName) return window.location.href;
+    return `${window.location.origin}/property-details/${encodeURIComponent(property.PropertyName as string)}`;
   };
 
   // Helper to copy link
@@ -280,18 +255,15 @@ export default function Similarproperties() {
     return filteredSubLocations;
   };
 
-  // Get available property types (including child types)
+  // Get available property types
   const getAllPropertyTypes = () => {
     const types = new Set<string>();
     allProperties.forEach(p => {
       if (p.PropertyTypeText) {
         types.add(p.PropertyTypeText);
       }
-      if (p.PropertyTypeText) {
-        types.add(p.propertyType.childType.displayName);
-      }
     });
-    const result = Array.from(types).sort(); // Sort to ensure consistent order
+    const result = Array.from(types).sort();
     return result;
   };
 
@@ -373,9 +345,6 @@ export default function Similarproperties() {
       if (p.PropertyTypeText) {
         allPropertyTypes.add(p.PropertyTypeText.toLowerCase());
       }
-      if (p.PropertyTypeText) {
-        allPropertyTypes.add(p.propertyType.childType.displayName.toLowerCase());
-      }
     });
 
     if (allPropertyTypes.has(searchLower)) {
@@ -412,9 +381,6 @@ export default function Similarproperties() {
     allProperties.forEach(p => {
       if (p.PropertyTypeText) {
         allPropertyTypes.add(p.PropertyTypeText);
-      }
-      if (p.PropertyTypeText) {
-        allPropertyTypes.add(p.propertyType.childType.displayName);
       }
     });
     const allPropertyTypesArray = Array.from(allPropertyTypes);
@@ -774,11 +740,9 @@ export default function Similarproperties() {
       const searchLower = searchTerm.toLowerCase();
       results = results.filter((property) => {
         return (
-          property.Title?.toLowerCase().includes(searchLower) ||
+          (property.PropertyName as string)?.toLowerCase().includes(searchLower) ||
           property.City?.toLowerCase().includes(searchLower) ||
           property.Location?.toLowerCase().includes(searchLower) ||
-          property.City?.toLowerCase().includes(searchLower) ||
-          property.PropertyTypeText?.toLowerCase().includes(searchLower) ||
           property.PropertyTypeText?.toLowerCase().includes(searchLower)
         );
       });
@@ -836,7 +800,6 @@ export default function Similarproperties() {
     if (selectedPropertyTypes.length > 0) {
       results = results.filter((property) => {
         return selectedPropertyTypes.some(propertyType =>
-          property.PropertyTypeText === propertyType ||
           property.PropertyTypeText === propertyType
         );
       });
@@ -891,7 +854,6 @@ export default function Similarproperties() {
     if (filters.propertyType) {
       results = results.filter((property) => {
         return (
-          property.PropertyTypeText === filters.propertyType ||
           property.PropertyTypeText === filters.propertyType
         );
       });
@@ -902,19 +864,18 @@ export default function Similarproperties() {
       results = results.filter((property) => {
         const price =
           property.Price ||
-          property.Price ||
           0;
 
         switch (filters.priceRange) {
-          case "Under ₹50 Lakhs":
+          case "Under â‚¹50 Lakhs":
             return price < 5000000;
-          case "₹50 Lakhs - ₹1 Cr":
+          case "â‚¹50 Lakhs - â‚¹1 Cr":
             return price >= 5000000 && price < 10000000;
-          case "₹1 Cr - ₹2 Cr":
+          case "â‚¹1 Cr - â‚¹2 Cr":
             return price >= 10000000 && price < 20000000;
-          case "₹2 Cr - ₹5 Cr":
+          case "â‚¹2 Cr - â‚¹5 Cr":
             return price >= 20000000 && price < 50000000;
-          case "Over ₹5 Cr":
+          case "Over â‚¹5 Cr":
             return price >= 50000000;
           default:
             return true;
@@ -972,7 +933,7 @@ export default function Similarproperties() {
         ...prev,
         location: selectedCities.join(", ") || "",
         propertyType: selectedPropertyTypes.join(", ") || "",
-        requirement: `${selectedCities.length > 0 ? `Cities: ${selectedCities.join(", ")}` : ""}${selectedSubLocations.length > 0 ? `, Sub-locations: ${selectedSubLocations.join(", ")}` : ""}${selectedPropertyTypes.length > 0 ? `, Property Types: ${selectedPropertyTypes.join(", ")}` : ""}${selectedCarpetArea ? `, Area: ${selectedCarpetArea}` : ""}${(minCarpetArea || maxCarpetArea) && !selectedCarpetArea ? `, Area: ${minCarpetArea || '0'} - ${maxCarpetArea || '∞'} sqft` : ""}${searchTerm ? `, Search: ${searchTerm}` : ""}`.trim()
+        requirement: `${selectedCities.length > 0 ? `Cities: ${selectedCities.join(", ")}` : ""}${selectedSubLocations.length > 0 ? `, Sub-locations: ${selectedSubLocations.join(", ")}` : ""}${selectedPropertyTypes.length > 0 ? `, Property Types: ${selectedPropertyTypes.join(", ")}` : ""}${selectedCarpetArea ? `, Area: ${selectedCarpetArea}` : ""}${(minCarpetArea || maxCarpetArea) && !selectedCarpetArea ? `, Area: ${minCarpetArea || '0'} - ${maxCarpetArea || 'âˆž'} sqft` : ""}${searchTerm ? `, Search: ${searchTerm}` : ""}`.trim()
       }));
     } else {
       setShowContactForm(false);
@@ -987,22 +948,22 @@ export default function Similarproperties() {
     return attribute?.value || "N/A";
   };
 
-  // Format price in Indian currency format (e.g., ₹ 45,00,000)
+  // Format price in Indian currency format (e.g., â‚¹ 45,00,000)
   const formatPrice = (price?: number) => {
     if (!price) return "Price not available";
 
     // For values less than 100,000, show directly
-    if (price < 100000) return `₹ ${price.toLocaleString("en-IN")}`;
+    if (price < 100000) return `â‚¹ ${price.toLocaleString("en-IN")}`;
 
     // For values in lakhs (1 lakh = 100,000)
     if (price < 10000000) {
       const lakhs = (price / 100000).toFixed(2);
-      return `₹ ${lakhs} Lakhs`;
+      return `â‚¹ ${lakhs} Lakhs`;
     }
 
     // For values in crores (1 crore = 10,000,000)
     const crores = (price / 10000000).toFixed(2);
-    return `₹ ${crores} Cr`;
+    return `â‚¹ ${crores} Cr`;
   };
 
   const handleFilterChange = (filterName: string, value: string) => {
@@ -1240,9 +1201,9 @@ export default function Similarproperties() {
                           {/* Detection indicator */}
                           {searchTerm.trim() && (
                             <div className="px-4 py-2 text-xs font-medium text-blue-600 bg-blue-50 border-b border-blue-100">
-                              {detectLocationType(searchTerm) === 'city' && "🏙️ Detected as City"}
-                              {detectLocationType(searchTerm) === 'subLocation' && "📍 Detected as Area/Location"}
-                              {detectLocationType(searchTerm) === 'unknown' && "🔍 Searching all categories"}
+                              {detectLocationType(searchTerm) === 'city' && "ðŸ™ï¸ Detected as City"}
+                              {detectLocationType(searchTerm) === 'subLocation' && "ðŸ“ Detected as Area/Location"}
+                              {detectLocationType(searchTerm) === 'unknown' && "ðŸ” Searching all categories"}
                             </div>
                           )}
 
@@ -1250,7 +1211,7 @@ export default function Similarproperties() {
                           {searchSuggestions.subLocations.length > 0 && (
                             <>
                               <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
-                                📍 Areas & Locations
+                                ðŸ“ Areas & Locations
                               </div>
                               {searchSuggestions.subLocations.map((subLocation, index) => (
                                 <div
@@ -1271,7 +1232,7 @@ export default function Similarproperties() {
                           {searchSuggestions.cities.length > 0 && (
                             <>
                               <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
-                                🏙️ Cities
+                                ðŸ™ï¸ Cities
                               </div>
                               {searchSuggestions.cities.map((city, index) => (
                                 <div
@@ -1293,7 +1254,7 @@ export default function Similarproperties() {
                           {searchSuggestions.propertyNames.length > 0 && (
                             <>
                               <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
-                                🏢 Properties
+                                ðŸ¢ Properties
                               </div>
                               {searchSuggestions.propertyNames.map((propertyName, index) => (
                                 <div
@@ -1368,9 +1329,6 @@ export default function Similarproperties() {
                             ["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
                           ).length > 0 && (
                               <>
-                                {/* <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
-                                Popular Cities
-                              </div> */}
                                 {getFilteredCities()
                                   .filter(city =>
                                     ["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
@@ -1406,9 +1364,6 @@ export default function Similarproperties() {
                             !["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
                           ).length > 0 && (
                               <>
-                                {/* <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 border-b border-gray-100">
-                                All Cities
-                              </div> */}
                                 {getFilteredCities()
                                   .filter(city =>
                                     !["Mumbai", "New Mumbai", "Thane", "Pune", "Pimpri-Chinchwad", "Bangalore", "Chennai", "Hyderabad", "Kolkata", "Delhi"].includes(city)
@@ -1679,7 +1634,7 @@ export default function Similarproperties() {
                           setShowTransactionTypeDropdown(false);
                         }}
                       >
-                        {selectedCarpetArea || (minCarpetArea || maxCarpetArea ? `${minCarpetArea || '0'} - ${maxCarpetArea || '∞'} sqft` : "Select Carpet Area")}
+                        {selectedCarpetArea || (minCarpetArea || maxCarpetArea ? `${minCarpetArea || '0'} - ${maxCarpetArea || 'âˆž'} sqft` : "Select Carpet Area")}
                       </button>
                       <svg
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-black"
@@ -1774,7 +1729,7 @@ export default function Similarproperties() {
                               setSelectedSubLocations([]);
                             }}
                           >
-                            ×
+                            Ã—
                           </button>
                         </div>
                       ))}
@@ -1786,7 +1741,7 @@ export default function Similarproperties() {
                             className="ml-1 text-white hover:text-gray-200 focus:outline-none"
                             onClick={() => setSelectedSubLocations(selectedSubLocations.filter(sl => sl !== subLocation))}
                           >
-                            ×
+                            Ã—
                           </button>
                         </div>
                       ))}
@@ -1798,7 +1753,7 @@ export default function Similarproperties() {
                             className="ml-1 text-white hover:text-gray-200 focus:outline-none"
                             onClick={() => setSelectedPropertyTypes(prev => prev.filter(type => type !== propertyType))}
                           >
-                            ×
+                            Ã—
                           </button>
                         </div>
                       ))}
@@ -1813,7 +1768,7 @@ export default function Similarproperties() {
                               setSelectedType("");
                             }}
                           >
-                            ×
+                            Ã—
                           </button>
                         </div>
                       )}
@@ -1825,13 +1780,13 @@ export default function Similarproperties() {
                             className="ml-1 text-white hover:text-gray-200 focus:outline-none"
                             onClick={() => setSelectedCarpetArea("")}
                           >
-                            ×
+                            Ã—
                           </button>
                         </div>
                       )}
                       {(minCarpetArea || maxCarpetArea) && !selectedCarpetArea && (
                         <div className="bg-black text-white px-3 py-1 rounded-full flex items-center text-xs font-medium">
-                          Area: {minCarpetArea || '0'} - {maxCarpetArea || '∞'} sqft
+                          Area: {minCarpetArea || '0'} - {maxCarpetArea || 'âˆž'} sqft
                           <button
                             type="button"
                             className="ml-1 text-white hover:text-gray-200 focus:outline-none"
@@ -1840,7 +1795,7 @@ export default function Similarproperties() {
                               setMaxCarpetArea("");
                             }}
                           >
-                            ×
+                            Ã—
                           </button>
                         </div>
                       )}
@@ -1857,7 +1812,7 @@ export default function Similarproperties() {
                   <div className="mb-8 px-4 sm:px-0">
                     <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-dashed border-blue-300 rounded-xl p-6 text-center">
                       <div className="mb-4">
-                        <div className="text-4xl mb-2">🤔</div>
+                        <div className="text-4xl mb-2">ðŸ¤”</div>
                         <h3 className="text-xl font-bold text-gray-800 mb-2">
                           Oooops! Seems like your requirement is rare/specific
                         </h3>
@@ -2058,7 +2013,7 @@ export default function Similarproperties() {
                 ) : filteredProperties.length === 0 ? (
                   // No properties found state - show empty state
                   <div className="text-center py-12">
-                    <div className="text-6xl mb-4">🏠</div>
+                    <div className="text-6xl mb-4">ðŸ </div>
                     <h3 className="text-xl font-semibold text-gray-800 mb-2">No properties found</h3>
                     <p className="text-gray-600 mb-4">Try adjusting your search criteria or browse all available properties.</p>
                     <button
@@ -2088,7 +2043,7 @@ export default function Similarproperties() {
                               const property = properties.find(p => p.Id === propertyId);
                               if (property) {
                                 const baseUrl = window.location.origin;
-                                return `${baseUrl}/property-details/${property.Title}`;
+                                return `${baseUrl}/property-details/${property.PropertyName}`;
                               }
                               return null;
                             }).filter(Boolean).join('\n');
@@ -2111,10 +2066,10 @@ export default function Similarproperties() {
                         >
                           {/* Header with title and checkbox */}
                           <div className="p-2 sm:p-3 flex justify-between items-center transition-all duration-300 hover:bg-gray-50/50">
-                            <Link href={`/property-details/${property.Title}`} className="block">
+                            <Link href={`/property-details/${property.PropertyName}`} className="block">
                               <div className="h-14">
                                 <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
-                                  {isLoggedIn ? (property.Title || "Prime Business Hub") : "Property Details"}
+                                  {isLoggedIn ? ((property.PropertyName as string) || "Prime Business Hub") : "Property Details"}
                                 </h3>
                                 <div className="flex items-center text-gray-700 text-xs transition-all duration-300 hover:text-gray-900">
                                   <svg
@@ -2167,11 +2122,11 @@ export default function Similarproperties() {
                             </button>
                           </div>
                           {/* Property Image */}
-                          <Link href={`/property-details/${property.Title}`} className="block">
+                          <Link href={`/property-details/${property.PropertyName}`} className="block">
                             <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
                               <Image
                                 src={getPropertyImage(property)}
-                                alt={isLoggedIn ? (property.Title || "Property") : "Property Details"}
+                                alt={isLoggedIn ? ((property.PropertyName as string) || "Property") : "Property Details"}
                                 className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
                                 width={340}
                                 height={180}
@@ -2202,17 +2157,13 @@ export default function Similarproperties() {
                               {/* For Sale/Rent / Property Type overlay */}
                               <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-80 text-white p-2 flex items-center text-xs transition-all duration-300 group-hover:bg-opacity-90 transform translate-y-0 group-hover:-translate-y-1">
                                 <span className="mr-2 transition-all duration-300 group-hover:font-medium">
-                                  {(property as any).WantToText === "Sale"
+                                  {(property.WantToText === "Sale")
                                     ? "For Sale"
-                                    : (property as any).WantToText === "Rent"
+                                    : (property.WantToText === "Rent")
                                       ? "For Rent"
-                                      : (property.WantToText === "Sale")
-                                        ? "For Sale"
-                                        : (property.WantToText === "Rent")
-                                          ? "For Rent"
-                                          : "For Sale"}
+                                      : "For Sale"}
                                 </span>
-                                <span className="mx-1 transition-all duration-300 group-hover:scale-110">•</span>
+                                <span className="mx-1 transition-all duration-300 group-hover:scale-110">â€¢</span>
                                 <span className="ml-1 transition-all duration-300 group-hover:font-medium">
                                   {property.PropertyTypeText ||
                                     "Office space"}
@@ -2222,7 +2173,7 @@ export default function Similarproperties() {
                           </Link>
                           {/* Property Details */}
                           <div className="p-2 sm:p-3 flex-grow font-monotransition-all duration-300 hover:bg-gray-50/30">
-                            <Link href={`/property-details/${property.Title}`} className="block">
+                            <Link href={`/property-details/${property.PropertyName}`} className="block">
                               <div className="grid grid-cols-2 gap-1 text-xs">
                                 <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Built up Area</div>
                                 <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
@@ -2248,11 +2199,11 @@ export default function Similarproperties() {
                             <div className="border-t border-gray-200 my-2 transition-all duration-300 hover:border-gray-300"></div>
                             {/* Price and Actions */}
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
-                              <Link href={`/property-details/${property.Title}`} className="block">
+                              <Link href={`/property-details/${property.PropertyName}`} className="block">
                                 <div className="transition-all duration-300 hover:scale-105">
                                   <div className="text-base text-black font-mono font-semibold transition-all duration-300 hover:text-gray-800">
                                     {(property.WantToText === "Rent")
-                                      ? `₹ ${(property.Price || 4500).toLocaleString("en-IN")}`
+                                      ? `â‚¹ ${(property.Price || 4500).toLocaleString("en-IN")}`
                                       : formatPrice(property.Price)}
                                   </div>
                                   <div className="text-gray-500 text-xs transition-all duration-300 hover:text-gray-600">
@@ -2291,16 +2242,7 @@ export default function Similarproperties() {
                                   </svg>
                                 </button>
                                 {/* Share button */}
-                                {/* Share button */}
                                 <div className="relative">
-                                  {/* <button
-                            className="p-1.5 rounded cursor-pointer flex items-center justify-center transition-all duration-300 hover:bg-blue-200 hover:scale-110 hover:shadow-md active:scale-95"
-                            onClick={() => setOpenShareIndex(openShareIndex === index ? null : index)}
-                            aria-label="Share"
-                            type="button"
-                          >
-                           
-                          </button> */}
                                   {isLoggedIn && (
                                     <button
                                       type="button"
@@ -2308,9 +2250,9 @@ export default function Similarproperties() {
                                       onClick={() => {
                                         if (navigator.share) {
                                           navigator.share({
-                                            title: property.Title,
-                                            text: `Check out this property: ${property.Title}`,
-                                            url: `https://realtraspaces.com/property-details/${property.Title}`,
+                                            title: property.PropertyName as string,
+                                            text: `Check out this property: ${property.PropertyName as string}`,
+                                            url: `https://realtraspaces.com/property-details/${property.PropertyName}`,
                                           });
                                         } else {
                                           alert("Share not supported on this browser.");
@@ -2330,7 +2272,7 @@ export default function Similarproperties() {
                                 </div>
                                 {/* WhatsApp button */}
                                 <a
-                                  href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.Title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(`${window.location.origin}/property-details/${encodeURIComponent(property.Title || '')}`)}`}
+                                  href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? ((property.PropertyName as string) || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(`${window.location.origin}/property-details/${encodeURIComponent(property.PropertyName as string || '')}`)}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"

@@ -64,8 +64,8 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onClose, property, getPro
   const handleNativeShare = async () => {
     try {
       const shareData = {
-        title: property.title || "Property",
-        text: `Check out this property: ${property.title || "Property"} in ${property.address?.city || ""}`,
+        title: property.PropertyName || "Property",
+        text: `Check out this property: ${property.PropertyName || "Property"} in ${property.address?.city || ""}`,
         url: getPropertyUrl(property),
       };
       
@@ -78,7 +78,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ open, onClose, property, getPro
   };
 
   const propertyUrl = getPropertyUrl(property);
-  const propertyTitle = property.title || 'Check out this property!';
+  const propertyTitle = property.PropertyName || 'Check out this property!';
   const encodedUrl = encodeURIComponent(propertyUrl);
   const encodedTitle = encodeURIComponent(propertyTitle);
 

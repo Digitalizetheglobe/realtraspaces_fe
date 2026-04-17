@@ -385,8 +385,8 @@ export default function PropertyCards() {
 
   // Helper to get property URL
   const getPropertyUrl = (property: RawProperty) => {
-    if (!property.Title) return window.location.href;
-    return `${window.location.origin}/property-details/${encodeURIComponent(property.Title)}`;
+    if (!property.PropertyName) return window.location.href;
+    return `${window.location.origin}/property-details/${encodeURIComponent(property.PropertyName)}`;
   };
 
   // Helper to copy link
@@ -530,7 +530,7 @@ export default function PropertyCards() {
       const s = search.toLowerCase();
       const matches = (v?: string) => v?.toLowerCase().includes(s) ?? false;
       const hasSearchMatch = search.trim() ? (
-        matches(property.Title) || matches(property.City) || matches(property.Location) ||
+        matches(property.PropertyName) || matches(property.City) || matches(property.Location) ||
         matches(property.PropertyTypeText) || matches(property.WantToText) ||
         matches(property.Furnishing) || matches(property.PriceText)
       ) : true;
@@ -539,7 +539,7 @@ export default function PropertyCards() {
         return (
           property.City?.toLowerCase().includes(l) ||
           property.Location?.toLowerCase().includes(l) ||
-          property.Title?.toLowerCase().includes(l) ||
+          property.PropertyName?.toLowerCase().includes(l) ||
           property.PropertyTypeText?.toLowerCase().includes(l)
         );
       }) : true;
@@ -959,7 +959,7 @@ export default function PropertyCards() {
                             const property = properties.find(p => p.Id === propertyId);
                             if (property) {
                               const baseUrl = window.location.origin;
-                              return `${baseUrl}/property-details/${property.Title}`;
+                              return `${baseUrl}/property-details/${property.PropertyName}`;
                             }
                             return null;
                           }).filter(Boolean).join('\n');
@@ -1003,10 +1003,10 @@ export default function PropertyCards() {
                     >
                       {/* Header with title and checkbox */}
                       <div className="p-2 sm:p-3 flex justify-between items-center transition-all duration-300 hover:bg-gray-50/50">
-                         <Link href={`/property-details/${property.Title}`} key={property.Title} className="block">
+                         <Link href={`/property-details/${property.PropertyName}`} key={property.PropertyName} className="block">
                           <div className="h-14">
                             <h3 className="font-medium text-black text-sm sm:text-base transition-all duration-300 hover:text-gray-800">
-                              {isLoggedIn ? (property.Title || "Prime Business Hub") : "Property Details"}
+                              {isLoggedIn ? (property.PropertyName || "Prime Business Hub") : "Property Details"}
                             </h3>
                             <div className="flex items-center text-gray-700 text-xs transition-all duration-300 hover:text-gray-900">
                               <svg
@@ -1078,11 +1078,11 @@ export default function PropertyCards() {
                       </div>
 
                       {/* Property Image */}
-                      <Link href={`/property-details/${property.Title}`} key={property.Title} className="block">
+                      <Link href={`/property-details/${property.PropertyName}`} key={property.PropertyName} className="block">
                         <div className="relative h-[140px] sm:h-[180px] overflow-hidden group">
                           <Image
                             src={getPropertyImage(property)}
-                            alt={isLoggedIn ? (property.Title || "Property") : "Property Details"}
+                            alt={isLoggedIn ? (property.PropertyName || "Property") : "Property Details"}
                             className="w-full h-full object-cover transition-all duration-700 ease-in-out group-hover:scale-110 group-hover:brightness-110"
                             width={340}
                             height={180}
@@ -1138,7 +1138,7 @@ export default function PropertyCards() {
                       </Link>
                       {/* Property Details */}
                       <div className="p-2 sm:p-3 flex-grow font-mono transition-all duration-300 hover:bg-gray-50/30">
-                         <Link href={`/property-details/${property.Title}`} key={property.Title} className="block">
+                         <Link href={`/property-details/${property.PropertyName}`} key={property.PropertyName} className="block">
                           <div className="grid grid-cols-2 gap-1 text-xs">
                             <div className="text-gray-500 transition-all font-mono duration-300 hover:text-gray-600">Built up Area</div>
                             <div className="text-right text-black transition-all duration-300 hover:font-medium hover:text-gray-800">
@@ -1164,7 +1164,7 @@ export default function PropertyCards() {
                         <div className="border-t border-gray-200 my-2 transition-all duration-300 hover:border-gray-300"></div>
 
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-1 gap-2 sm:gap-0">
-                         <Link href={`/property-details/${property.Title}`} key={property.Title} className="block">
+                         <Link href={`/property-details/${property.PropertyName}`} key={property.PropertyName} className="block">
                             <div className="transition-all duration-300 hover:scale-105">
                               <div className="text-base text-black font-mono font-semibold transition-all duration-300 hover:text-gray-800">
                                 {formatPrice(property)}
@@ -1212,9 +1212,9 @@ export default function PropertyCards() {
                                   onClick={() => {
                                     if (navigator.share) {
                                       navigator.share({
-                                        title: property.Title,
-                                        text: `Check out this property: ${property.Title}`,
-                                        url: `https://realtraspaces.com/property-details/${property.Title}`,
+                                        title: property.PropertyName,
+                                        text: `Check out this property: ${property.PropertyName}`,
+                                        url: `https://realtraspaces.com/property-details/${property.PropertyName}`,
                                       });
                                     } else {
                                       alert("Share not supported on this browser.");
@@ -1234,7 +1234,7 @@ export default function PropertyCards() {
                             )}
                             {/* WhatsApp button */}
                             <a
-                              href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.Title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
+                              href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.PropertyName || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"

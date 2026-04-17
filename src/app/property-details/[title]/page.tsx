@@ -33,6 +33,7 @@ const raleway = Raleway({
 type Property = {
   id: string;
   title?: string;
+  PropertyName?: string;
   images?: Array<{
     imageFilePath: string;
     isCoverImage: boolean;
@@ -1009,7 +1010,7 @@ export default function PropertyDetails() {
           <div className="absolute inset-0">
             <Image
               src={propertydetails}
-              alt={property.title || "Property"}
+              alt={property.PropertyName || "Property"}
               fill
               priority
               className="object-cover"
@@ -1019,7 +1020,7 @@ export default function PropertyDetails() {
 
           <div className="absolute inset-0 flex flex-col items-center justify-center z-10 text-center space-y-4">
             {isLoggedIn ? (
-              <h1 className="text-white text-4xl font-bold"> {property.title}</h1>
+              <h1 className="text-white text-4xl font-bold"> {property.PropertyName}</h1>
             ) : (
               <h1 className="text-white text-4xl font-bold">Property Details</h1>
             )}
@@ -1254,7 +1255,7 @@ export default function PropertyDetails() {
                   }`}
               >
                 <h1 className="text-xl font-semibold text-black">
-                  {isLoggedIn ? (property.title || "Property") : "Property Details"}
+                  {isLoggedIn ? (property.PropertyName || "Property") : "Property Details"}
                 </h1>
                 <div className="flex mt-2">
                   <Image

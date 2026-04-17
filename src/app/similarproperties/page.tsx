@@ -20,6 +20,7 @@ const raleway = Raleway({
 type Property = {
   id: string;
   title?: string;
+  PropertyName?: string;
   propertyType?: {
     displayName?: string;
     childType?: {
@@ -46,6 +47,7 @@ type Property = {
   }>;
   forSale?: boolean;
   forRent?: boolean;
+  Furnishing?: string;
   images?: Array<{
     imageFilePath: string;
     isCoverImage: boolean;
@@ -153,11 +155,11 @@ export default function Similarproperties() {
 
   // Helper to get property URL
   const getPropertyUrl = (property: Property) => {
-    if (!property.title) return typeof window !== 'undefined' ? window.location.href : '';
+    if (!property.PropertyName) return typeof window !== 'undefined' ? window.location.href : '';
     if (typeof window !== 'undefined') {
-      return `${window.location.origin}/property-details/${encodeURIComponent(property.title)}`;
+      return `${window.location.origin}/property-details/${encodeURIComponent(property.PropertyName)}`;
     }
-    return `/property-details/${encodeURIComponent(property.title)}`;
+    return `/property-details/${encodeURIComponent(property.PropertyName)}`;
   };
 
   if (loading) {
@@ -195,9 +197,9 @@ export default function Similarproperties() {
                   {/* Header with title and checkbox */}
                   <div className="p-3 flex justify-between items-center">
                     <div>
-                      <Link href={`/property-details/${encodeURIComponent(property.title ?? "")}`} prefetch={false}>
+                      <Link href={`/property-details/${encodeURIComponent(property.PropertyName ?? "")}`} prefetch={false}>
                         <h3 className="font-medium text-black text-base">
-                          {isLoggedIn ? (property.title || "Prime Business Hub") : "Property Details"}
+                          {isLoggedIn ? (property.PropertyName || "Prime Business Hub") : "Property Details"}
                         </h3>
                       </Link>
                       <div className="flex items-center text-gray-500 text-xs">
@@ -236,11 +238,11 @@ export default function Similarproperties() {
                   </div>
 
                   {/* Property Image */}
-                  <Link href={`/property-details/${encodeURIComponent(property.title ?? "")}`} prefetch={false}>
+                  <Link href={`/property-details/${encodeURIComponent(property.PropertyName ?? "")}`} prefetch={false}>
                     <div className="relative h-[180px]">
                       <Image
                         src={getPropertyImage(property)}
-                        alt={isLoggedIn ? (property.title || "Property") : "Property Details"}
+                        alt={isLoggedIn ? (property.PropertyName || "Property") : "Property Details"}
                         className="w-full h-full object-cover"
                         width={307}
                         height={180}
@@ -266,9 +268,9 @@ export default function Similarproperties() {
                         {property.dimension?.area || "5490"} sqft
                       </div>
                       
-                      <div className="text-gray-500">Space Condition</div>
+                      <div className="text-gray-500">Furnishing</div>
                       <div className="text-right text-black">
-                        {getAttributeValue(property, "condition-id") || "Furnished"}
+                        {property.Furnishing || "Semi Furnished"}
                       </div>
                       
                       <div className="text-gray-500">Seat in office</div>
@@ -337,9 +339,9 @@ export default function Similarproperties() {
                               onClick={() => {
                                 if (navigator.share) {
                                   navigator.share({
-                                    title: property.title,
-                                    text: `Check out this property: ${property.title}`,
-                                    url: `https://realtraspaces.com/property-details/${property.title}`,
+                                    title: property.PropertyName,
+                                    text: `Check out this property: ${property.PropertyName}`,
+                                    url: `https://realtraspaces.com/property-details/${property.PropertyName}`,
                                   });
                                 } else {
                                   alert("Share not supported on this browser.");
@@ -359,7 +361,7 @@ export default function Similarproperties() {
                         )}
                                               {/* WhatsApp button */}
                                               <a
-                                                href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.title || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
+                                                href={`https://wa.me/7039311539?text=${encodeURIComponent(isLoggedIn ? (property.PropertyName || 'Check out this property!') : 'Check out this property!')}%20${encodeURIComponent(getPropertyUrl(property))}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="p-1.5 items-center justify-center transition-all duration-300 hover:bg-green-200 hover:scale-110 hover:shadow-md active:scale-95 flex rounded"
